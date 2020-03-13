@@ -1,0 +1,23 @@
+{
+	"version": "1.0.0",
+	"name": "Supervision",
+	"description": "Parametrage de la Supervision",
+	"icons": {
+		"16": null,
+		"48": null,
+		"128": null
+	},
+    "developer": {
+        "url": "hispwca.org",
+        "name": "Moukaila LABODJA",
+        "company": "HISP WA",
+        "email": "info@hispwca.org"
+    },
+	"activities": {
+		"dhis": {
+			"href": "*"
+		}
+	},
+	"launch_path": "index.html",
+	"default_locale": "en"
+}
