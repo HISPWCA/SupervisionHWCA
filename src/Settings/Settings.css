@@ -3,7 +3,9 @@
     color: black;
 }
 
-.Settings:hover {
+.Settings:hover,
+.SelectedSetting {
     cursor: pointer;
-    color: orange
+    background-color: aquamarine;
+    color: black;
 }

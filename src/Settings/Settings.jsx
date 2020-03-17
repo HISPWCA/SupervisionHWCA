@@ -79,12 +79,14 @@ export class Settings extends Component {
 
     classNameProvider = type => type === this.state.currentAction ? 'btn btn-primary btn-sm ' : 'btn btn-sm btn-outline-primary '
 
+    aggregatedIndicatorClassNameProvider = indicator => this.state.selectedAggregatedIndicator && this.state.selectedAggregatedIndicator.id === indicator.id ? 'col text-left SelectedSetting  m-1 p-3' : 'col text-left Settings  m-1 p-3'
+
     displayAggregatedIndicators = () => {
         if (this.state.currentAction === C_AGGREGATED_INDICATORS) {
             return (
                 this.state.initialAggregatedIndicatorsWithGroups.map(indicatorGroup => (
                     <div className="row" key={indicatorGroup.id}>
-                        <div className={'col text-left Settings  m-1 p-3'}
+                        <div className={this.aggregatedIndicatorClassNameProvider(indicatorGroup)}
                             onClick={() => this.handleAggregatedIndicatorsClick(indicatorGroup)}>
                             {indicatorGroup.displayName}
                         </div>
@@ -120,11 +122,19 @@ export class Settings extends Component {
         console.log(indicator)
     }
 
+    displayParentTitle = () => {
+        if (this.state.currentAction === C_AGGREGATED_INDICATORS) {
+            return 'Indicator Groups'
+        } else if (this.state.currentAction === C_PROGRAMS) {
+            return 'Programs'
+        }
+    }
+
     render() {
         return (
             <React.Fragment>
-                <div className="row">
-                    <div className="col-3 btn-group">
+                <div className="row m-3">
+                    <div className="col-3 m-3 btn-group">
                         <button
                             onClick={this.loadAggregatedIndicatorsWithGroups}
                             className={this.classNameProvider(C_AGGREGATED_INDICATORS)}>
@@ -139,18 +149,34 @@ export class Settings extends Component {
                     </div>
                 </div>
 
-                <div className="row">
-                    <div className="col">
+                <div className="row m-3">
+                    <div className="col m-3">
+                        <div className="mb-1 text-left">
+                            {this.displayParentTitle()}
+                        </div>
+
                         {this.displayAggregatedIndicators()}
                     </div>
 
-                    <div className="col">
+                    <div className="col m-3">
+                        <div className="mb-1 text-left">
+                            Available Indicators
+                        </div>
+
                         {this.displayAggregatedIndicatorChildrens()}
                     </div>
 
-                    <div className="col">
+                    <div className="col m-3">
+                        <div className="row m-2">
+                            <div className="col">
+                                <div className="mb-1 text-left">
+                                    Settings
+                                </div>
+                            </div>
+                        </div>
+
                         <form>
-                            <div className="container-fluid">
+                            <div className="container-fluid-- form-group">
 
                                 <div className="row m-2">
                                     <div className="col-2 m-2">Name</div>
@@ -235,13 +261,32 @@ export class Settings extends Component {
                                         </div>
                                     </div>
                                 </div>
+
+                                <div className="row m-3">
+                                    <div className="col">
+                                        <div class="form-check text-left">
+                                            <input type="checkbox" class="form-check-input" id="hightIsGood" />
+                                            <label class="form-check-label" for="hightIsGood">High is Good</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="row m-3">
+                                    <div className="col text-left">
+                                        <button type="submit" className="btn btn-sm btn-outline-success">
+                                            Save settings
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </form>
                     </div>
 
-                    <div className="col">
-                        Selected Indicators
-                        <hr />
+                    <div className="col m-3">
+                        <div className="mb-1 text-left">
+                            Selected Indicators
+                        </div>
+
                         {this.displayAggregatedIndicatorChildrens()}
                     </div>
                 </div>
