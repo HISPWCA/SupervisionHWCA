@@ -6,7 +6,10 @@ import {
     PROGRAM_INDICATORS_BY_PROGRAM_ROUTE
 } from '../api.routes';
 import './Settings.css';
-
+import { Paginator } from 'primereact/paginator';
+import 'primereact/resources/themes/nova-light/theme.css';
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';
 
 const C_PROGRAMS = 'Programs';
 const C_PROGRAM_INDICATORS = 'Program indicators';
@@ -21,6 +24,9 @@ export class Settings extends Component {
             currentAction: C_AGGREGATED_INDICATORS,
             metaDatas: [],
             childMetaDatas: [],
+
+            aggregatedFirstPage: 0,
+            aggregatedNumRows: 5,
 
             initialAggregatedIndicatorsWithGroups: [],
             selectedAggregatedIndicator: null,
@@ -84,14 +90,16 @@ export class Settings extends Component {
     displayAggregatedIndicators = () => {
         if (this.state.currentAction === C_AGGREGATED_INDICATORS) {
             return (
-                this.state.initialAggregatedIndicatorsWithGroups.map(indicatorGroup => (
-                    <div className="row" key={indicatorGroup.id}>
-                        <div className={this.aggregatedIndicatorClassNameProvider(indicatorGroup)}
-                            onClick={() => this.handleAggregatedIndicatorsClick(indicatorGroup)}>
-                            {indicatorGroup.displayName}
+                this.state.initialAggregatedIndicatorsWithGroups
+                    .filter((i, index) => index >= this.state.aggregatedFirstPage && index <= (this.state.aggregatedFirstPage + 5))
+                    .map(indicatorGroup => (
+                        <div className="row" key={indicatorGroup.id}>
+                            <div className={this.aggregatedIndicatorClassNameProvider(indicatorGroup)}
+                                onClick={() => this.handleAggregatedIndicatorsClick(indicatorGroup)}>
+                                {indicatorGroup.displayName}
+                            </div>
                         </div>
-                    </div>
-                ))
+                    ))
             )
         } else {
             return null
@@ -130,6 +138,8 @@ export class Settings extends Component {
         }
     }
 
+    onAggragatedIndicatorPageChange = event => this.setState({ aggregatedFirstPage: event.first, aggregatedNumRows: event.rows })
+
     render() {
         return (
             <React.Fragment>
@@ -156,6 +166,16 @@ export class Settings extends Component {
                         </div>
 
                         {this.displayAggregatedIndicators()}
+
+                        <div className="m-3 p-3">
+                            <Paginator
+                                first={this.state.aggregatedFirstPage}
+                                rows={this.state.aggregatedNumRows}
+                                totalRecords={this.state.initialAggregatedIndicatorsWithGroups.length}
+                                rowsPerPageOptions={[5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]}
+                                onPageChange={this.onAggragatedIndicatorPageChange}
+                                template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink" />
+                        </div>
                     </div>
 
                     <div className="col m-3">
@@ -176,7 +196,7 @@ export class Settings extends Component {
                         </div>
 
                         <form>
-                            <div className="container-fluid-- form-group">
+                            <div className="form-group alert alert-info" role="alert">
 
                                 <div className="row m-2">
                                     <div className="col-2 m-2">Name</div>
