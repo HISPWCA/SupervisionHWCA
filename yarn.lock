@@ -1194,7 +1194,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.5.1, @babel/runtime@npm:^7.7.4, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7":
+"@babel/runtime@npm:^7.5.1, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.7.4, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7":
   version: 7.8.7
   resolution: "@babel/runtime@npm:7.8.7"
   dependencies:
@@ -3572,6 +3572,13 @@ __metadata:
     isobject: ^3.0.0
     static-extend: ^0.1.1
   checksum: 64ced6f5bfc461af7885e222c7522cc6e5674f0d2cac234426227878504439d658d21b6b822e0f32ae2ba097cf0b739f770249a2931bf972560145361548f6e3
+  languageName: node
+  linkType: hard
+
+"classnames@npm:^2.2.0":
+  version: 2.2.6
+  resolution: "classnames@npm:2.2.6"
+  checksum: f04e8b5b3ee2c7c4deec538752f364c6e61bf4459e011dd12553bcab87d25b4d5778a6e48a2f704b2ae65b1e89b727046c102aa4a3a91e522723f96771286095
   languageName: node
   linkType: hard
 
@@ -10901,7 +10908,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.6.2, prop-types@npm:^15.7.2":
+"prop-types@npm:^15.5.0, prop-types@npm:^15.6.2, prop-types@npm:^15.7.2":
   version: 15.7.2
   resolution: "prop-types@npm:15.7.2"
   dependencies:
@@ -11203,10 +11210,33 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"react-is@npm:^16.7.0":
+"react-is@npm:^16.7.0, react-is@npm:^16.9.0":
   version: 16.13.0
   resolution: "react-is@npm:16.13.0"
   checksum: 034c3da8285906ead0e70ffcc12f7e0f8632fe0a2eac2e201aa2a7a909c27a75ce8a6c816933a53dcc60dd2cc4f6b20d8e63d7dcb36caf03f0152124208d900b
+  languageName: node
+  linkType: hard
+
+"react-redux@npm:^7.2.0":
+  version: 7.2.0
+  resolution: "react-redux@npm:7.2.0"
+  dependencies:
+    "@babel/runtime": ^7.5.5
+    hoist-non-react-statics: ^3.3.0
+    loose-envify: ^1.4.0
+    prop-types: ^15.7.2
+    react-is: ^16.9.0
+  peerDependencies:
+    react: ^16.8.3
+    react-dom: "*"
+    react-native: "*"
+    redux: ^2.0.0 || ^3.0.0 || ^4.0.0-0
+  peerDependenciesMeta:
+    react-dom:
+      optional: true
+    react-native:
+      optional: true
+  checksum: c1d92faacebe014a88b13d7a845aa28c87130788c5574a7ca69844fdeab464c5d412f7fa1bfc9d6b945882848952967ebaeb51fb34e50dc58b35eb7d60bbf7e3
   languageName: node
   linkType: hard
 
@@ -11278,6 +11308,18 @@ fsevents@^1.2.7:
   bin:
     react-scripts: ./bin/react-scripts.js
   checksum: 3811e185f2838877708b28fe2f87246c66c48f0e890f394df8d8e84f3bc94c0e8e85da1aa8cdfe1b9b1c5fe410c327fd3354f685a8e6016623a79646cf1a1a49
+  languageName: node
+  linkType: hard
+
+"react-tabs@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "react-tabs@npm:3.1.0"
+  dependencies:
+    classnames: ^2.2.0
+    prop-types: ^15.5.0
+  peerDependencies:
+    react: ^16.3.0
+  checksum: 65a19fe66dff2fbb6700ffbc5bf8ba58c4a4377aea08891e9fa95a940ab0ddfd673057cb292d8067d9c1ad5d4c3e6469fd8dff0ef4d0ce5631705e490f535444
   languageName: node
   linkType: hard
 
@@ -11405,6 +11447,16 @@ fsevents@^1.2.7:
     indent-string: ^4.0.0
     strip-indent: ^3.0.0
   checksum: 55983b363f96f5b55663c001c1b9cb4e090d82e18ce6baad1076d6aac400306f8d2f45e9bdaf11e7a4400660b95a81e3251eb2c8cfc6df175105be5bb778fcd4
+  languageName: node
+  linkType: hard
+
+"redux@npm:^4.0.5":
+  version: 4.0.5
+  resolution: "redux@npm:4.0.5"
+  dependencies:
+    loose-envify: ^1.4.0
+    symbol-observable: ^1.2.0
+  checksum: bf8fcfa44db283545db4dd56043de7e164852ac81b61503f2c06e2c9a0d5670338c3722fe642134afb633346507f1568a309da9153c95d2213a0ff404d31625a
   languageName: node
   linkType: hard
 
@@ -12826,7 +12878,10 @@ resolve@1.15.0:
     formik: ^2.1.4
     react: ^16.13.0
     react-dom: ^16.13.0
+    react-redux: ^7.2.0
     react-scripts: 3.4.0
+    react-tabs: ^3.1.0
+    redux: ^4.0.5
     yup: ^0.28.3
   languageName: unknown
   linkType: soft
@@ -12892,6 +12947,13 @@ resolve@1.15.0:
   bin:
     svgo: ./bin/svgo
   checksum: cfa94b7984952c8f976350eac72fda492436be44f4b4ce2a788a2be03fe90cc23bb958d4f1b98b0e2e003cb7b72edd9f3017dcf5c905c4576c2c6dddd24c9ed7
+  languageName: node
+  linkType: hard
+
+"symbol-observable@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "symbol-observable@npm:1.2.0"
+  checksum: b033c8d6fa245a68b421b891b2fe07a9459274593405250918c7aea7ce4e991a94b1491bae1b68a8d90bd05c35a2f6862258b97334931df13850fe4daa0b2999
   languageName: node
   linkType: hard
 

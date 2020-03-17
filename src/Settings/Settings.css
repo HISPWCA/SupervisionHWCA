@@ -1,0 +1,9 @@
+.Settings {
+    background-color: antiquewhite;
+    color: black;
+}
+
+.Settings:hover {
+    cursor: pointer;
+    color: orange
+}

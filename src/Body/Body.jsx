@@ -1,23 +1,29 @@
-import React, { Component } from 'react'
-import Overview from '../Overview/Overview'
-import SidebarForm from '../SidebarForm/SidebarForm'
-import DataConfig from '../DataConfig/DataConfig'
-import Settings from '../Settings/Settings'
+import React from 'react';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
+import 'react-tabs/style/react-tabs.css';
+import Dashboard from '../Dashboard/Dashboard';
+import Settings from '../Settings/Settings';
 
-export class Body extends Component {
-    render() {
-        return (
-            <div className="container-fluid">
-                <Overview />
+const Body = () => (
+    <React.Fragment>
+        <Tabs>
 
-                <div className="row">
-                    <SidebarForm />
-                    <DataConfig />
-                    <Settings />
-                </div>
-            </div>
-        )
-    }
-}
+            <TabList>
+                <Tab>Dashboard</Tab>
+
+                <Tab>Settings</Tab>
+            </TabList>
+
+            <TabPanel>
+                <Dashboard />
+            </TabPanel>
+
+            <TabPanel>
+                <Settings />
+            </TabPanel>
+
+        </Tabs>
+    </React.Fragment>
+)
 
 export default Body
