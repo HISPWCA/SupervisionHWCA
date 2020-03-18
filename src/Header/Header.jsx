@@ -1,13 +1,5 @@
-import React, { Component } from 'react'
+import React from 'react'
 
-export class Header extends Component {
-    render() {
-        return (
-            <div>
-                Header
-            </div>
-        )
-    }
-}
+const Header = () => <h1 className="m-3"> Supervision Web Configs. && Stats.</h1>
 
 export default Header

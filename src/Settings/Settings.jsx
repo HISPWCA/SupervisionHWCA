@@ -11,6 +11,13 @@ import 'primereact/resources/themes/nova-light/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 
+import { Formik } from "formik";
+import * as Yup from "yup";
+import { ColorPicker } from 'primereact/colorpicker';
+
+import 'react-notifications/lib/notifications.css';
+import { NotificationContainer, NotificationManager } from 'react-notifications';
+
 const C_PROGRAMS = 'Programs';
 const C_PROGRAM_INDICATORS = 'Program indicators';
 const C_AGGREGATED_INDICATORS = 'Aggregated Indicators';
@@ -24,6 +31,12 @@ export class Settings extends Component {
             currentAction: C_AGGREGATED_INDICATORS,
             metaDatas: [],
             childMetaDatas: [],
+            selectedIndicators: [],
+
+            currentSelectedIndicator: null,
+            currentSelectedColor: null,
+
+            categoriesForm: [],
 
             aggregatedFirstPage: 0,
             aggregatedNumRows: 5,
@@ -52,6 +65,8 @@ export class Settings extends Component {
                 console.log(error)
             })
     }
+
+    handleCurrentSelectedIndicator = indicator => this.setState({ currentSelectedIndicator: indicator })
 
     loadPrograms = () => {
         axios.get(API_BASE_ROUTE.concat(PROGRAMS_ROUTE))
@@ -108,26 +123,166 @@ export class Settings extends Component {
 
     handleAggregatedIndicatorsClick = indicator => this.setState({ selectedAggregatedIndicator: indicator })
 
+    createCategoryForm = () => {
+        const currentSelectedIndicator = this.state.currentSelectedIndicator
+        if (currentSelectedIndicator && currentSelectedIndicator !== null && currentSelectedIndicator !== undefined) {
+
+            return (
+                <Formik
+                    initialValues={{ category: '', color: '' }}
+                    onSubmit={async values => {
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        if (this.state.currentSelectedColor === null) {
+                            NotificationManager.error('Please select color first', null, 5000);
+                            
+                        } else {
+                            values.color = this.state.currentSelectedColor !== null ? '#'.concat(this.state.currentSelectedColor) : null
+                            alert(JSON.stringify(values, null, 2));
+                        }
+                    }}
+                    validationSchema={Yup.object().shape({
+                        category: Yup.string().required("Required")
+                    })}
+                >
+                    {props => {
+                        const {
+                            values,
+                            touched,
+                            errors,
+                            dirty,
+                            isSubmitting,
+                            handleChange,
+                            handleBlur,
+                            handleSubmit,
+                            handleReset
+                        } = props;
+                        return (
+                            <form onSubmit={handleSubmit}
+                                className="form-group text-left">
+                                <label htmlFor="category" style={{ display: "block" }}>
+                                    Add Category
+                            </label>
+
+                                <input
+                                    id="category"
+                                    placeholder="Category Name"
+                                    autoComplete="off"
+                                    type="text"
+                                    value={values.category}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    className={
+                                        errors.category && touched.category
+                                            ? "form-control text-input error input-sm"
+                                            : "form-control text-input  input-sm"
+                                    }
+                                />
+
+                                <div className="row mt-3">
+                                    <div className="col">
+                                        <ColorPicker
+                                            value={this.state.currentSelectedColor}
+                                            onChange={(e) => this.setState({ currentSelectedColor: e.value })} />
+
+                                    </div>
+
+                                    <div className="col">
+                                        <input
+                                            id="colorCode"
+                                            placeholder="Color Code"
+                                            type="hidden"
+                                            value={values.color}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            className={
+                                                errors.color && touched.color
+                                                    ? "form-control text-input error input-sm"
+                                                    : "form-control text-input  input-sm"
+                                            }
+                                        />
+
+                                        {errors.color && touched.color && (
+                                            <div className="input-feedback">{errors.color}</div>
+                                        )}
+                                    </div>
+
+                                </div>
+
+                                <div className="mt-3">
+                                    <button
+                                        type="button"
+                                        className="btn btn-sm btn-outline-danger "
+                                        onClick={handleReset}
+                                        disabled={!dirty || isSubmitting}
+                                    >
+                                        Reset
+                                </button>
+
+                                    <button
+                                        type="submit"
+                                        className="btn btn-sm btn-outline-success m-3"
+                                        disabled={isSubmitting}>
+                                        Submit
+                                </button>
+
+                                </div>
+                            </form>
+                        );
+                    }}
+                </Formik>
+            )
+        } else {
+            return null
+        }
+    }
+
     displayAggregatedIndicatorChildrens = () => {
         if (this.state.currentAction === C_AGGREGATED_INDICATORS &&
             this.state.selectedAggregatedIndicator !== null) {
 
             return (
-                this.state.selectedAggregatedIndicator.indicators.map(indicator => (
-                    <div className="row" key={indicator.id}>
-                        <div className={'col text-left Settings m-1 p-3'}
-                            onClick={() => this.handleIndicatorSelection(indicator)}>
-                            {indicator.displayName}
+                this.state.selectedAggregatedIndicator.indicators
+                    .filter(i => !this.state.selectedIndicators
+                        .map(ai => ai.id)
+                        .includes(i.id)
+                    )
+                    .map(indicator => (
+                        <div className="row" key={indicator.id}>
+                            <div className={'col text-left Settings m-1 p-3'}
+                                onClick={() => this.handleIndicatorSelection(indicator)}>
+                                {indicator.displayName}
+                            </div>
                         </div>
-                    </div>
-                ))
+                    ))
             )
         }
     }
 
+    displaySelectedIndicators = () => {
+        return (
+            this.state.selectedIndicators.map(indicator => (
+                <div className="row" key={indicator.id}>
+                    <div className={'col text-left Settings m-1 p-3'}
+                        onClick={() => this.handleCurrentSelectedIndicator(indicator)}>
+                        {indicator.displayName}
+                    </div>
+                </div>
+            )))
+    }
+
+    handleIndicatorRemoval = indicator => {
+        if (indicator && indicator !== null && indicator !== undefined) {
+            const indicators = [...this.state.selectedIndicators]
+            const updatedIndicators = indicators.filter(i => i.id !== indicator.id)
+            this.setState({ selectedIndicators: updatedIndicators, currentSelectedIndicator: null })
+        }
+    }
+
     handleIndicatorSelection = indicator => {
-        console.log('mon indicateur selectonne est celui que voici')
-        console.log(indicator)
+        const indicators = [...this.state.selectedIndicators]
+        indicators.push(indicator)
+
+        this.setState({ selectedIndicators: indicators, currentSelectedIndicator: indicator })
     }
 
     displayParentTitle = () => {
@@ -139,6 +294,10 @@ export class Settings extends Component {
     }
 
     onAggragatedIndicatorPageChange = event => this.setState({ aggregatedFirstPage: event.first, aggregatedNumRows: event.rows })
+
+    onSelectedIndicatorPageChange = event => this.setState({ selectedIndicatorsFirstPage: event.first, selectedIndicatorsNumRows: event.rows })
+
+    onAvailableIndicatorPageChange = event => this.setState({ availableIndicatorsFirstPage: event.first, availableIndicatorsNumRows: event.rows })
 
     render() {
         return (
@@ -175,6 +334,12 @@ export class Settings extends Component {
                                 rowsPerPageOptions={[5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]}
                                 onPageChange={this.onAggragatedIndicatorPageChange}
                                 template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink" />
+                        </div>
+
+                        <div className="row">
+                            <div className="col m-3">
+                                {this.createCategoryForm()}
+                            </div>
                         </div>
                     </div>
 
@@ -220,13 +385,13 @@ export class Settings extends Component {
                                     <div className="col text-left m-2">
                                         Target achieved/ on track
                                          <div className="row">
-                                            <div className="col-1 mt-2">
+                                            <div className="col-2 mt-2">
                                                 Min
                                             </div>
                                             <div className="col">
                                                 <input type="number" className="form-control" />
                                             </div>
-                                            <div className="col-1 mt-2">
+                                            <div className="col-2 mt-2">
                                                 Max
                                             </div>
                                             <div className="col">
@@ -243,13 +408,13 @@ export class Settings extends Component {
                                     <div className="col text-left m-2">
                                         Target achieved/ on track
                                          <div className="row">
-                                            <div className="col-1 mt-2">
+                                            <div className="col-2 mt-2">
                                                 Min
                                             </div>
                                             <div className="col">
                                                 <input type="number" className="form-control" />
                                             </div>
-                                            <div className="col-1 mt-2">
+                                            <div className="col-2 mt-2">
                                                 Max
                                             </div>
                                             <div className="col">
@@ -266,13 +431,13 @@ export class Settings extends Component {
                                     <div className="col text-left m-1">
                                         Target achieved/ on track
                                         <div className="row">
-                                            <div className="col-1 mt-2">
+                                            <div className="col-2 mt-2">
                                                 Min
                                             </div>
                                             <div className="col">
                                                 <input type="number" className="form-control" />
                                             </div>
-                                            <div className="col-1 mt-2">
+                                            <div className="col-2 mt-2">
                                                 Max
                                             </div>
                                             <div className="col">
@@ -291,9 +456,47 @@ export class Settings extends Component {
                                     </div>
                                 </div>
 
+                                <div className="row m-1">
+                                    <div className="col text-left m-1">
+                                        Performance Metrics
+                                        <div className="row">
+                                            <div className="col-2 mt-2">
+                                                Best
+                                            </div>
+                                            <div className="col">
+                                                <input type="number" className="form-control" />
+                                            </div>
+                                            <div className="col-2 mt-2">
+                                                Worst
+                                            </div>
+                                            <div className="col">
+                                                <input type="number" className="form-control" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div className="row m-3">
+                                    <div className="col">
+                                        <div class="form-check text-left">
+                                            <input type="checkbox" class="form-check-input" id="usePercentage" />
+                                            <label class="form-check-label" for="usePercentage">Use Percentage</label>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div className="row m-3">
                                     <div className="col text-left">
-                                        <button type="submit" className="btn btn-sm btn-outline-success">
+                                        <hr />
+
+                                        <button className="m-3 btn btn-sm btn-outline-danger"
+                                            type="button"
+                                            onClick={() => this.handleIndicatorRemoval(this.state.currentSelectedIndicator)}>
+                                            Delete Indicator
+                                        </button>
+
+                                        <button className="m-3 btn btn-sm btn-outline-success">
                                             Save settings
                                         </button>
                                     </div>
@@ -307,9 +510,11 @@ export class Settings extends Component {
                             Selected Indicators
                         </div>
 
-                        {this.displayAggregatedIndicatorChildrens()}
+                        {this.displaySelectedIndicators()}
                     </div>
                 </div>
+
+                <NotificationContainer />
             </React.Fragment>
         )
     }
