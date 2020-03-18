@@ -132,13 +132,14 @@ export class Settings extends Component {
                     initialValues={{ category: '', color: '' }}
                     onSubmit={async values => {
                         await new Promise(resolve => setTimeout(resolve, 500));
-                        if (this.state.currentSelectedColor === null) {
-                            NotificationManager.error('Please select color first', null, 5000);
-                            
-                        } else {
-                            values.color = this.state.currentSelectedColor !== null ? '#'.concat(this.state.currentSelectedColor) : null
-                            alert(JSON.stringify(values, null, 2));
-                        }
+                        NotificationManager.info('Form Created successfully', null, 5000);
+                        values.color = this.state.currentSelectedColor !== null ? '#'.concat(this.state.currentSelectedColor) : '#eb1111'
+                        alert(JSON.stringify(values, null, 2));
+
+                        const categoriesForm = [...this.state.categoriesForm]
+                        categoriesForm.push(values)
+
+                        this.setState({ categoriesForm })
                     }}
                     validationSchema={Yup.object().shape({
                         category: Yup.string().required("Required")
