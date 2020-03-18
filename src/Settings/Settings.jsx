@@ -17,6 +17,7 @@ import { ColorPicker } from 'primereact/colorpicker';
 
 import 'react-notifications/lib/notifications.css';
 import { NotificationContainer, NotificationManager } from 'react-notifications';
+import { v4 as uuidv4 } from 'uuid';
 
 const C_PROGRAMS = 'Programs';
 const C_PROGRAM_INDICATORS = 'Program indicators';
@@ -66,7 +67,7 @@ export class Settings extends Component {
             })
     }
 
-    handleCurrentSelectedIndicator = indicator => this.setState({ currentSelectedIndicator: indicator })
+    handleCurrentSelectedIndicator = indicator => this.setState({ currentSelectedIndicator: null }, () => this.setState({ currentSelectedIndicator: indicator }))
 
     loadPrograms = () => {
         axios.get(API_BASE_ROUTE.concat(PROGRAMS_ROUTE))
@@ -123,6 +124,130 @@ export class Settings extends Component {
 
     handleAggregatedIndicatorsClick = indicator => this.setState({ selectedAggregatedIndicator: indicator })
 
+    createGlobalSettings = () => {
+        return (
+            <Formik
+                initialValues={{ bestPerformance: 1, worstPerformance: 1, usePercentage: true }}
+                onSubmit={async values => {
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    alert(JSON.stringify(values, null, 2));
+                }} >
+
+                {props => {
+                    const {
+                        values,
+                        touched,
+                        errors,
+                        dirty,
+                        isSubmitting,
+                        handleChange,
+                        handleBlur,
+                        handleSubmit,
+                        handleReset
+                    } = props;
+
+                    return (
+                        <form onSubmit={handleSubmit}
+                            className="form-group text-left">
+
+                            <div className="row m-1">
+                                <div className="col text-left m-1">
+                                    <h3>
+                                        Performance Metrics
+                                    </h3>
+
+                                    <div className="row">
+                                        <div className="col-1 mt-2">
+                                            Best
+                                        </div>
+                                        <div className="col">
+                                            <input
+                                                id="bestPerformance"
+                                                autoComplete="off"
+                                                type="number"
+                                                value={values.bestPerformance}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                className={
+                                                    errors.bestPerformance && touched.bestPerformance
+                                                        ? "form-control text-input error input-sm"
+                                                        : "form-control text-input  input-sm"
+                                                } />
+                                        </div>
+
+                                        <div className="col-1 mt-2">
+                                            Worst
+                                        </div>
+
+                                        <div className="col">
+                                            <input
+                                                id="worstPerformance"
+                                                autoComplete="off"
+                                                type="number"
+                                                value={values.worstPerformance}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                className={
+                                                    errors.worstPerformance && touched.worstPerformance
+                                                        ? "form-control text-input error input-sm"
+                                                        : "form-control text-input  input-sm"
+                                                } />
+                                        </div>
+
+                                        <div className="col">
+                                            <div className="form-check text-left">
+
+                                                <label
+                                                    className="form-check-label m-2 "
+                                                    for="usePercentage">Use Percentage</label>
+
+                                                <input
+                                                    id="usePercentage"
+                                                    autoComplete="off"
+                                                    type="checkbox"
+                                                    checked={values.usePercentage}
+                                                    value={values.usePercentage}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                    className={
+                                                        errors.usePercentage && touched.usePercentage
+                                                            ? "m-3 form-check-input text-input error input-sm"
+                                                            : "m-3 form-check-input text-input  input-sm"
+                                                    } />
+
+
+                                            </div>
+                                        </div>
+
+                                        <div className="col">
+                                            <button
+                                                type="button"
+                                                className="btn btn-sm btn-outline-danger m-2"
+                                                onClick={handleReset}
+                                                disabled={!dirty || isSubmitting} >
+                                                Reset
+                                            </button>
+
+                                            <button
+                                                type="submit"
+                                                className="btn btn-sm btn-outline-success m-2"
+                                                disabled={isSubmitting}>
+                                                Submit
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </form>
+                    );
+                }}
+            </Formik>
+        )
+    }
+
     createCategoryForm = () => {
         const currentSelectedIndicator = this.state.currentSelectedIndicator
         if (currentSelectedIndicator && currentSelectedIndicator !== null && currentSelectedIndicator !== undefined) {
@@ -133,6 +258,8 @@ export class Settings extends Component {
                     onSubmit={async values => {
                         await new Promise(resolve => setTimeout(resolve, 500));
                         NotificationManager.info('Form Created successfully', null, 5000);
+
+                        values.id = uuidv4()
                         values.color = this.state.currentSelectedColor !== null ? '#'.concat(this.state.currentSelectedColor) : '#eb1111'
                         alert(JSON.stringify(values, null, 2));
 
@@ -260,7 +387,37 @@ export class Settings extends Component {
     }
 
     displayCustomSettingForms = () => {
-        
+        return (
+            this.state.categoriesForm.map((c, index) => (
+
+                <div className="row m-1" key={c}>
+                    <div className="col-1 m-2">
+                        <input className="form-control input-sm" readOnly
+                            value="#562839"
+                            style={{ width: '20px', height: '20px', backgroundColor: c.color }} />
+                    </div>
+
+                    <div className="col text-left m-2">
+                        {c.category}
+
+                        <div className="row">
+                            <div className="col-2 mt-2">
+                                Min
+                            </div>
+                            <div className="col">
+                                <input type="number" value={0} className="form-control" />
+                            </div>
+                            <div className="col-2 mt-2">
+                                Max
+                            </div>
+                            <div className="col">
+                                <input type="number" value={100} className="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            )))
     }
 
     displaySelectedIndicators = () => {
@@ -287,7 +444,7 @@ export class Settings extends Component {
         const indicators = [...this.state.selectedIndicators]
         indicators.push(indicator)
 
-        this.setState({ selectedIndicators: indicators, currentSelectedIndicator: indicator })
+        this.setState({ selectedIndicators: indicators, currentSelectedIndicator: null }, () => this.setState({ currentSelectedIndicator: indicator }))
     }
 
     displayParentTitle = () => {
@@ -295,6 +452,168 @@ export class Settings extends Component {
             return 'Indicator Groups'
         } else if (this.state.currentAction === C_PROGRAMS) {
             return 'Programs'
+        }
+    }
+
+    displayIndicatorsSettingForm = () => {
+        const currentSelectedIndicator = this.state.currentSelectedIndicator
+
+        if (currentSelectedIndicator && currentSelectedIndicator !== undefined && currentSelectedIndicator !== null) {
+
+            return (
+                <div className="form-group alert alert-info" role="alert">
+
+                    <Formik
+                        initialValues={{
+                            name: this.state.currentSelectedIndicator ? this.state.currentSelectedIndicator.displayName : '',
+                            label: this.state.currentSelectedIndicator.label ? this.state.currentSelectedIndicator.label : this.state.currentSelectedIndicator.displayName,
+                            weight: this.state.currentSelectedIndicator.weight ? this.state.currentSelectedIndicator.weight : 0,
+                        }}
+
+                        onSubmit={async values => {
+                            await new Promise(resolve => setTimeout(resolve, 500));
+                            alert(JSON.stringify(values, null, 2));
+                        }}
+
+                        validationSchema={Yup.object().shape({
+                            category: Yup.string().required("Required")
+                        })} >
+
+                        {props => {
+                            const {
+                                values,
+                                touched,
+                                errors,
+                                dirty,
+                                isSubmitting,
+                                handleChange,
+                                handleBlur,
+                                handleSubmit,
+                                handleReset
+                            } = props;
+
+                            return (
+                                <form onSubmit={handleSubmit}
+                                    className="form-group text-left">
+
+                                    <div className="row m-2">
+                                        <div className="col-2 m-2">Name</div>
+                                        <div className="col p-1">
+                                            <input
+                                                id="name"
+                                                placeholder="Name"
+                                                readOnly
+                                                disabled
+                                                autoComplete="off"
+                                                type="text"
+                                                value={values.name}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                className={
+                                                    errors.name && touched.name
+                                                        ? "form-control text-input error input-sm"
+                                                        : "form-control text-input  input-sm"
+                                                } />
+                                        </div>
+                                    </div>
+
+                                    <div className="row m-2">
+                                        <div className="col-2 m-2">Label</div>
+                                        <div className="col p-1">
+                                            <input
+                                                id="label"
+                                                placeholder="Label"
+                                                autoComplete="off"
+                                                type="text"
+                                                value={values.label}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                className={
+                                                    errors.label && touched.label
+                                                        ? "form-control text-input error input-sm"
+                                                        : "form-control text-input  input-sm"
+                                                } />
+                                        </div>
+                                    </div>
+
+                                    <div className="row m-2">
+                                        <div className="col-2 m-2">Weight</div>
+                                        <div className="col p-1">
+                                            <input
+                                                id="weight"
+                                                placeholder="Weight"
+                                                autoComplete="off"
+                                                type="number"
+                                                value={values.weight}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                className={
+                                                    errors.weight && touched.weight
+                                                        ? "form-control text-input error input-sm"
+                                                        : "form-control text-input  input-sm"
+                                                } />
+                                        </div>
+                                    </div>
+
+                                    <div className="row m-3">
+                                        <div className="col">
+                                            <div className="form-check text-left">
+                                                <input
+                                                    id="hightIsGood"
+                                                    type="checkbox"
+                                                    checked={values.hightIsGood}
+                                                    value={values.hightIsGood}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                    className={
+                                                        errors.hightIsGood && touched.hightIsGood
+                                                            ? "form-check-input text-input error input-sm"
+                                                            : "form-check-input text-input  input-sm"
+                                                    } />
+
+                                                <label className="form-check-label" for="hightIsGood">High is Good</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="row">
+                                        <div className="col">
+                                            {this.displayCustomSettingForms()}
+                                        </div>
+                                    </div>
+
+                                    <hr />
+                                    <div className="mt-3 btn-group">
+                                        <button className="m-3 btn btn-sm btn-outline-danger"
+                                            type="button"
+                                            onClick={() => this.handleIndicatorRemoval(this.state.currentSelectedIndicator)}>
+                                            Delete Indicator
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            className="btn btn-sm btn-outline-danger "
+                                            onClick={handleReset}
+                                            disabled={!dirty || isSubmitting} >
+                                            Reset Form
+                                        </button>
+
+                                        <button
+                                            type="submit"
+                                            className="btn btn-sm btn-outline-success m-3"
+                                            disabled={isSubmitting}>
+                                            Save Settings
+                                        </button>
+                                    </div>
+                                </form>
+                            );
+                        }}
+                    </Formik>
+                </div>
+
+            )
+        } else {
+            return null
         }
     }
 
@@ -320,6 +639,12 @@ export class Settings extends Component {
                             className={this.classNameProvider(C_PROGRAM_INDICATORS)}>
                             Program Indicators
                         </button>
+                    </div>
+                </div>
+
+                <div className="row m-3">
+                    <div className="col-7 ml-3 form-group alert alert-info" role="alert">
+                        {this.createGlobalSettings()}
                     </div>
                 </div>
 
@@ -365,149 +690,7 @@ export class Settings extends Component {
                             </div>
                         </div>
 
-                        <form>
-                            <div className="form-group alert alert-info" role="alert">
-
-                                <div className="row m-2">
-                                    <div className="col-2 m-2">Name</div>
-                                    <div className="col p-1"><input readOnly className="form-control" /></div>
-                                </div>
-
-                                <div className="row m-2">
-                                    <div className="col-2 m-2">Label</div>
-                                    <div className="col p-1"><input className="form-control" /></div>
-                                </div>
-
-                                <div className="row m-2">
-                                    <div className="col-2 m-2">Weight</div>
-                                    <div className="col p-1"><input className="form-control" /></div>
-                                </div>
-
-                                <div className="row m-1">
-                                    <div className="col-1 m-2">
-                                        <input className="form-control input-sm" readOnly style={{ width: '20px', height: '20px', backgroundColor: 'yellow' }} />
-                                    </div>
-                                    <div className="col text-left m-2">
-                                        Target achieved/ on track
-                                         <div className="row">
-                                            <div className="col-2 mt-2">
-                                                Min
-                                            </div>
-                                            <div className="col">
-                                                <input type="number" className="form-control" />
-                                            </div>
-                                            <div className="col-2 mt-2">
-                                                Max
-                                            </div>
-                                            <div className="col">
-                                                <input type="number" className="form-control" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="row m-1">
-                                    <div className="col-1 m-2">
-                                        <input className="form-control input-sm" readOnly style={{ width: '20px', height: '20px', backgroundColor: 'green' }} />
-                                    </div>
-                                    <div className="col text-left m-2">
-                                        Target achieved/ on track
-                                         <div className="row">
-                                            <div className="col-2 mt-2">
-                                                Min
-                                            </div>
-                                            <div className="col">
-                                                <input type="number" className="form-control" />
-                                            </div>
-                                            <div className="col-2 mt-2">
-                                                Max
-                                            </div>
-                                            <div className="col">
-                                                <input type="number" className="form-control" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="row m-1">
-                                    <div className="col-1 m-2">
-                                        <input className="form-control input-sm" readOnly style={{ width: '20px', height: '20px', backgroundColor: 'red' }} />
-                                    </div>
-                                    <div className="col text-left m-1">
-                                        Target achieved/ on track
-                                        <div className="row">
-                                            <div className="col-2 mt-2">
-                                                Min
-                                            </div>
-                                            <div className="col">
-                                                <input type="number" className="form-control" />
-                                            </div>
-                                            <div className="col-2 mt-2">
-                                                Max
-                                            </div>
-                                            <div className="col">
-                                                <input type="number" className="form-control" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="row m-3">
-                                    <div className="col">
-                                        <div class="form-check text-left">
-                                            <input type="checkbox" class="form-check-input" id="hightIsGood" />
-                                            <label class="form-check-label" for="hightIsGood">High is Good</label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="row m-1">
-                                    <div className="col text-left m-1">
-                                        Performance Metrics
-                                        <div className="row">
-                                            <div className="col-2 mt-2">
-                                                Best
-                                            </div>
-                                            <div className="col">
-                                                <input type="number" className="form-control" />
-                                            </div>
-                                            <div className="col-2 mt-2">
-                                                Worst
-                                            </div>
-                                            <div className="col">
-                                                <input type="number" className="form-control" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                                <div className="row m-3">
-                                    <div className="col">
-                                        <div class="form-check text-left">
-                                            <input type="checkbox" class="form-check-input" id="usePercentage" />
-                                            <label class="form-check-label" for="usePercentage">Use Percentage</label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="row m-3">
-                                    <div className="col text-left">
-                                        <hr />
-
-                                        <button className="m-3 btn btn-sm btn-outline-danger"
-                                            type="button"
-                                            onClick={() => this.handleIndicatorRemoval(this.state.currentSelectedIndicator)}>
-                                            Delete Indicator
-                                        </button>
-
-                                        <button className="m-3 btn btn-sm btn-outline-success">
-                                            Save settings
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
+                        {this.displayIndicatorsSettingForm()}
                     </div>
 
                     <div className="col m-3">
@@ -517,10 +700,10 @@ export class Settings extends Component {
 
                         {this.displaySelectedIndicators()}
                     </div>
-                </div>
+                </div >
 
                 <NotificationContainer />
-            </React.Fragment>
+            </React.Fragment >
         )
     }
 }
