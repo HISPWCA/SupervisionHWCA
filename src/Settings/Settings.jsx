@@ -259,6 +259,10 @@ export class Settings extends Component {
         }
     }
 
+    displayCustomSettingForms = () => {
+        
+    }
+
     displaySelectedIndicators = () => {
         return (
             this.state.selectedIndicators.map(indicator => (
