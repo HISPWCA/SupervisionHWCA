@@ -1,23 +1,20 @@
 import axios from 'axios';
-import React, { Component } from 'react';
-import {
-    AGGREGATED_INDICATORS_ROUTE,
-    API_BASE_ROUTE, PROGRAMS_ROUTE,
-    PROGRAM_INDICATORS_BY_PROGRAM_ROUTE
-} from '../api.routes';
-import './Settings.css';
-import { Paginator } from 'primereact/paginator';
-import 'primereact/resources/themes/nova-light/theme.css';
-import 'primereact/resources/primereact.min.css';
-import 'primeicons/primeicons.css';
-
 import { Formik } from "formik";
-import * as Yup from "yup";
+import 'primeicons/primeicons.css';
 import { ColorPicker } from 'primereact/colorpicker';
-
-import 'react-notifications/lib/notifications.css';
+import { Paginator } from 'primereact/paginator';
+import 'primereact/resources/primereact.min.css';
+import 'primereact/resources/themes/nova-light/theme.css';
+import React, { Component } from 'react';
 import { NotificationContainer, NotificationManager } from 'react-notifications';
+import 'react-notifications/lib/notifications.css';
 import { v4 as uuidv4 } from 'uuid';
+import * as Yup from "yup";
+import { AGGREGATED_INDICATORS_ROUTE, API_BASE_ROUTE, PROGRAMS_ROUTE, PROGRAM_INDICATORS_BY_PROGRAM_ROUTE } from '../api.routes';
+import SettingsForm from '../SettingsForm/SettingsForm';
+import './Settings.css';
+
+
 
 const C_PROGRAMS = 'Programs';
 const C_PROGRAM_INDICATORS = 'Program indicators';
@@ -34,6 +31,7 @@ export class Settings extends Component {
             childMetaDatas: [],
             selectedIndicators: [],
 
+            displayCategoryForms: false,
             currentSelectedIndicator: null,
             currentSelectedColor: null,
 
@@ -67,7 +65,11 @@ export class Settings extends Component {
             })
     }
 
-    handleCurrentSelectedIndicator = indicator => this.setState({ currentSelectedIndicator: null }, () => this.setState({ currentSelectedIndicator: indicator }))
+    handleCurrentSelectedIndicator = indicator => {
+        this.setState({ currentSelectedIndicator: null, displayCategoryForms: false },
+            () => this.setState({ currentSelectedIndicator: indicator, displayCategoryForms: true })
+        )
+    }
 
     loadPrograms = () => {
         axios.get(API_BASE_ROUTE.concat(PROGRAMS_ROUTE))
@@ -250,28 +252,34 @@ export class Settings extends Component {
 
     createCategoryForm = () => {
         const currentSelectedIndicator = this.state.currentSelectedIndicator
-        if (currentSelectedIndicator && currentSelectedIndicator !== null && currentSelectedIndicator !== undefined) {
+        if (this.state.displayCategoryForms && currentSelectedIndicator && currentSelectedIndicator !== null && currentSelectedIndicator !== undefined) {
 
             return (
                 <Formik
                     initialValues={{ category: '', color: '' }}
                     onSubmit={async values => {
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                        NotificationManager.info('Form Created successfully', null, 5000);
-
+                        const defaultColor = '#eb1111'
                         values.id = uuidv4()
-                        values.color = this.state.currentSelectedColor !== null ? '#'.concat(this.state.currentSelectedColor) : '#eb1111'
-                        alert(JSON.stringify(values, null, 2));
+                        values.min = 0
+                        values.max = 100
+                        values.category = values.category.toLowerCase()
+                        values.color = this.state.currentSelectedColor !== null ? '#'.concat(this.state.currentSelectedColor) : defaultColor
 
                         const categoriesForm = [...this.state.categoriesForm]
-                        categoriesForm.push(values)
 
-                        this.setState({ categoriesForm })
+                        if (categoriesForm.map(c => c.category).includes(values.category)) {
+                            NotificationManager.error('This category already exists, try again with another name please', null, 3000);
+                        } else if (categoriesForm.map(c => c.color).includes(values.color)) {
+                            NotificationManager.error('This color has already been used exists,choose another one please', null, 3000);
+                        } else {
+                            categoriesForm.push(values)
+                            this.setState({ categoriesForm, displayCategoryForms: false }, () => this.setState({ displayCategoryForms: true }))
+                        }
                     }}
                     validationSchema={Yup.object().shape({
                         category: Yup.string().required("Required")
-                    })}
-                >
+                    })}>
+
                     {props => {
                         const {
                             values,
@@ -289,7 +297,7 @@ export class Settings extends Component {
                                 className="form-group text-left">
                                 <label htmlFor="category" style={{ display: "block" }}>
                                     Add Category
-                            </label>
+                                </label>
 
                                 <input
                                     id="category"
@@ -341,17 +349,16 @@ export class Settings extends Component {
                                         type="button"
                                         className="btn btn-sm btn-outline-danger "
                                         onClick={handleReset}
-                                        disabled={!dirty || isSubmitting}
-                                    >
+                                        disabled={!dirty || isSubmitting} >
                                         Reset
-                                </button>
+                                    </button>
 
                                     <button
                                         type="submit"
                                         className="btn btn-sm btn-outline-success m-3"
                                         disabled={isSubmitting}>
                                         Submit
-                                </button>
+                                    </button>
 
                                 </div>
                             </form>
@@ -386,39 +393,6 @@ export class Settings extends Component {
         }
     }
 
-    displayCustomSettingForms = () => {
-        return (
-            this.state.categoriesForm.map((c, index) => (
-
-                <div className="row m-1" key={c}>
-                    <div className="col-1 m-2">
-                        <input className="form-control input-sm" readOnly
-                            value="#562839"
-                            style={{ width: '20px', height: '20px', backgroundColor: c.color }} />
-                    </div>
-
-                    <div className="col text-left m-2">
-                        {c.category}
-
-                        <div className="row">
-                            <div className="col-2 mt-2">
-                                Min
-                            </div>
-                            <div className="col">
-                                <input type="number" value={0} className="form-control" />
-                            </div>
-                            <div className="col-2 mt-2">
-                                Max
-                            </div>
-                            <div className="col">
-                                <input type="number" value={100} className="form-control" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            )))
-    }
 
     displaySelectedIndicators = () => {
         return (
@@ -444,7 +418,14 @@ export class Settings extends Component {
         const indicators = [...this.state.selectedIndicators]
         indicators.push(indicator)
 
-        this.setState({ selectedIndicators: indicators, currentSelectedIndicator: null }, () => this.setState({ currentSelectedIndicator: indicator }))
+        this.setState({
+            selectedIndicators: indicators,
+            currentSelectedIndicator: null,
+            displayCategoryForms: false
+        }, () => this.setState({
+            currentSelectedIndicator: indicator,
+            displayCategoryForms: true
+        }))
     }
 
     displayParentTitle = () => {
@@ -455,163 +436,22 @@ export class Settings extends Component {
         }
     }
 
+    handleSubmit = event => {
+        console.log('handling submission')
+        console.log(event)
+    }
+
+    reloadCategories = event => this.setState({ categoriesForm: event })
+
     displayIndicatorsSettingForm = () => {
         const currentSelectedIndicator = this.state.currentSelectedIndicator
 
         if (currentSelectedIndicator && currentSelectedIndicator !== undefined && currentSelectedIndicator !== null) {
-
-            return (
-                <div className="form-group alert alert-info" role="alert">
-
-                    <Formik
-                        initialValues={{
-                            name: this.state.currentSelectedIndicator ? this.state.currentSelectedIndicator.displayName : '',
-                            label: this.state.currentSelectedIndicator.label ? this.state.currentSelectedIndicator.label : this.state.currentSelectedIndicator.displayName,
-                            weight: this.state.currentSelectedIndicator.weight ? this.state.currentSelectedIndicator.weight : 0,
-                        }}
-
-                        onSubmit={async values => {
-                            await new Promise(resolve => setTimeout(resolve, 500));
-                            alert(JSON.stringify(values, null, 2));
-                        }}
-
-                        validationSchema={Yup.object().shape({
-                            category: Yup.string().required("Required")
-                        })} >
-
-                        {props => {
-                            const {
-                                values,
-                                touched,
-                                errors,
-                                dirty,
-                                isSubmitting,
-                                handleChange,
-                                handleBlur,
-                                handleSubmit,
-                                handleReset
-                            } = props;
-
-                            return (
-                                <form onSubmit={handleSubmit}
-                                    className="form-group text-left">
-
-                                    <div className="row m-2">
-                                        <div className="col-2 m-2">Name</div>
-                                        <div className="col p-1">
-                                            <input
-                                                id="name"
-                                                placeholder="Name"
-                                                readOnly
-                                                disabled
-                                                autoComplete="off"
-                                                type="text"
-                                                value={values.name}
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                className={
-                                                    errors.name && touched.name
-                                                        ? "form-control text-input error input-sm"
-                                                        : "form-control text-input  input-sm"
-                                                } />
-                                        </div>
-                                    </div>
-
-                                    <div className="row m-2">
-                                        <div className="col-2 m-2">Label</div>
-                                        <div className="col p-1">
-                                            <input
-                                                id="label"
-                                                placeholder="Label"
-                                                autoComplete="off"
-                                                type="text"
-                                                value={values.label}
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                className={
-                                                    errors.label && touched.label
-                                                        ? "form-control text-input error input-sm"
-                                                        : "form-control text-input  input-sm"
-                                                } />
-                                        </div>
-                                    </div>
-
-                                    <div className="row m-2">
-                                        <div className="col-2 m-2">Weight</div>
-                                        <div className="col p-1">
-                                            <input
-                                                id="weight"
-                                                placeholder="Weight"
-                                                autoComplete="off"
-                                                type="number"
-                                                value={values.weight}
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                className={
-                                                    errors.weight && touched.weight
-                                                        ? "form-control text-input error input-sm"
-                                                        : "form-control text-input  input-sm"
-                                                } />
-                                        </div>
-                                    </div>
-
-                                    <div className="row m-3">
-                                        <div className="col">
-                                            <div className="form-check text-left">
-                                                <input
-                                                    id="hightIsGood"
-                                                    type="checkbox"
-                                                    checked={values.hightIsGood}
-                                                    value={values.hightIsGood}
-                                                    onChange={handleChange}
-                                                    onBlur={handleBlur}
-                                                    className={
-                                                        errors.hightIsGood && touched.hightIsGood
-                                                            ? "form-check-input text-input error input-sm"
-                                                            : "form-check-input text-input  input-sm"
-                                                    } />
-
-                                                <label className="form-check-label" for="hightIsGood">High is Good</label>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="row">
-                                        <div className="col">
-                                            {this.displayCustomSettingForms()}
-                                        </div>
-                                    </div>
-
-                                    <hr />
-                                    <div className="mt-3 btn-group">
-                                        <button className="m-3 btn btn-sm btn-outline-danger"
-                                            type="button"
-                                            onClick={() => this.handleIndicatorRemoval(this.state.currentSelectedIndicator)}>
-                                            Delete Indicator
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            className="btn btn-sm btn-outline-danger "
-                                            onClick={handleReset}
-                                            disabled={!dirty || isSubmitting} >
-                                            Reset Form
-                                        </button>
-
-                                        <button
-                                            type="submit"
-                                            className="btn btn-sm btn-outline-success m-3"
-                                            disabled={isSubmitting}>
-                                            Save Settings
-                                        </button>
-                                    </div>
-                                </form>
-                            );
-                        }}
-                    </Formik>
-                </div>
-
-            )
+            return (<SettingsForm handleIndicatorRemoval={this.handleIndicatorRemoval}
+                displayCustomSettingForms={this.displayCustomSettingForms}
+                categoriesForm={this.state.categoriesForm}
+                reloadCategories={this.reloadCategories}
+                currentSelectedIndicator={this.state.currentSelectedIndicator} />)
         } else {
             return null
         }
