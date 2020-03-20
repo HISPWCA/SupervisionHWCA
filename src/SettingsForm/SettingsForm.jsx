@@ -1,4 +1,7 @@
+import axios from 'axios';
 import React, { Component } from 'react';
+import { INDICATORS_ROUTE } from '../api.routes';
+import { NotificationManager } from 'react-notifications';
 
 export class SettingsForm extends Component {
 
@@ -6,19 +9,22 @@ export class SettingsForm extends Component {
         super(props)
 
         this.state = {
+            id: '',
             name: '',
             label: '',
             weight: 0,
-            hightIsGood: true,
             categories: [],
-            currentIndex: -1,
+            hightIsGood: this.props.currentSelectedIndicator.hightIsGood,
+            selectedIndicators: [],
         }
     }
 
     componentDidMount = () => {
         this.setState({
-            name: this.props.currentSelectedIndicator ? this.props.currentSelectedIndicator.displayName : '',
-            label: this.props.currentSelectedIndicator.label ? this.props.currentSelectedIndicator.label : this.props.currentSelectedIndicator.displayName,
+            id: this.props.currentSelectedIndicator.id,
+            name: this.props.currentSelectedIndicator ? this.props.currentSelectedIndicator.name : '',
+            hightIsGood: this.props.currentSelectedIndicator.hightIsGood,
+            label: this.props.currentSelectedIndicator.label ? this.props.currentSelectedIndicator.label : this.props.currentSelectedIndicator.name,
             weight: this.props.currentSelectedIndicator.weight ? this.props.currentSelectedIndicator.weight : 0,
             categories: this.props.categoriesForm,
         })
@@ -58,7 +64,29 @@ export class SettingsForm extends Component {
     handleSubmit = event => {
         event.preventDefault()
 
-        console.log(this.state)
+        this.setState({ categories: this.props.categoriesForm },
+            () => this.loadAndPersistIndicatorsOnServer())
+    }
+
+    persistState = () => {
+        const indicators = [...this.props.selectedIndicators]
+        const indicator = indicators.find(i => i.id === this.state.id)
+        const index = indicators.indexOf(indicator)
+
+        if (indicators.length === 0 || index === -1) {
+            indicators.push(this.state)
+        } else {
+            indicators[index] = this.state
+        }
+        this.props.handleIndicatorsUpdateFromServer(indicators)
+    }
+
+    loadAndPersistIndicatorsOnServer = () => {
+        axios.get(INDICATORS_ROUTE)
+            .then(response => {
+                this.props.updateSelectedIndicators(response.data)
+                this.persistState()
+            }).catch(error => NotificationManager.error(error.message, null, 3000))
     }
 
     retrieveMinValue = id => {
@@ -101,9 +129,9 @@ export class SettingsForm extends Component {
                             <strong title="Delete this Category"
                                 class="m-3 font-weight-bold text-danger cursorPointer"
                                 onClick={() => this.deleteCategory(c.id)}>
-                                    
-                                    </strong> 
-                                    {c.category}
+                                x
+                            </strong>
+                            {c.category}
                         </div>
 
                         <div className="row">
@@ -137,101 +165,117 @@ export class SettingsForm extends Component {
 
     render() {
         return (
-            <div className="form-group alert alert-info" role="alert">
-
-                <form onSubmit={this.handleSubmit} className="form-group text-left">
-
-                    <div className="row m-2">
-                        <div className="col-2 m-2">Name</div>
-                        <div className="col p-1">
-                            <input
-                                id="name"
-                                name="name"
-                                placeholder="Name"
-                                readOnly
-                                disabled
-                                autoComplete="off"
-                                type="text"
-                                value={this.state.name}
-                                onChange={this.handleChange}
-                                className="form-control text-input input-sm" />
-                        </div>
+            <div className="col m-3">
+                <div className="row m-2">
+                    <div className="col">
+                        <div className="mb-1 text-left">
+                            Settings
+                            </div>
                     </div>
+                </div>
+                <div className="form-group alert alert-info" role="alert">
 
-                    <div className="row m-2">
-                        <div className="col-2 m-2">Label</div>
-                        <div className="col p-1">
-                            <input
-                                id="label"
-                                name="label"
-                                placeholder="Label"
-                                autoComplete="off"
-                                type="text"
-                                value={this.state.label}
-                                onChange={this.handleChange}
-                                className="form-control input-sm" />
-                        </div>
-                    </div>
+                    <form onSubmit={this.handleSubmit} className="form-group text-left">
 
-                    <div className="row m-2">
-                        <div className="col-2 m-2">Weight</div>
-                        <div className="col p-1">
-                            <input
-                                id="weight"
-                                name="weight"
-                                placeholder="Weight"
-                                autoComplete="off"
-                                type="number"
-                                value={this.state.weight}
-                                onChange={this.handleChange}
-                                className="form-control input-sm" />
-                        </div>
-                    </div>
+                        <input
+                            name="id"
+                            type="hidden"
+                            value={this.state.id}
+                            onChange={this.handleChange} />
 
-                    <div className="row m-3">
-                        <div className="col">
-                            <div className="form-check text-left">
+                        <div className="row m-2">
+                            <div className="col-2 m-2">Name</div>
+                            <div className="col p-1">
                                 <input
-                                    id="hightIsGood"
-                                    name="hightIsGood"
-                                    type="checkbox"
-                                    checked={this.state.hightIsGood}
-                                    value={this.state.hightIsGood}
+                                    id="name"
+                                    name="name"
+                                    placeholder="Name"
+                                    readOnly
+                                    disabled
+                                    autoComplete="off"
+                                    type="text"
+                                    value={this.state.name}
                                     onChange={this.handleChange}
-                                    className="form-check-input input-sm" />
-
-                                <label className="form-check-label" for="hightIsGood">High is Good</label>
+                                    className="form-control text-input input-sm" />
                             </div>
                         </div>
-                    </div>
 
-                    <div className="row">
-                        <div className="col">
-                            {this.displayCustomSettingForms()}
+                        <div className="row m-2">
+                            <div className="col-2 m-2">Label</div>
+                            <div className="col p-1">
+                                <input
+                                    id="label"
+                                    name="label"
+                                    placeholder="Label"
+                                    autoComplete="off"
+                                    type="text"
+                                    value={this.state.label}
+                                    onChange={this.handleChange}
+                                    className="form-control input-sm" />
+                            </div>
                         </div>
-                    </div>
 
-                    <hr />
-                    <div className="mt-3 btn-group">
-                        <button className="m-3 btn btn-sm btn-outline-danger"
-                            type="button"
-                            onClick={() => this.props.handleIndicatorRemoval(this.props.currentSelectedIndicator)}>
-                            Delete Indicator
-                        </button>
+                        <div className="row m-2">
+                            <div className="col-2 m-2">Weight</div>
+                            <div className="col p-1">
+                                <input
+                                    id="weight"
+                                    name="weight"
+                                    placeholder="Weight"
+                                    autoComplete="off"
+                                    type="number"
+                                    value={this.state.weight}
+                                    onChange={this.handleChange}
+                                    className="form-control input-sm" />
+                            </div>
+                        </div>
 
-                        <button
-                            type="button"
-                            className="btn btn-sm btn-outline-danger "  >
-                            Reset Form
-                        </button>
+                        <div className="row m-3">
+                            <div className="col">
+                                <div className="form-check text-left">
+                                    <input
+                                        id="hightIsGood"
+                                        name="hightIsGood"
+                                        type="checkbox"
+                                        checked={this.state.hightIsGood}
+                                        value={this.state.hightIsGood}
+                                        onChange={this.handleChange}
+                                        className="form-check-input input-sm" />
 
-                        <button
-                            type="submit"
-                            className="btn btn-sm btn-outline-success m-3" >
-                            Save Settings
-                        </button>
-                    </div>
-                </form>
+                                    <label className="form-check-label" for="hightIsGood">High is Good</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="row">
+                            <div className="col">
+                                {this.displayCustomSettingForms()}
+                            </div>
+                        </div>
+
+                        <hr />
+                        <div className="mt-3 btn-group">
+                            <button className="m-3 btn btn-sm btn-outline-danger"
+                                type="button"
+                                onClick={() => this.props.handleIndicatorRemoval(this.props.currentSelectedIndicator)}>
+                                Delete Indicator
+                            </button>
+
+                            <button
+                                onClick={() => this.props.removeCurrentSelectedIndicator()}
+                                type="button"
+                                className="btn btn-sm btn-outline-warning"  >
+                                Close
+                            </button>
+
+                            <button
+                                type="submit"
+                                className="btn btn-sm btn-outline-success m-3" >
+                                Save Settings
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         )
     }
