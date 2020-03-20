@@ -100,7 +100,10 @@ export class SettingsForm extends Component {
                         <div style={{ textTransform: 'capitalize' }}>
                             <strong title="Delete this Category"
                                 class="m-3 font-weight-bold text-danger cursorPointer"
-                                onClick={() => this.deleteCategory(c.id)}>x</strong> {c.category}
+                                onClick={() => this.deleteCategory(c.id)}>
+                                    
+                                    </strong> 
+                                    {c.category}
                         </div>
 
                         <div className="row">
@@ -128,7 +131,8 @@ export class SettingsForm extends Component {
                         </div>
                     </div>
                 </div>
-            )))
+            ))
+        )
     }
 
     render() {
@@ -213,19 +217,19 @@ export class SettingsForm extends Component {
                             type="button"
                             onClick={() => this.props.handleIndicatorRemoval(this.props.currentSelectedIndicator)}>
                             Delete Indicator
-                                </button>
+                        </button>
 
                         <button
                             type="button"
                             className="btn btn-sm btn-outline-danger "  >
                             Reset Form
-                                </button>
+                        </button>
 
                         <button
                             type="submit"
                             className="btn btn-sm btn-outline-success m-3" >
                             Save Settings
-                                </button>
+                        </button>
                     </div>
                 </form>
             </div>
