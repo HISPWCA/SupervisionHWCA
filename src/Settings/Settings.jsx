@@ -9,7 +9,7 @@ import React, { Component } from 'react';
 import { NotificationContainer, NotificationManager } from 'react-notifications';
 import 'react-notifications/lib/notifications.css';
 import { v4 as uuidv4 } from 'uuid';
-import { AGGREGATED_INDICATORS_ROUTE, API_BASE_ROUTE, PROGRAMS_ROUTE, PROGRAM_INDICATORS_BY_PROGRAM_ROUTE, INDICATORS_ROUTE } from '../api.routes';
+import { AGGREGATED_INDICATORS_ROUTE, GLOBAL_SETTINGS_ROUTE, API_BASE_ROUTE, PROGRAMS_ROUTE, PROGRAM_INDICATORS_BY_PROGRAM_ROUTE, INDICATORS_ROUTE } from '../api.routes';
 import SettingsForm from '../SettingsForm/SettingsForm';
 import './Settings.css';
 
@@ -28,6 +28,8 @@ export class Settings extends Component {
             metaDatas: [],
             childMetaDatas: [],
             selectedIndicators: [],
+
+            globalSettings: { bestPerformance: 5, worstPerformance: 5, usePercentage: true },
 
             displayCategoryForms: false,
             currentSelectedIndicator: null,
@@ -50,6 +52,7 @@ export class Settings extends Component {
     }
 
     componentDidMount = () => {
+        this.retrieveGlobalSettingsFromServer()
         this.retrieveIndicatorsFromServer()
         this.loadAggregatedIndicatorsWithGroups()
     }
@@ -111,6 +114,20 @@ export class Settings extends Component {
             .catch(error => NotificationManager.error(error.message, null, 3000))
     }
 
+    retrieveGlobalSettingsFromServer = () => {
+        axios.get(GLOBAL_SETTINGS_ROUTE)
+            .then(response => this.setState({ globalSettings: response.data }, () => {
+                console.log('mon data est')
+                console.log(response)
+            })).catch(error => NotificationManager.error(error.message, null, 3000))
+    }
+
+    updateGlobalSettingsOnServer = globalSettings => {
+        axios.put(GLOBAL_SETTINGS_ROUTE, globalSettings)
+            .then(() => this.retrieveGlobalSettingsFromServer())
+            .catch(error => NotificationManager.error(error.message, null, 3000))
+    }
+
     classNameProvider = type => type === this.state.currentAction ? 'btn btn-primary btn-sm ' : 'btn btn-sm btn-outline-primary '
 
     aggregatedIndicatorClassNameProvider = indicator => this.state.selectedAggregatedIndicator && this.state.selectedAggregatedIndicator.id === indicator.id ? 'col text-left SelectedSetting  m-1 p-3' : 'col text-left Settings  m-1 p-3'
@@ -137,128 +154,156 @@ export class Settings extends Component {
     handleAggregatedIndicatorsClick = indicator => this.setState({ selectedAggregatedIndicator: indicator })
 
     createGlobalSettings = () => {
-        return (
-            <div className="row m-3">
-                <div className="col-7 ml-3 form-group alert alert-info" role="alert">
-                    <Formik
-                        initialValues={{ bestPerformance: 1, worstPerformance: 1, usePercentage: true }}
-                        onSubmit={async values => {
-                            await new Promise(resolve => setTimeout(resolve, 500));
-                            alert(JSON.stringify(values, null, 2));
-                        }} >
+        if (this.state.globalSettings !== null && this.state.globalSettings !== undefined) {
+            return (
+                <div className="row m-3">
+                    <div className="col-7 form-group alert alert-info" role="alert">
+                        <Formik
+                            initialValues={{
+                                bestPerformance: this.state.globalSettings.bestPerformance,
+                                worstPerformance: this.state.globalSettings.worstPerformance,
+                                usePercentage: this.state.globalSettings.usePercentage
+                            }}
 
-                        {props => {
-                            const {
-                                values,
-                                touched,
-                                errors,
-                                dirty,
-                                isSubmitting,
-                                handleChange,
-                                handleBlur,
-                                handleSubmit,
-                                handleReset
-                            } = props;
+                            onSubmit={async values => {
+                                // await new Promise(resolve => setTimeout(resolve, 500));
+                                // alert(JSON.stringify(values, null, 2));
+                                this.updateGlobalSettingsOnServer(values)
+                            }} >
 
-                            return (
-                                <form onSubmit={handleSubmit}
-                                    className="form-group text-left">
+                            {props => {
+                                const {
+                                    values,
+                                    touched,
+                                    errors,
+                                    dirty,
+                                    isSubmitting,
+                                    handleChange,
+                                    handleBlur,
+                                    handleSubmit,
+                                    handleReset
+                                } = props;
 
-                                    <div className="row m-1">
-                                        <div className="col text-left m-1">
-                                            <h3>
-                                                Performance Metrics
-                                    </h3>
+                                return (
+                                    <form onSubmit={handleSubmit}
+                                        className="form-group text-left">
 
-                                            <div className="row">
-                                                <div className="col-1 mt-2">
-                                                    Best
-                                        </div>
-                                                <div className="col">
-                                                    <input
-                                                        id="bestPerformance"
-                                                        autoComplete="off"
-                                                        type="number"
-                                                        value={values.bestPerformance}
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
-                                                        className={
-                                                            errors.bestPerformance && touched.bestPerformance
-                                                                ? "form-control text-input error input-sm"
-                                                                : "form-control text-input  input-sm"
-                                                        } />
-                                                </div>
+                                        <div className="row m-1">
+                                            <div className="col text-left m-1">
+                                                <h3>
+                                                    Performance Metrics
+                                        </h3>
 
-                                                <div className="col-1 mt-2">
-                                                    Worst
-                                        </div>
-
-                                                <div className="col">
-                                                    <input
-                                                        id="worstPerformance"
-                                                        autoComplete="off"
-                                                        type="number"
-                                                        value={values.worstPerformance}
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
-                                                        className={
-                                                            errors.worstPerformance && touched.worstPerformance
-                                                                ? "form-control text-input error input-sm"
-                                                                : "form-control text-input  input-sm"
-                                                        } />
-                                                </div>
-
-                                                <div className="col">
-                                                    <div className="form-check text-left">
-
-                                                        <label
-                                                            className="form-check-label m-2 "
-                                                            for="usePercentage">Use Percentage</label>
-
+                                                <div className="row">
+                                                    <div className="col-1 mt-2">
+                                                        Best
+                                            </div>
+                                                    <div className="col">
                                                         <input
-                                                            id="usePercentage"
+                                                            id="bestPerformance"
                                                             autoComplete="off"
-                                                            type="checkbox"
-                                                            checked={values.usePercentage}
-                                                            value={values.usePercentage}
+                                                            type="number"
+                                                            value={values.bestPerformance}
                                                             onChange={handleChange}
                                                             onBlur={handleBlur}
                                                             className={
-                                                                errors.usePercentage && touched.usePercentage
-                                                                    ? "m-3 form-check-input text-input error input-sm"
-                                                                    : "m-3 form-check-input text-input  input-sm"
+                                                                errors.bestPerformance && touched.bestPerformance
+                                                                    ? "form-control text-input error input-sm"
+                                                                    : "form-control text-input  input-sm"
                                                             } />
+                                                    </div>
 
+                                                    <div className="col-1 mt-2">
+                                                        Worst
+                                            </div>
 
+                                                    <div className="col">
+                                                        <input
+                                                            id="worstPerformance"
+                                                            autoComplete="off"
+                                                            type="number"
+                                                            value={values.worstPerformance}
+                                                            onChange={handleChange}
+                                                            onBlur={handleBlur}
+                                                            className={
+                                                                errors.worstPerformance && touched.worstPerformance
+                                                                    ? "form-control text-input error input-sm"
+                                                                    : "form-control text-input  input-sm"
+                                                            } />
+                                                    </div>
+
+                                                    <div className="col">
+                                                        <div className="form-check text-left">
+
+                                                            <label
+                                                                className="form-check-label m-2 "
+                                                                for="usePercentage">Use Percentage</label>
+
+                                                            <input
+                                                                id="usePercentage"
+                                                                autoComplete="off"
+                                                                type="checkbox"
+                                                                checked={values.usePercentage}
+                                                                value={values.usePercentage}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                className={
+                                                                    errors.usePercentage && touched.usePercentage
+                                                                        ? "m-3 form-check-input text-input error input-sm"
+                                                                        : "m-3 form-check-input text-input  input-sm"
+                                                                } />
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="col">
+                                                        <button
+                                                            type="button"
+                                                            className="btn btn-sm btn-outline-danger m-2"
+                                                            onClick={handleReset}
+                                                            disabled={!dirty || isSubmitting} >
+                                                            Reset
+                                                        </button>
+
+                                                        <button
+                                                            type="submit"
+                                                            className="btn btn-sm btn-outline-success m-2"
+                                                            disabled={isSubmitting}>
+                                                            Submit
+                                                        </button>
                                                     </div>
                                                 </div>
-
-                                                <div className="col">
-                                                    <button
-                                                        type="button"
-                                                        className="btn btn-sm btn-outline-danger m-2"
-                                                        onClick={handleReset}
-                                                        disabled={!dirty || isSubmitting} >
-                                                        Reset
-                                            </button>
-
-                                                    <button
-                                                        type="submit"
-                                                        className="btn btn-sm btn-outline-success m-2"
-                                                        disabled={isSubmitting}>
-                                                        Submit
-                                            </button>
-                                                </div>
-
                                             </div>
                                         </div>
-                                    </div>
+                                    </form>
+                                );
+                            }}
+                        </Formik>
+                    </div>
+                    {this.printGlobalSettings()}
+                </div>
+            )
+        } else {
+            return null
+        }
 
+    }
 
-                                </form>
-                            );
-                        }}
-                    </Formik>
+    printGlobalSettings = () => {
+        return (
+            <div className="col-5 form-group alert alert-success" role="alert">
+                <div className="row">
+                    <div className="col text-left m-1">
+                        <h3>
+                            Global Settings
+                            </h3>
+                    </div>
+                </div>
+
+                <div className="row text-left">
+                    <div className="col">Display:</div>
+                    <div className="col"> {this.displayBestPerformance()} best</div>
+                    <div className="col"> {this.displayWorstPerformance()} Worst</div>
+                    <div className="col">Use Percentage: {this.displayUsePercentage()}</div>
                 </div>
             </div>
         )
@@ -508,6 +553,29 @@ export class Settings extends Component {
 
     onAvailableIndicatorPageChange = event => this.setState({ availableIndicatorsFirstPage: event.first, availableIndicatorsNumRows: event.rows })
 
+    displayUsePercentage = () => {
+        const usePercentage = this.state.globalSettings.usePercentage
+        if (usePercentage === null || usePercentage === undefined) {
+            return 'Not yet defined (Default is True)'
+        } else if (usePercentage) {
+            return 'True'
+        } else {
+            return 'False'
+        }
+    }
+
+    displayBestPerformance = () => {
+        const bestPerformance = this.state.globalSettings.bestPerformance
+
+        return bestPerformance === null || bestPerformance === undefined ? '5 (Default)' : bestPerformance
+    }
+
+    displayWorstPerformance = () => {
+        const worstPerformance = this.state.globalSettings.worstPerformance
+
+        return worstPerformance === null || worstPerformance === undefined ? '5 (Default)' : worstPerformance
+    }
+
     render() {
         return (
             <React.Fragment>
@@ -528,6 +596,8 @@ export class Settings extends Component {
                 </div>
 
                 {this.createGlobalSettings()}
+
+
 
                 <div className="row m-3">
                     <div className="col m-3">
