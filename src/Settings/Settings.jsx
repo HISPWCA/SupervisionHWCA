@@ -332,7 +332,7 @@ export class Settings extends Component {
                 </div>
 
                 <div className="row text-left">
-                    <div className="col">Display:</div>
+                    <div className="col font-weight-bold">Display:</div>
                     <div className="col"> {this.displayBestPerformance()} best</div>
                     <div className="col"> {this.displayWorstPerformance()} Worst</div>
                     <div className="col">Use Percentage: {this.displayUsePercentage()}</div>
@@ -724,7 +724,7 @@ export class Settings extends Component {
 
                 </div>
 
-                <NotificationContainer />
+                {/* <NotificationContainer /> */}
             </React.Fragment >
         )
     }

@@ -8,3 +8,5 @@ export const PROGRAM_INDICATORS_BY_PROGRAM_ROUTE = '.json?fields=id,name,program
 
 export const INDICATORS_ROUTE = API_BASE_ROUTE.concat('/dataStore/SupervisionHWCA/indicators');
 export const GLOBAL_SETTINGS_ROUTE = API_BASE_ROUTE.concat('/dataStore/SupervisionHWCA/global_settings');
+
+export const SUPERVISIONS_ROUTE = API_BASE_ROUTE.concat('/dataStore/SupervisionHWCA/supervisions');
