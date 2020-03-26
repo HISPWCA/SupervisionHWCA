@@ -14,7 +14,6 @@ import SettingsForm from '../SettingsForm/SettingsForm';
 import './Settings.css';
 
 
-const C_PROGRAMS = 'Programs';
 const C_PROGRAM_INDICATORS = 'Program indicators';
 const C_AGGREGATED_INDICATORS = 'Aggregated Indicators';
 const C_PAGINATION_ROWS_PER_PAGE = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
@@ -62,9 +61,6 @@ export class Settings extends Component {
 
         if (this.state.currentAction === C_PROGRAM_INDICATORS) {
             this.loadPrograms()
-            console.log('programs indicators')
-        } else if (this.state.currentAction === C_PROGRAMS) {
-            console.log('programs')
         } else if (this.state.currentAction === C_AGGREGATED_INDICATORS) {
             this.loadAggregatedIndicatorsWithGroups()
         }
@@ -84,7 +80,7 @@ export class Settings extends Component {
         axios.get(API_BASE_ROUTE.concat(PROGRAMS_ROUTE))
             .then(response => {
                 this.setState({
-                    currentAction: C_PROGRAMS,
+                    currentAction: C_PROGRAM_INDICATORS,
                     initialPrograms: response.data.programs,
                     initialAggregatedIndicatorsWithGroups: response.data.programs,
                 })
@@ -167,7 +163,7 @@ export class Settings extends Component {
     }
 
     displayPrograms = () => {
-        if (this.state.currentAction === C_PROGRAMS || this.state.currentAction === C_PROGRAM_INDICATORS) {
+        if (this.state.currentAction === C_PROGRAM_INDICATORS) {
             return (
                 this.state.initialAggregatedIndicatorsWithGroups
                     .filter((i, index) => index >= this.state.programsFirstPage && index <= (this.state.programsFirstPage + 5))
@@ -645,7 +641,7 @@ export class Settings extends Component {
     handlePagination = () => {
         if (this.state.currentAction === C_AGGREGATED_INDICATORS) {
             return (
-                <div className="mt-3 p-3+">
+                <div className="mt-3">
                     <Paginator
                         first={this.state.aggregatedFirstPage}
                         rows={this.state.aggregatedNumRows}
@@ -655,9 +651,9 @@ export class Settings extends Component {
                         template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink" />
                 </div>
             )
-        } else if (this.state.currentAction === C_PROGRAM_INDICATORS || this.state.currentAction === C_PROGRAMS) {
+        } else if (this.state.currentAction === C_PROGRAM_INDICATORS) {
             return (
-                <div className="mt-3 p-3+">
+                <div className="mt-3">
                     <Paginator
                         first={this.state.programsFirstPage}
                         rows={this.state.programsNumRows}
