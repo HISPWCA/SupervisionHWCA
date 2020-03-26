@@ -17,6 +17,7 @@ import './Settings.css';
 const C_PROGRAMS = 'Programs';
 const C_PROGRAM_INDICATORS = 'Program indicators';
 const C_AGGREGATED_INDICATORS = 'Aggregated Indicators';
+const C_PAGINATION_ROWS_PER_PAGE = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
 export class Settings extends Component {
 
@@ -28,6 +29,7 @@ export class Settings extends Component {
             metaDatas: [],
             childMetaDatas: [],
             selectedIndicators: [],
+            selectedProgramIndicators: [],
 
             globalSettings: { bestPerformance: 5, worstPerformance: 5, usePercentage: true },
 
@@ -39,6 +41,9 @@ export class Settings extends Component {
 
             aggregatedFirstPage: 0,
             aggregatedNumRows: 5,
+
+            programsFirstPage: 0,
+            programsNumRows: 5,
 
             initialAggregatedIndicatorsWithGroups: [],
             selectedAggregatedIndicator: null,
@@ -54,7 +59,15 @@ export class Settings extends Component {
     componentDidMount = () => {
         this.retrieveGlobalSettingsFromServer()
         this.retrieveIndicatorsFromServer()
-        this.loadAggregatedIndicatorsWithGroups()
+
+        if (this.state.currentAction === C_PROGRAM_INDICATORS) {
+            this.loadPrograms()
+            console.log('programs indicators')
+        } else if (this.state.currentAction === C_PROGRAMS) {
+            console.log('programs')
+        } else if (this.state.currentAction === C_AGGREGATED_INDICATORS) {
+            this.loadAggregatedIndicatorsWithGroups()
+        }
     }
 
     loadAggregatedIndicatorsWithGroups = () => {
@@ -63,6 +76,17 @@ export class Settings extends Component {
                 this.setState({
                     currentAction: C_AGGREGATED_INDICATORS,
                     initialAggregatedIndicatorsWithGroups: response.data.indicatorGroups
+                })
+            }).catch(error => NotificationManager.error(error.message, null, 3000))
+    }
+
+    loadPrograms = () => {
+        axios.get(API_BASE_ROUTE.concat(PROGRAMS_ROUTE))
+            .then(response => {
+                this.setState({
+                    currentAction: C_PROGRAMS,
+                    initialPrograms: response.data.programs,
+                    initialAggregatedIndicatorsWithGroups: response.data.programs,
                 })
             }).catch(error => NotificationManager.error(error.message, null, 3000))
     }
@@ -84,15 +108,6 @@ export class Settings extends Component {
         }))
     }
 
-    loadPrograms = () => {
-        axios.get(API_BASE_ROUTE.concat(PROGRAMS_ROUTE))
-            .then(response => {
-                this.setState({
-                    currentAction: C_PROGRAMS,
-                    initialPrograms: response.data.programs
-                }, () => this.loadProgramIndicatorsByProgramId(this.state.initialPrograms[0].id))
-            }).catch(error => NotificationManager.error(error.message, null, 3000))
-    }
 
     loadProgramIndicatorsByProgramId = programId => {
         axios.get(
@@ -103,7 +118,7 @@ export class Settings extends Component {
         ).then(response => {
             this.setState({
                 currentAction: C_PROGRAM_INDICATORS,
-                initialPrograms: response.data
+                selectedProgramIndicators: response.data.programIndicators
             })
         }).catch(error => NotificationManager.error(error.message, null, 3000))
     }
@@ -116,10 +131,8 @@ export class Settings extends Component {
 
     retrieveGlobalSettingsFromServer = () => {
         axios.get(GLOBAL_SETTINGS_ROUTE)
-            .then(response => this.setState({ globalSettings: response.data }, () => {
-                console.log('mon data est')
-                console.log(response)
-            })).catch(error => NotificationManager.error(error.message, null, 3000))
+            .then(response => this.setState({ globalSettings: null }, () => this.setState({ globalSettings: response.data })))
+            .catch(error => NotificationManager.error(error.message, null, 3000))
     }
 
     updateGlobalSettingsOnServer = globalSettings => {
@@ -131,6 +144,8 @@ export class Settings extends Component {
     classNameProvider = type => type === this.state.currentAction ? 'btn btn-primary btn-sm ' : 'btn btn-sm btn-outline-primary '
 
     aggregatedIndicatorClassNameProvider = indicator => this.state.selectedAggregatedIndicator && this.state.selectedAggregatedIndicator.id === indicator.id ? 'col text-left SelectedSetting  m-1 p-3' : 'col text-left Settings  m-1 p-3'
+
+    programClassNameProvider = program => this.state.selectedProgram && this.state.selectedProgram.id === program.id ? 'col text-left SelectedSetting  m-1 p-3' : 'col text-left Settings  m-1 p-3'
 
     displayAggregatedIndicators = () => {
         if (this.state.currentAction === C_AGGREGATED_INDICATORS) {
@@ -151,7 +166,28 @@ export class Settings extends Component {
         }
     }
 
+    displayPrograms = () => {
+        if (this.state.currentAction === C_PROGRAMS || this.state.currentAction === C_PROGRAM_INDICATORS) {
+            return (
+                this.state.initialAggregatedIndicatorsWithGroups
+                    .filter((i, index) => index >= this.state.programsFirstPage && index <= (this.state.programsFirstPage + 5))
+                    .map(program => (
+                        <div className="row" key={program.id}>
+                            <div className={this.programClassNameProvider(program)}
+                                onClick={() => this.handleProgramClick(program)}>
+                                {program.displayName}
+                            </div>
+                        </div>
+                    ))
+            )
+        } else {
+            return null
+        }
+    }
+
     handleAggregatedIndicatorsClick = indicator => this.setState({ selectedAggregatedIndicator: indicator })
+
+    handleProgramClick = program => this.setState({ selectedProgram: program, selectedProgramIndicators: [] }, () => this.loadProgramIndicatorsByProgramId(program.id))
 
     createGlobalSettings = () => {
         if (this.state.globalSettings !== null && this.state.globalSettings !== undefined) {
@@ -469,6 +505,46 @@ export class Settings extends Component {
         }
     }
 
+    displayProgramIndicators = () => {
+        if (this.state.currentAction === C_PROGRAM_INDICATORS &&
+            this.state.selectedProgram !== null) {
+            if (this.state.selectedProgramIndicators.length === 0) {
+                return (
+                    <div className="alert alert-danger">No program indicator available for
+                        <span className="font-weight-bold p-3 text-primary"> {this.state.selectedProgram.displayName}</span>
+
+                        <hr />
+                        <button className="btn btn-outline-warning"
+                            onClick={() => this.setState({ selectedProgram: null })}>Close</button>
+                    </div>
+                )
+            } else {
+
+                return (
+                    <div className="col m-3">
+                        <div className="mb-1 text-left">
+                            Program Indicators
+                            </div>
+
+                        {this.state.selectedProgramIndicators
+                            .filter(i => !this.state.selectedIndicators
+                                .map(ai => ai.id)
+                                .includes(i.id)
+                            )
+                            .map(indicator => (
+                                <div className="row" key={indicator.id}>
+                                    <div className={'col text-left Settings m-1 p-3'}
+                                        onClick={() => this.handleCurrentSelectedIndicator(indicator)}>
+                                        {indicator.displayName}
+                                    </div>
+                                </div>
+                            ))}
+                    </div>
+                )
+            }
+        }
+    }
+
     displaySelectedIndicators = () => {
         if (this.state.selectedIndicators.length > 0) {
 
@@ -515,7 +591,7 @@ export class Settings extends Component {
     displayParentTitle = () => {
         if (this.state.currentAction === C_AGGREGATED_INDICATORS) {
             return <div className="mb-1 text-left">Indicator Groups</div>
-        } else if (this.state.currentAction === C_PROGRAMS) {
+        } else if (this.state.currentAction === C_PROGRAM_INDICATORS) {
             return <div className="mb-1 text-left">Programs</div>
         }
     }
@@ -549,6 +625,8 @@ export class Settings extends Component {
 
     onAggragatedIndicatorPageChange = event => this.setState({ aggregatedFirstPage: event.first, aggregatedNumRows: event.rows })
 
+    onProgramsPageChange = event => this.setState({ programsFirstPage: event.first, programsNumRows: event.rows })
+
     onSelectedIndicatorPageChange = event => this.setState({ selectedIndicatorsFirstPage: event.first, selectedIndicatorsNumRows: event.rows })
 
     onAvailableIndicatorPageChange = event => this.setState({ availableIndicatorsFirstPage: event.first, availableIndicatorsNumRows: event.rows })
@@ -561,6 +639,34 @@ export class Settings extends Component {
             return 'True'
         } else {
             return 'False'
+        }
+    }
+
+    handlePagination = () => {
+        if (this.state.currentAction === C_AGGREGATED_INDICATORS) {
+            return (
+                <div className="mt-3 p-3+">
+                    <Paginator
+                        first={this.state.aggregatedFirstPage}
+                        rows={this.state.aggregatedNumRows}
+                        totalRecords={this.state.initialAggregatedIndicatorsWithGroups.length}
+                        rowsPerPageOptions={[...C_PAGINATION_ROWS_PER_PAGE]}
+                        onPageChange={this.onAggragatedIndicatorPageChange}
+                        template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink" />
+                </div>
+            )
+        } else if (this.state.currentAction === C_PROGRAM_INDICATORS || this.state.currentAction === C_PROGRAMS) {
+            return (
+                <div className="mt-3 p-3+">
+                    <Paginator
+                        first={this.state.programsFirstPage}
+                        rows={this.state.programsNumRows}
+                        totalRecords={this.state.initialAggregatedIndicatorsWithGroups.length}
+                        rowsPerPageOptions={C_PAGINATION_ROWS_PER_PAGE}
+                        onPageChange={this.onProgramsPageChange}
+                        template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink" />
+                </div>
+            )
         }
     }
 
@@ -598,7 +704,6 @@ export class Settings extends Component {
                 {this.createGlobalSettings()}
 
 
-
                 <div className="row m-3">
                     <div className="col m-3">
 
@@ -606,20 +711,16 @@ export class Settings extends Component {
 
                         {this.displayAggregatedIndicators()}
 
-                        <div className="m-3 p-3">
-                            <Paginator
-                                first={this.state.aggregatedFirstPage}
-                                rows={this.state.aggregatedNumRows}
-                                totalRecords={this.state.initialAggregatedIndicatorsWithGroups.length}
-                                rowsPerPageOptions={[5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]}
-                                onPageChange={this.onAggragatedIndicatorPageChange}
-                                template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink" />
-                        </div>
+                        {this.displayPrograms()}
+
+                        {this.handlePagination()}
 
                         {this.createCategoryForm()}
                     </div>
 
                     {this.displayAggregatedIndicatorChildrens()}
+
+                    {this.displayProgramIndicators()}
 
                     {this.displayIndicatorsSettingForm()}
 
