@@ -1,9 +1,9 @@
-import React, { Component } from 'react'
-import { Tree } from 'primereact/tree';
-import { Growl } from 'primereact/growl';
 import axios from 'axios';
-import { ORGANISATION_UNITS_ROUTE } from '../api.routes';
+import { Tree } from 'primereact/tree';
+import React, { Component } from 'react';
 import { NotificationManager } from 'react-notifications';
+import { ORGANISATION_UNITS_ROUTE, SUPERVISORS_ROUTE } from '../api.routes';
+import { Calendar } from 'primereact/calendar';
 
 export class Supervision extends Component {
 
@@ -12,29 +12,37 @@ export class Supervision extends Component {
 
         this.state = {
             nodes: [],
+            dates: null,
+            supervisors: [],
             selectedNodes: [],
-            selectedNodeKeys3: null,
+            selectedNodeKeys: null,
+            selectedSupervisors: [],
+            currentSelectedNode: null,
         }
     }
 
-    componentDidMount = () => this.loadOrganisationUnits()
+    componentDidMount = () => {
+        this.loadSupervisors()
+        this.loadOrganisationUnits()
+    }
 
     loadOrganisationUnits = () => {
         axios.get(ORGANISATION_UNITS_ROUTE)
             .then(response => {
-                let organisationUnits = response.data.organisationUnits.map(o => {
-                    return {
-                        key: o.id,
-                        label: o.displayName,
-                        data: o,
-                        children: [],
-                        parent: (o.parent !== null && o.parent !== undefined) ? o.parent.id : null
-                    }
-                })
+                let organisationUnits = response.data.organisationUnits
+                    .map(o => {
+                        return {
+                            key: o.id,
+                            label: o.displayName,
+                            data: o,
+                            children: [],
+                            parent: (o.parent !== null && o.parent !== undefined) ? o.parent.id : null
+                        }
+                    })
 
-                const firstParents = organisationUnits.filter(o => o.parent === null);
+                const nodes = organisationUnits.filter(o => o.parent === null);
 
-                firstParents.forEach(o => {
+                nodes.forEach(o => {
                     o.children = organisationUnits.filter(org => org.parent === o.key)
 
                     o.children.forEach(a => {
@@ -138,8 +146,14 @@ export class Supervision extends Component {
                     })
                 })
 
-                this.setState({ nodes: firstParents })
+                this.setState({ nodes })
             }).catch(error => NotificationManager.error(error.message, null, 3000))
+    }
+
+    loadSupervisors = () => {
+        axios.get(SUPERVISORS_ROUTE)
+            .then(response => this.setState({ supervisors: response.data.users }))
+            .catch(error => NotificationManager.error(error.message, null, 3000))
     }
 
     onExpand = event => {
@@ -154,33 +168,116 @@ export class Supervision extends Component {
         const selectedNodes = [...this.state.selectedNodes]
         selectedNodes.push(event.node)
         this.setState({ selectedNodes })
-
-        // this.growl.show({ severity: 'info', summary: 'Node Selected', detail: event.node.label });
     }
 
     onUnselect = event => {
         const selectedNodes = this.state.selectedNodes.filter(n => n !== event.node)
         this.setState({ selectedNodes })
+    }
 
-        // this.growl.show({ severity: 'info', summary: 'Node Unselected', detail: event.node.label });
+    handleOrgsUnitSelection = currentSelectedNode => this.setState({ currentSelectedNode: null }, () => this.setState({ currentSelectedNode }))
+
+    orgUnitClassNameProvider = organisationUnit => this.state.currentSelectedNode !== null && this.state.currentSelectedNode.key === organisationUnit.key ? 'm-3 p-3 text-left Settings SelectedSetting' : 'm-3 p-3 text-left Settings'
+
+    displaySelectedOrgUnits = () => {
+        if (this.state.selectedNodes.length > 0) {
+            return (
+                <div className="col">
+                    <div className="font-weight-bold">Selected Org. Units</div>
+
+                    {this.state.selectedNodes.map(o => {
+                        return (
+                            <div
+                                onClick={() => this.handleOrgsUnitSelection(o)}
+                                className={this.orgUnitClassNameProvider(o)}
+                                key={o.key}>
+                                {o.label}
+                            </div>
+                        )
+                    })}
+                </div>
+            )
+        }
+    }
+
+    displayForms = () => {
+        if (this.state.currentSelectedNode !== null) {
+            return (
+                <div className="col">
+                    <div className="font-weight-bold">Select Period</div>
+
+                    <Calendar
+                        value={this.state.dates}
+                        onChange={(e) => this.setState({ dates: e.value })}
+                        selectionMode="range"
+                        readOnlyInput={true} />
+
+                    <div className="font-weight-bold mt-3">Select Supervisors</div>
+                    {this.displaySupervisors()}
+                </div>
+            )
+        }
+    }
+
+    handleSupevisorSelection = supervisor => {
+        const selectedSupervisors = [...this.state.selectedSupervisors]
+        selectedSupervisors.push(supervisor)
+
+        this.setState({ selectedSupervisors })
+    }
+
+    displaySupervisors = () => {
+        if (this.state.currentSelectedNode !== null && this.state.supervisors.length > 0) {
+            return (
+                <div className="col">
+                    {this.state.supervisors
+                        .filter(su => !this.state.selectedSupervisors.map(s => s.id).includes(su.id))
+                        .map(s => {
+                            return <div key={s.id} className="mt-3 p-3 text-left Settings" onClick={() => this.handleSupevisorSelection(s)}>{s.displayName}</div>
+                        })}
+                </div>
+            )
+        }
+    }
+
+    displaySelectedSupervisors = () => {
+        if (this.state.currentSelectedNode !== null && this.state.selectedSupervisors.length > 0) {
+            return (
+                <div className="col">
+                    {this.state.selectedSupervisors.map(s => {
+                        return <div key={s.id} className="m-3 p-3 text-left Settings">{s.displayName}</div>
+                    })}
+                </div>
+            )
+        }
     }
 
     render() {
         return (
             <React.Fragment>
 
-                {this.state.selectedNodes.map(n => console.log(n))}
+                <div className="row m-3 text-left">
+                    <div className="col">
+                        <div className="font-weight-bold">Organisation Units</div>
 
-                <Tree value={this.state.nodes}
-                    selectionMode="checkbox"
-                    filter={true}
-                    selectionKeys={this.state.selectedNodeKeys3}
-                    onSelectionChange={e => this.setState({ selectedNodeKeys3: e.value })}
-                    onExpand={this.onExpand}
-                    onCollapse={this.onCollapse}
-                    onSelect={this.onSelect}
-                    onUnselect={this.onUnselect} />
+                        <Tree value={this.state.nodes}
+                            selectionMode="checkbox"
+                            filter={true}
+                            selectionKeys={this.state.selectedNodeKeys3}
+                            onSelectionChange={e => this.setState({ selectedNodeKeys3: e.value })}
+                            onExpand={this.onExpand}
+                            onCollapse={this.onCollapse}
+                            onSelect={this.onSelect}
+                            onUnselect={this.onUnselect} />
 
+                    </div>
+
+                    {this.displaySelectedOrgUnits()}
+
+                    {this.displayForms()}
+
+                    {this.displaySelectedSupervisors()}
+                </div>
 
             </React.Fragment>
         )
