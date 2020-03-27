@@ -22,11 +22,10 @@ export class TableView extends Component {
 
     loadSupervisions = () => {
         axios.get(SUPERVISIONS_ROUTE)
-            .then(response => {
-                console.log('min mnnai si')
-                console.log(response.data)
-            }).catch(error => NotificationManager.success(error.message, null, 3000))
+            .then(response => this.setState({ supervisions: response.data }))
+            .catch(error => NotificationManager.error(error.message, null, 3000))
     }
+
 
     renderSupervisions = () => {
         // this.state.supervisions.map()        
