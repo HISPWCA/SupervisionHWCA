@@ -183,7 +183,7 @@ export class Supervision extends Component {
                             selectedSupervisors: [],
                             description: null,
                         }, () => {
-                            this.props.handleDisplayNewSupervison()
+                            this.props.loadSupervisions()
                             NotificationManager.success('Supervision planned successfully', null, 3000)
                         })
                     })
@@ -259,8 +259,6 @@ export class Supervision extends Component {
             supervision.organisationUnit = this.state.currentSelectedNode
 
             this.createSupervision(supervision)
-            console.log(supervision)
-
         }
     }
 

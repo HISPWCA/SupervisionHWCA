@@ -4,6 +4,7 @@ import { SUPERVISIONS_ROUTE } from '../api.routes';
 import NotificationManager from 'react-notifications/lib/NotificationManager';
 import Supervision from '../Supervision/Supervision';
 import './TableView.css';
+import moment from 'moment';
 
 export class TableView extends Component {
 
@@ -12,6 +13,7 @@ export class TableView extends Component {
 
         this.state = {
             supervisions: [],
+            selectedSupervision: null,
             displaySupervisionFormCreation: false,
         }
     }
@@ -20,7 +22,7 @@ export class TableView extends Component {
 
     loadSupervisions = () => {
         axios.get(SUPERVISIONS_ROUTE)
-            .then(response => this.setState({ supervisions: response.data }, () => console.log(this.state.supervisions)))
+            .then(response => this.setState({ supervisions: response.data }))
             .catch(error => NotificationManager.error(error.message, null, 3000))
     }
 
@@ -30,13 +32,17 @@ export class TableView extends Component {
                 return (
                     <tr key={s.id}>
                         <td>{s.id}</td>
-                        <td>{s.period}</td>
+                        <td>
+                            {moment(s.period[0]).format('Do MMMM, YYYY')}
+                            <span className="font-weight-bold m-3 text-secondary"> - </span>
+                            {moment(s.period[1]).format('Do MMMM, YYYY')}
+                        </td>
                         <td>{s.organisationUnit.label}</td>
                         <td>{s.owner.displayName}</td>
                         <td>{s.status}</td>
                         <td>
                             <button className="btn btn-outline-danger rounded" >
-                                D&eacute;tails
+                                Details
                             </button>
                         </td>
                     </tr>
@@ -47,25 +53,110 @@ export class TableView extends Component {
 
     handleDisplayNewSupervison = () => this.setState({ displaySupervisionFormCreation: !this.state.displaySupervisionFormCreation }, () => this.loadSupervisions())
 
-    displaySupervisonstable = () => {
-        if (!this.state.displaySupervisionFormCreation) {
+    deleteSupervision = supervision => {
+        axios.get(SUPERVISIONS_ROUTE)
+            .then(response => this.setState({ supervisions: response.data }, () => {
+                const supervisions = response.data.filter(s => s.id !== supervision.id)
+
+                axios.put(SUPERVISIONS_ROUTE, supervisions)
+                    .then(() => {
+                        this.setState({
+                            selectedSupervision: null,
+                            displaySupervisionFormCreation: false,
+                        }, () => {
+                            this.loadSupervisions()
+                            NotificationManager.info('Supervision deleted successfully', null, 3000)
+                        })
+                    }).catch(error => NotificationManager.error(error.message, null, 3000))
+            })).catch(error => NotificationManager.error(error.message, null, 3000))
+    }
+
+    handleSupervisionDetails = selectedSupervision => this.setState({ displaySupervisionFormCreation: false, selectedSupervision })
+
+    displaySupervisionDetails = () => {
+        if (this.state.selectedSupervision !== null
+            && this.state.selectedSupervision !== undefined
+            && !this.state.displaySupervisionFormCreation) {
             return (
-                <div className="row m-3">
-                    <div className="col">
-                        <table className="table table-striped table-sm table-hover table-borderless">
-                            <thead>
-                                <th>ID</th>
-                                <th>Period</th>
-                                <th>Org. Unit.</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </thead>
-                            <tbody>
-                                {this.renderSupervisions()}
-                            </tbody>
-                        </table>
+                <React.Fragment>
+                    <div className="row">
+                        <div className="col">
+                            <table className="table table-borderless table-sm table-striped text-left m-3">
+                                <tbody>
+                                    <tr><td className="text-danger"><h3>{this.state.selectedSupervision.description.toUpperCase()}</h3></td></tr>
+                                    <tr>
+                                        <td>
+                                            <span className="font-weight-bold m-3 text-secondary">Status:</span>
+                                            {this.state.selectedSupervision.status}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span className="font-weight-bold m-3 text-secondary">Owner:</span>
+                                            {this.state.selectedSupervision.owner.displayName}
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <span className="font-weight-bold m-3 text-secondary">Use Stepper:</span>
+                                            {this.state.selectedSupervision.useStepper ? 'Yes' : 'No'}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span className="font-weight-bold m-3 text-secondary">Organisation Unit:</span>
+                                            {this.state.selectedSupervision.organisationUnit.label}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span className="font-weight-bold m-3 text-secondary">Start:</span>
+                                            {moment(this.state.selectedSupervision.period[0]).format('dddd Do MMMM, YYYY')}
+                                            <span className="font-weight-bold m-3 text-secondary">End:</span>
+                                            {moment(this.state.selectedSupervision.period[1]).format('dddd Do MMMM, YYYY')}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
+
+                    <div className="row">
+                        <div className="col">
+                            <table className="table table-hover table-sm table-striped text-left m-3">
+                                <thead><th>Indicators</th></thead>
+                                <tbody>
+                                    {this.state.selectedSupervision.indicators.map(i => {
+                                        return <tr key={i.id}><td>{i.label}</td></tr>
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className="col">
+                            <table className="table table-hover table-sm table-striped text-left m-3">
+                                <thead><th>Supervisors</th></thead>
+                                <tbody>
+                                    {this.state.selectedSupervision.supervisors
+                                        .map(s => <tr key={s.id}><td>{s.displayName}</td></tr>)}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div className="mt-3 row">
+                        <div className="col btn-group">
+                            <button
+                                className="btn btn-outline-secondary btn-sm p-3"
+                                onClick={() => this.setState({ selectedSupervision: null, displaySupervisionFormCreation: false })}>Close</button>
+
+                            <button
+                                className="btn btn-outline-danger btn-sm p-3"
+                                onClick={() => this.deleteSupervision(this.state.selectedSupervision)} >Delete</button>
+                        </div>
+                    </div>
+
+                </React.Fragment>
             )
         }
     }
@@ -73,13 +164,55 @@ export class TableView extends Component {
     render() {
         return (
             <React.Fragment>
-                {this.displaySupervisonstable()}
+                <div className="row m-3">
+                    <div className="col">
+                        <table className="table table-hover table-sm table-striped text-left m-3">
+                            <thead>
+                                <th>Description</th>
+                                <th>Start Date - End Date</th>
+                                <th>Org. Unit</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </thead>
+                            <tbody>
 
-                {this.state.displaySupervisionFormCreation && <Supervision handleDisplayNewSupervison={this.handleDisplayNewSupervison} />}
+                                {this.state.supervisions.map(s => {
+                                    return (
+                                        <tr key={s.id}>
+                                            <td>{s.description}</td>
+                                            <td>
+                                                {moment(s.period[0]).format('Do MMMM, YYYY')}
+                                                <span className="font-weight-bold m-3 text-secondary"> - </span>
+                                                {moment(s.period[1]).format('Do MMMM, YYYY')}
+                                            </td>
+                                            <td>{s.organisationUnit.label}</td>
+                                            <td>{s.status}</td>
+                                            <td>
+                                                <button
+                                                    onClick={() => this.handleSupervisionDetails(s)}
+                                                    className="btn btn-sm btn-outline-danger"
+                                                    title="Details">
+                                                    Details
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    )
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {this.displaySupervisionDetails()}
+
+                {this.state.displaySupervisionFormCreation && <Supervision loadSupervisions={this.loadSupervisions} />}
 
                 {(<button
-                    title="New Supervision"
-                    className={this.state.displaySupervisionFormCreation ? 'TableView btn btn-outline-danger': 'TableView btn btn-outline-primary'}
+                    className={
+                        this.state.displaySupervisionFormCreation
+                            ? 'TableView btn btn-outline-danger'
+                            : 'TableView btn btn-outline-primary'
+                    }
                     onClick={() => this.handleDisplayNewSupervison()}>
                     {this.state.displaySupervisionFormCreation ? '-' : '+'}
                 </button>)}
