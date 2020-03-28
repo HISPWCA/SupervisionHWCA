@@ -6,10 +6,10 @@ import { Paginator } from 'primereact/paginator';
 import 'primereact/resources/primereact.min.css';
 import 'primereact/resources/themes/nova-light/theme.css';
 import React, { Component } from 'react';
-import { NotificationContainer, NotificationManager } from 'react-notifications';
+import { NotificationManager } from 'react-notifications';
 import 'react-notifications/lib/notifications.css';
 import { v4 as uuidv4 } from 'uuid';
-import { AGGREGATED_INDICATORS_ROUTE, GLOBAL_SETTINGS_ROUTE, API_BASE_ROUTE, PROGRAMS_ROUTE, PROGRAM_INDICATORS_BY_PROGRAM_ROUTE, INDICATORS_ROUTE } from '../api.routes';
+import { AGGREGATED_INDICATORS_ROUTE, API_BASE_ROUTE, GLOBAL_SETTINGS_ROUTE, INDICATORS_ROUTE, PROGRAMS_ROUTE, PROGRAM_INDICATORS_BY_PROGRAM_ROUTE } from '../api.routes';
 import SettingsForm from '../SettingsForm/SettingsForm';
 import './Settings.css';
 

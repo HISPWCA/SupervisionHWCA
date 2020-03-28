@@ -2,8 +2,9 @@ import axios from 'axios';
 import { Tree } from 'primereact/tree';
 import React, { Component } from 'react';
 import { NotificationManager } from 'react-notifications';
-import { ORGANISATION_UNITS_ROUTE, SUPERVISORS_ROUTE } from '../api.routes';
+import { ORGANISATION_UNITS_ROUTE, SUPERVISORS_ROUTE, ME_ROUTE, INDICATORS_ROUTE, SUPERVISIONS_ROUTE } from '../api.routes';
 import { Calendar } from 'primereact/calendar';
+import { v4 as uuidv4 } from 'uuid';
 
 export class Supervision extends Component {
 
@@ -11,19 +12,29 @@ export class Supervision extends Component {
         super(props)
 
         this.state = {
+            me: null,
             nodes: [],
             dates: null,
             supervisors: [],
+            supervisions: [],
+            useStepper: true,
+            description: null,
             selectedNodes: [],
             selectedNodeKeys: null,
+            availableIndicators: [],
             selectedSupervisors: [],
             currentSelectedNode: null,
+            currentSelectedOrgUnit: null,
+            currentSelectedIndicators: [],
+            currentSelectedSupervisor: null,
         }
     }
 
     componentDidMount = () => {
+        this.loadMe()
         this.loadSupervisors()
         this.loadOrganisationUnits()
+        this.loadIndicatorsFromServer()
     }
 
     loadOrganisationUnits = () => {
@@ -156,18 +167,42 @@ export class Supervision extends Component {
             .catch(error => NotificationManager.error(error.message, null, 3000))
     }
 
-    onExpand = event => {
-        // this.growl.show({ severity: 'success', summary: 'Node Expanded', detail: event.node.label });
+    createSupervision = supervision => {
+        axios.get(SUPERVISIONS_ROUTE)
+            .then(response => this.setState({ supervisions: response.data }, () => {
+                const supervisions = response.data
+                supervisions.push(supervision)
+
+                axios.put(SUPERVISIONS_ROUTE, supervisions)
+                    .then(() => {
+                        this.setState({
+                            dates: null,
+                            currentSelectedSupervisor: null,
+                            currentSelectedIndicators: [],
+                            currentSelectedNode: null,
+                            selectedSupervisors: [],
+                            description: null,
+                        }, () => {
+                            this.props.handleDisplayNewSupervison()
+                            NotificationManager.success('Supervision planned successfully', null, 3000)
+                        })
+                    })
+                    .catch(error => NotificationManager.error(error.message, null, 3000))
+            })).catch(error => NotificationManager.error(error.message, null, 3000))
     }
 
-    onCollapse = event => {
-        // this.growl.show({ severity: 'success', summary: 'Node Collapsed', detail: event.node.label });
+    loadMe = () => {
+        axios.get(ME_ROUTE)
+            .then(response => this.setState({ me: response.data }))
+            .catch(error => NotificationManager.error(error.message, null, 3000))
     }
 
     onSelect = event => {
         const selectedNodes = [...this.state.selectedNodes]
-        selectedNodes.push(event.node)
-        this.setState({ selectedNodes })
+        if (!selectedNodes.includes(event.node)) {
+            selectedNodes.push(event.node)
+            this.setState({ selectedNodes })
+        }
     }
 
     onUnselect = event => {
@@ -200,17 +235,80 @@ export class Supervision extends Component {
         }
     }
 
+    handleSupervisionCreation = () => {
+        if (this.state.dates === null) {
+            NotificationManager.error('Please Select date or Period', null, 3000)
+        } else if (this.state.description === null || this.state.description.length === 0) {
+            NotificationManager.error('Please you should fill descripton', null, 3000)
+        } else if (this.state.currentSelectedNode === null) {
+            NotificationManager.error('Please Select organisation unit', null, 3000)
+        } else if (this.state.currentSelectedIndicators.length === 0) {
+            NotificationManager.error('Please Select Indicators', null, 3000)
+        } else if (this.state.selectedSupervisors.length === 0) {
+            NotificationManager.error('Please Select Supervisors', null, 3000)
+        } else {
+            const supervision = {}
+            supervision.id = uuidv4()
+            supervision.status = 'Planned'
+            supervision.owner = this.state.me
+            supervision.period = this.state.dates
+            supervision.useStepper = this.state.useStepper
+            supervision.description = this.state.description
+            supervision.supervisors = this.state.selectedSupervisors
+            supervision.indicators = this.state.currentSelectedIndicators
+            supervision.organisationUnit = this.state.currentSelectedNode
+
+            this.createSupervision(supervision)
+            console.log(supervision)
+
+        }
+    }
+
+    handleChange = event => {
+        if (event.target.type === 'checkbox') {
+            this.setState({ useStepper: event.target.checked })
+        } else {
+            this.setState({ description: event.target.value })
+        }
+    }
+
     displayForms = () => {
-        if (this.state.currentSelectedNode !== null) {
+        if (this.state.currentSelectedNode !== null && this.state.selectedNodes.length > 0) {
             return (
                 <div className="col">
-                    <div className="font-weight-bold">Select Period</div>
+                    <div className="form-group alert alert-secondary m-1" role="alert">
+                        <div className="font-weight-bold">Select Period</div>
 
-                    <Calendar
-                        value={this.state.dates}
-                        onChange={(e) => this.setState({ dates: e.value })}
-                        selectionMode="range"
-                        readOnlyInput={true} />
+                        <Calendar
+                            value={this.state.dates}
+                            onChange={(e) => this.setState({ dates: e.value })}
+                            selectionMode="range"
+                            readOnlyInput={true} />
+
+                        <div className="font-weight-bold">Add description</div>
+
+                        <input
+                            className="form-control"
+                            onChange={this.handleChange}
+                            value={this.state.description} />
+
+                        <input
+                            id="useStepper"
+                            type="checkbox"
+                            checked={this.state.useStepper}
+                            value={this.state.useStepper}
+                            onChange={this.handleChange}
+                            className="form-check-input input-sm" />
+
+                        <label className="form-check-label" for="useStepper">Use Stepper</label>
+
+                        <hr />
+                        <button
+                            className="btn btn-sm btn-outline-primary"
+                            onClick={this.handleSupervisionCreation}>
+                            Save
+                        </button>
+                    </div>
 
                     <div className="font-weight-bold mt-3">Select Supervisors</div>
                     {this.displaySupervisors()}
@@ -240,21 +338,102 @@ export class Supervision extends Component {
         }
     }
 
+    removeHandleSupervisorsSelection = supervisor => {
+        const selectedSupervisors = [...this.state.selectedSupervisors].filter(s => s.id !== supervisor.id)
+
+        this.setState({ selectedSupervisors })
+    }
+
     displaySelectedSupervisors = () => {
-        if (this.state.currentSelectedNode !== null && this.state.selectedSupervisors.length > 0) {
+        if (this.state.currentSelectedNode !== null && this.state.selectedSupervisors.length > 0 && this.state.selectedNodes.length > 0) {
             return (
                 <div className="col">
+                    <div className="font-weight-bold">Selected Supervisors</div>
+
                     {this.state.selectedSupervisors.map(s => {
-                        return <div key={s.id} className="m-3 p-3 text-left Settings">{s.displayName}</div>
+                        return <div key={s.id} className="mt-3 p-3 text-left Settings" onClick={() => this.removeHandleSupervisorsSelection(s)}>{s.displayName}</div>
                     })}
                 </div>
             )
         }
     }
 
+    loadIndicatorsFromServer = () => {
+        axios.get(INDICATORS_ROUTE)
+            .then(response => this.setState({ availableIndicators: response.data }))
+            .catch(error => NotificationManager.error(error.message, null, 3000))
+    }
+
+    handleCurrentSelectedIndicator = indicator => {
+        const currentSelectedIndicators = [...this.state.currentSelectedIndicators]
+        currentSelectedIndicators.push(indicator)
+
+        this.setState({ currentSelectedIndicators })
+    }
+
+    displayAvailableIndicators = () => {
+        if (this.state.availableIndicators.length > 0) {
+            return (
+                <div className="col alert alert-primary scroll-indicators" role="alert">
+                    <div className="font-weight-bold">Indicators</div>
+
+                    <div className="m-1">
+                        {this.state.availableIndicators
+                            .filter(i => !this.state.currentSelectedIndicators.map(i => i.id).includes(i.id))
+                            .map(indicator => (
+                                <div className="row" key={indicator}>
+                                    <div className={'col text-left Settings m-1 p-2'}
+                                        onClick={() => this.handleCurrentSelectedIndicator(indicator)}>
+                                        {indicator.name}
+                                    </div>
+                                </div>
+                            ))}
+                    </div>
+                </div>
+            )
+        } else {
+            return <div className="col alert alert-danger" role="alert">You don't have any indicator configured yet</div>
+        }
+    }
+
+    handleIndicatorRemoval = indicator => {
+        const currentSelectedIndicators = [...this.state.currentSelectedIndicators].filter(i => i.id !== indicator.id)
+
+        this.setState({ currentSelectedIndicators })
+    }
+
+    displayCurrentSelectedIndicators = () => {
+        if (this.state.currentSelectedIndicators.length > 0) {
+            return (
+                <div className="col alert alert-danger scroll-indicators" role="alert">
+                    <div className="font-weight-bold">Selected Indicators</div>
+
+                    <div className="m-1">
+                        {this.state.currentSelectedIndicators.map(indicator => (
+                            <div className="row" key={indicator}>
+                                <div className={'col text-left Settings m-1 p-2'}
+                                    onClick={() => this.handleIndicatorRemoval(indicator)}>
+                                    {indicator.name}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )
+        } else {
+            return <div className="col alert alert-danger" role="alert">No indicator selected yet</div>
+        }
+    }
+
     render() {
         return (
             <React.Fragment>
+
+                <div className="row m-3 text-left">
+                    {this.displayAvailableIndicators()}
+
+                    {this.displayCurrentSelectedIndicators()}
+                </div>
 
                 <div className="row m-3 text-left">
                     <div className="col">
@@ -265,8 +444,6 @@ export class Supervision extends Component {
                             filter={true}
                             selectionKeys={this.state.selectedNodeKeys3}
                             onSelectionChange={e => this.setState({ selectedNodeKeys3: e.value })}
-                            onExpand={this.onExpand}
-                            onCollapse={this.onCollapse}
                             onSelect={this.onSelect}
                             onUnselect={this.onUnselect} />
 

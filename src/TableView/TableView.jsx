@@ -12,48 +12,62 @@ export class TableView extends Component {
 
         this.state = {
             supervisions: [],
-            displaySupervisionFormCreation: true,
+            displaySupervisionFormCreation: false,
         }
     }
 
-    componentDidMount = () => {
-        this.loadSupervisions()
-    }
+    componentDidMount = () => this.loadSupervisions()
 
     loadSupervisions = () => {
         axios.get(SUPERVISIONS_ROUTE)
-            .then(response => this.setState({ supervisions: response.data }))
+            .then(response => this.setState({ supervisions: response.data }, () => console.log(this.state.supervisions)))
             .catch(error => NotificationManager.error(error.message, null, 3000))
     }
 
-
     renderSupervisions = () => {
-        // this.state.supervisions.map()        
+        if (this.state.supervisions.length > 0) {
+            this.state.supervisions.map(s => {
+                return (
+                    <tr key={s.id}>
+                        <td>{s.id}</td>
+                        <td>{s.period}</td>
+                        <td>{s.organisationUnit.label}</td>
+                        <td>{s.owner.displayName}</td>
+                        <td>{s.status}</td>
+                        <td>
+                            <button className="btn btn-outline-danger rounded" >
+                                D&eacute;tails
+                            </button>
+                        </td>
+                    </tr>
+                )
+            })
+        }
     }
 
-    handleDisplayNewSupervison = () => {
-        this.setState({ displaySupervisionFormCreation: !this.state.displaySupervisionFormCreation })
-    }
+    handleDisplayNewSupervison = () => this.setState({ displaySupervisionFormCreation: !this.state.displaySupervisionFormCreation }, () => this.loadSupervisions())
 
     displaySupervisonstable = () => {
-        return (
-            <div className="row m-3">
-                <div className="col">
-                    <table className="table table-striped table-sm table-hover table-borderless">
-                        <thead>
-                            <th>ID</th>
-                            <th>Start Date (Approx.)</th>
-                            <th>End Date (Approx.)</th>
-                            <th>Orgs. Units.</th>
-                            <th>State</th>
-                        </thead>
-                        <tbody>
-                            {this.renderSupervisions()}
-                        </tbody>
-                    </table>
+        if (!this.state.displaySupervisionFormCreation) {
+            return (
+                <div className="row m-3">
+                    <div className="col">
+                        <table className="table table-striped table-sm table-hover table-borderless">
+                            <thead>
+                                <th>ID</th>
+                                <th>Period</th>
+                                <th>Org. Unit.</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </thead>
+                            <tbody>
+                                {this.renderSupervisions()}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-        )
+            )
+        }
     }
 
     render() {
@@ -61,13 +75,14 @@ export class TableView extends Component {
             <React.Fragment>
                 {this.displaySupervisonstable()}
 
-                {this.state.displaySupervisionFormCreation && <Supervision />}
+                {this.state.displaySupervisionFormCreation && <Supervision handleDisplayNewSupervison={this.handleDisplayNewSupervison} />}
 
-                {this.state.displaySupervisionFormCreation &&
-                    (<button
-                        title="New Supervision"
-                        className="TableView btn btn-outline-danger"
-                        onClick={() => this.handleDisplayNewSupervison()}>+</button>)}
+                {(<button
+                    title="New Supervision"
+                    className={this.state.displaySupervisionFormCreation ? 'TableView btn btn-outline-danger': 'TableView btn btn-outline-primary'}
+                    onClick={() => this.handleDisplayNewSupervison()}>
+                    {this.state.displaySupervisionFormCreation ? '-' : '+'}
+                </button>)}
             </React.Fragment>
         )
     }
