@@ -5,6 +5,9 @@ import NotificationManager from 'react-notifications/lib/NotificationManager';
 import Supervision from '../Supervision/Supervision';
 import './TableView.css';
 import moment from 'moment';
+import { Paginator } from 'primereact/paginator';
+
+const C_PAGINATION_ROWS_PER_PAGE = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
 export class TableView extends Component {
 
@@ -13,6 +16,8 @@ export class TableView extends Component {
 
         this.state = {
             supervisions: [],
+            supervisionFirstPage: 0,
+            supervisionNumRows: 4,
             selectedSupervision: null,
             displaySupervisionFormCreation: false,
         }
@@ -22,7 +27,7 @@ export class TableView extends Component {
 
     loadSupervisions = () => {
         axios.get(SUPERVISIONS_ROUTE)
-            .then(response => this.setState({ supervisions: response.data }))
+            .then(response => this.setState({ supervisions: [] }, () => this.setState({ supervisions: response.data })))
             .catch(error => NotificationManager.error(error.message, null, 3000))
     }
 
@@ -161,6 +166,23 @@ export class TableView extends Component {
         }
     }
 
+    onHandlePageChange = event => this.setState({ supervisionFirstPage: event.first, supervisionNumRows: event.rows })
+
+    renderPaginator = () => {
+        if (this.state.supervisions.length > 0) {
+            return (
+                <Paginator
+                    first={this.state.supervisionFirstPage}
+                    rows={this.state.supervisionNumRows}
+                    totalRecords={this.state.supervisions.length}
+                    rowsPerPageOptions={[...C_PAGINATION_ROWS_PER_PAGE]}
+                    onPageChange={this.onHandlePageChange}
+                    template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink" />
+
+            )
+        }
+    }
+
     render() {
         return (
             <React.Fragment>
@@ -176,30 +198,35 @@ export class TableView extends Component {
                             </thead>
                             <tbody>
 
-                                {this.state.supervisions.map(s => {
-                                    return (
-                                        <tr key={s.id}>
-                                            <td>{s.description}</td>
-                                            <td>
-                                                {moment(s.period[0]).format('Do MMMM, YYYY')}
-                                                <span className="font-weight-bold m-3 text-secondary"> - </span>
-                                                {moment(s.period[1]).format('Do MMMM, YYYY')}
-                                            </td>
-                                            <td>{s.organisationUnit.label}</td>
-                                            <td>{s.status}</td>
-                                            <td>
-                                                <button
-                                                    onClick={() => this.handleSupervisionDetails(s)}
-                                                    className="btn btn-sm btn-outline-danger"
-                                                    title="Details">
-                                                    Details
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    )
-                                })}
+                                {this.state.supervisions
+                                    .filter((i, index) => index >= this.state.supervisionFirstPage && index <= (this.state.supervisionFirstPage + 5))
+                                    .map(s => {
+                                        return (
+                                            <tr key={s.id}>
+                                                <td>{s.description}</td>
+                                                <td>
+                                                    {moment(s.period[0]).format('Do MMMM, YYYY')}
+                                                    <span className="font-weight-bold m-3 text-secondary"> - </span>
+                                                    {moment(s.period[1]).format('Do MMMM, YYYY')}
+                                                </td>
+                                                <td>{s.organisationUnit.label}</td>
+                                                <td>{s.status}</td>
+                                                <td>
+                                                    <button
+                                                        onClick={() => this.handleSupervisionDetails(s)}
+                                                        className="btn btn-sm btn-outline-danger"
+                                                        title="Details">
+                                                        Details
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        )
+                                    })}
                             </tbody>
                         </table>
+                        <br />
+
+                        {this.renderPaginator()}
                     </div>
                 </div>
 

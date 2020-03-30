@@ -724,7 +724,6 @@ export class Settings extends Component {
 
                 </div>
 
-                {/* <NotificationContainer /> */}
             </React.Fragment >
         )
     }
