@@ -2,7 +2,6 @@ import React from 'react';
 import { NotificationContainer } from 'react-notifications';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
-import CalendarView from '../CalendarView/CalendarView';
 import Dashboard from '../Dashboard/Dashboard';
 import Settings from '../Settings/Settings';
 import TableView from '../TableView/TableView';
@@ -14,8 +13,6 @@ const Body = () => (
             <TabList>
                 <Tab>Dashboard</Tab>
 
-                <Tab>Calendar View</Tab>
-
                 <Tab>Table View</Tab>
 
                 <Tab>Settings</Tab>
@@ -23,10 +20,6 @@ const Body = () => (
 
             <TabPanel>
                 <Dashboard />
-            </TabPanel>
-
-            <TabPanel>
-                <CalendarView />
             </TabPanel>
 
             <TabPanel>
