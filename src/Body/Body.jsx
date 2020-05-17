@@ -11,16 +11,14 @@ const Body = () => (
         <Tabs>
 
             <TabList>
-                <Tab>Dashboard</Tab>
-
+                {/* <Tab>Dashboard</Tab> */}
                 <Tab>Table View</Tab>
-
                 <Tab>Settings</Tab>
             </TabList>
 
-            <TabPanel>
+            {/* <TabPanel>
                 <Dashboard />
-            </TabPanel>
+            </TabPanel> */}
 
             <TabPanel>
                 <TableView />
