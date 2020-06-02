@@ -4,26 +4,26 @@ import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import Dashboard from '../Dashboard/Dashboard';
 import Settings from '../Settings/Settings';
-import TableView from '../TableView/TableView';
+import Scheduler from '../Scheduler/Scheduler';
 
 const Body = () => (
     <React.Fragment>
         <Tabs>
 
             <TabList>
-                <Tab>Dashboard</Tab>
+                {/* <Tab>Dashboard</Tab> */}
 
-                <Tab>Table View</Tab>
+                <Tab>Scheduler</Tab>
 
                 <Tab>Settings</Tab>
             </TabList>
 
-            <TabPanel>
+            {/* <TabPanel>
                 <Dashboard />
-            </TabPanel>
+            </TabPanel> */}
 
             <TabPanel>
-                <TableView />
+                <Scheduler />
             </TabPanel>
 
             <TabPanel>

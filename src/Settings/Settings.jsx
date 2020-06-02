@@ -185,9 +185,7 @@ export class Settings extends Component {
 
     handleProgramClick = program => this.setState({ selectedProgram: program, selectedProgramIndicators: [] }, () => this.loadProgramIndicatorsByProgramId(program.id))
 
-    createGlobalSettings = () => {
-        if (this.state.globalSettings !== null && this.state.globalSettings !== undefined) {
-            return (
+    createGlobalSettings = () => this.state.globalSettings !== null && this.state.globalSettings !== undefined && (
                 <div className="row m-3">
                     <div className="col-7 form-group alert alert-info" role="alert">
                         <Formik
@@ -197,24 +195,11 @@ export class Settings extends Component {
                                 usePercentage: this.state.globalSettings.usePercentage
                             }}
 
-                            onSubmit={async values => {
-                                // await new Promise(resolve => setTimeout(resolve, 500));
-                                // alert(JSON.stringify(values, null, 2));
-                                this.updateGlobalSettingsOnServer(values)
-                            }} >
+                            onSubmit={async values =>  this.updateGlobalSettingsOnServer(values)} >
 
-                            {props => {
-                                const {
-                                    values,
-                                    touched,
-                                    errors,
-                                    dirty,
-                                    isSubmitting,
-                                    handleChange,
-                                    handleBlur,
-                                    handleSubmit,
-                                    handleReset
-                                } = props;
+                            {
+                            props => {
+                                const {values,touched,errors,dirty,isSubmitting,handleChange,handleBlur,handleSubmit,handleReset} = props
 
                                 return (
                                     <form onSubmit={handleSubmit}
@@ -224,12 +209,12 @@ export class Settings extends Component {
                                             <div className="col text-left m-1">
                                                 <h3>
                                                     Performance Metrics
-                                        </h3>
+                                                </h3>
 
                                                 <div className="row">
                                                     <div className="col-1 mt-2">
                                                         Best
-                                            </div>
+                                                    </div>
                                                     <div className="col">
                                                         <input
                                                             id="bestPerformance"
@@ -247,7 +232,7 @@ export class Settings extends Component {
 
                                                     <div className="col-1 mt-2">
                                                         Worst
-                                            </div>
+                                                    </div>
 
                                                     <div className="col">
                                                         <input
@@ -307,21 +292,16 @@ export class Settings extends Component {
                                             </div>
                                         </div>
                                     </form>
-                                );
+                                )
                             }}
                         </Formik>
                     </div>
                     {this.printGlobalSettings()}
                 </div>
             )
-        } else {
-            return null
-        }
+    
 
-    }
-
-    printGlobalSettings = () => {
-        return (
+    printGlobalSettings = () => (
             <div className="col-5 form-group alert alert-success" role="alert">
                 <div className="row">
                     <div className="col text-left m-1">
@@ -339,10 +319,10 @@ export class Settings extends Component {
                 </div>
             </div>
         )
-    }
 
     createCategoryForm = () => {
         const currentSelectedIndicator = this.state.currentSelectedIndicator
+        
         if (this.state.displayCategoryForms
             && currentSelectedIndicator
             && currentSelectedIndicator !== null
@@ -462,7 +442,7 @@ export class Settings extends Component {
 
                                         </div>
                                     </form>
-                                );
+                                )
                             }}
                         </Formik>
                     </div>
@@ -473,40 +453,38 @@ export class Settings extends Component {
         }
     }
 
-    displayAggregatedIndicatorChildrens = () => {
-        if (this.state.currentAction === C_AGGREGATED_INDICATORS &&
-            this.state.selectedAggregatedIndicator !== null) {
+    displayAggregatedIndicatorChildrens = () => this.state.currentAction === C_AGGREGATED_INDICATORS && this.state.selectedAggregatedIndicator !== null && (
+        <div className="col m-3">
+            <div className="mb-1 text-left">
+                Available Indicators
+            </div>
 
-            return (
-                <div className="col m-3">
-                    <div className="mb-1 text-left">
-                        Available Indicators
-                        </div>
-
-                    {this.state.selectedAggregatedIndicator.indicators
-                        .filter(i => !this.state.selectedIndicators
-                            .map(ai => ai.id)
-                            .includes(i.id)
-                        )
-                        .map(indicator => (
-                            <div className="row" key={indicator.id}>
-                                <div className={'col text-left Settings m-1 p-3'}
-                                    onClick={() => this.handleCurrentSelectedIndicator(indicator)}>
-                                    {indicator.displayName}
-                                </div>
+            {
+                this.state.selectedAggregatedIndicator.indicators
+                    .filter(i => !this.state.selectedIndicators.map(ai => ai.id).includes(i.id))
+                    .map(indicator => (
+                        <div className="row" key={indicator.id}>
+                            <div className={'col text-left Settings m-1 p-3'}
+                                onClick={() => this.handleCurrentSelectedIndicator(indicator)}>
+                                {indicator.displayName}
                             </div>
-                        ))}
-                </div>
-            )
-        }
-    }
+                        </div>
+                    ))
+            }
+
+            {this.state.selectedAggregatedIndicator.indicators.length === 0 && <div className='alert alert-warning'> Nothing to display</div>}
+        </div>
+    )
+
 
     displayProgramIndicators = () => {
         if (this.state.currentAction === C_PROGRAM_INDICATORS &&
             this.state.selectedProgram !== null) {
             if (this.state.selectedProgramIndicators.length === 0) {
                 return (
-                    <div className="alert alert-danger">No program indicator available for
+                    <div className="alert alert-danger">
+                        No program indicator available for
+                        
                         <span className="font-weight-bold p-3 text-primary"> {this.state.selectedProgram.displayName}</span>
 
                         <hr />
@@ -515,53 +493,51 @@ export class Settings extends Component {
                     </div>
                 )
             } else {
-
                 return (
                     <div className="col m-3">
                         <div className="mb-1 text-left">
                             Program Indicators
-                            </div>
+                        </div>
 
-                        {this.state.selectedProgramIndicators
-                            .filter(i => !this.state.selectedIndicators
-                                .map(ai => ai.id)
-                                .includes(i.id)
-                            )
-                            .map(indicator => (
-                                <div className="row" key={indicator.id}>
-                                    <div className={'col text-left Settings m-1 p-3'}
-                                        onClick={() => this.handleCurrentSelectedIndicator(indicator)}>
-                                        {indicator.displayName}
+                        {
+                            this.state.selectedProgramIndicators
+                                .filter(i => !this.state.selectedIndicators
+                                    .map(ai => ai.id)
+                                    .includes(i.id)
+                                ).map(indicator => (
+                                    <div className="row" key={indicator.id}>
+                                        <div className={'col text-left Settings m-1 p-3'}
+                                            onClick={() => this.handleCurrentSelectedIndicator(indicator)}>
+                                            {indicator.displayName}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))
+                        }
                     </div>
                 )
             }
         }
     }
 
-    displaySelectedIndicators = () => {
-        if (this.state.selectedIndicators.length > 0) {
+    displaySelectedIndicators = () => this.state.selectedIndicators.length > 0 && (
+        <div className="col m-3">
+            <div className="mb-1 text-left">
+                Selected Indicators
+            </div>
 
-            return (
-                <div className="col m-3">
-                    <div className="mb-1 text-left">
-                        Selected Indicators
-                    </div>
-
-                    {this.state.selectedIndicators.map(indicator => (
-                        <div className="row" key={indicator}>
-                            <div className={'col text-left Settings m-1 p-3'}
-                                onClick={() => this.handleCurrentSelectedIndicator(indicator)}>
-                                {indicator.name}
-                            </div>
+            {
+                this.state.selectedIndicators.map(indicator => (
+                    <div className="row" key={indicator}>
+                        <div className={'col text-left Settings m-1 p-3'}
+                            onClick={() => this.handleCurrentSelectedIndicator(indicator)}>
+                            {indicator.name}
                         </div>
-                    ))}
-                </div>
-            )
-        }
-    }
+                    </div>
+                ))
+            }
+        </div>
+    )
+
 
     handleIndicatorRemoval = indicator => {
         if (indicator && indicator !== null && indicator !== undefined) {
@@ -572,15 +548,14 @@ export class Settings extends Component {
         }
     }
 
-    handleIndicatorsUpdateFromServer = indicators => {
-        axios.put(INDICATORS_ROUTE, indicators)
-            .then(() => {
-                this.setState({ currentSelectedIndicator: null }, () => {
-                    NotificationManager.success('Server Updated succefully !', null, 3000)
-                    this.retrieveIndicatorsFromServer()
-                })
-            }).catch(error => NotificationManager.error(error.message, null, 3000))
-    }
+
+    handleIndicatorsUpdateFromServer = indicators => axios.put(INDICATORS_ROUTE, indicators)
+        .then(() => {
+            this.setState({ currentSelectedIndicator: null }, () => {
+                NotificationManager.success('Server Updated succefully !', null, 3000)
+                this.retrieveIndicatorsFromServer()
+            })
+        }).catch(error => NotificationManager.error(error.message, null, 3000))
 
 
 
@@ -614,8 +589,6 @@ export class Settings extends Component {
                 categoriesForm={this.state.categoriesForm}
                 selectedIndicators={this.state.selectedIndicators}
                 currentSelectedIndicator={this.state.currentSelectedIndicator} />)
-        } else {
-            return null
         }
     }
 
@@ -641,7 +614,7 @@ export class Settings extends Component {
     handlePagination = () => {
         if (this.state.currentAction === C_AGGREGATED_INDICATORS) {
             return (
-                <div className="mt-3">
+                <div className="mt-2">
                     <Paginator
                         first={this.state.aggregatedFirstPage}
                         rows={this.state.aggregatedNumRows}
@@ -653,7 +626,7 @@ export class Settings extends Component {
             )
         } else if (this.state.currentAction === C_PROGRAM_INDICATORS) {
             return (
-                <div className="mt-3">
+                <div className="mt-2">
                     <Paginator
                         first={this.state.programsFirstPage}
                         rows={this.state.programsNumRows}
@@ -678,55 +651,53 @@ export class Settings extends Component {
         return worstPerformance === null || worstPerformance === undefined ? '5 (Default)' : worstPerformance
     }
 
-    render() {
-        return (
-            <React.Fragment>
-                <div className="row m-3">
-                    <div className="col-3 m-3 btn-group">
-                        <button
-                            onClick={this.loadAggregatedIndicatorsWithGroups}
-                            className={this.classNameProvider(C_AGGREGATED_INDICATORS)}>
-                            Indicators
+    render = () => (
+        <React.Fragment>
+            <div className="row m-3">
+                <div className="col-3 m-3 btn-group">
+                    <button
+                        onClick={this.loadAggregatedIndicatorsWithGroups}
+                        className={this.classNameProvider(C_AGGREGATED_INDICATORS)}>
+                        Indicators
                         </button>
 
-                        <button
-                            onClick={this.loadPrograms}
-                            className={this.classNameProvider(C_PROGRAM_INDICATORS)}>
-                            Program Indicators
+                    <button
+                        onClick={this.loadPrograms}
+                        className={this.classNameProvider(C_PROGRAM_INDICATORS)}>
+                        Program Indicators
                         </button>
-                    </div>
+                </div>
+            </div>
+
+            {this.createGlobalSettings()}
+
+
+            <div className="row m-3">
+                <div className="col m-3">
+
+                    {this.displayParentTitle()}
+
+                    {this.displayAggregatedIndicators()}
+
+                    {this.displayPrograms()}
+
+                    {this.handlePagination()}
+
+                    {this.createCategoryForm()}
                 </div>
 
-                {this.createGlobalSettings()}
+                {this.displayAggregatedIndicatorChildrens()}
 
+                {this.displayProgramIndicators()}
 
-                <div className="row m-3">
-                    <div className="col m-3">
+                {this.displayIndicatorsSettingForm()}
 
-                        {this.displayParentTitle()}
+                {this.displaySelectedIndicators()}
 
-                        {this.displayAggregatedIndicators()}
+            </div>
 
-                        {this.displayPrograms()}
-
-                        {this.handlePagination()}
-
-                        {this.createCategoryForm()}
-                    </div>
-
-                    {this.displayAggregatedIndicatorChildrens()}
-
-                    {this.displayProgramIndicators()}
-
-                    {this.displayIndicatorsSettingForm()}
-
-                    {this.displaySelectedIndicators()}
-
-                </div>
-
-            </React.Fragment >
-        )
-    }
+        </React.Fragment>
+    )
 }
 
 export default Settings
