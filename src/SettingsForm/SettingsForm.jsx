@@ -3,6 +3,8 @@ import React, { Component } from 'react';
 import { INDICATORS_ROUTE } from '../api.routes';
 import { NotificationManager } from 'react-notifications';
 
+const SELECT = 'Select ..'
+
 export class SettingsForm extends Component {
 
     constructor(props) {
@@ -13,29 +15,43 @@ export class SettingsForm extends Component {
             name: '',
             label: '',
             weight: 0,
+            best: 0,
+            worst: 0,
             categories: [],
-            hightIsGood: this.props.currentSelectedIndicator.hightIsGood,
+            usePercentages: true,
             selectedIndicators: [],
+            hasTrakerPrograms: false,
+            selectedTrackerProgram: SELECT,
+            hightIsGood: this.props.currentSelectedIndicator.hightIsGood,
         }
     }
 
-    componentDidMount = () => {
-        this.setState({
-            id: this.props.currentSelectedIndicator.id,
-            name: this.props.currentSelectedIndicator ? this.props.currentSelectedIndicator.name : '',
-            hightIsGood: this.props.currentSelectedIndicator.hightIsGood,
+
+    componentDidMount = () => this.setState(
+        {
             label: this.props.currentSelectedIndicator.label ? this.props.currentSelectedIndicator.label : this.props.currentSelectedIndicator.name,
             weight: this.props.currentSelectedIndicator.weight ? this.props.currentSelectedIndicator.weight : 0,
+            worst: this.props.currentSelectedIndicator.weight ? this.props.currentSelectedIndicator.worst : 0,
+            best: this.props.currentSelectedIndicator.best ? this.props.currentSelectedIndicator.best : 0,
+            name: this.props.currentSelectedIndicator ? this.props.currentSelectedIndicator.name : '',
+            selectedTrackerProgram: this.props.currentSelectedIndicator.selectedTrackerProgram,
+            hasTrakerPrograms: this.props.currentSelectedIndicator.hasTrakerPrograms,
+            usePercentages: this.props.currentSelectedIndicator.usePercentages,
+            hightIsGood: this.props.currentSelectedIndicator.hightIsGood,
+            id: this.props.currentSelectedIndicator.id,
             categories: this.props.categoriesForm,
-        })
-    }
+        }
+    )
+
 
     handleChange = event => {
         const name = event.target.name
 
-        if (event.target.type === 'checkbox') {
+        if (event.target.type === 'select-one') {
+            this.setState({ [name]:  event.target.value === SELECT ? event.target.value : JSON.parse(event.target.value) })
+        } else if(event.target.type === 'checkbox') {
             this.setState({ [name]: event.target.checked })
-        } else if (name.endsWith('min')) {
+        } else if (name.endsWith('min') && name !== 'min') {
             const categories = [...this.props.categoriesForm]
 
             const category = categories.find(c => name === c.category.concat('_min'))
@@ -46,7 +62,7 @@ export class SettingsForm extends Component {
 
             this.setState({ categories }, () => this.props.reloadCategories(categories))
 
-        } else if (name.endsWith('max')) {
+        } else if (name.endsWith('max') && name !== 'max') {
             const categories = [...this.props.categoriesForm]
             const category = categories.find(c => name === c.category.concat('_max'))
             const index = categories.indexOf(category)
@@ -61,12 +77,21 @@ export class SettingsForm extends Component {
         }
     }
 
+
     handleSubmit = event => {
         event.preventDefault()
 
-        this.setState({ categories: this.props.categoriesForm },
-            () => this.loadAndPersistIndicatorsOnServer())
+        this.setState({ categories: this.props.categoriesForm }, () => this.loadAndPersistIndicatorsOnServer())
     }
+
+
+    loadAndPersistIndicatorsOnServer = () => axios.get(INDICATORS_ROUTE)
+        .then(response => {
+            this.props.updateSelectedIndicators(response.data)
+
+            this.persistState()
+        }).catch(error => NotificationManager.error(error.message, null, 3000))
+
 
     persistState = () => {
         const indicators = [...this.props.selectedIndicators]
@@ -81,13 +106,6 @@ export class SettingsForm extends Component {
         this.props.handleIndicatorsUpdateFromServer(indicators)
     }
 
-    loadAndPersistIndicatorsOnServer = () => {
-        axios.get(INDICATORS_ROUTE)
-            .then(response => {
-                this.props.updateSelectedIndicators(response.data)
-                this.persistState()
-            }).catch(error => NotificationManager.error(error.message, null, 3000))
-    }
 
     retrieveMinValue = id => {
         const category = this.state.categories.filter(c => c.id === id)[0]
@@ -173,7 +191,7 @@ export class SettingsForm extends Component {
                             </div>
                     </div>
                 </div>
-                <div className="form-group alert alert-info" role="alert">
+                <div className="form-group alert alert-secondary" role="alert">
 
                     <form onSubmit={this.handleSubmit} className="form-group text-left">
 
@@ -230,28 +248,135 @@ export class SettingsForm extends Component {
                             </div>
                         </div>
 
-                        <div className="row m-3">
-                            <div className="col">
-                                <div className="form-check text-left">
-                                    <input
-                                        id="hightIsGood"
-                                        name="hightIsGood"
-                                        type="checkbox"
-                                        checked={this.state.hightIsGood}
-                                        value={this.state.hightIsGood}
-                                        onChange={this.handleChange}
-                                        className="form-check-input input-sm" />
+                        <div className="row m-2">
+                            <div className="col-2 m-2">Best</div>
+                            <div className="col p-1">
+                                <input
+                                    id="best"
+                                    name="best"
+                                    placeholder="Best"
+                                    autoComplete="off"
+                                    type="number"
+                                    value={this.state.best}
+                                    onChange={this.handleChange}
+                                    className="form-control input-sm" />
+                            </div>
+                        </div>
 
-                                    <label className="form-check-label" for="hightIsGood">High is Good</label>
+                        <div className="row m-2">
+                            <div className="col-2 m-2">Worst</div>
+                            <div className="col p-1">
+                                <input
+                                    id="worst"
+                                    name="worst"
+                                    placeholder="Worst"
+                                    autoComplete="off"
+                                    type="number"
+                                    value={this.state.worst}
+                                    onChange={this.handleChange}
+                                    className="form-control input-sm" />
+                            </div>
+                        </div>
+
+                        <div className="row m-3">
+                            <div className="row p-1">
+                                <div className="col">
+                                    <div className="form-check text-left">
+                                        <input
+                                            id="hightIsGood"
+                                            name="hightIsGood"
+                                            type="checkbox"
+                                            checked={this.state.hightIsGood}
+                                            value={this.state.hightIsGood}
+                                            onChange={this.handleChange}
+                                            className="form-check-input input-sm" />
+
+                                        <label className="form-check-label" for="hightIsGood">High is Good</label>
+                                    </div>
                                 </div>
                             </div>
+
+                            <div className="row p-1">
+                                <div className="col ml-3">
+                                    <div className="form-check text-left">
+                                        <input
+                                            id="usePercentages"
+                                            name="usePercentages"
+                                            type="checkbox"
+                                            checked={this.state.usePercentages}
+                                            value={this.state.usePercentages}
+                                            onChange={this.handleChange}
+                                            className="form-check-input input-sm" />
+
+                                        <label className="form-check-label" for="usePercentages">Use Percentages</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="row p-1">
+                                <div className="col">
+                                    <div className="form-check text-left">
+                                        <input
+                                            id="hasTrakerPrograms"
+                                            name="hasTrakerPrograms"
+                                            type="checkbox"
+                                            checked={this.state.hasTrakerPrograms}
+                                            value={this.state.hasTrakerPrograms}
+                                            onChange={this.handleChange}
+                                            className="form-check-input input-sm" />
+
+                                        <label className="form-check-label" for="hasTrakerPrograms">Has tracker Program</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {
+                                this.state.hasTrakerPrograms && this.props.trackerPrograms.length > 0 && (
+
+                                    <div className="row mt-3">
+                                        <div className="col">
+                                            <select
+                                                onChange={this.handleChange}
+                                                name='selectedTrackerProgram'
+                                                className="form-control input-sm">
+                                                <option> {SELECT} </option>
+                                                {this.props.trackerPrograms.map(trackerProgram => <option key={trackerProgram.id} value={JSON.stringify(trackerProgram)} selected={this.state.hasTrakerPrograms && this.state.selectedTrackerProgram && this.state.selectedTrackerProgram.id === trackerProgram.id}>{trackerProgram.displayName}</option>)}
+                                            </select>
+                                        </div>
+                                    </div>
+                                )
+                            }
+
+                            {
+                                this.state.hasTrakerPrograms && this.props.trackerPrograms.length === 0 && (
+
+                                    <div className="row m-2">
+                                        <div className="col alert alert-dark">
+                                            No tracker program available yet
+                                        </div>
+                                    </div>
+                                )
+                            }
                         </div>
 
-                        <div className="row">
-                            <div className="col">
-                                {this.displayCustomSettingForms()}
-                            </div>
-                        </div>
+                        {
+                            this.props.categoriesForm.length > 0 && (
+                                <div className="row">
+                                    <div className="col">
+                                        <hr />
+
+                                        <div className="row m-2">
+                                            <div className="col">
+                                                Categories
+                                            </div>
+                                        </div>
+
+                                        {this.displayCustomSettingForms()}
+                                    </div>
+                                </div>
+                            )
+                        }
+
 
                         <hr />
                         <div className="mt-3 btn-group">
