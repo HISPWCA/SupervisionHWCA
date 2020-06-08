@@ -154,13 +154,7 @@ export class Scheduler extends Component {
                     <table className="table table-hover table-sm table-striped text-left m-3">
                         <thead><th>Indicators</th></thead>
                         <tbody>
-<<<<<<< HEAD
                             {this.state.selectedSupervision.indicators.map(i => <tr key={i.id}><td>{i.label}</td></tr>)}
-=======
-                            {this.state.selectedSupervision.indicators.map(i => {
-                                return <tr key={i.id}><td>{i.label}</td></tr>
-                            })}
->>>>>>> mises a jour
                         </tbody>
                     </table>
                 </div>
@@ -168,12 +162,7 @@ export class Scheduler extends Component {
                     <table className="table table-hover table-sm table-striped text-left m-3">
                         <thead><th>Supervisors</th></thead>
                         <tbody>
-<<<<<<< HEAD
                             {this.state.selectedSupervision.supervisors.map(s => <tr key={s.id}><td>{s.displayName}</td></tr>)}
-=======
-                            {this.state.selectedSupervision.supervisors
-                                .map(s => <tr key={s.id}><td>{s.displayName}</td></tr>)}
->>>>>>> mises a jour
                         </tbody>
                     </table>
                 </div>
@@ -183,7 +172,6 @@ export class Scheduler extends Component {
                 <div className="col btn-group">
                     <button
                         className="btn btn-outline-secondary btn-sm p-1"
-<<<<<<< HEAD
                         onClick={() => this.setState({ selectedSupervision: null, displaySupervisionFormCreation: false })}>
                         Close
                     </button>
@@ -193,23 +181,12 @@ export class Scheduler extends Component {
                         onClick={() => this.deleteSupervision(this.state.selectedSupervision)} >
                         Delete
                     </button>
-=======
-                        onClick={() => this.setState({ selectedSupervision: null, displaySupervisionFormCreation: false })}>Close</button>
 
-                    <button
-                        className="btn btn-outline-danger btn-sm p-1"
-                        onClick={() => this.deleteSupervision(this.state.selectedSupervision)} >Delete</button>
->>>>>>> mises a jour
                 </div>
             </div>
 
         </React.Fragment>
-<<<<<<< HEAD
     ))
-=======
-    )
-    )
->>>>>>> mises a jour
 
     onHandlePageChange = event => this.setState({ supervisionFirstPage: event.first, supervisionNumRows: event.rows })
 
@@ -260,7 +237,6 @@ export class Scheduler extends Component {
 
                                 {this.state.supervisions
                                     .filter((i, index) => index >= this.state.supervisionFirstPage && index <= (this.state.supervisionFirstPage + 5))
-<<<<<<< HEAD
                                     .map(s => (
                                         <tr key={s.id}>
                                             <td>{s.description}</td>
@@ -281,30 +257,6 @@ export class Scheduler extends Component {
                                             </td>
                                         </tr>
                                     ))}
-=======
-                                    .map(s => {
-                                        return (
-                                            <tr key={s.id}>
-                                                <td>{s.description}</td>
-                                                <td>
-                                                    {moment(s.period[0]).format('Do MMMM, YYYY')}
-                                                    <span className="font-weight-bold m-3 text-secondary"> - </span>
-                                                    {moment(s.period[1]).format('Do MMMM, YYYY')}
-                                                </td>
-                                                <td>{s.organisationUnit.label}</td>
-                                                <td>{s.status}</td>
-                                                <td>
-                                                    <button
-                                                        onClick={() => this.handleSupervisionDetails(s)}
-                                                        className="btn btn-sm btn-outline-secondary"
-                                                        title="Display details">
-                                                        Details
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        )
-                                    })}
->>>>>>> mises a jour
                             </tbody>
                         </table>
                         <br />

@@ -193,13 +193,8 @@ export class Settings extends Component {
     handleProgramClick = program => this.setState({ selectedProgram: program, selectedProgramIndicators: [] }, () => this.loadProgramIndicatorsByProgramId(program.id))
 
     createGlobalSettings = () => this.state.globalSettings !== null && this.state.globalSettings !== undefined && (
-<<<<<<< HEAD
                 <div className="row m-3 p-1">
                     <div className="col-7 form-group alert alert-secondary" role="alert">
-=======
-                <div className="row m-3">
-                    <div className="col-7 form-group alert alert-info" role="alert">
->>>>>>> mises a jour
                         <Formik
                             initialValues={{
                                 bestPerformance: this.state.globalSettings.bestPerformance,
@@ -314,12 +309,8 @@ export class Settings extends Component {
     
 
     printGlobalSettings = () => (
-<<<<<<< HEAD
             <div className="col-5 form-group  p-1">
             <div className="alert alert-secondary" role="alert">
-=======
-            <div className="col-5 form-group alert alert-success" role="alert">
->>>>>>> mises a jour
                 <div className="row">
                     <div className="col text-left m-1">
                         <h3>
@@ -490,11 +481,7 @@ export class Settings extends Component {
                     ))
             }
 
-<<<<<<< HEAD
-            {this.state.selectedAggregatedIndicator.indicators.length === 0 && <div className='alert alert-secondary'> Nothing to display</div>}
-=======
             {this.state.selectedAggregatedIndicator.indicators.length === 0 && <div className='alert alert-warning'> Nothing to display</div>}
->>>>>>> mises a jour
         </div>
     )
 
@@ -504,11 +491,7 @@ export class Settings extends Component {
             this.state.selectedProgram !== null) {
             if (this.state.selectedProgramIndicators.length === 0) {
                 return (
-<<<<<<< HEAD
-                    <div className="alert alert-secondary">
-=======
                     <div className="alert alert-danger">
->>>>>>> mises a jour
                         No program indicator available for
                         
                         <span className="font-weight-bold p-3 text-primary"> {this.state.selectedProgram.displayName}</span>
@@ -556,11 +539,7 @@ export class Settings extends Component {
                     <div className="row" key={indicator}>
                         <div className={'col text-left Settings m-1 p-3'}
                             onClick={() => this.handleCurrentSelectedIndicator(indicator)}>
-<<<<<<< HEAD
                             {indicator.label}
-=======
-                            {indicator.name}
->>>>>>> mises a jour
                         </div>
                     </div>
                 ))
@@ -578,17 +557,6 @@ export class Settings extends Component {
         }
     }
 
-<<<<<<< HEAD
-=======
-
-    handleIndicatorsUpdateFromServer = indicators => axios.put(INDICATORS_ROUTE, indicators)
-        .then(() => {
-            this.setState({ currentSelectedIndicator: null }, () => {
-                NotificationManager.success('Server Updated succefully !', null, 3000)
-                this.retrieveIndicatorsFromServer()
-            })
-        }).catch(error => NotificationManager.error(error.message, null, 3000))
->>>>>>> mises a jour
 
     handleIndicatorsUpdateFromServer = indicators => axios.put(INDICATORS_ROUTE, indicators)
         .then(() => {
@@ -621,7 +589,6 @@ export class Settings extends Component {
             && currentSelectedIndicator !== undefined
             && currentSelectedIndicator !== null) {
 
-<<<<<<< HEAD
             return (
                 <SettingsForm
                     removeCurrentSelectedIndicator={this.removeCurrentSelectedIndicator}
@@ -634,17 +601,6 @@ export class Settings extends Component {
                     selectedIndicators={this.state.selectedIndicators}
                     currentSelectedIndicator={this.state.currentSelectedIndicator} />
             )
-=======
-            return (<SettingsForm
-                removeCurrentSelectedIndicator={this.removeCurrentSelectedIndicator}
-                handleIndicatorsUpdateFromServer={this.handleIndicatorsUpdateFromServer}
-                reloadCategories={this.reloadCategories}
-                handleIndicatorRemoval={this.handleIndicatorRemoval}
-                updateSelectedIndicators={this.updateSelectedIndicators}
-                categoriesForm={this.state.categoriesForm}
-                selectedIndicators={this.state.selectedIndicators}
-                currentSelectedIndicator={this.state.currentSelectedIndicator} />)
->>>>>>> mises a jour
         }
     }
 
@@ -715,29 +671,17 @@ export class Settings extends Component {
                         onClick={this.loadAggregatedIndicatorsWithGroups}
                         className={this.classNameProvider(C_AGGREGATED_INDICATORS)}>
                         Indicators
-<<<<<<< HEAD
                     </button>
-=======
-                        </button>
->>>>>>> mises a jour
 
                     <button
                         onClick={this.loadPrograms}
                         className={this.classNameProvider(C_PROGRAM_INDICATORS)}>
                         Program Indicators
-<<<<<<< HEAD
                     </button>
-=======
-                        </button>
->>>>>>> mises a jour
                 </div>
             </div>
 
             {this.createGlobalSettings()}
-<<<<<<< HEAD
-=======
-
->>>>>>> mises a jour
 
             <div className="row m-3">
                 <div className="col m-3">
