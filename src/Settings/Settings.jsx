@@ -491,7 +491,7 @@ export class Settings extends Component {
             this.state.selectedProgram !== null) {
             if (this.state.selectedProgramIndicators.length === 0) {
                 return (
-                    <div className="alert alert-danger">
+                    <div className="alert alert-secondary">
                         No program indicator available for
                         
                         <span className="font-weight-bold p-3 text-primary"> {this.state.selectedProgram.displayName}</span>

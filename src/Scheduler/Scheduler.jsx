@@ -181,7 +181,6 @@ export class Scheduler extends Component {
                         onClick={() => this.deleteSupervision(this.state.selectedSupervision)} >
                         Delete
                     </button>
-
                 </div>
             </div>
 
