@@ -12,13 +12,7 @@ const Body = () => (
 
             <TabList>
                 {/* <Tab>Dashboard</Tab> */}
-<<<<<<< HEAD
-                <Tab>Table View</Tab>
-=======
-
                 <Tab>Scheduler</Tab>
-
->>>>>>> mises a jour
                 <Tab>Settings</Tab>
             </TabList>
 
