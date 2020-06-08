@@ -5,6 +5,7 @@ import 'react-tabs/style/react-tabs.css';
 import Dashboard from '../Dashboard/Dashboard';
 import Settings from '../Settings/Settings';
 import Scheduler from '../Scheduler/Scheduler';
+import './Body.css'
 
 const Body = () => (
     <React.Fragment>

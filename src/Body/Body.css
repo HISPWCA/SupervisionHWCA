@@ -1,0 +1,60 @@
+.btn:not(:disabled):not(.disabled) {
+    cursor: pointer;
+}
+
+.disabled-wrapper {
+    display: inline-block;
+    cursor: not-allowed;
+}
+
+.disabled-wrapper a,
+.disabled-wrapper button {
+    pointer-events: none;
+}
+
+button[disabled] {
+    cursor: not-allowed;
+}
+
+a.disabled.js-test,
+button.disabled.js-test {
+    cursor: not-allowed;
+}
+
+.Settings {
+    background-color: antiquewhite;
+    color: black;
+}
+
+.Settings:hover,
+.SelectedSetting {
+    cursor: pointer;
+    background-color: aquamarine;
+    color: black;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0;
+    /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+    /* Firefox */
+}
+
+.cursorPointer {
+    cursor: pointer;
+}
+
+.scroll-indicators {
+    max-height: 300px;
+    overflow: scroll;
+}
+
+.hideElement{
+    display: none;
+}
