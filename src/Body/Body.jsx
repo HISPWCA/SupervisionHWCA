@@ -4,7 +4,7 @@ import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import Dashboard from '../Dashboard/Dashboard';
 import Settings from '../Settings/Settings';
-import TableView from '../TableView/TableView';
+import Scheduler from '../Scheduler/Scheduler';
 
 const Body = () => (
     <React.Fragment>
@@ -12,7 +12,13 @@ const Body = () => (
 
             <TabList>
                 {/* <Tab>Dashboard</Tab> */}
+<<<<<<< HEAD
                 <Tab>Table View</Tab>
+=======
+
+                <Tab>Scheduler</Tab>
+
+>>>>>>> mises a jour
                 <Tab>Settings</Tab>
             </TabList>
 
@@ -21,7 +27,7 @@ const Body = () => (
             </TabPanel> */}
 
             <TabPanel>
-                <TableView />
+                <Scheduler />
             </TabPanel>
 
             <TabPanel>
