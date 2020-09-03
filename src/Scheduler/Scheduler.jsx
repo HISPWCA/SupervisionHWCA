@@ -207,8 +207,8 @@ export class Scheduler extends Component {
         <React.Fragment>
             <LoadingOverlay spinner active={this.state.loading} text='Processing ...' >
                 {
-                    <div className='row ml-3'>
-                        <div className='col text-left m-3'>
+                    <div className='row my-3'>
+                        <div className='col text-left'>
                             <button
                                 className={
                                     this.state.displaySupervisionFormCreation
@@ -222,8 +222,8 @@ export class Scheduler extends Component {
                     </div>
                 }
 
-                <div className="row m-3">
-                    <div className="col m-3">
+                <div className="row">
+                    <div className="col">
                         <table className="table table-hover table-sm table-striped text-left ">
                             <thead>
                                 <th>Description</th>

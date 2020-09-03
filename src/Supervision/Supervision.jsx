@@ -409,10 +409,10 @@ export class Supervision extends Component {
     render = () => (
         <React.Fragment>
             <LoadingOverlay spinner active={this.state.loading} text='Processing ...' >
-                <div className='row m-3'>
+                <div className='row'>
                     <div className='col'>
 
-                        <div className="row m-3 text-left">
+                        <div className="row m-1 py-3 text-left">
                             {this.displayAvailableIndicators()}
 
                             {this.displayCurrentSelectedIndicators()}
@@ -420,7 +420,7 @@ export class Supervision extends Component {
                         </div>
 
                         <div className="row text-left">
-                            <div className="col m-3">
+                            <div className="col">
                                 <div className="font-weight-bold">Organisation Units</div>
 
                                 <Tree value={this.state.nodes}

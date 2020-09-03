@@ -193,7 +193,7 @@ export class Settings extends Component {
     handleProgramClick = program => this.setState({ selectedProgram: program, selectedProgramIndicators: [] }, () => this.loadProgramIndicatorsByProgramId(program.id))
 
     createGlobalSettings = () => this.state.globalSettings !== null && this.state.globalSettings !== undefined && (
-                <div className="row m-3 p-1">
+                <div className="row my-3 p-1">
                     <div className="col-7 form-group alert alert-secondary" role="alert">
                         <Formik
                             initialValues={{
@@ -463,7 +463,7 @@ export class Settings extends Component {
     }
 
     displayAggregatedIndicatorChildrens = () => this.state.currentAction === C_AGGREGATED_INDICATORS && this.state.selectedAggregatedIndicator !== null && (
-        <div className="col m-3">
+        <div className="col my-3">
             <div className="mb-1 text-left">
                 Available Indicators
             </div>
@@ -503,7 +503,7 @@ export class Settings extends Component {
                 )
             } else {
                 return (
-                    <div className="col m-3">
+                    <div className="col my-3">
                         <div className="mb-1 text-left">
                             Program Indicators
                         </div>
@@ -665,8 +665,8 @@ export class Settings extends Component {
 
     render = () => (
         <React.Fragment>
-            <div className="row m-3">
-                <div className="col-3 m-3 btn-group">
+            <div className="row m-1--">
+                <div className="col btn-group">
                     <button
                         onClick={this.loadAggregatedIndicatorsWithGroups}
                         className={this.classNameProvider(C_AGGREGATED_INDICATORS)}>
@@ -683,8 +683,8 @@ export class Settings extends Component {
 
             {this.createGlobalSettings()}
 
-            <div className="row m-3">
-                <div className="col m-3">
+            <div className="row">
+                <div className="col">
 
                     {this.displayParentTitle()}
 

@@ -8,7 +8,7 @@ import Scheduler from '../Scheduler/Scheduler';
 import './Body.css'
 
 const Body = () => (
-    <React.Fragment>
+    <div className="m-3">
         <Tabs>
 
             <TabList>
@@ -33,7 +33,7 @@ const Body = () => (
         </Tabs>
 
         <NotificationContainer />
-    </React.Fragment>
+    </div>
 )
 
 export default Body
