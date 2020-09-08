@@ -4,6 +4,9 @@
   "private": true,
   "homepage": "./",
   "dependencies": {
+    "@dhis2/app-runtime": "^2.2.2",
+    "@dhis2/d2-i18n": "^1.0.6",
+    "@dhis2/ui": "^5.5.5",
     "@fullcalendar/core": "^4.4.0",
     "@fullcalendar/daygrid": "^4.4.0",
     "@fullcalendar/interaction": "^4.4.0",
@@ -31,6 +34,7 @@
     "react-transition-group": "^4.3.0",
     "recharts": "^1.8.5",
     "redux": "^4.0.5",
+    "styled-jsx": "^3.3.0",
     "uuid": "^7.0.3",
     "yup": "^0.28.3"
   },

@@ -8,6 +8,7 @@ import { Paginator } from 'primereact/paginator';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import LoadingOverlay from 'react-loading-overlay';
+import Header from '../Header/Header';
 
 
 const C_PAGINATION_ROWS_PER_PAGE = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
@@ -50,7 +51,7 @@ export class Scheduler extends Component {
                         <td>{s.owner.displayName}</td>
                         <td>{s.status}</td>
                         <td>
-                            <button className="btn btn-outline-danger rounded" >
+                            <button className="btn btn-light rounded" >
                                 Details
                             </button>
                         </td>
@@ -171,13 +172,13 @@ export class Scheduler extends Component {
             <div className="m-3 row">
                 <div className="col btn-group">
                     <button
-                        className="btn btn-outline-secondary btn-sm p-1"
+                        className="btn btn-secondary btn-sm p-1"
                         onClick={() => this.setState({ selectedSupervision: null, displaySupervisionFormCreation: false })}>
                         Close
                     </button>
 
                     <button
-                        className="btn btn-outline-danger btn-sm p-1"
+                        className="btn btn-danger btn-sm p-1"
                         onClick={() => this.deleteSupervision(this.state.selectedSupervision)} >
                         Delete
                     </button>
@@ -205,6 +206,8 @@ export class Scheduler extends Component {
 
     render = () => (
         <React.Fragment>
+            <Header title='Plannification' />
+
             <LoadingOverlay spinner active={this.state.loading} text='Processing ...' >
                 {
                     <div className='row my-3'>
@@ -212,8 +215,8 @@ export class Scheduler extends Component {
                             <button
                                 className={
                                     this.state.displaySupervisionFormCreation
-                                        ? 'btn-sm btn-outline-danger'
-                                        : 'btn-sm btn-outline-success'
+                                        ? 'btn btn-sm btn-danger'
+                                        : 'btn btn-sm btn-primary'
                                 }
                                 onClick={() => this.handleDisplayNewSupervison()}>
                                 {this.state.displaySupervisionFormCreation ? 'Close Form' : 'New Planning'}
@@ -249,7 +252,7 @@ export class Scheduler extends Component {
                                             <td>
                                                 <button
                                                     onClick={() => this.handleSupervisionDetails(s)}
-                                                    className="btn btn-sm btn-outline-secondary"
+                                                    className="btn btn-sm btn-secondary"
                                                     title="Display details">
                                                     Details
                                                     </button>

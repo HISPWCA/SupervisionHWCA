@@ -214,23 +214,39 @@ export class Supervision extends Component {
 
     handleOrgsUnitSelection = currentSelectedNode => this.setState({ currentSelectedNode: null }, () => this.setState({ currentSelectedNode }))
 
-    orgUnitClassNameProvider = organisationUnit => this.state.currentSelectedNode !== null && this.state.currentSelectedNode.key === organisationUnit.key ? 'm-3 p-3 text-left Settings SelectedSetting' : 'm-3 p-3 text-left Settings'
+    orgUnitClassNameProvider = organisationUnit => this.state.currentSelectedNode !== null && this.state.currentSelectedNode.key === organisationUnit.key ? 'my-3 p-3 text-left Settings SelectedSetting' : 'my-3 p-3 text-left Settings'
 
     displaySelectedOrgUnits = () => {
         if (this.state.selectedNodes.length > 0) {
             return (
                 <div className="col">
-                    <div className="font-weight-bold">Selected Org. Units</div>
-                    {
-                        this.state.selectedNodes.map(o => (
-                            <div
-                                onClick={() => this.handleOrgsUnitSelection(o)}
-                                className={this.orgUnitClassNameProvider(o)}
-                                key={o.key}>
-                                {o.label}
-                            </div>
-                        ))
-                    }
+                    <div className="font-weight-bold">
+                        <a className="btn btn-link"
+                            data-toggle="collapse"
+                            href="#collapseOrganisationUnits"
+                            role="button"
+                            aria-expanded="false"
+                            aria-controls="collapseOrganisationUnits">
+                            Selected Org. Units
+                        </a>
+                    </div>
+
+                    <div className="collapse" id="collapseOrganisationUnits">
+                        <div className="card card-body">
+                            {
+                                this.state.selectedNodes.map(o => (
+                                    <div
+                                        onClick={() => this.handleOrgsUnitSelection(o)}
+                                        className={this.orgUnitClassNameProvider(o)}
+                                        key={o.key}>
+                                        {o.label}
+                                    </div>
+                                ))
+                            }
+                        </div>
+                    </div>
+
+
                 </div>
             )
         }
@@ -268,41 +284,72 @@ export class Supervision extends Component {
     displayForms = () => this.state.currentSelectedNode !== null && this.state.selectedNodes.length > 0 && (
         <div className="col">
             <div className="form-group alert alert-secondary m-1" role="alert">
-                <div className="font-weight-bold">Select Period</div>
 
+                <label for="period" className="form-label font-weight-bold mt-2">Select Period</label>
+                <br />
                 <Calendar
+                    id="period"
+                    className=""
                     value={this.state.dates}
                     onChange={e => this.setState({ dates: e.value })}
                     selectionMode="range"
                     readOnlyInput={true} />
 
-                <div className="font-weight-bold">Add description</div>
-
-                <input
+                <br />
+                <label for="description" className="form-label font-weight-bold mt-2">Add description</label>
+                <textarea
+                    id="description"
                     className="form-control"
                     onChange={this.handleChange}
-                    value={this.state.description} />
+                    value={this.state.description} ></textarea>
 
-                <input
-                    id="useStepper"
-                    type="checkbox"
-                    checked={this.state.useStepper}
-                    value={this.state.useStepper}
-                    onChange={this.handleChange}
-                    className="form-check-input input-sm" />
 
-                <label className="form-check-label" for="useStepper">Use Stepper</label>
+                <label for="otherSupervisors" className="form-label font-weight-bold mt-2">
+                    Other Supervisors
+                </label>
+                <textarea id="otherSupervisors" className="form-control"></textarea>
+
+                <div className="row">
+                    <div className="col">
+                        <label className="form-check-label m-2" for="useStepper">
+                            <input
+                                id="useStepper"
+                                type="checkbox"
+                                checked={this.state.useStepper}
+                                value={this.state.useStepper}
+                                onChange={this.handleChange}
+                                className="form-check-input input-sm" />
+                    Use Stepper
+                    </label>
+                    </div>
+                </div>
 
                 <hr />
+
                 <button
-                    className="btn btn-sm btn-outline-primary"
+                    className="btn btn-sm btn-light"
                     onClick={this.handleSupervisionCreation}>
                     Schedule
                 </button>
             </div>
 
-            <div className="font-weight-bold mt-3">Select Supervisors</div>
-            {this.displaySupervisors()}
+            <div className="font-weight-bold mt-3">
+                <a className="btn btn-link"
+                    data-toggle="collapse"
+                    href="#collapseSelectSupervisors"
+                    role="button"
+                    aria-expanded="false"
+                    aria-controls="collapseSelectSupervisors">
+                    Select Supervisors
+                </a>
+            </div>
+
+            <div className="collapse" id="collapseSelectSupervisors">
+                <div className="card card-body">
+                    {this.displaySupervisors()}
+                </div>
+            </div>
+
         </div>
     )
 
@@ -314,12 +361,12 @@ export class Supervision extends Component {
     }
 
     displaySupervisors = () => this.state.currentSelectedNode !== null && this.state.supervisors.length > 0 && (
-        <div className="col">
+        <React.Fragment>
             {
                 this.state.supervisors.filter(supervisor => !this.state.selectedSupervisors.map(s => s.id).includes(supervisor.id))
                     .map(s => <div key={s.id} className="mt-3 p-3 text-left Settings" onClick={() => this.handleSupevisorSelection(s)}>{s.displayName}</div>)
             }
-        </div>
+        </React.Fragment>
     )
 
     removeHandleSupervisorsSelection = supervisor => {
@@ -333,9 +380,23 @@ export class Supervision extends Component {
         this.state.selectedNodes.length > 0 &&
         (
             <div className="col">
-                <div className="font-weight-bold">Selected Supervisors</div>
+                <div className="font-weight-bold">
+                    <a className="btn btn-link"
+                        data-toggle="collapse"
+                        href="#collapseSelectedSupervisors"
+                        role="button"
+                        aria-expanded="false"
+                        aria-controls="collapseSelectedSupervisors">
+                        Selected Supervisors
+                    </a>
+                </div>
 
-                {this.state.selectedSupervisors.map(s => <div key={s.id} className="mt-3 p-3 text-left Settings" onClick={() => this.removeHandleSupervisorsSelection(s)}>{s.displayName}</div>)}
+                <div className="collapse" id="collapseSelectedSupervisors">
+                    <div className="card card-body">
+                        {this.state.selectedSupervisors.map(s => <div key={s.id} className="mt-3 p-3 text-left Settings" onClick={() => this.removeHandleSupervisorsSelection(s)}>{s.displayName}</div>)}
+                    </div>
+                </div>
+
             </div>
         )
 
@@ -364,7 +425,7 @@ export class Supervision extends Component {
                                 <div className="row" key={indicator}>
                                     <div className={'col text-left Settings m-1 p-2'}
                                         onClick={() => this.handleCurrentSelectedIndicator(indicator)}>
-                                        {indicator.name}
+                                        {indicator.label}
                                     </div>
                                 </div>
                             ))}
@@ -419,7 +480,7 @@ export class Supervision extends Component {
                             <hr />
                         </div>
 
-                        <div className="row text-left">
+                        <div className="row text-left my-3">
                             <div className="col">
                                 <div className="font-weight-bold">Organisation Units</div>
 

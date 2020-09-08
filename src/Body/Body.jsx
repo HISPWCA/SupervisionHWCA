@@ -9,30 +9,32 @@ import './Body.css'
 
 const Body = () => (
     <div className="m-3">
-        <Tabs>
+        <Scheduler />
+        <Settings />
 
-            <TabList>
-                {/* <Tab>Dashboard</Tab> */}
-                <Tab>Scheduler</Tab>
+        <NotificationContainer />
 
-                <Tab>Settings</Tab>
-            </TabList>
+        {/* <Tabs> */}
 
-            {/* <TabPanel>
+        {/* <TabList> */}
+        {/* <Tab>Dashboard</Tab> */}
+        {/* <Tab>Scheduler</Tab> */}
+
+        {/* <Tab>Settings</Tab> */}
+        {/* </TabList> */}
+
+        {/* <TabPanel>
                 <Dashboard />
             </TabPanel> */}
 
-            <TabPanel>
-                <Scheduler />
-            </TabPanel>
+        {/* <TabPanel>
+            </TabPanel> */}
 
-            <TabPanel>
-                <Settings />
-            </TabPanel>
+        {/* <TabPanel>
+            </TabPanel> */}
 
-        </Tabs>
+        {/* </Tabs> */}
 
-        <NotificationContainer />
     </div>
 )
 

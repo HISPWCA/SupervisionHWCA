@@ -20,12 +20,10 @@ export class SettingsForm extends Component {
             categories: [],
             usePercentages: true,
             selectedIndicators: [],
-            hasTrakerPrograms: false,
             selectedTrackerProgram: SELECT,
             hightIsGood: this.props.currentSelectedIndicator.hightIsGood,
         }
     }
-
 
     componentDidMount = () => this.setState(
         {
@@ -35,7 +33,6 @@ export class SettingsForm extends Component {
             best: this.props.currentSelectedIndicator.best ? this.props.currentSelectedIndicator.best : 0,
             name: this.props.currentSelectedIndicator ? this.props.currentSelectedIndicator.name : '',
             selectedTrackerProgram: this.props.currentSelectedIndicator.selectedTrackerProgram,
-            hasTrakerPrograms: this.props.currentSelectedIndicator.hasTrakerPrograms,
             usePercentages: this.props.currentSelectedIndicator.usePercentages,
             hightIsGood: this.props.currentSelectedIndicator.hightIsGood,
             id: this.props.currentSelectedIndicator.id,
@@ -48,8 +45,8 @@ export class SettingsForm extends Component {
         const name = event.target.name
 
         if (event.target.type === 'select-one') {
-            this.setState({ [name]:  event.target.value === SELECT ? event.target.value : JSON.parse(event.target.value) })
-        } else if(event.target.type === 'checkbox') {
+            this.setState({ [name]: event.target.value === SELECT ? event.target.value : JSON.parse(event.target.value) })
+        } else if (event.target.type === 'checkbox') {
             this.setState({ [name]: event.target.checked })
         } else if (name.endsWith('min') && name !== 'min') {
             const categories = [...this.props.categoriesForm]
@@ -183,14 +180,15 @@ export class SettingsForm extends Component {
 
     render() {
         return (
-            <div className="col m-3">
-                <div className="row m-2">
+            <div className="col">
+                <div className="row">
                     <div className="col">
                         <div className="mb-1 text-left">
                             Settings
-                            </div>
+                        </div>
                     </div>
                 </div>
+
                 <div className="form-group alert alert-secondary" role="alert">
 
                     <form onSubmit={this.handleSubmit} className="form-group text-left">
@@ -202,25 +200,28 @@ export class SettingsForm extends Component {
                             onChange={this.handleChange} />
 
                         <div className="row m-2">
-                            <div className="col-2 m-2">Name</div>
                             <div className="col p-1">
+
+                                <label className="form-label" for="name">Name</label>
                                 <input
                                     id="name"
                                     name="name"
+                                    type="text"
                                     placeholder="Name"
+                                    autoComplete="off"
                                     readOnly
                                     disabled
-                                    autoComplete="off"
-                                    type="text"
                                     value={this.state.name}
                                     onChange={this.handleChange}
-                                    className="form-control text-input input-sm" />
+                                    className="form-control input-sm" />
                             </div>
                         </div>
 
+
                         <div className="row m-2">
-                            <div className="col-2 m-2">Label</div>
                             <div className="col p-1">
+
+                                <label className="form-label" for="label">Label</label>
                                 <input
                                     id="label"
                                     name="label"
@@ -234,8 +235,8 @@ export class SettingsForm extends Component {
                         </div>
 
                         <div className="row m-2">
-                            <div className="col-2 m-2">Weight</div>
                             <div className="col p-1">
+                                <label className="form-label" for="weight">Weight</label>
                                 <input
                                     id="weight"
                                     name="weight"
@@ -249,8 +250,8 @@ export class SettingsForm extends Component {
                         </div>
 
                         <div className="row m-2">
-                            <div className="col-2 m-2">Best</div>
                             <div className="col p-1">
+                                <label className="form-label" for="best">Best</label>
                                 <input
                                     id="best"
                                     name="best"
@@ -264,8 +265,8 @@ export class SettingsForm extends Component {
                         </div>
 
                         <div className="row m-2">
-                            <div className="col-2 m-2">Worst</div>
                             <div className="col p-1">
+                                <label className="form-label" for="worst">Worst</label>
                                 <input
                                     id="worst"
                                     name="worst"
@@ -313,50 +314,6 @@ export class SettingsForm extends Component {
                                 </div>
                             </div>
 
-                            <div className="row p-1">
-                                <div className="col">
-                                    <div className="form-check text-left">
-                                        <input
-                                            id="hasTrakerPrograms"
-                                            name="hasTrakerPrograms"
-                                            type="checkbox"
-                                            checked={this.state.hasTrakerPrograms}
-                                            value={this.state.hasTrakerPrograms}
-                                            onChange={this.handleChange}
-                                            className="form-check-input input-sm" />
-
-                                        <label className="form-check-label" for="hasTrakerPrograms">Has tracker Program</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {
-                                this.state.hasTrakerPrograms && this.props.trackerPrograms.length > 0 && (
-
-                                    <div className="row mt-3">
-                                        <div className="col">
-                                            <select
-                                                onChange={this.handleChange}
-                                                name='selectedTrackerProgram'
-                                                className="form-control input-sm">
-                                                <option> {SELECT} </option>
-                                                {this.props.trackerPrograms.map(trackerProgram => <option key={trackerProgram.id} value={JSON.stringify(trackerProgram)} selected={this.state.hasTrakerPrograms && this.state.selectedTrackerProgram && this.state.selectedTrackerProgram.id === trackerProgram.id}>{trackerProgram.displayName}</option>)}
-                                            </select>
-                                        </div>
-                                    </div>
-                                )
-                            }
-
-                            {
-                                this.state.hasTrakerPrograms && this.props.trackerPrograms.length === 0 && (
-
-                                    <div className="row m-2">
-                                        <div className="col alert alert-dark">
-                                            No tracker program available yet
-                                        </div>
-                                    </div>
-                                )
-                            }
                         </div>
 
                         {
@@ -379,26 +336,34 @@ export class SettingsForm extends Component {
 
 
                         <hr />
-                        <div className="mt-3 btn-group">
-                            <button className="m-3 btn btn-sm btn-outline-danger"
-                                type="button"
-                                onClick={() => this.props.handleIndicatorRemoval(this.props.currentSelectedIndicator)}>
-                                Delete Indicator
-                            </button>
+                        <div className="row p-3">
+                            <div className="col">
+                                <div className="btn-group">
 
-                            <button
-                                onClick={() => this.props.removeCurrentSelectedIndicator()}
-                                type="button"
-                                className="btn btn-sm btn-outline-warning"  >
-                                Close
-                            </button>
+                                    <button
+                                        className="btn btn-danger"
+                                        type="button"
+                                        onClick={() => this.props.handleIndicatorRemoval(this.props.currentSelectedIndicator)}>
+                                        Delete Indicator
+                                    </button>
 
-                            <button
-                                type="submit"
-                                className="btn btn-sm btn-outline-success m-3" >
-                                Save Settings
-                            </button>
+                                    <button
+                                        onClick={() => this.props.removeCurrentSelectedIndicator()}
+                                        type="button"
+                                        className="btn btn-light">
+                                        Close
+                                    </button>
+
+                                    <button
+                                        type="submit"
+                                        className="btn btn-primary">
+                                        Save Settings
+                                    </button>
+
+                                </div>
+                            </div>
                         </div>
+
                     </form>
                 </div>
             </div>

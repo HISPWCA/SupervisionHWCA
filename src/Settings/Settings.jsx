@@ -144,7 +144,7 @@ export class Settings extends Component {
             .catch(error => NotificationManager.error(error.message, null, 3000))
     
 
-    classNameProvider = type => type === this.state.currentAction ? 'btn btn-primary btn-sm ' : 'btn btn-sm btn-outline-primary '
+    classNameProvider = type => type === this.state.currentAction ? 'btn btn-primary btn-sm ' : 'btn btn-sm btn-light '
 
     aggregatedIndicatorClassNameProvider = indicator => this.state.selectedAggregatedIndicator && this.state.selectedAggregatedIndicator.id === indicator.id ? 'col text-left SelectedSetting  m-1 p-3' : 'col text-left Settings  m-1 p-3'
 
@@ -192,140 +192,24 @@ export class Settings extends Component {
 
     handleProgramClick = program => this.setState({ selectedProgram: program, selectedProgramIndicators: [] }, () => this.loadProgramIndicatorsByProgramId(program.id))
 
-    createGlobalSettings = () => this.state.globalSettings !== null && this.state.globalSettings !== undefined && (
-                <div className="row my-3 p-1">
-                    <div className="col-7 form-group alert alert-secondary" role="alert">
-                        <Formik
-                            initialValues={{
-                                bestPerformance: this.state.globalSettings.bestPerformance,
-                                worstPerformance: this.state.globalSettings.worstPerformance,
-                                usePercentage: this.state.globalSettings.usePercentage
-                            }}
-
-                            onSubmit={async values =>  this.updateGlobalSettingsOnServer(values)} >
-
-                            {
-                            props => {
-                                const {values,touched,errors,dirty,isSubmitting,handleChange,handleBlur,handleSubmit,handleReset} = props
-
-                                return (
-                                    <form onSubmit={handleSubmit}
-                                        className="form-group text-left">
-
-                                        <div className="row m-1">
-                                            <div className="col text-left m-1">
-                                                <h3>
-                                                    Performance Metrics
-                                                </h3>
-
-                                                <div className="row">
-                                                    <div className="col-1 mt-2">
-                                                        Best
-                                                    </div>
-                                                    <div className="col">
-                                                        <input
-                                                            id="bestPerformance"
-                                                            autoComplete="off"
-                                                            type="number"
-                                                            value={values.bestPerformance}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            className={
-                                                                errors.bestPerformance && touched.bestPerformance
-                                                                    ? "form-control text-input error input-sm"
-                                                                    : "form-control text-input  input-sm"
-                                                            } />
-                                                    </div>
-
-                                                    <div className="col-1 mt-2">
-                                                        Worst
-                                                    </div>
-
-                                                    <div className="col">
-                                                        <input
-                                                            id="worstPerformance"
-                                                            autoComplete="off"
-                                                            type="number"
-                                                            value={values.worstPerformance}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            className={
-                                                                errors.worstPerformance && touched.worstPerformance
-                                                                    ? "form-control text-input error input-sm"
-                                                                    : "form-control text-input  input-sm"
-                                                            } />
-                                                    </div>
-
-                                                    <div className="col">
-                                                        <div className="form-check text-left">
-
-                                                            <label
-                                                                className="form-check-label m-2 "
-                                                                for="usePercentage">Use Percentage</label>
-
-                                                            <input
-                                                                id="usePercentage"
-                                                                autoComplete="off"
-                                                                type="checkbox"
-                                                                checked={values.usePercentage}
-                                                                value={values.usePercentage}
-                                                                onChange={handleChange}
-                                                                onBlur={handleBlur}
-                                                                className={
-                                                                    errors.usePercentage && touched.usePercentage
-                                                                        ? "m-3 form-check-input text-input error input-sm"
-                                                                        : "m-3 form-check-input text-input  input-sm"
-                                                                } />
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="col">
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-sm btn-outline-danger m-2"
-                                                            onClick={handleReset}
-                                                            disabled={!dirty || isSubmitting} >
-                                                            Reset
-                                                        </button>
-
-                                                        <button
-                                                            type="submit"
-                                                            className="btn btn-sm btn-outline-success m-2"
-                                                            disabled={isSubmitting}>
-                                                            Submit
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </form>
-                                )
-                            }}
-                        </Formik>
-                    </div>
-                    {this.printGlobalSettings()}
-                </div>
-            )
-    
-
     printGlobalSettings = () => (
             <div className="col-5 form-group  p-1">
-            <div className="alert alert-secondary" role="alert">
-                <div className="row">
-                    <div className="col text-left m-1">
-                        <h3>
-                            Global Settings
+                <div className="alert alert-secondary" role="alert">
+                    <div className="row">
+                        <div className="col text-left m-1">
+                            <h3>
+                                Global Settings
                             </h3>
+                        </div>
+                    </div>
+
+                    <div className="row text-left">
+                        <div className="col font-weight-bold">Display:</div>
+                        <div className="col"> {this.displayBestPerformance()} best</div>
+                        <div className="col"> {this.displayWorstPerformance()} Worst</div>
+                        <div className="col">Use Percentage: {this.displayUsePercentage()}</div>
                     </div>
                 </div>
-
-                <div className="row text-left">
-                    <div className="col font-weight-bold">Display:</div>
-                    <div className="col"> {this.displayBestPerformance()} best</div>
-                    <div className="col"> {this.displayWorstPerformance()} Worst</div>
-                    <div className="col">Use Percentage: {this.displayUsePercentage()}</div>
-                </div>
-            </div>
             </div>
         )
 
@@ -338,8 +222,8 @@ export class Settings extends Component {
             && currentSelectedIndicator !== undefined) {
 
             return (
-                <div className="row">
-                    <div className="col m-3">
+                <div className="row my-3">
+                    <div className="col">
                         <Formik
                             initialValues={{ category: '', color: '' }}
                             onSubmit={async values => {
@@ -436,15 +320,15 @@ export class Settings extends Component {
                                         <div className="mt-3">
                                             <button
                                                 type="button"
-                                                className="btn btn-sm btn-outline-danger "
+                                                className="btn btn-sm btn-danger "
                                                 onClick={handleReset}
                                                 disabled={!dirty || isSubmitting} >
                                                 Reset
-                                    </button>
+                                            </button>
 
                                             <button
                                                 type="submit"
-                                                className="btn btn-sm btn-outline-success m-3"
+                                                className="btn btn-sm btn-primary m-3"
                                                 disabled={isSubmitting}>
                                                 Submit
                                     </button>
@@ -457,14 +341,12 @@ export class Settings extends Component {
                     </div>
                 </div>
             )
-        } else {
-            return null
         }
     }
 
     displayAggregatedIndicatorChildrens = () => this.state.currentAction === C_AGGREGATED_INDICATORS && this.state.selectedAggregatedIndicator !== null && (
-        <div className="col my-3">
-            <div className="mb-1 text-left">
+        <div className="col my-1">
+            <div className="m-1 text-left">
                 Available Indicators
             </div>
 
@@ -491,20 +373,20 @@ export class Settings extends Component {
             this.state.selectedProgram !== null) {
             if (this.state.selectedProgramIndicators.length === 0) {
                 return (
-                    <div className="alert alert-secondary">
+                    <div className="col alert alert-secondary">
                         No program indicator available for
                         
                         <span className="font-weight-bold p-3 text-primary"> {this.state.selectedProgram.displayName}</span>
 
                         <hr />
-                        <button className="btn btn-outline-warning"
+                        <button className="btn btn-light"
                             onClick={() => this.setState({ selectedProgram: null })}>Close</button>
                     </div>
                 )
             } else {
                 return (
-                    <div className="col my-3">
-                        <div className="mb-1 text-left">
+                    <div className="col my-1">
+                        <div className="m-1 text-left">
                             Program Indicators
                         </div>
 
@@ -529,7 +411,7 @@ export class Settings extends Component {
     }
 
     displaySelectedIndicators = () => this.state.selectedIndicators.length > 0 && (
-        <div className="col m-3">
+        <div className="col m-1">
             <div className="mb-1 text-left">
                 Selected Indicators
             </div>
@@ -626,27 +508,33 @@ export class Settings extends Component {
     handlePagination = () => {
         if (this.state.currentAction === C_AGGREGATED_INDICATORS) {
             return (
-                <div className="mt-2">
-                    <Paginator
-                        first={this.state.aggregatedFirstPage}
-                        rows={this.state.aggregatedNumRows}
-                        totalRecords={this.state.initialAggregatedIndicatorsWithGroups.length}
-                        rowsPerPageOptions={[...C_PAGINATION_ROWS_PER_PAGE]}
-                        onPageChange={this.onAggragatedIndicatorPageChange}
-                        template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink" />
+                <div className="row">
+                    <div style={{ marginLeft: '-12px' }} className="col my-1">
+                        <Paginator
+                            style={{ width: '50%' }}
+                            first={this.state.aggregatedFirstPage}
+                            rows={this.state.aggregatedNumRows}
+                            totalRecords={this.state.initialAggregatedIndicatorsWithGroups.length}
+                            rowsPerPageOptions={[...C_PAGINATION_ROWS_PER_PAGE]}
+                            onPageChange={this.onAggragatedIndicatorPageChange}
+                            template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink" />
+                    </div>
                 </div>
-            )
-        } else if (this.state.currentAction === C_PROGRAM_INDICATORS) {
-            return (
-                <div className="mt-2">
-                    <Paginator
-                        first={this.state.programsFirstPage}
-                        rows={this.state.programsNumRows}
-                        totalRecords={this.state.initialAggregatedIndicatorsWithGroups.length}
-                        rowsPerPageOptions={C_PAGINATION_ROWS_PER_PAGE}
-                        onPageChange={this.onProgramsPageChange}
-                        template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink" />
-                </div>
+                    )
+                } else if (this.state.currentAction === C_PROGRAM_INDICATORS) {
+                    return (
+                        <div className="row">
+                            <div style={{ marginLeft: '-12px' }} className="col my-1">
+                            <Paginator
+                                style={{ width: '50%' }}
+                                first={this.state.programsFirstPage}
+                                rows={this.state.programsNumRows}
+                                totalRecords={this.state.initialAggregatedIndicatorsWithGroups.length}
+                                rowsPerPageOptions={C_PAGINATION_ROWS_PER_PAGE}
+                                onPageChange={this.onProgramsPageChange}
+                                template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink" />
+                            </div>
+                        </div>
             )
         }
     }
@@ -665,7 +553,7 @@ export class Settings extends Component {
 
     render = () => (
         <React.Fragment>
-            <div className="row m-1--">
+            <div className="row">
                 <div className="col btn-group">
                     <button
                         onClick={this.loadAggregatedIndicatorsWithGroups}
@@ -681,9 +569,9 @@ export class Settings extends Component {
                 </div>
             </div>
 
-            {this.createGlobalSettings()}
+            {/* {this.createGlobalSettings()} */}
 
-            <div className="row">
+            <div className="row m-1 alert alert-primary">
                 <div className="col">
 
                     {this.displayParentTitle()}
@@ -695,6 +583,7 @@ export class Settings extends Component {
                     {this.handlePagination()}
 
                     {this.createCategoryForm()}
+
                 </div>
 
                 {this.displayAggregatedIndicatorChildrens()}
