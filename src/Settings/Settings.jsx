@@ -71,22 +71,23 @@ export class Settings extends Component {
     }
 
     
-    loadTrackerPrograms = ()=>axios.get(TRACKER_PROGRAMS_ROUTE)
+    loadTrackerPrograms = ()=>
+        axios.get(TRACKER_PROGRAMS_ROUTE)
         .then(response=>this.setState({trackerPrograms: response.data.programs}))
         .catch(error => NotificationManager.error(error.message, null, 3000))
 
 
-    loadAggregatedIndicatorsWithGroups = () => {
-        axios.get(API_BASE_ROUTE.concat(AGGREGATED_INDICATORS_ROUTE))
+    loadAggregatedIndicatorsWithGroups = () => 
+    axios.get(API_BASE_ROUTE.concat(AGGREGATED_INDICATORS_ROUTE))
             .then(response => {
                 this.setState({
                     currentAction: C_AGGREGATED_INDICATORS,
                     initialAggregatedIndicatorsWithGroups: response.data.indicatorGroups
                 })
             }).catch(error => NotificationManager.error(error.message, null, 3000))
-    }
+    
 
-    loadPrograms = () => {
+    loadPrograms = () => 
         axios.get(API_BASE_ROUTE.concat(PROGRAMS_ROUTE))
             .then(response => {
                 this.setState({
@@ -95,7 +96,7 @@ export class Settings extends Component {
                     initialAggregatedIndicatorsWithGroups: response.data.programs,
                 })
             }).catch(error => NotificationManager.error(error.message, null, 3000))
-    }
+    
 
     handleCurrentSelectedIndicator = indicator => {
 
@@ -164,8 +165,6 @@ export class Settings extends Component {
                         </div>
                     ))
             )
-        } else {
-            return null
         }
     }
 
@@ -183,8 +182,6 @@ export class Settings extends Component {
                         </div>
                     ))
             )
-        } else {
-            return null
         }
     }
 
@@ -265,6 +262,7 @@ export class Settings extends Component {
                                     handleSubmit,
                                     handleReset
                                 } = props;
+
                                 return (
                                     <form onSubmit={handleSubmit}
                                         className="form-group text-left">
@@ -331,7 +329,7 @@ export class Settings extends Component {
                                                 className="btn btn-sm btn-primary m-3"
                                                 disabled={isSubmitting}>
                                                 Submit
-                                    </button>
+                                            </button>
 
                                         </div>
                                     </form>
@@ -347,7 +345,9 @@ export class Settings extends Component {
     displayAggregatedIndicatorChildrens = () => this.state.currentAction === C_AGGREGATED_INDICATORS && this.state.selectedAggregatedIndicator !== null && (
         <div className="col my-1">
             <div className="m-1 text-left">
-                Available Indicators
+                <strong>
+                    Available Indicators
+                </strong>
             </div>
 
             {
@@ -413,7 +413,9 @@ export class Settings extends Component {
     displaySelectedIndicators = () => this.state.selectedIndicators.length > 0 && (
         <div className="col m-1">
             <div className="mb-1 text-left">
-                Selected Indicators
+                <strong>
+                    Selected Indicators
+                </strong>
             </div>
 
             {
@@ -452,9 +454,9 @@ export class Settings extends Component {
 
     displayParentTitle = () => {
         if (this.state.currentAction === C_AGGREGATED_INDICATORS) {
-            return <div className="mb-1 text-left">Indicator Groups</div>
+            return <div className="mb-1 text-left"><strong>Indicator Groups</strong></div>
         } else if (this.state.currentAction === C_PROGRAM_INDICATORS) {
-            return <div className="mb-1 text-left">Programs</div>
+            return <div className="mb-1 text-left"> <strong>Programs</strong></div>
         }
     }
 
@@ -511,7 +513,7 @@ export class Settings extends Component {
                 <div className="row">
                     <div style={{ marginLeft: '-12px' }} className="col my-1">
                         <Paginator
-                            style={{ width: '50%' }}
+                            style={{ width: '70%' }}
                             first={this.state.aggregatedFirstPage}
                             rows={this.state.aggregatedNumRows}
                             totalRecords={this.state.initialAggregatedIndicatorsWithGroups.length}
@@ -526,7 +528,7 @@ export class Settings extends Component {
                         <div className="row">
                             <div style={{ marginLeft: '-12px' }} className="col my-1">
                             <Paginator
-                                style={{ width: '50%' }}
+                                style={{ width: '70%' }}
                                 first={this.state.programsFirstPage}
                                 rows={this.state.programsNumRows}
                                 totalRecords={this.state.initialAggregatedIndicatorsWithGroups.length}
@@ -553,12 +555,17 @@ export class Settings extends Component {
 
     render = () => (
         <React.Fragment>
-            <div className="row">
+            <div className="row alert alert-light">
                 <div className="col btn-group">
+                    <h4>
+                        Let's configure some indicators
+                    </h4>
+                    <hr/>
+
                     <button
                         onClick={this.loadAggregatedIndicatorsWithGroups}
                         className={this.classNameProvider(C_AGGREGATED_INDICATORS)}>
-                        Indicators
+                        Aggregatted Indicators
                     </button>
 
                     <button
@@ -569,9 +576,7 @@ export class Settings extends Component {
                 </div>
             </div>
 
-            {/* {this.createGlobalSettings()} */}
-
-            <div className="row m-1 alert alert-primary">
+            <div className="row m-1 mt-0 alert alert-primary">
                 <div className="col">
 
                     {this.displayParentTitle()}

@@ -6,6 +6,8 @@ import { ORGANISATION_UNITS_ROUTE, SUPERVISORS_ROUTE, ME_ROUTE, INDICATORS_ROUTE
 import { Calendar } from 'primereact/calendar';
 import { v4 as uuidv4 } from 'uuid';
 import LoadingOverlay from 'react-loading-overlay';
+import { MultiSelect } from 'primereact/multiselect';
+import { Dropdown } from 'primereact/dropdown';
 
 export class Supervision extends Component {
 
@@ -29,6 +31,8 @@ export class Supervision extends Component {
             currentSelectedOrgUnit: null,
             currentSelectedIndicators: [],
             currentSelectedSupervisor: null,
+            otherSupervisors: null,
+            currentSelectedSelectedSupervisionType: null,
         }
     }
 
@@ -263,6 +267,8 @@ export class Supervision extends Component {
             this.setState({ loading: false }, () => NotificationManager.error('Please Select Indicators', null, 3000))
         } else if (this.state.selectedSupervisors.length === 0) {
             this.setState({ loading: false }, () => NotificationManager.error('Please Select Supervisors', null, 3000))
+        } else if (!this.state.currentSelectedSelectedSupervisionType) {
+            this.setState({ loading: false }, () => NotificationManager.error('Please Select Supervision Type', null, 3000))
         } else {
             const supervision = {}
             supervision.id = uuidv4()
@@ -274,6 +280,7 @@ export class Supervision extends Component {
             supervision.supervisors = this.state.selectedSupervisors
             supervision.indicators = this.state.currentSelectedIndicators
             supervision.organisationUnit = this.state.currentSelectedNode
+            supervision.otherSupervisors = this.state.otherSupervisors
 
             this.setState({ loading: false }, () => this.createSupervision(supervision))
         }
@@ -281,33 +288,58 @@ export class Supervision extends Component {
 
     handleChange = event => event.target.type === 'checkbox' ? this.setState({ useStepper: event.target.checked }) : this.setState({ description: event.target.value })
 
+    handleOtherSupervisorsChange = event => this.setState({ otherSupervisors: event.target.value })
+
     displayForms = () => this.state.currentSelectedNode !== null && this.state.selectedNodes.length > 0 && (
         <div className="col">
-            <div className="form-group alert alert-secondary m-1" role="alert">
+            <div className="form-group alert alert-primary m-1" role="alert">
 
-                <label for="period" className="form-label font-weight-bold mt-2">Select Period</label>
-                <br />
+                <strong className="d-block p-3 alert alert-secondary">
+                    <h3> {this.state.currentSelectedNode.label} </h3>
+                </strong>
+
+                <label for="period" className="form-label font-weight-bold mt-2 d-block">Select Period</label>
                 <Calendar
                     id="period"
-                    className=""
+                    className="d-block"
                     value={this.state.dates}
                     onChange={e => this.setState({ dates: e.value })}
                     selectionMode="range"
                     readOnlyInput={true} />
 
-                <br />
-                <label for="description" className="form-label font-weight-bold mt-2">Add description</label>
+                <label for="supervisionType" className="form-label font-weight-bold mt-2 d-block">Supervision type</label>
+                <Dropdown
+                    className="d-block"
+                    optionLabel="name"
+                    optionValue="code"
+                    value={this.state.currentSelectedSelectedSupervisionType}
+                    options={[{ name: 'Integrated Supervision', code: 'Integrated' }, { name: 'Specific Supervision', code: 'Specific' }]}
+                    onChange={e => { this.setState({ currentSelectedSelectedSupervisionType: e.value }) }}
+                    placeholder="Choose a Supervision Type" />
+
+                <label for="description" className="form-label font-weight-bold mt-2 d-block">Add description</label>
                 <textarea
                     id="description"
                     className="form-control"
                     onChange={this.handleChange}
                     value={this.state.description} ></textarea>
 
+                <label for="mainSupervisors" className="form-label font-weight-bold mt-2 d-block">
+                    Supervisors
+                </label>
+                <MultiSelect
+                    id="mainSupervisors"
+                    className="d-block"
+                    optionLabel="displayName"
+                    options={this.state.supervisors}
+                    value={this.state.selectedSupervisors}
+                    onChange={e => this.setState({ selectedSupervisors: e.value })}
+                    filter />
 
                 <label for="otherSupervisors" className="form-label font-weight-bold mt-2">
                     Other Supervisors
                 </label>
-                <textarea id="otherSupervisors" className="form-control"></textarea>
+                <textarea id="otherSupervisors" className="form-control" onChange={this.handleOtherSupervisorsChange}>{ this.state.otherSupervisors }</textarea>
 
                 <div className="row">
                     <div className="col">
@@ -319,8 +351,8 @@ export class Supervision extends Component {
                                 value={this.state.useStepper}
                                 onChange={this.handleChange}
                                 className="form-check-input input-sm" />
-                    Use Stepper
-                    </label>
+                         Use Stepper <em className="text-dark"> (Recommanded for huge datasets or complex forms) </em>
+                        </label>
                     </div>
                 </div>
 
@@ -332,41 +364,7 @@ export class Supervision extends Component {
                     Schedule
                 </button>
             </div>
-
-            <div className="font-weight-bold mt-3">
-                <a className="btn btn-link"
-                    data-toggle="collapse"
-                    href="#collapseSelectSupervisors"
-                    role="button"
-                    aria-expanded="false"
-                    aria-controls="collapseSelectSupervisors">
-                    Select Supervisors
-                </a>
-            </div>
-
-            <div className="collapse" id="collapseSelectSupervisors">
-                <div className="card card-body">
-                    {this.displaySupervisors()}
-                </div>
-            </div>
-
         </div>
-    )
-
-    handleSupevisorSelection = supervisor => {
-        const selectedSupervisors = [...this.state.selectedSupervisors]
-        selectedSupervisors.push(supervisor)
-
-        this.setState({ selectedSupervisors })
-    }
-
-    displaySupervisors = () => this.state.currentSelectedNode !== null && this.state.supervisors.length > 0 && (
-        <React.Fragment>
-            {
-                this.state.supervisors.filter(supervisor => !this.state.selectedSupervisors.map(s => s.id).includes(supervisor.id))
-                    .map(s => <div key={s.id} className="mt-3 p-3 text-left Settings" onClick={() => this.handleSupevisorSelection(s)}>{s.displayName}</div>)
-            }
-        </React.Fragment>
     )
 
     removeHandleSupervisorsSelection = supervisor => {
@@ -447,7 +445,7 @@ export class Supervision extends Component {
         if (this.state.currentSelectedIndicators.length > 0) {
             return (
                 <div className='col alert alert-secondary scroll-indicators' role='alert'>
-                    <div className='font-weight-bold'>Selected Indicators</div>
+                    <div className='font-weight-bold'> <strong>Selected Indicators</strong> </div>
 
                     <div className='m-1'>
                         {this.state.currentSelectedIndicators.map(indicator => (

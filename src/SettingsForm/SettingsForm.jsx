@@ -95,6 +95,9 @@ export class SettingsForm extends Component {
         const indicator = indicators.find(i => i.id === this.state.id)
         const index = indicators.indexOf(indicator)
 
+
+        // indicators.push(this.state)
+
         if (indicators.length === 0 || index === -1) {
             indicators.push(this.state)
         } else {
@@ -183,8 +186,10 @@ export class SettingsForm extends Component {
             <div className="col">
                 <div className="row">
                     <div className="col">
-                        <div className="mb-1 text-left">
-                            Settings
+                        <div className="mb-1 px-1 text-left">
+                            <strong>
+                                Settings
+                            </strong>
                         </div>
                     </div>
                 </div>
@@ -298,7 +303,7 @@ export class SettingsForm extends Component {
                             </div>
 
                             <div className="row p-1">
-                                <div className="col ml-3">
+                                <div className="col">
                                     <div className="form-check text-left">
                                         <input
                                             id="usePercentages"
@@ -341,7 +346,7 @@ export class SettingsForm extends Component {
                                 <div className="btn-group">
 
                                     <button
-                                        className="btn btn-danger"
+                                        className="btn btn-danger btn-sm"
                                         type="button"
                                         onClick={() => this.props.handleIndicatorRemoval(this.props.currentSelectedIndicator)}>
                                         Delete Indicator
@@ -350,13 +355,13 @@ export class SettingsForm extends Component {
                                     <button
                                         onClick={() => this.props.removeCurrentSelectedIndicator()}
                                         type="button"
-                                        className="btn btn-light">
+                                        className="btn btn-light btn-sm">
                                         Close
                                     </button>
 
                                     <button
                                         type="submit"
-                                        className="btn btn-primary">
+                                        className="btn btn-primary btn-sm">
                                         Save Settings
                                     </button>
 
