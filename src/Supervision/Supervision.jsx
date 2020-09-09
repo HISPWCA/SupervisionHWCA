@@ -185,6 +185,7 @@ export class Supervision extends Component {
                             currentSelectedIndicators: [],
                             currentSelectedNode: null,
                             selectedSupervisors: [],
+                            otherSupervisors: null,
                             description: null,
                             loading: false
                         }, () => {
@@ -339,7 +340,7 @@ export class Supervision extends Component {
                 <label for="otherSupervisors" className="form-label font-weight-bold mt-2">
                     Other Supervisors
                 </label>
-                <textarea id="otherSupervisors" className="form-control" onChange={this.handleOtherSupervisorsChange}>{ this.state.otherSupervisors }</textarea>
+                <textarea id="otherSupervisors" className="form-control" onChange={this.handleOtherSupervisorsChange}>{this.state.otherSupervisors}</textarea>
 
                 <div className="row">
                     <div className="col">
