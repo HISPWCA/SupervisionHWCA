@@ -16,6 +16,8 @@ export const ME_ROUTE = API_BASE_ROUTE.concat('/me.json?fields=id,displayName')
 
 export const INDICATORS_ROUTE = API_BASE_ROUTE.concat('/dataStore/SupervisionHWCA/indicators')
 
+export const SETTINGS_ROUTE = API_BASE_ROUTE.concat('/dataStore/SupervisionHWCA/settings')
+
 export const GLOBAL_SETTINGS_ROUTE = API_BASE_ROUTE.concat('/dataStore/SupervisionHWCA/global_settings')
 
 export const SUPERVISIONS_ROUTE = API_BASE_ROUTE.concat('/dataStore/SupervisionHWCA/supervisions')

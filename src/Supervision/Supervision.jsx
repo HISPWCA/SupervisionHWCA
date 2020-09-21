@@ -1,13 +1,13 @@
-import axios from 'axios';
-import { Tree } from 'primereact/tree';
-import React, { Component } from 'react';
-import { NotificationManager } from 'react-notifications';
-import { ORGANISATION_UNITS_ROUTE, SUPERVISORS_ROUTE, ME_ROUTE, INDICATORS_ROUTE, SUPERVISIONS_ROUTE } from '../api.routes';
-import { Calendar } from 'primereact/calendar';
-import { v4 as uuidv4 } from 'uuid';
-import LoadingOverlay from 'react-loading-overlay';
-import { MultiSelect } from 'primereact/multiselect';
-import { Dropdown } from 'primereact/dropdown';
+import axios from 'axios'
+import { Tree } from 'primereact/tree'
+import React, { Component } from 'react'
+import { NotificationManager } from 'react-notifications'
+import { ORGANISATION_UNITS_ROUTE, SUPERVISORS_ROUTE, ME_ROUTE, INDICATORS_ROUTE, SUPERVISIONS_ROUTE } from '../api.routes'
+import { Calendar } from 'primereact/calendar'
+import { v4 as uuidv4 } from 'uuid'
+import LoadingOverlay from 'react-loading-overlay'
+import { MultiSelect } from 'primereact/multiselect'
+import { Dropdown } from 'primereact/dropdown'
 
 export class Supervision extends Component {
 
@@ -21,15 +21,14 @@ export class Supervision extends Component {
             loading: false,
             supervisors: [],
             supervisions: [],
+            settingsList: [],
             useStepper: true,
             description: null,
             selectedNodes: [],
             selectedNodeKeys: null,
-            availableIndicators: [],
             selectedSupervisors: [],
             currentSelectedNode: null,
             currentSelectedOrgUnit: null,
-            currentSelectedIndicators: [],
             currentSelectedSupervisor: null,
             otherSupervisors: null,
             currentSelectedSelectedSupervisionType: null,
@@ -40,7 +39,6 @@ export class Supervision extends Component {
         this.loadMe()
         this.loadSupervisors()
         this.loadOrganisationUnits()
-        this.loadIndicatorsFromServer()
     }
 
     loadOrganisationUnits = () => axios.get(ORGANISATION_UNITS_ROUTE)
@@ -182,7 +180,6 @@ export class Supervision extends Component {
                         this.setState({
                             dates: null,
                             currentSelectedSupervisor: null,
-                            currentSelectedIndicators: [],
                             currentSelectedNode: null,
                             selectedSupervisors: [],
                             otherSupervisors: null,
@@ -264,8 +261,6 @@ export class Supervision extends Component {
             this.setState({ loading: false }, () => NotificationManager.error('Please you should fill descripton', null, 3000))
         } else if (this.state.currentSelectedNode === null) {
             this.setState({ loading: false }, () => NotificationManager.error('Please Select organisation unit', null, 3000))
-        } else if (this.state.currentSelectedIndicators.length === 0) {
-            this.setState({ loading: false }, () => NotificationManager.error('Please Select Indicators', null, 3000))
         } else if (this.state.selectedSupervisors.length === 0) {
             this.setState({ loading: false }, () => NotificationManager.error('Please Select Supervisors', null, 3000))
         } else if (!this.state.currentSelectedSelectedSupervisionType) {
@@ -279,7 +274,6 @@ export class Supervision extends Component {
             supervision.useStepper = this.state.useStepper
             supervision.description = this.state.description
             supervision.supervisors = this.state.selectedSupervisors
-            supervision.indicators = this.state.currentSelectedIndicators
             supervision.organisationUnit = this.state.currentSelectedNode
             supervision.otherSupervisors = this.state.otherSupervisors
 
@@ -360,7 +354,7 @@ export class Supervision extends Component {
                 <hr />
 
                 <button
-                    className="btn btn-sm btn-light"
+                    className="btn btn-sm btn-primary"
                     onClick={this.handleSupervisionCreation}>
                     Schedule
                 </button>
@@ -399,86 +393,17 @@ export class Supervision extends Component {
             </div>
         )
 
-    loadIndicatorsFromServer = () => axios.get(INDICATORS_ROUTE)
-        .then(response => this.setState({ availableIndicators: response.data }))
-        .catch(error => NotificationManager.error(error.message, null, 3000))
-
-
-    handleCurrentSelectedIndicator = indicator => {
-        const currentSelectedIndicators = [...this.state.currentSelectedIndicators]
-        currentSelectedIndicators.push(indicator)
-
-        this.setState({ currentSelectedIndicators })
-    }
-
-    displayAvailableIndicators = () => {
-        if (this.state.availableIndicators.length > 0) {
-            return (
-                <div className="col alert alert-secondary scroll-indicators" role="alert">
-                    <div className="font-weight-bold">Indicators</div>
-
-                    <div className="m-1">
-                        {this.state.availableIndicators
-                            .filter(i => !this.state.currentSelectedIndicators.map(i => i.id).includes(i.id))
-                            .map(indicator => (
-                                <div className="row" key={indicator}>
-                                    <div className={'col text-left Settings m-1 p-2'}
-                                        onClick={() => this.handleCurrentSelectedIndicator(indicator)}>
-                                        {indicator.label}
-                                    </div>
-                                </div>
-                            ))}
-                    </div>
-                </div>
-            )
-        } else {
-            return <div className="col p-1" role="alert"><div className='alert alert-secondary'>You don't have any indicator configured yet</div></div>
-        }
-    }
-
-    handleIndicatorRemoval = indicator => {
-        const currentSelectedIndicators = [...this.state.currentSelectedIndicators].filter(i => i.id !== indicator.id)
-
-        this.setState({ currentSelectedIndicators })
-    }
-
-    displayCurrentSelectedIndicators = () => {
-        if (this.state.currentSelectedIndicators.length > 0) {
-            return (
-                <div className='col alert alert-secondary scroll-indicators' role='alert'>
-                    <div className='font-weight-bold'> <strong>Selected Indicators</strong> </div>
-
-                    <div className='m-1'>
-                        {this.state.currentSelectedIndicators.map(indicator => (
-                            <div className="row" key={indicator}>
-                                <div className={'col text-left Settings m-1 p-2'}
-                                    onClick={() => this.handleIndicatorRemoval(indicator)}>
-                                    {indicator.name}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )
-        } else {
-            return <div className="col p-1" role="alert"><div className='alert alert-secondary'>No indicator selected yet</div></div>
-        }
-    }
-
 
     render = () => (
         <React.Fragment>
             <LoadingOverlay spinner active={this.state.loading} text='Processing ...' >
+
+                <div className="row m-3">
+                    
+                </div>
+
                 <div className='row'>
                     <div className='col'>
-
-                        <div className="row m-1 py-3 text-left">
-                            {this.displayAvailableIndicators()}
-
-                            {this.displayCurrentSelectedIndicators()}
-                            <hr />
-                        </div>
-
                         <div className="row text-left my-3">
                             <div className="col">
                                 <div className="font-weight-bold">Organisation Units</div>
@@ -498,8 +423,8 @@ export class Supervision extends Component {
                             {this.displayForms()}
 
                             {this.displaySelectedSupervisors()}
-                        </div>
 
+                        </div>
                     </div>
                 </div>
             </LoadingOverlay>

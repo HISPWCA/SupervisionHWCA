@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { Component } from 'react';
-import { INDICATORS_ROUTE } from '../api.routes';
+import { INDICATORS_ROUTE, ME_ROUTE } from '../api.routes';
 import { NotificationManager } from 'react-notifications';
 
 const SELECT = 'Select ..'
@@ -17,6 +17,7 @@ export class SettingsForm extends Component {
             weight: 0,
             best: 0,
             worst: 0,
+            me: null,
             categories: [],
             usePercentages: true,
             selectedIndicators: [],
@@ -39,7 +40,6 @@ export class SettingsForm extends Component {
             categories: this.props.categoriesForm,
         }
     )
-
 
     handleChange = event => {
         const name = event.target.name
@@ -94,9 +94,6 @@ export class SettingsForm extends Component {
         const indicators = [...this.props.selectedIndicators]
         const indicator = indicators.find(i => i.id === this.state.id)
         const index = indicators.indexOf(indicator)
-
-
-        // indicators.push(this.state)
 
         if (indicators.length === 0 || index === -1) {
             indicators.push(this.state)
@@ -362,7 +359,7 @@ export class SettingsForm extends Component {
                                     <button
                                         type="submit"
                                         className="btn btn-primary btn-sm">
-                                        Save Settings
+                                        Save Indicator
                                     </button>
 
                                 </div>

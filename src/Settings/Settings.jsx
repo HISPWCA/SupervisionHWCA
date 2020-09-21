@@ -1,22 +1,24 @@
-import axios from 'axios';
-import { Formik } from "formik";
-import 'primeicons/primeicons.css';
-import { ColorPicker } from 'primereact/colorpicker';
-import { Paginator } from 'primereact/paginator';
-import 'primereact/resources/primereact.min.css';
-import 'primereact/resources/themes/nova-light/theme.css';
-import React, { Component } from 'react';
-import { NotificationManager } from 'react-notifications';
-import 'react-notifications/lib/notifications.css';
-import { v4 as uuidv4 } from 'uuid';
-import { AGGREGATED_INDICATORS_ROUTE, API_BASE_ROUTE,TRACKER_PROGRAMS_ROUTE, GLOBAL_SETTINGS_ROUTE, INDICATORS_ROUTE, PROGRAMS_ROUTE, PROGRAM_INDICATORS_BY_PROGRAM_ROUTE } from '../api.routes';
-import SettingsForm from '../SettingsForm/SettingsForm';
-import './Settings.css';
+import axios from 'axios'
+import { Formik } from "formik"
+import 'primeicons/primeicons.css'
+import { ColorPicker } from 'primereact/colorpicker'
+import { Paginator } from 'primereact/paginator'
+import 'primereact/resources/primereact.min.css'
+import 'primereact/resources/themes/nova-light/theme.css'
+import React, { Component } from 'react'
+import { NotificationManager } from 'react-notifications'
+import 'react-notifications/lib/notifications.css'
+import { v4 as uuidv4 } from 'uuid'
+import { AGGREGATED_INDICATORS_ROUTE, API_BASE_ROUTE,TRACKER_PROGRAMS_ROUTE, GLOBAL_SETTINGS_ROUTE, INDICATORS_ROUTE, PROGRAMS_ROUTE, PROGRAM_INDICATORS_BY_PROGRAM_ROUTE, ME_ROUTE, SETTINGS_ROUTE } from '../api.routes'
+import SettingsForm from '../SettingsForm/SettingsForm'
+import { MultiSelect } from 'primereact/multiselect'
+import { Dialog } from 'primereact/dialog';
+import './Settings.css'
 
 
-const C_PROGRAM_INDICATORS = 'Program indicators';
-const C_AGGREGATED_INDICATORS = 'Aggregated Indicators';
-const C_PAGINATION_ROWS_PER_PAGE = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+const C_PROGRAM_INDICATORS = 'Program indicators'
+const C_AGGREGATED_INDICATORS = 'Aggregated Indicators'
+const C_PAGINATION_ROWS_PER_PAGE = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 
 export class Settings extends Component {
 
@@ -24,6 +26,17 @@ export class Settings extends Component {
         super(props)
 
         this.state = {
+            me: null,
+            settingName: null,
+            indicatorsSettings: [],
+            displaySettingList: false,
+
+            setting: null,
+
+            settingsList: [],
+
+            settings: [],
+            
             currentAction: C_AGGREGATED_INDICATORS,
             trackerPrograms: [],
             
@@ -58,10 +71,8 @@ export class Settings extends Component {
     }
 
 
-    componentDidMount = () => {
-        this.retrieveGlobalSettingsFromServer()
-        this.retrieveIndicatorsFromServer()
-        this.loadTrackerPrograms()
+    componentDidMount = () => {        
+        this.loadMe()
 
         if (this.state.currentAction === C_PROGRAM_INDICATORS) {
             this.loadPrograms()
@@ -70,6 +81,12 @@ export class Settings extends Component {
         }
     }
 
+    loadMe = () => axios.get(ME_ROUTE)
+        .then(response => this.setState({ me: response.data }, ()=> {
+            this.retrieveGlobalSettingsFromServer()
+            this.retrieveIndicatorsFromServer()
+            this.loadTrackerPrograms()
+        })).catch(error => NotificationManager.error(error.message, null, 3000))
     
     loadTrackerPrograms = ()=>
         axios.get(TRACKER_PROGRAMS_ROUTE)
@@ -213,10 +230,7 @@ export class Settings extends Component {
     createCategoryForm = () => {
         const currentSelectedIndicator = this.state.currentSelectedIndicator
         
-        if (this.state.displayCategoryForms
-            && currentSelectedIndicator
-            && currentSelectedIndicator !== null
-            && currentSelectedIndicator !== undefined) {
+        if (this.state.displayCategoryForms && currentSelectedIndicator ) {
 
             return (
                 <div className="row my-3">
@@ -265,7 +279,7 @@ export class Settings extends Component {
 
                                 return (
                                     <form onSubmit={handleSubmit}
-                                        className="form-group text-left">
+                                        className="form-group text-left alert alert-secondary">
                                         <label htmlFor="category" style={{ display: "block" }}>
                                             Add Category
                                         </label>
@@ -291,9 +305,6 @@ export class Settings extends Component {
                                                     value={this.state.currentSelectedColor}
                                                     onChange={(e) => this.setState({ currentSelectedColor: e.value })} />
 
-                                            </div>
-
-                                            <div className="col">
                                                 <input
                                                     id="colorCode"
                                                     placeholder="Color Code"
@@ -311,27 +322,28 @@ export class Settings extends Component {
                                                 {errors.color && touched.color && (
                                                     <div className="input-feedback">{errors.color}</div>
                                                 )}
+
+                                            </div>
+
+                                            <div className="col btn-group">
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-sm btn-block--- btn-danger"
+                                                    onClick={handleReset}
+                                                    disabled={!dirty || isSubmitting} >
+                                                    Reset
+                                                </button>
+
+                                                <button
+                                                    type="submit"
+                                                    className="btn btn-sm btn-block btn-primary"
+                                                    disabled={isSubmitting}>
+                                                    Submit Category
+                                                </button>
                                             </div>
 
                                         </div>
 
-                                        <div className="mt-3">
-                                            <button
-                                                type="button"
-                                                className="btn btn-sm btn-danger "
-                                                onClick={handleReset}
-                                                disabled={!dirty || isSubmitting} >
-                                                Reset
-                                            </button>
-
-                                            <button
-                                                type="submit"
-                                                className="btn btn-sm btn-primary m-3"
-                                                disabled={isSubmitting}>
-                                                Submit
-                                            </button>
-
-                                        </div>
                                     </form>
                                 )
                             }}
@@ -352,7 +364,9 @@ export class Settings extends Component {
 
             {
                 this.state.selectedAggregatedIndicator.indicators
-                    .filter(i => !this.state.selectedIndicators.map(ai => ai.id).includes(i.id))
+                    .filter(i => !this.state.selectedIndicators
+                        .filter(indicator => indicator.me.id === this.state.me.id)
+                        .map(ai => ai.id).includes(i.id))
                     .map(indicator => (
                         <div className="row" key={indicator.id}>
                             <div className={'col text-left Settings m-1 p-3'}
@@ -387,7 +401,9 @@ export class Settings extends Component {
                 return (
                     <div className="col my-1">
                         <div className="m-1 text-left">
-                            Program Indicators
+                            <strong>
+                                Program Indicators
+                            </strong>
                         </div>
 
                         {
@@ -410,16 +426,18 @@ export class Settings extends Component {
         }
     }
 
-    displaySelectedIndicators = () => this.state.selectedIndicators.length > 0 && (
+    displaySelectedIndicators = () => this.state.selectedIndicators.filter(indicator => indicator.me.id === this.state.me.id).length > 0 && (
         <div className="col m-1">
             <div className="mb-1 text-left">
                 <strong>
-                    Selected Indicators
+                    Configured Indicators
                 </strong>
             </div>
 
             {
-                this.state.selectedIndicators.map(indicator => (
+                this.state.selectedIndicators
+                .filter(indicator => indicator.me.id === this.state.me.id)
+                .map(indicator => (
                     <div className="row" key={indicator}>
                         <div className={'col text-left Settings m-1 p-3'}
                             onClick={() => this.handleCurrentSelectedIndicator(indicator)}>
@@ -434,7 +452,7 @@ export class Settings extends Component {
 
     handleIndicatorRemoval = indicator => {
         if (indicator && indicator !== null && indicator !== undefined) {
-            const indicators = [...this.state.selectedIndicators]
+            const indicators = [...this.state.selectedIndicators.filter(indicator => indicator.me.id === this.state.me.id)]
             const updatedIndicators = indicators.filter(i => i.id !== indicator.id)
 
             this.setState({ currentSelectedIndicator: null }, () => this.handleIndicatorsUpdateFromServer(updatedIndicators))
@@ -442,7 +460,11 @@ export class Settings extends Component {
     }
 
 
-    handleIndicatorsUpdateFromServer = indicators => axios.put(INDICATORS_ROUTE, indicators)
+    handleIndicatorsUpdateFromServer = indicators => axios.put(INDICATORS_ROUTE, indicators.map(indicator => {
+        indicator.me = this.state.me
+
+        return indicator
+    } ))
         .then(() => {
             this.setState({ currentSelectedIndicator: null }, () => {
                 NotificationManager.success('Server Updated succefully !', null, 3000)                
@@ -466,27 +488,18 @@ export class Settings extends Component {
 
     removeCurrentSelectedIndicator = () => this.setState({ currentSelectedIndicator: null })
 
-    displayIndicatorsSettingForm = () => {
-        const currentSelectedIndicator = this.state.currentSelectedIndicator
-
-        if (currentSelectedIndicator
-            && currentSelectedIndicator !== undefined
-            && currentSelectedIndicator !== null) {
-
-            return (
-                <SettingsForm
-                    removeCurrentSelectedIndicator={this.removeCurrentSelectedIndicator}
-                    handleIndicatorsUpdateFromServer={this.handleIndicatorsUpdateFromServer}
-                    reloadCategories={this.reloadCategories}
-                    handleIndicatorRemoval={this.handleIndicatorRemoval}
-                    updateSelectedIndicators={this.updateSelectedIndicators}
-                    trackerPrograms={this.state.trackerPrograms}
-                    categoriesForm={this.state.categoriesForm}
-                    selectedIndicators={this.state.selectedIndicators}
-                    currentSelectedIndicator={this.state.currentSelectedIndicator} />
-            )
-        }
-    }
+    displayIndicatorsSettingForm = () => this.state.currentSelectedIndicator && (
+         <SettingsForm
+            removeCurrentSelectedIndicator={this.removeCurrentSelectedIndicator}
+            handleIndicatorsUpdateFromServer={this.handleIndicatorsUpdateFromServer}
+            reloadCategories={this.reloadCategories}
+            handleIndicatorRemoval={this.handleIndicatorRemoval}
+            updateSelectedIndicators={this.updateSelectedIndicators}
+            trackerPrograms={this.state.trackerPrograms}
+            categoriesForm={this.state.categoriesForm}
+            selectedIndicators={this.state.selectedIndicators.filter(indicator => indicator.me.id === this.state.me.id)}
+            currentSelectedIndicator={this.state.currentSelectedIndicator} />
+    )
 
     onAggragatedIndicatorPageChange = event => this.setState({ aggregatedFirstPage: event.first, aggregatedNumRows: event.rows })
 
@@ -553,7 +566,109 @@ export class Settings extends Component {
         return worstPerformance === null || worstPerformance === undefined ? '5 (Default)' : worstPerformance
     }
 
-    render = () => (
+
+    handleSettingCreation = () => axios
+            .get(SETTINGS_ROUTE)
+            .then(response => this.setState({ settingsList: response.data }, () => {
+                const settingsList = this.state.settingsList
+                settingsList.push({ id: uuidv4(),me: this.state.me, name: this.state.settingName, indicators: this.state.indicatorsSettings})
+
+                axios.put(SETTINGS_ROUTE, settingsList)
+                .then(() => axios.get(SETTINGS_ROUTE)
+                                 .then(response => this.setState({ settingsList: response.data, settingName: null, indicatorsSettings: [] }, () => NotificationManager.success( 'Settings successfully saved', null, 3000)))
+                                 .catch(error => NotificationManager.error(error.message, null, 3000)))
+                .catch(error => NotificationManager.error(error.message, null, 3000))
+            }))
+            .catch(error => NotificationManager.error(error.message, null, 3000))
+    
+
+            retrieveSettingsFromDataStore = () => axios.get(SETTINGS_ROUTE)
+                .then(response => this.setState({ settings: response.data, displaySettingList: true }, () => this.settingDetails()))
+                .catch(error => NotificationManager.error(error.message, null, 3000))
+                
+
+    removeSettingFromDataStore   = () => {
+                const settingsList = this.state.settingsList.filter(setting => setting.id !== this.state.setting.id)
+
+                    axios.put(SETTINGS_ROUTE, settingsList)
+                        .then(() => axios.get(SETTINGS_ROUTE)
+                            .then(response => this.setState({ displaySettingList: true, setting: null, settings:[], settingsList: response.data, settingName: null, indicatorsSettings: [] }, () => this.retrieveSettingsFromDataStore() ))
+                            .catch(error => NotificationManager.error(error.message, null, 3000)))
+                        .catch(error => NotificationManager.error(error.message, null, 3000))
+    }
+
+
+    settingDetails = () => <Dialog header="Setting List" 
+        visible={this.state.displaySettingList} 
+        style={{ width: '75vw' }} 
+        onHide={() => this.setState({ displaySettingList: false})}>
+
+        {
+            this.state.setting &&    <div className="row text-center alert alert-primary m-1 mt-3">
+                
+                <button onClick={() => this.removeSettingFromDataStore()} className="btn btn-sm btn-link text-danger m-2">
+                    Delete
+                </button>
+                
+                <strong className="text-uppercase"> {this.state.setting.name} </strong>
+                <br/>
+
+                <table className="table table-sm table-hover text-left table-primary table-striped">
+                    <thead>
+                        <th>Label</th>
+                        <th>Name</th>
+                        <th>Hight is Good</th>
+                        <th>Best</th>
+                        <th>Worst</th>
+                        <th>Weight</th>
+                        <th>Categories</th>
+                        <th>Action</th>
+                    </thead>
+
+                    <tbody>
+                        {
+                            this.state.setting.indicators.map(setting => <tr key={setting.id}>
+                                <td className="text-left">{setting.label}</td>
+                                <td className="text-left">{setting.name}</td>
+                                <td>{setting.hightIsGood ? 'Yes' : 'No'}</td>
+                                <td>{setting.best}</td>
+                                <td>{setting.worst}</td>
+                                <td>{setting.weight}</td>
+                                <td>{setting.categories.map(c =>
+                                    <div className="row m-1 Settings">
+                                        <div className="col">{c.category}</div>
+                                        <div className="col"><span style={{ width: '100px', minWidth: '100px', maxWidth: '100px', height: '50px', backgroundColor: c.color }}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+                                        <div className="col font-weight-bold">Min: {c.min}</div>
+                                        <div className="col font-weight-bold">Max: {c.max}</div>
+                                    </div>
+                                )}
+                                </td>
+                            </tr>)
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }           
+
+            {
+                <div className="row m-1 text-center alert alert-primary" style={{ maxHeight: '300px', overflow: 'auto' }} >
+                    
+
+                <table className="table table-sm table-hover text-left table-primary table-striped">
+                    <thead>
+                        <th>Name</th>
+                    </thead>
+
+                    <tbody>
+                        {this.state.settings.filter(setting => setting.me.id === this.state.me.id).map(setting =><tr> <td>  <button key={setting.id} onClick={() => this.setState({ setting })} className="text-left text-uppercase d-block border btn btn-primary Settings align-middle" style={{ height: '100px--', width: '100%' }}> {setting.name} </button>   </td></tr>)}
+                    </tbody>
+                </table>
+                </div>
+            }
+        </Dialog>
+
+
+render = () => (
         <React.Fragment>
             <div className="row alert alert-light">
                 <div className="col btn-group">
@@ -574,6 +689,38 @@ export class Settings extends Component {
                         Program Indicators
                     </button>
                 </div>
+            </div>
+
+            <div className="row m-1 mt-0 alert alert-primary">
+                    <div className="col-4">
+                        <input type="text" placeholder="Setting Name"
+                            value={this.state.settingName }
+                            onChange={e => this.setState({settingName: e.target.value})}
+                            className="form-control input-sm" />
+                    </div>
+
+                    <div className="col">
+                        <MultiSelect
+                            placeholder="Select Indicators"
+                            className="d-block"
+                            optionLabel="label"
+                            options={this.state.selectedIndicators.filter(indicator => indicator.me.id === this.state.me.id)}
+                            value={this.state.indicatorsSettings}
+                            onChange={e => this.setState({ indicatorsSettings: e.value })}
+                            filter />
+                    </div>
+
+                    <div className="col-2 text-right btn-group">
+                        <button className="btn btn-primary"
+                            disabled={!this.state.settingName || this.state.settingName.length === 0  || this.state.indicatorsSettings.length === 0}
+                            onClick={this.handleSettingCreation}>
+                            Save setting
+                        </button>
+
+                        <button className="btn btn-light" onClick={() => this.retrieveSettingsFromDataStore() }>
+                            Settings List
+                        </button>
+                    </div>
             </div>
 
             <div className="row m-1 mt-0 alert alert-primary">
@@ -600,6 +747,8 @@ export class Settings extends Component {
                 {this.displaySelectedIndicators()}
 
             </div>
+
+            {this.settingDetails()}
 
         </React.Fragment>
     )
