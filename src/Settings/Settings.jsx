@@ -606,11 +606,13 @@ export class Settings extends Component {
         {
             this.state.setting &&    <div className="row text-center alert alert-primary m-1 mt-3">
                 
-                <button onClick={() => this.removeSettingFromDataStore()} className="btn btn-sm btn-link text-danger m-2">
+                <button onClick={() => this.removeSettingFromDataStore()} className="btn btn-sm btn-light m-2">
                     Delete
                 </button>
                 
+                <button className="btn btn-link m-2">
                 <strong className="text-uppercase"> {this.state.setting.name} </strong>
+                </button>
                 <br/>
 
                 <table className="table table-sm table-hover text-left table-primary table-striped">
@@ -622,7 +624,6 @@ export class Settings extends Component {
                         <th>Worst</th>
                         <th>Weight</th>
                         <th>Categories</th>
-                        <th>Action</th>
                     </thead>
 
                     <tbody>
@@ -654,15 +655,15 @@ export class Settings extends Component {
                 <div className="row m-1 text-center alert alert-primary" style={{ maxHeight: '300px', overflow: 'auto' }} >
                     
 
-                <table className="table table-sm table-hover text-left table-primary table-striped">
-                    <thead>
-                        <th>Name</th>
-                    </thead>
+                    <table className="table table-sm table-hover text-left table-primary table-striped">
+                        <thead>
+                            <th>Name</th>
+                        </thead>
 
-                    <tbody>
-                        {this.state.settings.filter(setting => setting.me.id === this.state.me.id).map(setting =><tr> <td>  <button key={setting.id} onClick={() => this.setState({ setting })} className="text-left text-uppercase d-block border btn btn-primary Settings align-middle" style={{ height: '100px--', width: '100%' }}> {setting.name} </button>   </td></tr>)}
-                    </tbody>
-                </table>
+                        <tbody>
+                            {this.state.settings.filter(setting => setting.me.id === this.state.me.id).map(setting =><tr> <td>  <button key={setting.id} onClick={() => this.setState({ setting })} className="text-left d-block border btn btn-primary Settings align-middle" style={{ width: '100%' }}> {setting.name} </button>   </td></tr>)}
+                        </tbody>
+                    </table>
                 </div>
             }
         </Dialog>
