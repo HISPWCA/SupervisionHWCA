@@ -1,6 +1,6 @@
 import axios from 'axios'
 import React, { Component } from 'react'
-import { ME_ROUTE, SETTINGS_ROUTE, SUPERVISIONS_ROUTE } from '../api.routes'
+import { ME_ROUTE, ORGANISATION_UNITS_ROUTE, ORGANISATION_UNIT_GROUP_ROUTE, ORGANISATION_UNIT_GROUP_SET_ROUTE, SETTINGS_ROUTE, SUPERVISIONS_ROUTE, PERIOD_TYPE_ROUTE, ANALYTICS_ROUTE } from '../api.routes'
 import NotificationManager from 'react-notifications/lib/NotificationManager'
 import Supervision from '../Supervision/Supervision'
 import moment from 'moment'
@@ -11,6 +11,11 @@ import LoadingOverlay from 'react-loading-overlay'
 import Header from '../Header/Header'
 import { Dialog } from 'primereact/dialog'
 import { Button } from 'primereact/button'
+import { Tree } from 'primereact/tree'
+import { Calendar } from 'primereact/calendar';
+import { Dropdown } from 'primereact/dropdown';
+
+
 
 const C_PAGINATION_ROWS_PER_PAGE = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 const C_INDICATORS_BASED_CONFIGURATION = 'Indicators Based Configuration'
@@ -21,27 +26,58 @@ const C_BASED_ON_SUPERVISION_PERIOD = 'Based on Supervision Period'
 
 export class Scheduler extends Component {
 
-    // constructor(props) {
-    //     super(props)
-
     state = {
         me: null,
+        nodes: [],
+        best: null,
+        worst: null,
         loading: false,
+        periodtypes: [],
+        finalResults: [],
         supervisions: [],
         settingsList: [],
-        selectedSetting: null,
-        supervisionNumRows: 4,
-        supervisionFirstPage: 0,
-        selectedSupervision: null,
-        displaySupervisionFormCreation: false,
+        hightIsGood: true,
+        filteredResults: [],
+        selectedOrgUnit: [],
         selectedConfig: null,
+        selectedPeriod: null,
+        supervisionNumRows: 4,
+        selectedSetting: null,
+        supervisionFirstPage: 0,
+        selectedPeriodtype: null,
+        selectedSupervision: null,
+        organisationUnitGroups: [],
+        resultLoadingPerformed: false,
+        organisationUnitGroupSets: [],
+        selectedOrganisationUnitGroup: null,
+        selectedOrganisationUnitGroupSet: null,
+        displaySupervisionFormCreation: false,
     }
-    // }
 
     componentDidMount = () => {
         this.loadMe()
+        this.loadPeriodTypes()
         this.loadSupervisions()
+        this.loadOrganisationUnits()
+        this.loadOrganisationUnitGroups()
+        this.loadOrganisationUnitGroupSets()
     }
+
+
+    loadPeriodTypes = () => axios.get(PERIOD_TYPE_ROUTE)
+        .then(response => this.setState({ periodtypes: response.data.periodTypes }))
+        .catch(error => NotificationManager.error(error.message, null, 3000))
+
+
+    loadOrganisationUnitGroups = () => axios.get(ORGANISATION_UNIT_GROUP_ROUTE)
+        .then(response => this.setState({ organisationUnitGroups: response.data.organisationUnitGroups }))
+        .catch(error => NotificationManager.error(error.message, null, 3000))
+
+
+    loadOrganisationUnitGroupSets = () => axios.get(ORGANISATION_UNIT_GROUP_SET_ROUTE)
+        .then(response => this.setState({ organisationUnitGroupSets: response.data.organisationUnitGroupSets }))
+        .catch(error => NotificationManager.error(error.message, null, 3000))
+
 
     loadSupervisions = () => this.setState({ loading: true }, () => {
         axios.get(SUPERVISIONS_ROUTE)
@@ -231,6 +267,194 @@ export class Scheduler extends Component {
         .catch(error => NotificationManager.error(error.message, null, 3000))
 
 
+    loadOrganisationUnits = () => axios.get(ORGANISATION_UNITS_ROUTE)
+        .then(response => {
+            let organisationUnits = response.data.organisationUnits
+                .map(o => {
+                    return {
+                        key: o.id,
+                        label: o.displayName,
+                        data: o,
+                        children: [],
+                        parent: (o.parent !== null && o.parent !== undefined) ? o.parent.id : null
+                    }
+                })
+
+            const nodes = organisationUnits.filter(o => o.parent === null)
+
+            nodes.forEach(o => {
+                o.children = organisationUnits.filter(org => org.parent === o.key)
+
+                o.children.forEach(a => {
+                    a.children = organisationUnits.filter(org => org.parent === a.key)
+
+                    a.children.forEach(b => {
+                        b.children = organisationUnits.filter(org => org.parent === b.key)
+
+                        b.children.forEach(c => {
+                            c.children = organisationUnits.filter(org => org.parent === c.key)
+
+                            c.children.forEach(d => {
+                                d.children = organisationUnits.filter(org => org.parent === d.key)
+
+                                d.children.forEach(e => {
+                                    e.children = organisationUnits.filter(org => org.parent === e.key)
+
+                                    e.children.forEach(f => {
+                                        f.children = organisationUnits.filter(org => org.parent === f.key)
+
+                                        f.children.forEach(g => {
+                                            g.children = organisationUnits.filter(org => org.parent === g.key)
+
+                                            g.children.forEach(h => {
+                                                h.children = organisationUnits.filter(org => org.parent === h.key)
+
+                                                h.children.forEach(i => {
+                                                    i.children = organisationUnits.filter(org => org.parent === i.key)
+
+                                                    i.children.forEach(j => {
+                                                        j.children = organisationUnits.filter(org => org.parent === j.key)
+
+                                                        j.children.forEach(k => {
+                                                            k.children = organisationUnits.filter(org => org.parent === k.key)
+
+                                                            k.children.forEach(l => {
+                                                                l.children = organisationUnits.filter(org => org.parent === l.key)
+
+                                                                l.children.forEach(m => {
+                                                                    m.children = organisationUnits.filter(org => org.parent === m.key)
+
+                                                                    m.children.forEach(n => {
+                                                                        n.children = organisationUnits.filter(org => org.parent === n.key)
+
+                                                                        n.children.forEach(p => {
+                                                                            p.children = organisationUnits.filter(org => org.parent === p.key)
+
+                                                                            p.children.forEach(q => {
+                                                                                q.children = organisationUnits.filter(org => org.parent === q.key)
+
+                                                                                q.children.forEach(r => {
+                                                                                    r.children = organisationUnits.filter(org => org.parent === r.key)
+
+                                                                                    r.children.forEach(s => {
+                                                                                        s.children = organisationUnits.filter(org => org.parent === s.key)
+
+                                                                                        s.children.forEach(t => {
+                                                                                            t.children = organisationUnits.filter(org => org.parent === t.key)
+
+                                                                                            t.children.forEach(u => {
+                                                                                                u.children = organisationUnits.filter(org => org.parent === u.key)
+
+                                                                                                u.children.forEach(v => {
+                                                                                                    v.children = organisationUnits.filter(org => org.parent === v.key)
+
+                                                                                                    v.children.forEach(w => {
+                                                                                                        w.children = organisationUnits.filter(org => org.parent === w.key)
+
+                                                                                                        w.children.forEach(x => {
+                                                                                                            x.children = organisationUnits.filter(org => org.parent === x.key)
+
+                                                                                                            x.children.forEach(y => {
+                                                                                                                y.children = organisationUnits.filter(org => org.parent === y.key)
+
+                                                                                                                y.children.forEach(z => {
+                                                                                                                    z.children = organisationUnits.filter(org => org.parent === z.key)
+                                                                                                                })
+                                                                                                            })
+                                                                                                        })
+                                                                                                    })
+                                                                                                })
+                                                                                            })
+                                                                                        })
+                                                                                    })
+                                                                                })
+                                                                            })
+                                                                        })
+                                                                    })
+                                                                })
+                                                            })
+                                                        })
+                                                    })
+                                                })
+                                            })
+                                        })
+                                    })
+                                })
+                            })
+                        })
+                    })
+                })
+            })
+
+            this.setState({ nodes })
+        }).catch(error => NotificationManager.error(error.message, null, 3000))
+
+
+    performResultsLoading = () => {
+        this.setState({ loading: true, resultLoadingPerformed: true }, () => {
+            const route = ANALYTICS_ROUTE.concat(this.state.selectedSetting.indicators.map(indicator => indicator.id).join(';'))
+                .concat('&dimension=ou:OU_GROUP-')
+                .concat(this.state.selectedOrganisationUnitGroup.id)
+                .concat(';')
+                .concat(this.state.selectedOrgUnit)
+                .concat('&filter=pe:')
+                .concat(this.state.selectedPeriod.replaceAll('-', ''))
+                .concat('&filter=')
+                .concat(this.state.selectedOrganisationUnitGroupSet.id)
+                .concat(':')
+                .concat(this.state.selectedOrganisationUnitGroup.id)
+                .concat('&displayProperty=NAME&outputIdScheme=NAME')
+
+            axios.get(route)
+                .then(response => this.setState({ filteredResults: response.data }, () => {
+                    const weightSuffix = ' Weight'
+                    const weightAverageSuffix = ' Weight AVG'
+                    const indicators = [...new Set(this.state.filteredResults.rows.map(row => row[0]))]
+                    const organisationUnits = [...new Set(this.state.filteredResults.rows.map(row => row[1]))]
+
+                    let elements = []
+                    organisationUnits.forEach(organisationUnit => elements.push({ organisationUnit }))
+                    elements = elements.map(e => {
+                        indicators.forEach(indicator => e[indicator] = 0)
+
+                        return e
+                    }).map(e => {
+                        this.state.filteredResults.rows.filter(row => row[1] === e.organisationUnit)
+                            .forEach(result => Object.keys(e).forEach(key => {
+                                if (key === result[0]) {
+                                    e[key] = parseFloat(parseFloat(result[result.length - 1]).toFixed(2))
+                                }
+                            }))
+
+                        return e
+                    }).map(e => {
+                        this.state.selectedSetting.indicators.forEach(indicator => {
+                            e[indicator.name.concat(weightSuffix)] = parseInt(indicator.weight)
+                        })
+
+                        return e
+                    }).map(e => {
+                        let total = 0
+                        this.state.selectedSetting.indicators.forEach(indicator => total += parseInt(indicator.weight))
+                        e.indicatorsTotalWeight = total
+
+                        this.state.selectedSetting.indicators.forEach(indicator => e[indicator.name.concat(weightAverageSuffix)] = parseFloat((parseInt(indicator.weight) / parseInt(total)).toFixed(2)))
+
+                        return e
+                    }).map(e => {
+                        let score = 0
+                        indicators.forEach(indicator => score = e[indicator] * e[indicator.concat(weightAverageSuffix)])
+                        e.score = parseFloat(score.toFixed(2))
+
+                        return e
+                    })
+
+                    console.log(elements)
+                    this.setState({ finalResults: elements, loading: false })
+                })).catch(error => this.setState({ loading: false }, () => NotificationManager.error(error.message, null, 3000)))
+        })
+    }
+
     render = () => (
         <React.Fragment>
             <Header title='Plannification' />
@@ -371,18 +595,141 @@ export class Scheduler extends Component {
 
                 {
                     this.state.displaySupervisionFormCreation && this.state.selectedConfig === C_INDICATORS_BASED_CONFIGURATION && <div className="row m-1 text-center alert alert-primary" style={{ maxHeight: '300px', overflow: 'auto' }} >
-                        {this.state.settingsList.filter(setting => setting.me.id === this.state.me.id).map(setting => <div className="col-3 p-3">  <button key={setting.id} onClick={() => this.setState({ selectedSetting: setting })} className=" text-uppercase d-block border btn btn-primary Settings align-middle" style={{ height: '100px', width: '100%' }}> {setting.name} </button>   </div>)}
+                        {this.state.settingsList.filter(setting => setting.me.id === this.state.me.id).map(setting => <div className="col-3 p-1">  <button key={setting.id} onClick={() => this.setState({ selectedSetting: setting })} className=" text-uppercase d-block border btn btn-primary Settings align-middle" style={{ height: '100px', width: '100%' }}> {setting.name} </button>   </div>)}
                     </div>
                 }
 
+                {
+                    this.state.displaySupervisionFormCreation &&
+                    this.state.selectedSetting &&
+                    this.state.selectedConfig === C_INDICATORS_BASED_CONFIGURATION &&
+                    <>
 
-                {(this.state.displaySupervisionFormCreation && this.state.selectedConfig === C_ALL_ORGANISATION_UNITS) && <Supervision loadSupervisions={this.loadSupervisions} />}
+                        <div className="row m-1 alert alert-primary">
+                            <div className="col text-center">
+                                <strong>
+                                    Please select options in order to display related results
+                                </strong>
+                            </div>
+                        </div>
+
+                        <div className="row m-1 alert alert-primary">
+                            <div className="col-3 px-3 mx-3">
+                                <strong className="d-block">Organisation Unit</strong>
+
+                                <Tree value={this.state.nodes}
+                                    selectionMode="single"
+                                    filter={true}
+                                    selectionKeys={this.state.selectedOrgUnit}
+                                    onSelectionChange={e => this.setState({ selectedOrgUnit: e.value })} />
+                            </div>
+
+                            <div className="col form-group">
+                                <strong className="d-block mt-2">Best</strong>
+                                <input
+                                    type="number"
+                                    placeholder="Best"
+                                    className="form-control"
+                                    onChange={e => this.setState({ best: e.target.value })}
+                                />
+
+                                <strong className="d-block mt-2">Worst</strong>
+                                <input
+                                    type="number"
+                                    placeholder="Worst"
+                                    className="form-control"
+                                    onChange={e => this.setState({ worst: e.target.value })} />
+
+                                <label className="d-block mt-2">
+                                    <input type="checkbox" checked={this.state.hightIsGood} onChange={e => this.setState({ hightIsGood: e.target.checked })} /> <strong>Hight is good </strong>
+                                </label>
+                            </div>
+
+                            <div className="col px-3">
+
+                                <strong className="d-block mt-2">Organisation Unit Group Set</strong>
+
+                                <Dropdown showClear
+                                    filterBy="displayName"
+                                    optionLabel="displayName"
+                                    className="d-block"
+                                    value={this.state.selectedOrganisationUnitGroupSet}
+                                    options={this.state.organisationUnitGroupSets}
+                                    onChange={e => this.setState({ selectedOrganisationUnitGroupSet: e.value, selectedOrganisationUnitGroup: null })} />
+
+                                {this.state.selectedOrganisationUnitGroupSet &&
+                                    this.state.organisationUnitGroups.filter(organisationUnitGroup => this.state.selectedOrganisationUnitGroupSet.organisationUnitGroups.map(oug => oug.id).includes(organisationUnitGroup.id)).length > 0 &&
+                                    <React.Fragment>
+                                        <strong className="d-block mt-1">Organisation Unit Group </strong>
+
+                                        <Dropdown showClear
+                                            filterBy="displayName"
+                                            optionLabel="displayName"
+                                            className="d-block"
+                                            value={this.state.selectedOrganisationUnitGroup}
+                                            options={this.state.organisationUnitGroups.filter(organisationUnitGroup => this.state.selectedOrganisationUnitGroupSet.organisationUnitGroups.map(oug => oug.id).includes(organisationUnitGroup.id))}
+                                            onChange={e => this.setState({ selectedOrganisationUnitGroup: e.value })} />
+
+                                    </React.Fragment>
+                                }
+
+                                <strong className="d-block mt-1">Select period  </strong>
+
+                                <input
+                                    className="form-control"
+                                    type="month"
+                                    name="start"
+                                    onChange={e => this.setState({ selectedPeriod: e.target.value })}
+                                    value={this.state.selectedPeriod} />
+
+                                <button
+                                    className="btn btn-sm float-right my-3 btn-primary"
+                                    disabled={
+                                        !this.state.best ||
+                                        !this.state.worst ||
+                                        (this.state.best === 0 && this.state.worst === 0) ||
+                                        !this.state.selectedOrgUnit ||
+                                        !this.state.selectedPeriod ||
+                                        !this.state.selectedOrganisationUnitGroup ||
+                                        !this.state.selectedOrganisationUnitGroupSet
+                                    }
+                                    onClick={this.performResultsLoading}  >
+                                    Display Results
+                                </button>
+                            </div>
+                        </div>
+
+                        {this.state.resultLoadingPerformed && this.state.finalResults === 0 && <table className="table table-sm table-striped table-primary"><thead><th> No Result availbale yet </th> </thead></table>}
+
+                        {
+                            this.state.finalResults.length > 0 &&
+                            <div className="row my-1" >
+                                <div className="col">
+                                    <div className="d-block my-1 alert alert-info">
+                                        Selected Period: <strong> {moment(this.state.selectedPeriod).format(' MMMM, YYYY')} </strong>
+                                    </div>
+
+                                    <table className="table table-sm table-striped table-primary table-hover">
+                                        <thead> {Object.keys(this.state.finalResults[0]).map(key => <th className="text-capitalize"> {key} </th>)} </thead>
+                                        <tbody>
+                                            {!this.state.hightIsGood && this.state.finalResults.sort((a, b) => a.score - b.score).slice(0, this.state.best).map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-success"> {result[key]} </td>)}  </tr>)}
+                                            {this.state.hightIsGood && this.state.finalResults.sort((a, b) => b.score - a.score).slice(0, this.state.best).map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-success"> {result[key]} </td>)}  </tr>)}
+
+                                            {!this.state.hightIsGood && this.state.finalResults.sort((a, b) => b.score - a.score).slice(0, this.state.worst).map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-danger"> {result[key]} </td>)}  </tr>)}
+                                            {this.state.hightIsGood && this.state.finalResults.sort((a, b) => a.score - b.score).slice(0, this.state.worst).map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-danger"> {result[key]} </td>)}  </tr>)}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        }
+                    </>
+                }
+
+                {(this.state.displaySupervisionFormCreation && (this.state.selectedConfig === C_ALL_ORGANISATION_UNITS)) && <Supervision loadSupervisions={this.loadSupervisions} />}
 
             </LoadingOverlay>
         </React.Fragment>
     )
-
-
 
 }
 

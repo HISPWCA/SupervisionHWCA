@@ -592,7 +592,7 @@ export class Settings extends Component {
 
                     axios.put(SETTINGS_ROUTE, settingsList)
                         .then(() => axios.get(SETTINGS_ROUTE)
-                            .then(response => this.setState({ displaySettingList: true, setting: null, settings:[], settingsList: response.data, settingName: null, indicatorsSettings: [] }, () => this.retrieveSettingsFromDataStore() ))
+                            .then(response => this.setState({ displaySettingList: false, setting: null, settings:[], settingsList: response.data, settingName: null, indicatorsSettings: [] }, () => this.retrieveSettingsFromDataStore() ))
                             .catch(error => NotificationManager.error(error.message, null, 3000)))
                         .catch(error => NotificationManager.error(error.message, null, 3000))
     }

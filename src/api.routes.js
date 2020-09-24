@@ -23,3 +23,11 @@ export const GLOBAL_SETTINGS_ROUTE = API_BASE_ROUTE.concat('/dataStore/Supervisi
 export const SUPERVISIONS_ROUTE = API_BASE_ROUTE.concat('/dataStore/SupervisionHWCA/supervisions')
 
 export const TRACKER_PROGRAMS_ROUTE = API_BASE_ROUTE.concat('/programs.json?paging=false&filter=programType:eq:WITH_REGISTRATION')
+
+export const ORGANISATION_UNIT_GROUP_ROUTE = API_BASE_ROUTE.concat('/organisationUnitGroups.json?paging=false')
+
+export const ORGANISATION_UNIT_GROUP_SET_ROUTE = API_BASE_ROUTE.concat('/organisationUnitGroupSets.json?paging=false&fields=id,displayName,organisationUnitGroups')
+
+export const PERIOD_TYPE_ROUTE = API_BASE_ROUTE.concat('/periodTypes.json?paging=false')
+
+export const ANALYTICS_ROUTE = API_BASE_ROUTE.concat('/analytics.json?dimension=dx:')

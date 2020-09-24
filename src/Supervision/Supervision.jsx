@@ -11,28 +11,24 @@ import { Dropdown } from 'primereact/dropdown'
 
 export class Supervision extends Component {
 
-    constructor(props) {
-        super(props)
-
-        this.state = {
-            me: null,
-            nodes: [],
-            dates: null,
-            loading: false,
-            supervisors: [],
-            supervisions: [],
-            settingsList: [],
-            useStepper: true,
-            description: null,
-            selectedNodes: [],
-            selectedNodeKeys: null,
-            selectedSupervisors: [],
-            currentSelectedNode: null,
-            currentSelectedOrgUnit: null,
-            currentSelectedSupervisor: null,
-            otherSupervisors: null,
-            currentSelectedSelectedSupervisionType: null,
-        }
+    state = {
+        me: null,
+        nodes: [],
+        dates: null,
+        loading: false,
+        supervisors: [],
+        supervisions: [],
+        settingsList: [],
+        useStepper: true,
+        description: null,
+        selectedNodes: [],
+        otherSupervisors: null,
+        selectedNodeKeys: null,
+        selectedSupervisors: [],
+        currentSelectedNode: null,
+        currentSelectedOrgUnit: null,
+        currentSelectedSupervisor: null,
+        currentSelectedSelectedSupervisionType: null,
     }
 
     componentDidMount = () => {
@@ -399,7 +395,7 @@ export class Supervision extends Component {
             <LoadingOverlay spinner active={this.state.loading} text='Processing ...' >
 
                 <div className="row m-3">
-                    
+
                 </div>
 
                 <div className='row'>
