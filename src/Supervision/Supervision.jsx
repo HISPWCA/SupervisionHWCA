@@ -21,7 +21,6 @@ export class Supervision extends Component {
         settingsList: [],
         useStepper: true,
         description: null,
-        selectedNodes: [],
         otherSupervisors: null,
         selectedNodeKeys: null,
         selectedSupervisors: [],
@@ -197,17 +196,18 @@ export class Supervision extends Component {
 
 
     onSelect = event => {
-        const selectedNodes = [...this.state.selectedNodes]
+        const selectedNodes = [...this.props.selectedNodes]
         if (!selectedNodes.includes(event.node)) {
             selectedNodes.push(event.node)
-            this.setState({ selectedNodes })
+            this.props.selectedNodes = selectedNodes
         }
     }
 
-    onUnselect = event => {
-        const selectedNodes = this.state.selectedNodes.filter(n => n !== event.node)
 
-        this.setState({ selectedNodes })
+    onUnselect = event => {
+        const selectedNodes = this.props.selectedNodes.filter(n => n !== event.node)
+
+        this.props.selectedNodes = selectedNodes
     }
 
     handleOrgsUnitSelection = currentSelectedNode => this.setState({ currentSelectedNode: null }, () => this.setState({ currentSelectedNode }))
@@ -215,7 +215,7 @@ export class Supervision extends Component {
     orgUnitClassNameProvider = organisationUnit => this.state.currentSelectedNode !== null && this.state.currentSelectedNode.key === organisationUnit.key ? 'my-3 p-3 text-left Settings SelectedSetting' : 'my-3 p-3 text-left Settings'
 
     displaySelectedOrgUnits = () => {
-        if (this.state.selectedNodes.length > 0) {
+        if (this.props.selectedNodes.length > 0) {
             return (
                 <div className="col">
                     <div className="font-weight-bold">
@@ -232,7 +232,7 @@ export class Supervision extends Component {
                     <div className="collapse" id="collapseOrganisationUnits">
                         <div className="card card-body">
                             {
-                                this.state.selectedNodes.map(o => (
+                                this.props.selectedNodes.map(o => (
                                     <div
                                         onClick={() => this.handleOrgsUnitSelection(o)}
                                         className={this.orgUnitClassNameProvider(o)}
@@ -281,7 +281,7 @@ export class Supervision extends Component {
 
     handleOtherSupervisorsChange = event => this.setState({ otherSupervisors: event.target.value })
 
-    displayForms = () => this.state.currentSelectedNode !== null && this.state.selectedNodes.length > 0 && (
+    displayForms = () => this.state.currentSelectedNode !== null && this.props.selectedNodes.length > 0 && (
         <div className="col">
             <div className="form-group alert alert-primary m-1" role="alert">
 
@@ -366,7 +366,7 @@ export class Supervision extends Component {
 
     displaySelectedSupervisors = () => this.state.currentSelectedNode !== null &&
         this.state.selectedSupervisors.length > 0 &&
-        this.state.selectedNodes.length > 0 &&
+        this.props.selectedNodes.length > 0 &&
         (
             <div className="col">
                 <div className="font-weight-bold">
@@ -394,23 +394,25 @@ export class Supervision extends Component {
         <React.Fragment>
             <LoadingOverlay spinner active={this.state.loading} text='Processing ...' >
 
-                <div className="row m-3">
-
-                </div>
-
                 <div className='row'>
                     <div className='col'>
                         <div className="row text-left my-3">
                             <div className="col">
                                 <div className="font-weight-bold">Organisation Units</div>
 
-                                <Tree value={this.state.nodes}
+                                {/* <Tree value={this.state.nodes}
                                     selectionMode="checkbox"
                                     filter={true}
                                     selectionKeys={this.state.selectedNodeKeys3}
                                     onSelectionChange={e => this.setState({ selectedNodeKeys3: e.value })}
                                     onSelect={this.onSelect}
-                                    onUnselect={this.onUnselect} />
+                                    onUnselect={this.onUnselect} /> */}
+
+                                <Tree value={this.state.nodes}
+                                    selectionMode="single"
+                                    filter={true}
+                                    selectionKeys={this.props.selectedNode}
+                                    onSelectionChange={e => this.props.selectedNode = e.value} />
 
                             </div>
 

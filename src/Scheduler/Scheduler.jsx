@@ -37,11 +37,13 @@ export class Scheduler extends Component {
         supervisions: [],
         settingsList: [],
         hightIsGood: true,
+        selectedNode: null,
         filteredResults: [],
-        selectedOrgUnit: [],
+        selectedOrgUnit: null,
         selectedConfig: null,
         selectedPeriod: null,
         supervisionNumRows: 4,
+        organisationUnits: [],
         selectedSetting: null,
         supervisionFirstPage: 0,
         selectedPeriodtype: null,
@@ -49,6 +51,7 @@ export class Scheduler extends Component {
         organisationUnitGroups: [],
         resultLoadingPerformed: false,
         organisationUnitGroupSets: [],
+        selectedOrganisationUnitsList: [],
         selectedOrganisationUnitGroup: null,
         selectedOrganisationUnitGroupSet: null,
         displaySupervisionFormCreation: false,
@@ -269,96 +272,98 @@ export class Scheduler extends Component {
 
     loadOrganisationUnits = () => axios.get(ORGANISATION_UNITS_ROUTE)
         .then(response => {
-            let organisationUnits = response.data.organisationUnits
-                .map(o => {
-                    return {
-                        key: o.id,
-                        label: o.displayName,
-                        data: o,
-                        children: [],
-                        parent: (o.parent !== null && o.parent !== undefined) ? o.parent.id : null
-                    }
-                })
+            this.setState({ organisationUnits: response.data.organisationUnits }, () => {
+                let organisationUnits = response.data.organisationUnits
+                    .map(o => {
+                        return {
+                            key: o.id,
+                            label: o.displayName,
+                            data: o,
+                            children: [],
+                            parent: (o.parent !== null && o.parent !== undefined) ? o.parent.id : null
+                        }
+                    })
 
-            const nodes = organisationUnits.filter(o => o.parent === null)
+                const nodes = organisationUnits.filter(o => o.parent === null)
 
-            nodes.forEach(o => {
-                o.children = organisationUnits.filter(org => org.parent === o.key)
+                nodes.forEach(o => {
+                    o.children = organisationUnits.filter(org => org.parent === o.key)
 
-                o.children.forEach(a => {
-                    a.children = organisationUnits.filter(org => org.parent === a.key)
+                    o.children.forEach(a => {
+                        a.children = organisationUnits.filter(org => org.parent === a.key)
 
-                    a.children.forEach(b => {
-                        b.children = organisationUnits.filter(org => org.parent === b.key)
+                        a.children.forEach(b => {
+                            b.children = organisationUnits.filter(org => org.parent === b.key)
 
-                        b.children.forEach(c => {
-                            c.children = organisationUnits.filter(org => org.parent === c.key)
+                            b.children.forEach(c => {
+                                c.children = organisationUnits.filter(org => org.parent === c.key)
 
-                            c.children.forEach(d => {
-                                d.children = organisationUnits.filter(org => org.parent === d.key)
+                                c.children.forEach(d => {
+                                    d.children = organisationUnits.filter(org => org.parent === d.key)
 
-                                d.children.forEach(e => {
-                                    e.children = organisationUnits.filter(org => org.parent === e.key)
+                                    d.children.forEach(e => {
+                                        e.children = organisationUnits.filter(org => org.parent === e.key)
 
-                                    e.children.forEach(f => {
-                                        f.children = organisationUnits.filter(org => org.parent === f.key)
+                                        e.children.forEach(f => {
+                                            f.children = organisationUnits.filter(org => org.parent === f.key)
 
-                                        f.children.forEach(g => {
-                                            g.children = organisationUnits.filter(org => org.parent === g.key)
+                                            f.children.forEach(g => {
+                                                g.children = organisationUnits.filter(org => org.parent === g.key)
 
-                                            g.children.forEach(h => {
-                                                h.children = organisationUnits.filter(org => org.parent === h.key)
+                                                g.children.forEach(h => {
+                                                    h.children = organisationUnits.filter(org => org.parent === h.key)
 
-                                                h.children.forEach(i => {
-                                                    i.children = organisationUnits.filter(org => org.parent === i.key)
+                                                    h.children.forEach(i => {
+                                                        i.children = organisationUnits.filter(org => org.parent === i.key)
 
-                                                    i.children.forEach(j => {
-                                                        j.children = organisationUnits.filter(org => org.parent === j.key)
+                                                        i.children.forEach(j => {
+                                                            j.children = organisationUnits.filter(org => org.parent === j.key)
 
-                                                        j.children.forEach(k => {
-                                                            k.children = organisationUnits.filter(org => org.parent === k.key)
+                                                            j.children.forEach(k => {
+                                                                k.children = organisationUnits.filter(org => org.parent === k.key)
 
-                                                            k.children.forEach(l => {
-                                                                l.children = organisationUnits.filter(org => org.parent === l.key)
+                                                                k.children.forEach(l => {
+                                                                    l.children = organisationUnits.filter(org => org.parent === l.key)
 
-                                                                l.children.forEach(m => {
-                                                                    m.children = organisationUnits.filter(org => org.parent === m.key)
+                                                                    l.children.forEach(m => {
+                                                                        m.children = organisationUnits.filter(org => org.parent === m.key)
 
-                                                                    m.children.forEach(n => {
-                                                                        n.children = organisationUnits.filter(org => org.parent === n.key)
+                                                                        m.children.forEach(n => {
+                                                                            n.children = organisationUnits.filter(org => org.parent === n.key)
 
-                                                                        n.children.forEach(p => {
-                                                                            p.children = organisationUnits.filter(org => org.parent === p.key)
+                                                                            n.children.forEach(p => {
+                                                                                p.children = organisationUnits.filter(org => org.parent === p.key)
 
-                                                                            p.children.forEach(q => {
-                                                                                q.children = organisationUnits.filter(org => org.parent === q.key)
+                                                                                p.children.forEach(q => {
+                                                                                    q.children = organisationUnits.filter(org => org.parent === q.key)
 
-                                                                                q.children.forEach(r => {
-                                                                                    r.children = organisationUnits.filter(org => org.parent === r.key)
+                                                                                    q.children.forEach(r => {
+                                                                                        r.children = organisationUnits.filter(org => org.parent === r.key)
 
-                                                                                    r.children.forEach(s => {
-                                                                                        s.children = organisationUnits.filter(org => org.parent === s.key)
+                                                                                        r.children.forEach(s => {
+                                                                                            s.children = organisationUnits.filter(org => org.parent === s.key)
 
-                                                                                        s.children.forEach(t => {
-                                                                                            t.children = organisationUnits.filter(org => org.parent === t.key)
+                                                                                            s.children.forEach(t => {
+                                                                                                t.children = organisationUnits.filter(org => org.parent === t.key)
 
-                                                                                            t.children.forEach(u => {
-                                                                                                u.children = organisationUnits.filter(org => org.parent === u.key)
+                                                                                                t.children.forEach(u => {
+                                                                                                    u.children = organisationUnits.filter(org => org.parent === u.key)
 
-                                                                                                u.children.forEach(v => {
-                                                                                                    v.children = organisationUnits.filter(org => org.parent === v.key)
+                                                                                                    u.children.forEach(v => {
+                                                                                                        v.children = organisationUnits.filter(org => org.parent === v.key)
 
-                                                                                                    v.children.forEach(w => {
-                                                                                                        w.children = organisationUnits.filter(org => org.parent === w.key)
+                                                                                                        v.children.forEach(w => {
+                                                                                                            w.children = organisationUnits.filter(org => org.parent === w.key)
 
-                                                                                                        w.children.forEach(x => {
-                                                                                                            x.children = organisationUnits.filter(org => org.parent === x.key)
+                                                                                                            w.children.forEach(x => {
+                                                                                                                x.children = organisationUnits.filter(org => org.parent === x.key)
 
-                                                                                                            x.children.forEach(y => {
-                                                                                                                y.children = organisationUnits.filter(org => org.parent === y.key)
+                                                                                                                x.children.forEach(y => {
+                                                                                                                    y.children = organisationUnits.filter(org => org.parent === y.key)
 
-                                                                                                                y.children.forEach(z => {
-                                                                                                                    z.children = organisationUnits.filter(org => org.parent === z.key)
+                                                                                                                    y.children.forEach(z => {
+                                                                                                                        z.children = organisationUnits.filter(org => org.parent === z.key)
+                                                                                                                    })
                                                                                                                 })
                                                                                                             })
                                                                                                         })
@@ -384,9 +389,10 @@ export class Scheduler extends Component {
                         })
                     })
                 })
+
+                this.setState({ nodes })
             })
 
-            this.setState({ nodes })
         }).catch(error => NotificationManager.error(error.message, null, 3000))
 
 
@@ -449,7 +455,6 @@ export class Scheduler extends Component {
                         return e
                     })
 
-                    console.log(elements)
                     this.setState({ finalResults: elements, loading: false })
                 })).catch(error => this.setState({ loading: false }, () => NotificationManager.error(error.message, null, 3000)))
         })
@@ -693,7 +698,7 @@ export class Scheduler extends Component {
                                         !this.state.selectedOrganisationUnitGroup ||
                                         !this.state.selectedOrganisationUnitGroupSet
                                     }
-                                    onClick={this.performResultsLoading}  >
+                                    onClick={this.performResultsLoading}>
                                     Display Results
                                 </button>
                             </div>
@@ -701,16 +706,17 @@ export class Scheduler extends Component {
 
                         {this.state.resultLoadingPerformed && this.state.finalResults === 0 && <table className="table table-sm table-striped table-primary"><thead><th> No Result availbale yet </th> </thead></table>}
 
-                        {
-                            this.state.finalResults.length > 0 &&
-                            <div className="row my-1" >
-                                <div className="col">
-                                    <div className="d-block my-1 alert alert-info">
-                                        Selected Period: <strong> {moment(this.state.selectedPeriod).format(' MMMM, YYYY')} </strong>
-                                    </div>
+                        <div className="row my-1" >
+                            <div className="col">
+                                <div className="d-block my-1 alert alert-info">
+                                    Selected Period: <strong> {moment(this.state.selectedPeriod).format(' MMMM, YYYY')} </strong>
+                                </div>
 
-                                    <table className="table table-sm table-striped table-primary table-hover">
-                                        <thead> {Object.keys(this.state.finalResults[0]).map(key => <th className="text-capitalize"> {key} </th>)} </thead>
+                                <table className="table table-sm table-striped table-primary table-hover">
+                                    <thead> {Object.keys(this.state.finalResults[0]).map(key => <th className="text-capitalize"> {key} </th>)} </thead>
+                                    {
+                                        this.state.hightIsGood &&
+                                        this.state.finalResults.length > 1 &&
                                         <tbody>
                                             {!this.state.hightIsGood && this.state.finalResults.sort((a, b) => a.score - b.score).slice(0, this.state.best).map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-success"> {result[key]} </td>)}  </tr>)}
                                             {this.state.hightIsGood && this.state.finalResults.sort((a, b) => b.score - a.score).slice(0, this.state.best).map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-success"> {result[key]} </td>)}  </tr>)}
@@ -718,14 +724,21 @@ export class Scheduler extends Component {
                                             {!this.state.hightIsGood && this.state.finalResults.sort((a, b) => b.score - a.score).slice(0, this.state.worst).map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-danger"> {result[key]} </td>)}  </tr>)}
                                             {this.state.hightIsGood && this.state.finalResults.sort((a, b) => a.score - b.score).slice(0, this.state.worst).map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-danger"> {result[key]} </td>)}  </tr>)}
                                         </tbody>
-                                    </table>
-                                </div>
+                                    }
+
+                                    {
+                                        this.state.finalResults.length === 1 &&
+                                        <tbody>
+                                            {this.state.finalResults.map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-primary"> {result[key]} </td>)}  </tr>)}
+                                        </tbody>
+                                    }
+                                </table>
                             </div>
-                        }
+                        </div>
                     </>
                 }
 
-                {(this.state.displaySupervisionFormCreation && (this.state.selectedConfig === C_ALL_ORGANISATION_UNITS)) && <Supervision loadSupervisions={this.loadSupervisions} />}
+                {(this.state.displaySupervisionFormCreation && (this.state.selectedConfig === C_ALL_ORGANISATION_UNITS)) || (this.state.displaySupervisionFormCreation && this.state.selectedOrganisationUnitsList.length > 0 && this.state.selectedConfig === C_INDICATORS_BASED_CONFIGURATION) && <Supervision selectedNode={this.state.selectedNode} loadSupervisions={this.loadSupervisions} />}
 
             </LoadingOverlay>
         </React.Fragment>
