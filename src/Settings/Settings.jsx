@@ -39,6 +39,11 @@ export class Settings extends Component {
             
             currentAction: C_AGGREGATED_INDICATORS,
             trackerPrograms: [],
+
+            indicatorGroupNameFilter: '',
+            programGroupNameFilter: '',
+            programIndicatorNameFilter: '',
+            aggregatedIndicatorNameFilter: '',
             
             metaDatas: [],
             childMetaDatas: [],
@@ -173,6 +178,7 @@ export class Settings extends Component {
             return (
                 this.state.initialAggregatedIndicatorsWithGroups
                     .filter((i, index) => index >= this.state.aggregatedFirstPage && index <= (this.state.aggregatedFirstPage + 5))
+                    .filter(group => group.displayName.toLowerCase().includes(this.state.indicatorGroupNameFilter.toLowerCase()))
                     .map(indicatorGroup => (
                         <div className="row" key={indicatorGroup.id}>
                             <div className={this.aggregatedIndicatorClassNameProvider(indicatorGroup)}
@@ -190,6 +196,7 @@ export class Settings extends Component {
             return (
                 this.state.initialAggregatedIndicatorsWithGroups
                     .filter((i, index) => index >= this.state.programsFirstPage && index <= (this.state.programsFirstPage + 5))
+                    .filter(group => group.displayName.toLowerCase().includes(this.state.programGroupNameFilter.toLowerCase()))
                     .map(program => (
                         <div className="row" key={program.id}>
                             <div className={this.programClassNameProvider(program)}
@@ -355,18 +362,19 @@ export class Settings extends Component {
     }
 
     displayAggregatedIndicatorChildrens = () => this.state.currentAction === C_AGGREGATED_INDICATORS && this.state.selectedAggregatedIndicator !== null && (
-        <div className="col my-1">
+        <div className="col my-1" style={{ overflow: 'auto', maxHeight: '600px' }} >
             <div className="m-1 text-left">
                 <strong>
                     Available Indicators
                 </strong>
+                <input type="search" className="form-control input-sm my-2" onChange={e => this.setState({ aggregatedIndicatorNameFilter: e.target.value})} />
             </div>
 
             {
                 this.state.selectedAggregatedIndicator.indicators
-                    .filter(i => !this.state.selectedIndicators
-                        .filter(indicator => indicator.me.id === this.state.me.id)
-                        .map(ai => ai.id).includes(i.id))
+                    .filter(i => !this.state.selectedIndicators.filter(indicator => indicator.me.id === this.state.me.id)
+                    .map(ai => ai.id).includes(i.id))
+                    .filter(indicator => indicator.displayName.toLowerCase().includes(this.state.aggregatedIndicatorNameFilter.toLowerCase()))
                     .map(indicator => (
                         <div className="row" key={indicator.id}>
                             <div className={'col text-left Settings m-1 p-3'}
@@ -393,25 +401,24 @@ export class Settings extends Component {
                         <span className="font-weight-bold p-3 text-primary"> {this.state.selectedProgram.displayName}</span>
 
                         <hr />
-                        <button className="btn btn-light"
-                            onClick={() => this.setState({ selectedProgram: null })}>Close</button>
+                        <button className="btn btn-light" onClick={() => this.setState({ selectedProgram: null })}>Close</button>
                     </div>
                 )
             } else {
                 return (
-                    <div className="col my-1">
+                    <div className="col my-1" >
                         <div className="m-1 text-left">
                             <strong>
                                 Program Indicators
                             </strong>
+                            <input type="search" className="form-control my-2 input-sm" onChange={e => this.setState({ programIndicatorNameFilter: e.target.value})} />
                         </div>
 
                         {
                             this.state.selectedProgramIndicators
-                                .filter(i => !this.state.selectedIndicators
-                                    .map(ai => ai.id)
-                                    .includes(i.id)
-                                ).map(indicator => (
+                                .filter(i => !this.state.selectedIndicators.map(ai => ai.id).includes(i.id))
+                                .filter(indicator => indicator.displayName.toLowerCase().includes(this.state.programIndicatorNameFilter.toLowerCase()))
+                                .map(indicator => (
                                     <div className="row" key={indicator.id}>
                                         <div className={'col text-left Settings m-1 p-3'}
                                             onClick={() => this.handleCurrentSelectedIndicator(indicator)}>
@@ -427,7 +434,7 @@ export class Settings extends Component {
     }
 
     displaySelectedIndicators = () => this.state.selectedIndicators.filter(indicator => indicator.me.id === this.state.me.id).length > 0 && (
-        <div className="col m-1">
+        <div className="col m-1" style={{ overflow: 'auto', maxHeight: '600px' }} >
             <div className="mb-1 text-left">
                 <strong>
                     Configured Indicators
@@ -488,7 +495,7 @@ export class Settings extends Component {
 
     removeCurrentSelectedIndicator = () => this.setState({ currentSelectedIndicator: null })
 
-    displayIndicatorsSettingForm = () => this.state.currentSelectedIndicator && (
+    displayIndicatorsSettingForm = () => this.state.currentSelectedIndicator && 
          <SettingsForm
             removeCurrentSelectedIndicator={this.removeCurrentSelectedIndicator}
             handleIndicatorsUpdateFromServer={this.handleIndicatorsUpdateFromServer}
@@ -499,7 +506,6 @@ export class Settings extends Component {
             categoriesForm={this.state.categoriesForm}
             selectedIndicators={this.state.selectedIndicators.filter(indicator => indicator.me.id === this.state.me.id)}
             currentSelectedIndicator={this.state.currentSelectedIndicator} />
-    )
 
     onAggragatedIndicatorPageChange = event => this.setState({ aggregatedFirstPage: event.first, aggregatedNumRows: event.rows })
 
@@ -728,6 +734,9 @@ render = () => (
                 <div className="col">
 
                     {this.displayParentTitle()}
+                    
+                    { this.state.currentAction === C_AGGREGATED_INDICATORS && <input type="search" className="my-2 form-control input-sm" onChange={e => this.setState({ indicatorGroupNameFilter: e.target.value })} /> } 
+                     { this.state.currentAction === C_PROGRAM_INDICATORS && <input type="search" className="my-2 form-control input-sm" onChange={e => this.setState({ programGroupNameFilter: e.target.value })} /> }
 
                     {this.displayAggregatedIndicators()}
 

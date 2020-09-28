@@ -7,23 +7,19 @@ const SELECT = 'Select ..'
 
 export class SettingsForm extends Component {
 
-    constructor(props) {
-        super(props)
-
-        this.state = {
-            id: '',
-            name: '',
-            label: '',
-            weight: 0,
-            best: 0,
-            worst: 0,
-            me: null,
-            categories: [],
-            usePercentages: true,
-            selectedIndicators: [],
-            selectedTrackerProgram: SELECT,
-            hightIsGood: this.props.currentSelectedIndicator.hightIsGood,
-        }
+    state = {
+        id: '',
+        name: '',
+        label: '',
+        weight: 0,
+        best: 0,
+        worst: 0,
+        me: null,
+        categories: [],
+        usePercentages: true,
+        selectedIndicators: [],
+        selectedTrackerProgram: SELECT,
+        hightIsGood: this.props.currentSelectedIndicator.hightIsGood,
     }
 
     componentDidMount = () => this.setState(
@@ -180,7 +176,7 @@ export class SettingsForm extends Component {
 
     render() {
         return (
-            <div className="col">
+            <div className="col" >
                 <div className="row">
                     <div className="col">
                         <div className="mb-1 px-1 text-left">

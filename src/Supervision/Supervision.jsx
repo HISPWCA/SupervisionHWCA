@@ -21,10 +21,10 @@ export class Supervision extends Component {
         settingsList: [],
         useStepper: true,
         description: null,
+        selectedOrgUnit: null,
         otherSupervisors: null,
         selectedNodeKeys: null,
         selectedSupervisors: [],
-        currentSelectedNode: null,
         currentSelectedOrgUnit: null,
         currentSelectedSupervisor: null,
         currentSelectedSelectedSupervisionType: null,
@@ -175,7 +175,6 @@ export class Supervision extends Component {
                         this.setState({
                             dates: null,
                             currentSelectedSupervisor: null,
-                            currentSelectedNode: null,
                             selectedSupervisors: [],
                             otherSupervisors: null,
                             description: null,
@@ -195,67 +194,12 @@ export class Supervision extends Component {
         .catch(error => NotificationManager.error(error.message, null, 3000))
 
 
-    onSelect = event => {
-        const selectedNodes = [...this.props.selectedNodes]
-        if (!selectedNodes.includes(event.node)) {
-            selectedNodes.push(event.node)
-            this.props.selectedNodes = selectedNodes
-        }
-    }
-
-
-    onUnselect = event => {
-        const selectedNodes = this.props.selectedNodes.filter(n => n !== event.node)
-
-        this.props.selectedNodes = selectedNodes
-    }
-
-    handleOrgsUnitSelection = currentSelectedNode => this.setState({ currentSelectedNode: null }, () => this.setState({ currentSelectedNode }))
-
-    orgUnitClassNameProvider = organisationUnit => this.state.currentSelectedNode !== null && this.state.currentSelectedNode.key === organisationUnit.key ? 'my-3 p-3 text-left Settings SelectedSetting' : 'my-3 p-3 text-left Settings'
-
-    displaySelectedOrgUnits = () => {
-        if (this.props.selectedNodes.length > 0) {
-            return (
-                <div className="col">
-                    <div className="font-weight-bold">
-                        <a className="btn btn-link"
-                            data-toggle="collapse"
-                            href="#collapseOrganisationUnits"
-                            role="button"
-                            aria-expanded="false"
-                            aria-controls="collapseOrganisationUnits">
-                            Selected Org. Units
-                        </a>
-                    </div>
-
-                    <div className="collapse" id="collapseOrganisationUnits">
-                        <div className="card card-body">
-                            {
-                                this.props.selectedNodes.map(o => (
-                                    <div
-                                        onClick={() => this.handleOrgsUnitSelection(o)}
-                                        className={this.orgUnitClassNameProvider(o)}
-                                        key={o.key}>
-                                        {o.label}
-                                    </div>
-                                ))
-                            }
-                        </div>
-                    </div>
-
-
-                </div>
-            )
-        }
-    }
-
     handleSupervisionCreation = () => this.setState({ loading: true }, () => {
         if (this.state.dates === null) {
             this.setState({ loading: false }, () => NotificationManager.error('Please Select date or Period', null, 3000))
-        } else if (this.state.description === null || this.state.description.length === 0) {
+        } else if (!this.state.description || this.state.description.length === 0) {
             this.setState({ loading: false }, () => NotificationManager.error('Please you should fill descripton', null, 3000))
-        } else if (this.state.currentSelectedNode === null) {
+        } else if (!this.props.selectedNode) {
             this.setState({ loading: false }, () => NotificationManager.error('Please Select organisation unit', null, 3000))
         } else if (this.state.selectedSupervisors.length === 0) {
             this.setState({ loading: false }, () => NotificationManager.error('Please Select Supervisors', null, 3000))
@@ -270,7 +214,8 @@ export class Supervision extends Component {
             supervision.useStepper = this.state.useStepper
             supervision.description = this.state.description
             supervision.supervisors = this.state.selectedSupervisors
-            supervision.organisationUnit = this.state.currentSelectedNode
+            supervision.organisationUnit = this.props.selectedNode
+            supervision.indicators = this.props.indicators
             supervision.otherSupervisors = this.state.otherSupervisors
 
             this.setState({ loading: false }, () => this.createSupervision(supervision))
@@ -281,12 +226,12 @@ export class Supervision extends Component {
 
     handleOtherSupervisorsChange = event => this.setState({ otherSupervisors: event.target.value })
 
-    displayForms = () => this.state.currentSelectedNode !== null && this.props.selectedNodes.length > 0 && (
+    displayForms = () => this.props.selectedNode && (
         <div className="col">
             <div className="form-group alert alert-primary m-1" role="alert">
 
                 <strong className="d-block p-3 alert alert-secondary">
-                    <h3> {this.state.currentSelectedNode.label} </h3>
+                    <h3> {this.props.selectedNode.displayName} </h3>
                 </strong>
 
                 <label for="period" className="form-label font-weight-bold mt-2 d-block">Select Period</label>
@@ -364,28 +309,16 @@ export class Supervision extends Component {
         this.setState({ selectedSupervisors })
     }
 
-    displaySelectedSupervisors = () => this.state.currentSelectedNode !== null &&
+    displaySelectedSupervisors = () => this.props.selectedNode &&
         this.state.selectedSupervisors.length > 0 &&
-        this.props.selectedNodes.length > 0 &&
         (
-            <div className="col">
-                <div className="font-weight-bold">
-                    <a className="btn btn-link"
-                        data-toggle="collapse"
-                        href="#collapseSelectedSupervisors"
-                        role="button"
-                        aria-expanded="false"
-                        aria-controls="collapseSelectedSupervisors">
-                        Selected Supervisors
-                    </a>
-                </div>
+            <div className="col alert alert-primary">
+                <strong>
+                    Selected Supervisors
+                </strong>
+                <hr />
 
-                <div className="collapse" id="collapseSelectedSupervisors">
-                    <div className="card card-body">
-                        {this.state.selectedSupervisors.map(s => <div key={s.id} className="mt-3 p-3 text-left Settings" onClick={() => this.removeHandleSupervisorsSelection(s)}>{s.displayName}</div>)}
-                    </div>
-                </div>
-
+                {this.state.selectedSupervisors.map(s => <btn key={s.id} className="btn btn-primary m-1" onClick={() => this.removeHandleSupervisorsSelection(s)}>{s.displayName}</btn>)}
             </div>
         )
 
@@ -396,31 +329,27 @@ export class Supervision extends Component {
 
                 <div className='row'>
                     <div className='col'>
+
+                        <div className="row">
+                            {this.displaySelectedSupervisors()}
+                        </div>
+
                         <div className="row text-left my-3">
                             <div className="col">
                                 <div className="font-weight-bold">Organisation Units</div>
-
-                                {/* <Tree value={this.state.nodes}
-                                    selectionMode="checkbox"
-                                    filter={true}
-                                    selectionKeys={this.state.selectedNodeKeys3}
-                                    onSelectionChange={e => this.setState({ selectedNodeKeys3: e.value })}
-                                    onSelect={this.onSelect}
-                                    onUnselect={this.onUnselect} /> */}
 
                                 <Tree value={this.state.nodes}
                                     selectionMode="single"
                                     filter={true}
                                     selectionKeys={this.props.selectedNode}
-                                    onSelectionChange={e => this.props.selectedNode = e.value} />
+                                    onSelectionChange={e => this.props.nodeHandler(e.value)} />
 
                             </div>
 
-                            {this.displaySelectedOrgUnits()}
 
                             {this.displayForms()}
 
-                            {this.displaySelectedSupervisors()}
+
 
                         </div>
                     </div>

@@ -105,7 +105,7 @@ export class Scheduler extends Component {
                             <span className="font-weight-bold m-3 text-secondary"> - </span>
                             {moment(s.period[1]).format('Do MMMM, YYYY')}
                         </td>
-                        <td>{s.organisationUnit.label}</td>
+                        <td>{s.organisationUnit.displayName}</td>
                         <td>{s.owner.displayName}</td>
                         <td>{s.status}</td>
                         <td>
@@ -163,7 +163,6 @@ export class Scheduler extends Component {
             })).catch(error => this.setState({ loading: false }, () => NotificationManager.error(error.message, null, 3000)))
     })
 
-
     handleSupervisionDetails = selectedSupervision => this.setState({ displaySupervisionFormCreation: false, selectedSupervision })
 
     displaySupervisionDetails = () => (this.state.selectedSupervision && !this.state.displaySupervisionFormCreation && (
@@ -194,7 +193,7 @@ export class Scheduler extends Component {
                             <tr>
                                 <td>
                                     <span className="font-weight-bold m-3 text-secondary">Organisation Unit:</span>
-                                    {this.state.selectedSupervision.organisationUnit.label}
+                                    {this.state.selectedSupervision.organisationUnit.displayName}
                                 </td>
                             </tr>
                             <tr>
@@ -215,7 +214,7 @@ export class Scheduler extends Component {
                     <table className="table table-hover table-sm table-striped text-left m-3">
                         <thead><th>Indicators</th></thead>
                         <tbody>
-                            {this.state.selectedSupervision.indicators.map(i => <tr key={i.id}><td>{i.label}</td></tr>)}
+                            {this.state.selectedSupervision?.indicators.map(i => <tr key={i.id}><td>{i.label}</td></tr>)}
                         </tbody>
                     </table>
                 </div>
@@ -413,8 +412,7 @@ export class Scheduler extends Component {
 
             axios.get(route)
                 .then(response => this.setState({ filteredResults: response.data }, () => {
-                    const weightSuffix = ' Weight'
-                    const weightAverageSuffix = ' Weight AVG'
+                    const indicatorScoreSuffix = ' Score'
                     const indicators = [...new Set(this.state.filteredResults.rows.map(row => row[0]))]
                     const organisationUnits = [...new Set(this.state.filteredResults.rows.map(row => row[1]))]
 
@@ -427,30 +425,23 @@ export class Scheduler extends Component {
                     }).map(e => {
                         this.state.filteredResults.rows.filter(row => row[1] === e.organisationUnit)
                             .forEach(result => Object.keys(e).forEach(key => {
-                                if (key === result[0]) {
+                                if (key === result[0])
                                     e[key] = parseFloat(parseFloat(result[result.length - 1]).toFixed(2))
-                                }
                             }))
 
                         return e
                     }).map(e => {
-                        this.state.selectedSetting.indicators.forEach(indicator => {
-                            e[indicator.name.concat(weightSuffix)] = parseInt(indicator.weight)
-                        })
-
-                        return e
-                    }).map(e => {
-                        let total = 0
-                        this.state.selectedSetting.indicators.forEach(indicator => total += parseInt(indicator.weight))
-                        e.indicatorsTotalWeight = total
-
-                        this.state.selectedSetting.indicators.forEach(indicator => e[indicator.name.concat(weightAverageSuffix)] = parseFloat((parseInt(indicator.weight) / parseInt(total)).toFixed(2)))
+                        this.state.selectedSetting.indicators.forEach(indicator => e[indicator.name.concat(indicatorScoreSuffix)] = parseFloat(e[indicator.name]) * parseFloat(indicator.weight))
 
                         return e
                     }).map(e => {
                         let score = 0
-                        indicators.forEach(indicator => score = e[indicator] * e[indicator.concat(weightAverageSuffix)])
+                        indicators.forEach(indicator => score += e[indicator.concat(indicatorScoreSuffix)])
                         e.score = parseFloat(score.toFixed(2))
+
+                        return e
+                    }).map(e => {
+                        indicators.forEach(indicator => e[indicator] = e[indicator] === 0 ? '-' : e[indicator])
 
                         return e
                     })
@@ -459,6 +450,10 @@ export class Scheduler extends Component {
                 })).catch(error => this.setState({ loading: false }, () => NotificationManager.error(error.message, null, 3000)))
         })
     }
+
+
+    nodeHandler = e => this.setState({ selectedNode: this.state.organisationUnits.find(o => e === o.id) })
+
 
     render = () => (
         <React.Fragment>
@@ -493,7 +488,9 @@ export class Scheduler extends Component {
                             </thead>
                             <tbody>
 
-                                {this.state.supervisions
+                                {this.state.supervisions.length === 0 && <tr><td colspan="5" className="text-center">No supervision available yet</td></tr>}
+
+                                {this.state.supervisions.length > 0 && this.state.supervisions
                                     .filter((i, index) => index >= this.state.supervisionFirstPage && index <= (this.state.supervisionFirstPage + 5))
                                     .map(s => (
                                         <tr key={s.id}>
@@ -503,7 +500,7 @@ export class Scheduler extends Component {
                                                 <span className="font-weight-bold m-3 text-secondary"> - </span>
                                                 {moment(s.period[1]).format('Do MMMM, YYYY') === 'Invalid date' ? moment(s.period[0]).format('Do MMMM, YYYY') : moment(s.period[1]).format('Do MMMM, YYYY')}
                                             </td>
-                                            <td>{s.organisationUnit.label}</td>
+                                            <td>{s.organisationUnit.displayName}</td>
                                             <td>{s.status}</td>
                                             <td>
                                                 <button
@@ -535,7 +532,7 @@ export class Scheduler extends Component {
                             </button>
 
                             <button
-                                onClick={() => this.setState({ selectedConfig: C_ALL_ORGANISATION_UNITS })}
+                                onClick={() => this.setState({ selectedConfig: C_ALL_ORGANISATION_UNITS, selectedSetting: null })}
                                 className="btn btn-sm btn-primary m-1">
                                 {C_ALL_ORGANISATION_UNITS}
                             </button>
@@ -704,41 +701,90 @@ export class Scheduler extends Component {
                             </div>
                         </div>
 
-                        {this.state.resultLoadingPerformed && this.state.finalResults === 0 && <table className="table table-sm table-striped table-primary"><thead><th> No Result availbale yet </th> </thead></table>}
-
                         <div className="row my-1" >
                             <div className="col">
-                                <div className="d-block my-1 alert alert-info">
-                                    Selected Period: <strong> {moment(this.state.selectedPeriod).format(' MMMM, YYYY')} </strong>
-                                </div>
+                                {
+                                    this.state.selectedPeriod &&
+                                    <div className="d-block my-1 alert alert-info">
+                                        <span className="">Selected Period:</span> <strong> {moment(this.state.selectedPeriod).format(' MMMM, YYYY')} </strong>
+                                        <span className="">Hight Is Good:</span> <strong> {this.state.hightIsGood ? 'Yes' : 'No'} </strong>
 
-                                <table className="table table-sm table-striped table-primary table-hover">
-                                    <thead> {Object.keys(this.state.finalResults[0]).map(key => <th className="text-capitalize"> {key} </th>)} </thead>
-                                    {
-                                        this.state.hightIsGood &&
-                                        this.state.finalResults.length > 1 &&
-                                        <tbody>
-                                            {!this.state.hightIsGood && this.state.finalResults.sort((a, b) => a.score - b.score).slice(0, this.state.best).map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-success"> {result[key]} </td>)}  </tr>)}
-                                            {this.state.hightIsGood && this.state.finalResults.sort((a, b) => b.score - a.score).slice(0, this.state.best).map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-success"> {result[key]} </td>)}  </tr>)}
+                                        {this.state.selectedSetting.indicators.map(indicator => <React.Fragment> <span className="ml-2">{indicator.name}:</span> <strong>{indicator.weight}</strong> </React.Fragment>)}
+                                    </div>
+                                }
 
-                                            {!this.state.hightIsGood && this.state.finalResults.sort((a, b) => b.score - a.score).slice(0, this.state.worst).map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-danger"> {result[key]} </td>)}  </tr>)}
-                                            {this.state.hightIsGood && this.state.finalResults.sort((a, b) => a.score - b.score).slice(0, this.state.worst).map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-danger"> {result[key]} </td>)}  </tr>)}
-                                        </tbody>
-                                    }
+                                {
+                                    this.state.finalResults.length > 0 &&
+                                    (parseInt(this.state.finalResults.length + 1) - (parseInt(this.state.best || 0) + parseInt(this.state.worst || 0)) > 0) &&
+                                    <table className="table table-sm table-striped table-primary table-hover">
+                                        <thead> {Object.keys(this.state.finalResults[0]).map(key => <th className="text-capitalize"> {key} </th>)} </thead>
+                                        {
+                                            this.state.finalResults.length > 1 &&
+                                            <tbody>
+                                                {this.state.hightIsGood && this.state.finalResults.sort((a, b) => b.score - a.score).slice(0, this.state.best).map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-success"> {result[key]} </td>)}  </tr>)}
+                                                {this.state.hightIsGood && this.state.finalResults.sort((a, b) => a.score - b.score).slice(0, this.state.worst).sort((a, b) => b.score - a.score).map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-danger"> {result[key]} </td>)}  </tr>)}
 
-                                    {
-                                        this.state.finalResults.length === 1 &&
-                                        <tbody>
-                                            {this.state.finalResults.map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-primary"> {result[key]} </td>)}  </tr>)}
-                                        </tbody>
-                                    }
-                                </table>
+                                                {!this.state.hightIsGood && this.state.finalResults.sort((a, b) => a.score - b.score).slice(0, this.state.best).map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-success"> {result[key]} </td>)}  </tr>)}
+                                                {!this.state.hightIsGood && this.state.finalResults.sort((a, b) => b.score - a.score).slice(0, this.state.worst).sort((a, b) => a.score - b.score).map((result, index) => <tr title={result.organisationUnit} onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-danger"> {result[key]} </td>)}  </tr>)}
+                                            </tbody>
+                                        }
+
+                                        {
+                                            this.state.finalResults.length === 1 &&
+                                            <tbody>
+                                                {this.state.finalResults.map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-primary"> {result[key]} </td>)}  </tr>)}
+                                            </tbody>
+                                        }
+                                    </table>
+                                }
+
+                                {
+                                    this.state.finalResults.length > 0 &&
+                                    (parseInt(this.state.finalResults.length + 1) - (parseInt(this.state.best || 0) + parseInt(this.state.worst || 0)) <= 0) &&
+                                    <React.Fragment>
+                                        <div className="d-block alert alert-danger my-2">
+
+                                            The total results from Analytics is
+                                            <strong className="mx-1">
+                                                {this.state.finalResults.length}
+                                            </strong>
+                                            , but you seam looking for
+
+                                            <strong className="mx-1">
+                                                {this.state.best}
+                                            </strong>
+                                            best and
+
+                                            <strong className="mx-1">
+                                                {this.state.worst}
+                                            </strong>
+                                            worst
+
+                                        </div>
+                                        <table className="table table-sm table-striped table-primary table-hover">
+                                            <thead> {Object.keys(this.state.finalResults[0]).map(key => <th className="text-capitalize"> {key} </th>)} </thead>
+                                            {
+                                                this.state.finalResults.length > 1 &&
+                                                <tbody>
+                                                    {this.state.hightIsGood && this.state.finalResults.sort((a, b) => b.score - a.score).map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className=""> {result[key]} </td>)}  </tr>)}
+
+                                                    {!this.state.hightIsGood && this.state.finalResults.sort((a, b) => a.score - b.score).map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className=""> {result[key]} </td>)}  </tr>)}
+                                                </tbody>
+                                            }
+                                        </table>
+                                    </React.Fragment>
+                                }
+
+
                             </div>
                         </div>
+
+                        {this.state.resultLoadingPerformed && this.state.finalResults.length === 0 && <table className="table table-sm table-striped table-primary"><thead><th className="text-center"> No Result availbale yet </th> </thead></table>}
+
                     </>
                 }
 
-                {(this.state.displaySupervisionFormCreation && (this.state.selectedConfig === C_ALL_ORGANISATION_UNITS)) || (this.state.displaySupervisionFormCreation && this.state.selectedOrganisationUnitsList.length > 0 && this.state.selectedConfig === C_INDICATORS_BASED_CONFIGURATION) && <Supervision selectedNode={this.state.selectedNode} loadSupervisions={this.loadSupervisions} />}
+                {(this.state.displaySupervisionFormCreation && (this.state.selectedConfig === C_ALL_ORGANISATION_UNITS)) || (this.state.displaySupervisionFormCreation && this.state.selectedNode) && <Supervision selectedNode={this.state.selectedNode} nodeHandler={this.nodeHandler} indicators={this.state.selectedSetting.indicators} loadSupervisions={this.loadSupervisions} />}
 
             </LoadingOverlay>
         </React.Fragment>
