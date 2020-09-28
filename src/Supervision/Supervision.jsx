@@ -172,14 +172,7 @@ export class Supervision extends Component {
 
                 axios.put(SUPERVISIONS_ROUTE, supervisions)
                     .then(() => {
-                        this.setState({
-                            dates: null,
-                            currentSelectedSupervisor: null,
-                            selectedSupervisors: [],
-                            otherSupervisors: null,
-                            description: null,
-                            loading: false
-                        }, () => {
+                        this.setState({loading: false}, () => {
                             this.props.loadSupervisions()
 
                             NotificationManager.success('Supervision planned successfully', null, 3000)
@@ -312,13 +305,14 @@ export class Supervision extends Component {
     displaySelectedSupervisors = () => this.props.selectedNode &&
         this.state.selectedSupervisors.length > 0 &&
         (
-            <div className="col alert alert-primary">
-                <strong>
-                    Selected Supervisors
-                </strong>
-                <hr />
+            <div className="col">
+                <div className="mx-1 alert alert-primary">
+                    <h4 className="d-block m-1">
+                        Selected Supervisors
+                    </h4>
 
-                {this.state.selectedSupervisors.map(s => <btn key={s.id} className="btn btn-primary m-1" onClick={() => this.removeHandleSupervisorsSelection(s)}>{s.displayName}</btn>)}
+                    {this.state.selectedSupervisors.map(s => <btn key={s.id} className="btn btn-sm btn-primary m-1" onClick={() => this.removeHandleSupervisorsSelection(s)}>{s.displayName}</btn>)}
+                </div>
             </div>
         )
 

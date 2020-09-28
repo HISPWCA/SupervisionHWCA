@@ -721,10 +721,10 @@ export class Scheduler extends Component {
                                         {
                                             this.state.finalResults.length > 1 &&
                                             <tbody>
-                                                {this.state.hightIsGood && this.state.finalResults.sort((a, b) => b.score - a.score).slice(0, this.state.best).map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-success"> {result[key]} </td>)}  </tr>)}
-                                                {this.state.hightIsGood && this.state.finalResults.sort((a, b) => a.score - b.score).slice(0, this.state.worst).sort((a, b) => b.score - a.score).map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-danger"> {result[key]} </td>)}  </tr>)}
+                                                {this.state.hightIsGood && this.state.finalResults.sort((a, b) => b.score - a.score).slice(0, this.state.best).map((result, index) => <tr title={result.organisationUnit} onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-success"> {result[key]} </td>)}  </tr>)}
+                                                {this.state.hightIsGood && this.state.finalResults.sort((a, b) => a.score - b.score).slice(0, this.state.worst).sort((a, b) => b.score - a.score).map((result, index) => <tr title={result.organisationUnit} onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-danger"> {result[key]} </td>)}  </tr>)}
 
-                                                {!this.state.hightIsGood && this.state.finalResults.sort((a, b) => a.score - b.score).slice(0, this.state.best).map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-success"> {result[key]} </td>)}  </tr>)}
+                                                {!this.state.hightIsGood && this.state.finalResults.sort((a, b) => a.score - b.score).slice(0, this.state.best).map((result, index) => <tr title={result.organisationUnit} onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-success"> {result[key]} </td>)}  </tr>)}
                                                 {!this.state.hightIsGood && this.state.finalResults.sort((a, b) => b.score - a.score).slice(0, this.state.worst).sort((a, b) => a.score - b.score).map((result, index) => <tr title={result.organisationUnit} onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-danger"> {result[key]} </td>)}  </tr>)}
                                             </tbody>
                                         }
@@ -732,7 +732,7 @@ export class Scheduler extends Component {
                                         {
                                             this.state.finalResults.length === 1 &&
                                             <tbody>
-                                                {this.state.finalResults.map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-primary"> {result[key]} </td>)}  </tr>)}
+                                                {this.state.finalResults.map((result, index) => <tr title={result.organisationUnit} onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-primary"> {result[key]} </td>)}  </tr>)}
                                             </tbody>
                                         }
                                     </table>
@@ -766,25 +766,22 @@ export class Scheduler extends Component {
                                             {
                                                 this.state.finalResults.length > 1 &&
                                                 <tbody>
-                                                    {this.state.hightIsGood && this.state.finalResults.sort((a, b) => b.score - a.score).map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className=""> {result[key]} </td>)}  </tr>)}
+                                                    {this.state.hightIsGood && this.state.finalResults.sort((a, b) => b.score - a.score).map((result, index) => <tr title={result.organisationUnit} onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {Object.keys(this.state.finalResults[index]).map(key => <td className=""> {result[key]} </td>)}  </tr>)}
 
-                                                    {!this.state.hightIsGood && this.state.finalResults.sort((a, b) => a.score - b.score).map((result, index) => <tr> {Object.keys(this.state.finalResults[index]).map(key => <td className=""> {result[key]} </td>)}  </tr>)}
+                                                    {!this.state.hightIsGood && this.state.finalResults.sort((a, b) => a.score - b.score).map((result, index) => <tr title={result.organisationUnit} onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {Object.keys(this.state.finalResults[index]).map(key => <td className=""> {result[key]} </td>)}  </tr>)}
                                                 </tbody>
                                             }
                                         </table>
                                     </React.Fragment>
                                 }
-
-
                             </div>
                         </div>
 
                         {this.state.resultLoadingPerformed && this.state.finalResults.length === 0 && <table className="table table-sm table-striped table-primary"><thead><th className="text-center"> No Result availbale yet </th> </thead></table>}
-
                     </>
                 }
 
-                {(this.state.displaySupervisionFormCreation && (this.state.selectedConfig === C_ALL_ORGANISATION_UNITS)) || (this.state.displaySupervisionFormCreation && this.state.selectedNode) && <Supervision selectedNode={this.state.selectedNode} nodeHandler={this.nodeHandler} indicators={this.state.selectedSetting.indicators} loadSupervisions={this.loadSupervisions} />}
+                {(this.state.displaySupervisionFormCreation && (this.state.selectedConfig === C_ALL_ORGANISATION_UNITS || this.state.selectedNode)) && <Supervision selectedNode={this.state.selectedNode} nodeHandler={this.nodeHandler} indicators={this.state.selectedSetting ? this.state.selectedSetting.indicators : []} loadSupervisions={this.loadSupervisions} />}
 
             </LoadingOverlay>
         </React.Fragment>
