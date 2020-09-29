@@ -440,8 +440,13 @@ export class Scheduler extends Component {
                         return e
                     }).map(e => {
                         this.state.selectedSetting.indicators.forEach(indicator => {
-                            if (isNaN(parseFloat(e[indicator.name])) || isNaN(parseFloat(indicator.weight))) {
+                            if (isNaN(parseFloat(e[indicator.name]))) {
                                 e[indicator.name] = '-'
+
+                                if (!Object.keys(e).includes(indicator.name.concat(indicatorScoreSuffix)))
+                                    e[indicator.name.concat(indicatorScoreSuffix)] = '-'
+
+                            } else if (isNaN(parseFloat(indicator.weight))) {
                                 e[indicator.name.concat(indicatorScoreSuffix)] = '-'
                             } else {
                                 e[indicator.name.concat(indicatorScoreSuffix)] = parseFloat(e[indicator.name]) * parseFloat(indicator.weight)
@@ -452,7 +457,7 @@ export class Scheduler extends Component {
                     }).map(e => {
                         let score = 0
                         indicators.forEach(indicator => {
-                            if (e[indicator] !== '-' && !isNaN(parseFloat(e[indicator]))) 
+                            if (e[indicator] !== '-' && !isNaN(parseFloat(e[indicator])))
                                 score += e[indicator.concat(indicatorScoreSuffix)]
                         })
                         e.score = parseFloat(score.toFixed(2))
