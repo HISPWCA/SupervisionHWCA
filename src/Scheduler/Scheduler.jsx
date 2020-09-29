@@ -413,13 +413,21 @@ export class Scheduler extends Component {
             axios.get(route)
                 .then(response => this.setState({ filteredResults: response.data }, () => {
                     const indicatorScoreSuffix = ' Score'
-                    const indicators = [...new Set(this.state.filteredResults.rows.map(row => row[0]))]
+                    // const indicators = [...new Set(this.state.filteredResults.rows.map(row => row[0]))]
+                    const indicators = [...new Set(this.state.selectedSetting.indicators.map(indicator => indicator.name))]
                     const organisationUnits = [...new Set(this.state.filteredResults.rows.map(row => row[1]))]
 
                     let elements = []
                     organisationUnits.forEach(organisationUnit => elements.push({ organisationUnit }))
                     elements = elements.map(e => {
-                        indicators.forEach(indicator => e[indicator] = 0)
+                        indicators.forEach(indicator => e[indicator] = '')
+
+                        return e
+                    }).map(e => {
+                        indicators.forEach(indicator => {
+                            if (!Object.keys(e).includes(indicator))
+                                e[indicator] = ''
+                        })
 
                         return e
                     }).map(e => {
@@ -431,17 +439,23 @@ export class Scheduler extends Component {
 
                         return e
                     }).map(e => {
-                        this.state.selectedSetting.indicators.forEach(indicator => e[indicator.name.concat(indicatorScoreSuffix)] = parseFloat(e[indicator.name]) * parseFloat(indicator.weight))
+                        this.state.selectedSetting.indicators.forEach(indicator => {
+                            if (isNaN(parseFloat(e[indicator.name])) || isNaN(parseFloat(indicator.weight))) {
+                                e[indicator.name] = '-'
+                                e[indicator.name.concat(indicatorScoreSuffix)] = '-'
+                            } else {
+                                e[indicator.name.concat(indicatorScoreSuffix)] = parseFloat(e[indicator.name]) * parseFloat(indicator.weight)
+                            }
+                        })
 
                         return e
                     }).map(e => {
                         let score = 0
-                        indicators.forEach(indicator => score += e[indicator.concat(indicatorScoreSuffix)])
+                        indicators.forEach(indicator => {
+                            if (e[indicator] !== '-' && !isNaN(parseFloat(e[indicator]))) 
+                                score += e[indicator.concat(indicatorScoreSuffix)]
+                        })
                         e.score = parseFloat(score.toFixed(2))
-
-                        return e
-                    }).map(e => {
-                        indicators.forEach(indicator => e[indicator] = e[indicator] === 0 ? '-' : e[indicator])
 
                         return e
                     })
@@ -598,14 +612,15 @@ export class Scheduler extends Component {
                 {
                     this.state.displaySupervisionFormCreation && this.state.selectedConfig === C_INDICATORS_BASED_CONFIGURATION && <div className="row m-1 text-center alert alert-primary" style={{ maxHeight: '300px', overflow: 'auto' }} >
                         {this.state.settingsList.filter(setting => setting.me.id === this.state.me.id).map(setting => <div className="col-3 p-1">  <button key={setting.id} onClick={() => this.setState({ selectedSetting: setting })} className=" text-uppercase d-block border btn btn-primary Settings align-middle" style={{ height: '100px', width: '100%' }}> {setting.name} </button>   </div>)}
+                        {/* {this.state.settingsList.filter(setting => setting.me.id === this.state.me.id).map(setting => <div className="col-3 p-1">  <button key={setting.id} onClick={() => this.setState({ selectedSetting: setting })} className=" text-uppercase d-block border btn btn-primary Settings align-middle" style={{ height: '100px', width: '100%' }}> {setting.name} </button>   </div>)} */}
                     </div>
                 }
 
                 {
-                    this.state.displaySupervisionFormCreation &&
                     this.state.selectedSetting &&
+                    this.state.displaySupervisionFormCreation &&
                     this.state.selectedConfig === C_INDICATORS_BASED_CONFIGURATION &&
-                    <>
+                    <React.Fragment>
 
                         <div className="row m-1 alert alert-primary">
                             <div className="col text-center">
@@ -778,7 +793,7 @@ export class Scheduler extends Component {
                         </div>
 
                         {this.state.resultLoadingPerformed && this.state.finalResults.length === 0 && <table className="table table-sm table-striped table-primary"><thead><th className="text-center"> No Result availbale yet </th> </thead></table>}
-                    </>
+                    </React.Fragment>
                 }
 
                 {(this.state.displaySupervisionFormCreation && (this.state.selectedConfig === C_ALL_ORGANISATION_UNITS || this.state.selectedNode)) && <Supervision selectedNode={this.state.selectedNode} nodeHandler={this.nodeHandler} indicators={this.state.selectedSetting ? this.state.selectedSetting.indicators : []} loadSupervisions={this.loadSupervisions} />}
