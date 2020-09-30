@@ -1,24 +1,80 @@
-import React from 'react'
+import React, { Component } from 'react'
 import './App.css'
 import Header from './Header/Header'
 import Body from './Body/Body'
 import Footer from './Footer/Footer'
 import { Provider } from '@dhis2/app-runtime'
-import { API_BASE_ROUTE } from './api.routes'
+import { API_BASE_ROUTE, GLOBAL_SETTINGS_ROUTE, INDICATORS_ROUTE, SETTINGS_ROUTE, SUPERVISIONS_ROUTE } from './api.routes'
 import { HeaderBar } from '@dhis2/ui'
+import axios from 'axios'
 
 const BASE_ROUTE = API_BASE_ROUTE.substring(0, API_BASE_ROUTE.indexOf('/api'))
 
-const App = () => (
-  <Provider config={{ apiVersion: 33, baseUrl: BASE_ROUTE }}>
-    <HeaderBar appName='Supervision Management' />
+class App extends Component {
+  state = {
+    settingsCreated: false,
+    indicatorsCreated: false,
+    supervisionsCreated: false,
+    globalSettingsCreated: false,
+  }
 
-    <div className='container-fluid m-3'>
-      <Header />
-      <Body />
-      <Footer />
-    </div>
-  </Provider>
-)
+  constructor() {
+    super()
+
+    axios.get(SETTINGS_ROUTE)
+      .then(() => this.setState({ settingsCreated: true }, () => console.clear()))
+      .catch(() => axios.post(SETTINGS_ROUTE, []).then(() => this.setState({ settingsCreated: true }, () => console.clear())).catch(() => this.setState({ settingsCreated: false }, () => console.clear())))
+
+    axios.get(INDICATORS_ROUTE)
+      .then(() => this.setState({ indicatorsCreated: true }, () => console.clear()))
+      .catch(() => axios.post(INDICATORS_ROUTE, []).then(() => this.setState({ indicatorsCreated: true }, () => console.clear())).catch(() => this.setState({ indicatorsCreated: false }, () => console.clear())))
+
+    axios.get(SUPERVISIONS_ROUTE)
+      .then(() => this.setState({ supervisionsCreated: true }, () => console.clear()))
+      .catch(() => axios.post(SUPERVISIONS_ROUTE, []).then(() => this.setState({ supervisionsCreated: true }, () => console.clear())).catch(() => this.setState({ supervisionsCreated: false }, () => console.clear())))
+
+    axios.get(GLOBAL_SETTINGS_ROUTE)
+      .then(() => this.setState({ globalSettingsCreated: true }, () => console.clear()))
+      .catch(() => axios.post(GLOBAL_SETTINGS_ROUTE, {}).then(() => this.setState({ globalSettingsCreated: true }, () => console.clear())).catch(() => this.setState({ globalSettingsCreated: false }, () => console.clear())))
+  }
+
+  componentDidMount() { console.clear() }
+
+  render() {
+    return (
+      <Provider config={{ apiVersion: 33, baseUrl: BASE_ROUTE }}>
+        <HeaderBar appName='Supervision Management' />
+        {
+          (!this.state.globalSettingsCreated || !this.state.indicatorsCreated || !this.state.settingsCreated || !this.state.supervisionsCreated) &&
+          <div className="row align-middle my-5">
+            <div className="col">
+              {!this.state.globalSettingsCreated && <div className="d-block text-info m-1">Creating App Settings</div>}
+              {this.state.globalSettingsCreated && <div className="d-block text-primary m-1">App Settings successfully created</div>}
+
+              {!this.state.supervisionsCreated && <div className="d-block text-info m-1">Creating Supervision Settings</div>}
+              {this.state.supervisionsCreated && <div className="d-block text-primary m-1">Supervision Settings successfully created</div>}
+
+              {!this.state.indicatorsCreated && <div className="d-block text-info m-1">Creating Indicators Settings</div>}
+              {this.state.indicatorsCreated && <div className="d-block text-primary m-1">Indicators Settings successfully created</div>}
+
+              {!this.state.settingsCreated && <div className="d-block text-info m-1">Creating Custom Settings</div>}
+              {this.state.settingsCreated && <div className="d-block text-primary m-1">Custom Settings successfully created</div>}
+            </div>
+          </div>
+        }
+
+
+
+        {this.state.globalSettingsCreated && this.state.indicatorsCreated && this.state.settingsCreated && this.state.supervisionsCreated &&
+          <div className='container-fluid m-3'>
+            <Header />
+            <Body />
+            <Footer />
+          </div>
+        }
+      </Provider>
+    )
+  }
+}
 
 export default App

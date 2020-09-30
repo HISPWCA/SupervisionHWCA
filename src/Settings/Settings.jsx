@@ -612,12 +612,12 @@ export class Settings extends Component {
         {
             this.state.setting &&    <div className="row text-center alert alert-primary m-1 mt-3">
                 
-                <button onClick={() => this.removeSettingFromDataStore()} className="btn btn-sm btn-light m-2">
+                <button onClick={() => this.removeSettingFromDataStore()} className="btn btn-sm btn-dark m-2">
                     Delete
                 </button>
                 
                 <button className="btn btn-link m-2">
-                <strong className="text-uppercase"> {this.state.setting.name} </strong>
+                    <strong className="text-uppercase"> {this.state.setting.name} </strong>
                 </button>
                 <br/>
 
