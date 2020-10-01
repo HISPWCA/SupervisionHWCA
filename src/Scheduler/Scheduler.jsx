@@ -499,9 +499,8 @@ export class Scheduler extends Component {
                     <div className="col">
                         <table className="table table-hover table-primary table-sm table-striped text-left ">
                             <thead>
-                                <th>Description</th>
-                                <th>Start Date - End Date</th>
                                 <th>Org. Unit</th>
+                                <th>Start Date - End Date</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </thead>
@@ -513,13 +512,12 @@ export class Scheduler extends Component {
                                     .filter((i, index) => index >= this.state.supervisionFirstPage && index <= (this.state.supervisionFirstPage + 5))
                                     .map(s => (
                                         <tr key={s.id}>
-                                            <td>{s.description}</td>
+                                            <td title={s.description}>{s.organisationUnit.displayName}</td>
                                             <td>
                                                 {moment(s.period[0]).format('Do MMMM, YYYY')}
                                                 <span className="font-weight-bold m-3 text-secondary"> - </span>
                                                 {moment(s.period[1]).format('Do MMMM, YYYY') === 'Invalid date' ? moment(s.period[0]).format('Do MMMM, YYYY') : moment(s.period[1]).format('Do MMMM, YYYY')}
                                             </td>
-                                            <td>{s.organisationUnit.displayName}</td>
                                             <td>{s.status}</td>
                                             <td>
                                                 <button
@@ -800,7 +798,7 @@ export class Scheduler extends Component {
                     </React.Fragment>
                 }
 
-                {(this.state.displaySupervisionFormCreation && (this.state.selectedConfig === C_ALL_ORGANISATION_UNITS || this.state.selectedNode)) && <Supervision nodes={this.state.nodes} displayTree={this.state.displayTree} selectedNode={this.state.selectedNode} nodeHandler={this.nodeHandler} indicators={this.state.selectedSetting ? this.state.selectedSetting.indicators : []} loadSupervisions={this.loadSupervisions} />}
+                {(this.state.displaySupervisionFormCreation && (this.state.selectedConfig === C_ALL_ORGANISATION_UNITS || this.state.selectedNode)) && <Supervision supervisions={this.state.supervisions} nodes={this.state.nodes} displayTree={this.state.displayTree} selectedNode={this.state.selectedNode} nodeHandler={this.nodeHandler} indicators={this.state.selectedSetting ? this.state.selectedSetting.indicators : []} loadSupervisions={this.loadSupervisions} />}
 
             </LoadingOverlay>
         </React.Fragment>

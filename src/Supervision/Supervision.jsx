@@ -7,6 +7,7 @@ import { Calendar } from 'primereact/calendar'
 import { v4 as uuidv4 } from 'uuid'
 import LoadingOverlay from 'react-loading-overlay'
 import { MultiSelect } from 'primereact/multiselect'
+import moment from 'moment'
 import { Dropdown } from 'primereact/dropdown'
 
 export class Supervision extends Component {
@@ -74,6 +75,8 @@ export class Supervision extends Component {
             this.setState({ loading: false }, () => NotificationManager.error('Please Select Supervisors', null, 3000))
         } else if (!this.state.currentSelectedSelectedSupervisionType) {
             this.setState({ loading: false }, () => NotificationManager.error('Please Select Supervision Type', null, 3000))
+        } else if (this.props.supervisions.find(supervision => supervision.organisationUnit.id === this.props.selectedNode.id && moment(supervision.period[0]).format('Do MMMM, YYYY')  === moment(this.state.dates[0]).format('Do MMMM, YYYY') && moment(supervision.period[1]).format('Do MMMM, YYYY')  === moment(this.state.dates[1]).format('Do MMMM, YYYY')   )) {
+            this.setState({ loading: false }, () => NotificationManager.error('It seems this supervision already exists', null, 3000))
         } else {
             const supervision = {}
             supervision.id = uuidv4()
@@ -206,17 +209,17 @@ export class Supervision extends Component {
 
                         <div className="row text-left my-3">
                             {
-                                this.props.displayTree && 
+                                this.props.displayTree &&
                                 <div className="col">
-                                <div className="font-weight-bold">Organisation Units</div>
+                                    <div className="font-weight-bold">Organisation Units</div>
 
-                                <Tree value={this.props.nodes}
-                                    selectionMode="single"
-                                    filter={true}
-                                    selectionKeys={this.props.selectedNode}
-                                    onSelectionChange={e => this.props.nodeHandler(e.value)} />
+                                    <Tree value={this.props.nodes}
+                                        selectionMode="single"
+                                        filter={true}
+                                        selectionKeys={this.props.selectedNode}
+                                        onSelectionChange={e => this.props.nodeHandler(e.value)} />
 
-                            </div>
+                                </div>
                             }
 
 
