@@ -10,18 +10,27 @@ import 'react-confirm-alert/src/react-confirm-alert.css'
 import LoadingOverlay from 'react-loading-overlay'
 import Header from '../Header/Header'
 import { Dialog } from 'primereact/dialog'
-import { Button } from 'primereact/button'
 import { Tree } from 'primereact/tree'
-import { Calendar } from 'primereact/calendar';
-import { Dropdown } from 'primereact/dropdown';
 
+import { VerticalTimeline, VerticalTimelineElement } from 'react-vertical-timeline-component'
+import 'react-vertical-timeline-component/style.min.css'
+import { Dropdown } from 'primereact/dropdown'
 
+import FullCalendar from '@fullcalendar/react'
+
+import dayGridPlugin from '@fullcalendar/daygrid'
+import timeGridPlugin from '@fullcalendar/timegrid'
+import listPlugin from '@fullcalendar/list'
+import interactionPlugin from "@fullcalendar/interaction"
+
+import { DatePicker, Space } from 'antd'
 
 const C_PAGINATION_ROWS_PER_PAGE = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 const C_INDICATORS_BASED_CONFIGURATION = 'Indicators Based Configuration'
 const C_ALL_ORGANISATION_UNITS = 'All Organisation Units'
 const C_BASED_ON_SUPERVISION_FREQUENCIES = 'Based On Supervision Frequencies'
 const C_BASED_ON_SUPERVISION_PERIOD = 'Based on Supervision Period'
+
 
 
 export class Scheduler extends Component {
@@ -36,7 +45,9 @@ export class Scheduler extends Component {
         finalResults: [],
         supervisions: [],
         settingsList: [],
+        periodType: null,
         hightIsGood: true,
+        viewType: 'Table',
         selectedNode: null,
         filteredResults: [],
         selectedOrgUnit: null,
@@ -218,6 +229,7 @@ export class Scheduler extends Component {
                         </tbody>
                     </table>
                 </div>
+
                 <div className="col">
                     <table className="table table-hover table-sm table-striped text-left m-3">
                         <thead><th>Supervisors</th></thead>
@@ -470,9 +482,16 @@ export class Scheduler extends Component {
         })
     }
 
-
     nodeHandler = e => this.setState({ selectedNode: this.state.organisationUnits.find(o => e === o.id) })
 
+    handleDateClick = ({ dateStr }) => this.setState({ viewType: dateStr })
+
+    onDateSelection = (date, dateString) => {
+        if (this.state.periodType === 'Week')
+            this.setState({ selectedPeriod: moment(date).format('yyyy').concat('W').concat(moment(date).format('WW')) })
+        else
+            this.setState({ selectedPeriod: dateString })
+    }
 
     render = () => (
         <React.Fragment>
@@ -495,45 +514,191 @@ export class Scheduler extends Component {
                     </div>
                 }
 
+                {
+                    this.state.supervisions.length > 0 &&
+                    <div className="row">
+                        <div className="col">
+
+                            <button
+                                onClick={() => this.setState({ viewType: 'Table' })}
+                                className="btn btn-sm btn-secondary m-1 float-sm-right">
+                                Table View
+                            </button>
+
+                            <button
+                                onClick={() => this.setState({ viewType: 'Calendar' })}
+                                className="btn btn-sm btn-secondary m-1 float-sm-right">
+                                Calendar View
+                            </button>
+
+                            <button
+                                onClick={() => this.setState({ viewType: 'Timeline' })}
+                                className="btn btn-sm btn-secondary m-1 float-sm-right">
+                                Timeline View
+                            </button>
+
+                        </div>
+                    </div>
+                }
+
                 <div className="row">
                     <div className="col">
-                        <table className="table table-hover table-primary table-sm table-striped text-left ">
-                            <thead>
-                                <th>Org. Unit</th>
-                                <th>Start Date - End Date</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </thead>
-                            <tbody>
+                        {
+                            this.state.viewType === 'Timeline' &&
+                            <Dialog
+                                header="Timeline view"
+                                visible={this.state.viewType === 'Timeline'}
+                                style={{ width: '75vw' }}
+                                onHide={() => this.setState({ viewType: 'Table' })}>
 
-                                {this.state.supervisions.length === 0 && <tr><td colspan="5" className="text-center">No supervision available yet</td></tr>}
+                                <div className="alert alert-secondary">
+                                    {
+                                        this.state.supervisions.length > 0 && <VerticalTimeline className="alert alert-secondary p-2">
+                                            {this.state.supervisions.map(supervision => <React.Fragment>
+                                                <VerticalTimelineElement
+                                                    dateClassName="text-dark font-weight-bold"
+                                                    contentStyle={{ background: 'rgb(127, 255, 212)', color: '#000000' }}
+                                                    contentArrowStyle={{ borderRight: '7px solid  rgb(127, 255, 212)' }}
+                                                    date={''.concat(moment(supervision.period[0]).format('Do MMMM, YYYY').concat(' - ').concat(moment(supervision.period[1]).format('Do MMMM, YYYY') === 'Invalid date' ? moment(supervision.period[0]).format('Do MMMM, YYYY') : moment(supervision.period[1]).format('Do MMMM, YYYY')))}
+                                                    iconStyle={{ background: 'rgb(127, 255, 212)', color: '#fff' }} >
 
-                                {this.state.supervisions.length > 0 && this.state.supervisions
-                                    .filter((i, index) => index >= this.state.supervisionFirstPage && index <= (this.state.supervisionFirstPage + 5))
-                                    .map(s => (
-                                        <tr key={s.id}>
-                                            <td title={s.description}>{s.organisationUnit.displayName}</td>
-                                            <td>
-                                                {moment(s.period[0]).format('Do MMMM, YYYY')}
-                                                <span className="font-weight-bold m-3 text-secondary"> - </span>
-                                                {moment(s.period[1]).format('Do MMMM, YYYY') === 'Invalid date' ? moment(s.period[0]).format('Do MMMM, YYYY') : moment(s.period[1]).format('Do MMMM, YYYY')}
-                                            </td>
-                                            <td>{s.status}</td>
-                                            <td>
-                                                <button
-                                                    onClick={() => this.handleSupervisionDetails(s)}
-                                                    className="btn btn-sm btn-light"
-                                                    title="Display details">
-                                                    Details
+                                                    <h3 className="vertical-timeline-element-title font-weight-bold my-2">
+                                                        {supervision.organisationUnit.displayName.toUpperCase()}
+                                                    </h3>
+
+                                                    <h5>
+                                                        (<strong>{supervision.status}</strong>)
+                                                    </h5>
+
+                                                    <h4 className="vertical-timeline-element-subtitle">{supervision.description}</h4>
+                                                    <div className="row m-3">
+                                                        {
+                                                            supervision.indicators.length > 0 &&
+                                                            <div className="col">
+                                                                <table className="table table-hover table-sm table-striped text-left table-light m-3">
+                                                                    <thead><th>Indicators</th></thead>
+                                                                    <tbody>
+                                                                        {supervision?.indicators.map(i => <tr key={i.id}><td>{i.label}</td></tr>)}
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        }
+
+                                                        {
+                                                            supervision.supervisors.length > 0 &&
+                                                            <div className="col">
+                                                                <table className="table table-hover table-sm table-striped text-left table-light m-3">
+                                                                    <thead><th>Supervisors</th></thead>
+                                                                    <tbody>
+                                                                        {supervision.supervisors.map(s => <tr key={s.id}><td>{s.displayName}</td></tr>)}
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </VerticalTimelineElement>
+                                            </React.Fragment>)
+                                            }
+                                        </VerticalTimeline>
+                                    }
+                                </div>
+
+                            </Dialog>
+                        }
+
+                        {
+                            this.state.viewType !== 'Table' && this.state.viewType !== 'Timeline' && <div classname="d-block">
+                                {this.state.viewType !== 'Table' && this.state.viewType !== 'Calendar' && this.state.viewType !== 'Timeline' && <table className="table table-hover table-primary table-sm table-striped text-left ">
+                                    <thead>
+                                        <th>Org. Unit</th>
+                                        <th>Tracker Program</th>
+                                        <th>Start Date - End Date</th>
+                                        <th>Status</th>
+                                    </thead>
+                                    <tbody>
+                                        {
+                                            this.state.supervisions.filter(supervision => this.state.viewType === moment(supervision.period[0]).format('YYYY-MM-DD') || this.state.viewType === moment(supervision.period[1]).format('YYYY-MM-DD')).length === 0
+                                            && <tr><td colspan="5" className="text-center">Nothing planned for <strong> {this.state.dateStr} </strong> </td></tr>
+                                        }
+
+                                        {
+                                            this.state.supervisions
+                                                .filter(supervision => this.state.viewType === moment(supervision.period[0]).format('YYYY-MM-DD') || this.state.viewType === moment(supervision.period[1]).format('YYYY-MM-DD'))
+                                                .filter((i, index) => index >= this.state.supervisionFirstPage && index <= (this.state.supervisionFirstPage + 5))
+                                                .map(s => (
+                                                    <tr key={s.id}>
+                                                        <td title={s.description}>{s.organisationUnit.displayName}</td>
+                                                        <td title={s.description}>{s.program.displayName}</td>
+                                                        <td>
+                                                            {moment(s.period[0]).format('Do MMMM, YYYY')}
+                                                            <span className="font-weight-bold m-3 text-secondary"> - </span>
+                                                            {moment(s.period[1]).format('Do MMMM, YYYY') === 'Invalid date' ? moment(s.period[0]).format('Do MMMM, YYYY') : moment(s.period[1]).format('Do MMMM, YYYY')}
+                                                        </td>
+                                                        <td>{s.status}</td>
+                                                    </tr>
+                                                ))
+                                        }
+
+                                    </tbody>
+                                </table>
+                                }
+
+
+                                <FullCalendar
+                                    dateClick={this.handleDateClick}
+                                    className="d-block"
+                                    defaultView='dayGridMonth'
+                                    plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
+                                    initialView="dayGridMonth" events={this.state.supervisions.map(supervision => {
+                                        return { title: supervision.organisationUnit.displayName, start: supervision.period[0], end: moment(supervision.period[1]).format('Do MMMM, YYYY') === 'Invalid date' ? supervision.period[0] : supervision.period[1] }
+                                    })} />
+                            </div>
+                        }
+
+                        {
+                            this.state.viewType === 'Table' &&
+                            <React.Fragment>
+                                <table className="table table-hover table-primary table-sm table-striped text-left ">
+                                    <thead>
+                                        <th>Org. Unit</th>
+                                        <th>Sup. Type</th>
+                                        <th>Start Date - End Date</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </thead>
+                                    <tbody>
+
+                                        {this.state.supervisions.length === 0 && <tr><td colspan="6" className="text-center">No supervision available yet</td></tr>}
+
+                                        {this.state.supervisions.length > 0 && this.state.supervisions
+                                            .filter((i, index) => index >= this.state.supervisionFirstPage && index <= (this.state.supervisionFirstPage + 5))
+                                            .map(s => (
+                                                <tr key={s.id}>
+                                                    <td title={s.description}>{s.organisationUnit.displayName}</td>
+                                                    <td title={s.description}>{s.type}</td>
+                                                    <td>
+                                                        {moment(s.period[0]).format('Do MMMM, YYYY')}
+                                                        <span className="font-weight-bold m-3 text-secondary"> - </span>
+                                                        {moment(s.period[1]).format('Do MMMM, YYYY') === 'Invalid date' ? moment(s.period[0]).format('Do MMMM, YYYY') : moment(s.period[1]).format('Do MMMM, YYYY')}
+                                                    </td>
+                                                    <td>{s.status}</td>
+                                                    <td>
+                                                        <button
+                                                            onClick={() => this.handleSupervisionDetails(s)}
+                                                            className="btn btn-sm btn-light"
+                                                            title="Display details">
+                                                            Details
                                                 </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                            </tbody>
-                        </table>
-                        <br />
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                    </tbody>
+                                </table>
+                                <br />
 
-                        {this.renderPaginator()}
+                                {this.renderPaginator()}
+                            </React.Fragment>
+                        }
                     </div>
                 </div>
 
@@ -692,19 +857,49 @@ export class Scheduler extends Component {
                                     </React.Fragment>
                                 }
 
-                                <strong className="d-block mt-1">Select Period  </strong>
+                                <label for="period" className="form-label font-weight-bold mt-2 d-block">Period Type</label>
+                                <div className="d-block m-1">
 
-                                <input
+                                    <Dropdown
+                                        className="d-block"
+                                        optionLabel="name"
+                                        optionValue="code"
+                                        value={this.state.periodType}
+                                        options={
+                                            [
+                                                { name: 'Day', code: 'Day' },
+                                                { name: 'Week', code: 'Week' },
+                                                { name: 'Month', code: 'Month' },
+                                                { name: 'Quarter', code: 'Quarter' },
+                                                { name: 'Year', code: 'Year' },
+                                            ]
+                                        }
+                                        onChange={e => { this.setState({ periodType: e.value }) }}
+                                        placeholder="Choose a Period Type" />
+                                </div>
+
+                                {this.state.periodType && <strong className="d-block mt-1">Select {this.state.periodType}  </strong>}
+
+                                {/* <input
                                     className="form-control"
                                     type="month"
                                     name="start"
                                     onChange={e => this.setState({ selectedPeriod: e.target.value })}
-                                    value={this.state.selectedPeriod} />
+                                    value={this.state.selectedPeriod} /> */}
+
+
+                                {this.state.periodType === 'Day' && <DatePicker id="period" onChange={this.onDateSelection} />}
+                                {this.state.periodType === 'Week' && <DatePicker id="period" picker="week" format={'yyyyW'} onChange={this.onDateSelection} />}
+                                {this.state.periodType === 'Month' && <DatePicker id="period" picker="month" onChange={this.onDateSelection} />}
+                                {this.state.periodType === 'Quarter' && <DatePicker id="period" picker="quarter" onChange={this.onDateSelection} />}
+                                {this.state.periodType === 'Year' && <DatePicker id="period" picker="year" onChange={this.onDateSelection} />}
+
 
                                 <button
                                     className="btn btn-sm float-right my-3 btn-primary"
                                     disabled={
                                         !this.state.best ||
+                                        !this.state.periodType ||
                                         !this.state.worst ||
                                         (this.state.best === 0 && this.state.worst === 0) ||
                                         !this.state.selectedOrgUnit ||

@@ -2,13 +2,16 @@ import axios from 'axios'
 import { Tree } from 'primereact/tree'
 import React, { Component } from 'react'
 import { NotificationManager } from 'react-notifications'
-import { SUPERVISORS_ROUTE, ME_ROUTE, SUPERVISIONS_ROUTE } from '../api.routes'
+import { SUPERVISORS_ROUTE, ME_ROUTE, SUPERVISIONS_ROUTE, TRACKER_PROGRAMS_ROUTE } from '../api.routes'
 import { Calendar } from 'primereact/calendar'
 import { v4 as uuidv4 } from 'uuid'
 import LoadingOverlay from 'react-loading-overlay'
 import { MultiSelect } from 'primereact/multiselect'
 import moment from 'moment'
 import { Dropdown } from 'primereact/dropdown'
+
+
+
 
 export class Supervision extends Component {
 
@@ -17,27 +20,40 @@ export class Supervision extends Component {
         dates: null,
         loading: false,
         supervisors: [],
+ 
         supervisions: [],
         settingsList: [],
+ 
         useStepper: true,
         description: null,
+        trackerPrograms: [],
+        trackerProgram: null,
         selectedOrgUnit: null,
+
         otherSupervisors: null,
         selectedNodeKeys: null,
+ 
         selectedSupervisors: [],
+        
         currentSelectedOrgUnit: null,
         currentSelectedSupervisor: null,
-        currentSelectedSelectedSupervisionType: null,
     }
+
 
     componentDidMount = () => {
         this.loadMe()
         this.loadSupervisors()
+        this.loadTrackerPrograms()
     }
 
 
     loadSupervisors = () => axios.get(SUPERVISORS_ROUTE)
         .then(response => this.setState({ supervisors: response.data.users }))
+        .catch(error => NotificationManager.error(error.message, null, 3000))
+
+
+    loadTrackerPrograms = () => axios.get(TRACKER_PROGRAMS_ROUTE)
+        .then(response => this.setState({ trackerPrograms: response.data.programs }))
         .catch(error => NotificationManager.error(error.message, null, 3000))
 
 
@@ -73,9 +89,9 @@ export class Supervision extends Component {
             this.setState({ loading: false }, () => NotificationManager.error('Please Select organisation unit', null, 3000))
         } else if (this.state.selectedSupervisors.length === 0) {
             this.setState({ loading: false }, () => NotificationManager.error('Please Select Supervisors', null, 3000))
-        } else if (!this.state.currentSelectedSelectedSupervisionType) {
+        } else if (!this.state.trackerProgram) {
             this.setState({ loading: false }, () => NotificationManager.error('Please Select Supervision Type', null, 3000))
-        } else if (this.props.supervisions.find(supervision => supervision.organisationUnit.id === this.props.selectedNode.id && moment(supervision.period[0]).format('Do MMMM, YYYY')  === moment(this.state.dates[0]).format('Do MMMM, YYYY') && moment(supervision.period[1]).format('Do MMMM, YYYY')  === moment(this.state.dates[1]).format('Do MMMM, YYYY')   )) {
+        } else if (this.props.supervisions.find(supervision => supervision.organisationUnit.id === this.props.selectedNode.id && moment(supervision.period[0]).format('Do MMMM, YYYY') === moment(this.state.dates[0]).format('Do MMMM, YYYY') && moment(supervision.period[1]).format('Do MMMM, YYYY') === moment(this.state.dates[1]).format('Do MMMM, YYYY'))) {
             this.setState({ loading: false }, () => NotificationManager.error('It seems this supervision already exists', null, 3000))
         } else {
             const supervision = {}
@@ -89,6 +105,7 @@ export class Supervision extends Component {
             supervision.organisationUnit = this.props.selectedNode
             supervision.indicators = this.props.indicators
             supervision.otherSupervisors = this.state.otherSupervisors
+            supervision.program = this.state.trackerPrograms.find(program => program.id === this.state.trackerProgram)
 
             this.setState({ loading: false }, () => this.createSupervision(supervision))
         }
@@ -115,26 +132,29 @@ export class Supervision extends Component {
                     selectionMode="range"
                     readOnlyInput={true} />
 
-                <label for="supervisionType" className="form-label font-weight-bold mt-2 d-block">Supervision type</label>
+
+                <label for="trackerProgram" className="form-label font-weight-bold mt-2 d-block">Tracker Program</label>
                 <Dropdown
+                    filter
                     className="d-block"
                     optionLabel="name"
                     optionValue="code"
-                    value={this.state.currentSelectedSelectedSupervisionType}
-                    options={[{ name: 'Integrated Supervision', code: 'Integrated' }, { name: 'Specific Supervision', code: 'Specific' }]}
-                    onChange={e => { this.setState({ currentSelectedSelectedSupervisionType: e.value }) }}
-                    placeholder="Choose a Supervision Type" />
+                    value={this.state.trackerProgram}
+                    options={this.state.trackerPrograms.map(program => {
+                        return { name: program.displayName, code: program.id }
+                    })}
+                    onChange={e => { this.setState({ trackerProgram: e.value }) }}
+                    placeholder="Select a Tracker Program" />
 
-                <label for="description" className="form-label font-weight-bold mt-2 d-block">Add description</label>
+                <label for="description" className="form-label font-weight-bold mt-2 d-block">Description Label</label>
                 <textarea
                     id="description"
                     className="form-control"
                     onChange={this.handleChange}
                     value={this.state.description} ></textarea>
 
-                <label for="mainSupervisors" className="form-label font-weight-bold mt-2 d-block">
-                    Supervisors
-                </label>
+                <label for="mainSupervisors" className="form-label font-weight-bold mt-2 d-block">Supervisors</label>
+
                 <MultiSelect
                     id="mainSupervisors"
                     className="d-block"
@@ -144,9 +164,8 @@ export class Supervision extends Component {
                     onChange={e => this.setState({ selectedSupervisors: e.value })}
                     filter />
 
-                <label for="otherSupervisors" className="form-label font-weight-bold mt-2">
-                    Other Supervisors
-                </label>
+                <label for="otherSupervisors" className="form-label font-weight-bold mt-2">Other Supervisors</label>
+
                 <textarea id="otherSupervisors" className="form-control" onChange={this.handleOtherSupervisorsChange}>{this.state.otherSupervisors}</textarea>
 
                 <div className="row">
@@ -159,7 +178,7 @@ export class Supervision extends Component {
                                 value={this.state.useStepper}
                                 onChange={this.handleChange}
                                 className="form-check-input input-sm" />
-                         Use Stepper <em className="text-dark"> (Recommanded for huge datasets or complex forms) </em>
+                                       Use Stepper <em className="text-dark"> (Recommanded for huge datasets or complex forms) </em>
                         </label>
                     </div>
                 </div>
@@ -170,7 +189,8 @@ export class Supervision extends Component {
                     className="btn btn-sm btn-primary"
                     onClick={this.handleSupervisionCreation}>
                     Schedule
-                </button>
+                        </button>
+
             </div>
         </div>
     )
