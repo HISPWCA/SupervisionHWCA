@@ -20,11 +20,10 @@ export class Supervision extends Component {
         dates: null,
         loading: false,
         supervisors: [],
- 
+
         supervisions: [],
         settingsList: [],
- 
-        useStepper: true,
+
         description: null,
         trackerPrograms: [],
         trackerProgram: null,
@@ -32,9 +31,9 @@ export class Supervision extends Component {
 
         otherSupervisors: null,
         selectedNodeKeys: null,
- 
+
         selectedSupervisors: [],
-        
+
         currentSelectedOrgUnit: null,
         currentSelectedSupervisor: null,
     }
@@ -99,7 +98,6 @@ export class Supervision extends Component {
             supervision.status = 'Planned'
             supervision.owner = this.state.me
             supervision.period = this.state.dates
-            supervision.useStepper = this.state.useStepper
             supervision.description = this.state.description
             supervision.supervisors = this.state.selectedSupervisors
             supervision.organisationUnit = this.props.selectedNode
@@ -111,7 +109,7 @@ export class Supervision extends Component {
         }
     })
 
-    handleChange = event => event.target.type === 'checkbox' ? this.setState({ useStepper: event.target.checked }) : this.setState({ description: event.target.value })
+    handleChange = event =>  this.setState({ description: event.target.value })
 
     handleOtherSupervisorsChange = event => this.setState({ otherSupervisors: event.target.value })
 
@@ -168,28 +166,13 @@ export class Supervision extends Component {
 
                 <textarea id="otherSupervisors" className="form-control" onChange={this.handleOtherSupervisorsChange}>{this.state.otherSupervisors}</textarea>
 
-                <div className="row">
-                    <div className="col">
-                        <label className="form-check-label m-2" for="useStepper">
-                            <input
-                                id="useStepper"
-                                type="checkbox"
-                                checked={this.state.useStepper}
-                                value={this.state.useStepper}
-                                onChange={this.handleChange}
-                                className="form-check-input input-sm" />
-                                       Use Stepper <em className="text-dark"> (Recommanded for huge datasets or complex forms) </em>
-                        </label>
-                    </div>
-                </div>
-
                 <hr />
 
                 <button
                     className="btn btn-sm btn-primary"
                     onClick={this.handleSupervisionCreation}>
                     Schedule
-                        </button>
+                </button>
 
             </div>
         </div>

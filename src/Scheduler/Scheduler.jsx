@@ -197,12 +197,6 @@ export class Scheduler extends Component {
                             </tr>
                             <tr>
                                 <td>
-                                    <span className="font-weight-bold m-3 text-secondary">Use Stepper:</span>
-                                    {this.state.selectedSupervision.useStepper ? 'Yes' : 'No'}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
                                     <span className="font-weight-bold m-3 text-secondary">Organisation Unit:</span>
                                     {this.state.selectedSupervision.organisationUnit.displayName}
                                 </td>
@@ -499,7 +493,7 @@ export class Scheduler extends Component {
 
             <LoadingOverlay spinner active={this.state.loading} text='Processing ...' >
                 {
-                    <div className='row my-3'>
+                    <div className='row my-1'>
                         <div className='col text-left'>
                             <button
                                 className={
@@ -661,7 +655,7 @@ export class Scheduler extends Component {
                                 <table className="table table-hover table-primary table-sm table-striped text-left ">
                                     <thead>
                                         <th>Org. Unit</th>
-                                        <th>Sup. Type</th>
+                                        <th>Program Form</th>
                                         <th>Start Date - End Date</th>
                                         <th>Status</th>
                                         <th>Action</th>
@@ -675,7 +669,7 @@ export class Scheduler extends Component {
                                             .map(s => (
                                                 <tr key={s.id}>
                                                     <td title={s.description}>{s.organisationUnit.displayName}</td>
-                                                    <td title={s.description}>{s.type}</td>
+                                                    <td title={s.description}>{s.program.displayName}</td>
                                                     <td>
                                                         {moment(s.period[0]).format('Do MMMM, YYYY')}
                                                         <span className="font-weight-bold m-3 text-secondary"> - </span>
@@ -688,7 +682,7 @@ export class Scheduler extends Component {
                                                             className="btn btn-sm btn-light"
                                                             title="Display details">
                                                             Details
-                                                </button>
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             ))}
@@ -879,14 +873,6 @@ export class Scheduler extends Component {
                                 </div>
 
                                 {this.state.periodType && <strong className="d-block mt-1">Select {this.state.periodType}  </strong>}
-
-                                {/* <input
-                                    className="form-control"
-                                    type="month"
-                                    name="start"
-                                    onChange={e => this.setState({ selectedPeriod: e.target.value })}
-                                    value={this.state.selectedPeriod} /> */}
-
 
                                 {this.state.periodType === 'Day' && <DatePicker id="period" onChange={this.onDateSelection} />}
                                 {this.state.periodType === 'Week' && <DatePicker id="period" picker="week" format={'yyyyW'} onChange={this.onDateSelection} />}

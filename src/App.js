@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import './App.css'
-import Header from './Header/Header'
 import Body from './Body/Body'
 import Footer from './Footer/Footer'
 import { Provider } from '@dhis2/app-runtime'
@@ -42,11 +41,11 @@ class App extends Component {
 
   render() {
     return (
-      <Provider config={{ apiVersion: 33, baseUrl: BASE_ROUTE }}>
+      <Provider config={{ apiVersion: 29, baseUrl: BASE_ROUTE }}>
         <HeaderBar appName='Supervision Management' />
         {
           (!this.state.globalSettingsCreated || !this.state.indicatorsCreated || !this.state.settingsCreated || !this.state.supervisionsCreated) &&
-          <div className="row align-middle my-5">
+          <div className="row my-5">
             <div className="col">
               {!this.state.globalSettingsCreated && <div className="d-block text-info m-1">Creating App Settings</div>}
               {this.state.globalSettingsCreated && <div className="d-block text-primary m-1">App Settings successfully created</div>}
@@ -63,11 +62,8 @@ class App extends Component {
           </div>
         }
 
-
-
         {this.state.globalSettingsCreated && this.state.indicatorsCreated && this.state.settingsCreated && this.state.supervisionsCreated &&
-          <div className='container-fluid m-3'>
-            <Header />
+          <div className='container-fluid'>
             <Body />
             <Footer />
           </div>

@@ -5,11 +5,10 @@ import Scheduler from '../Scheduler/Scheduler';
 import './Body.css'
 
 const Body = () =>
-    <div className="m-3">
+    <React.Fragment>
         <Scheduler />
         <Settings />
-
         <NotificationContainer />
-    </div>
+    </React.Fragment>
 
 export default Body
