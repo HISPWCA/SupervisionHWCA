@@ -1,5 +1,4 @@
 import React from 'react';
-import { NotificationContainer } from 'react-notifications';
 import Settings from '../Settings/Settings';
 import Scheduler from '../Scheduler/Scheduler';
 import './Body.css'
@@ -8,7 +7,6 @@ const Body = () =>
     <React.Fragment>
         <Scheduler />
         <Settings />
-        <NotificationContainer />
     </React.Fragment>
 
 export default Body

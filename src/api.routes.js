@@ -12,7 +12,7 @@ export const ORGANISATION_UNITS_ROUTE = API_BASE_ROUTE.concat('/organisationUnit
 
 export const SUPERVISORS_ROUTE = API_BASE_ROUTE.concat('/users.json?paging=false')
 
-export const ME_ROUTE = API_BASE_ROUTE.concat('/me.json?fields=id,displayName')
+export const ME_ROUTE = API_BASE_ROUTE.concat('/me.json?fields=id,displayName,userGroups')
 
 export const INDICATORS_ROUTE = API_BASE_ROUTE.concat('/dataStore/SupervisionHWCA/indicators')
 
@@ -31,3 +31,5 @@ export const ORGANISATION_UNIT_GROUP_SET_ROUTE = API_BASE_ROUTE.concat('/organis
 export const PERIOD_TYPE_ROUTE = API_BASE_ROUTE.concat('/periodTypes.json?paging=false')
 
 export const ANALYTICS_ROUTE = API_BASE_ROUTE.concat('/analytics.json?dimension=dx:')
+
+export const USER_GROUPS_ROUTE = API_BASE_ROUTE.concat('/userGroups.json?paging=false')

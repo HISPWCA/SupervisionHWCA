@@ -6,6 +6,7 @@ import { Provider } from '@dhis2/app-runtime'
 import { API_BASE_ROUTE, GLOBAL_SETTINGS_ROUTE, INDICATORS_ROUTE, SETTINGS_ROUTE, SUPERVISIONS_ROUTE } from './api.routes'
 import { HeaderBar } from '@dhis2/ui'
 import axios from 'axios'
+import { NotificationContainer } from 'react-notifications';
 
 const BASE_ROUTE = API_BASE_ROUTE.substring(0, API_BASE_ROUTE.indexOf('/api'))
 
@@ -62,10 +63,12 @@ class App extends Component {
           </div>
         }
 
-        {this.state.globalSettingsCreated && this.state.indicatorsCreated && this.state.settingsCreated && this.state.supervisionsCreated &&
+        {
+        this.state.globalSettingsCreated && this.state.indicatorsCreated && this.state.settingsCreated && this.state.supervisionsCreated &&
           <div className='container-fluid'>
             <Body />
             <Footer />
+            <NotificationContainer />
           </div>
         }
       </Provider>

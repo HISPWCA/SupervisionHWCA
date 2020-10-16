@@ -489,7 +489,10 @@ export class Scheduler extends Component {
 
     render = () => (
         <React.Fragment>
-            <Header title='Plannification' />
+            <Header
+                title='Plannification'
+                me={this.state.me}
+                settings={this.state.settings} />
 
             <LoadingOverlay spinner active={this.state.loading} text='Processing ...' >
                 {

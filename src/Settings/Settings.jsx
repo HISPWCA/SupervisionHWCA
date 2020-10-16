@@ -593,12 +593,48 @@ export class Settings extends Component {
                 .catch(error => NotificationManager.error(error.message, null, 3000))
                 
 
+                userHasPartialAccess = setting => {
+                    const ids = this.state.me.userGroups.map(group => group.id)
+                    const dis = setting.partialAccessGroups.map(group => group.id)
+            
+                    for (let i = 0; i < ids.length; i++) {
+                        for (let j = 0; j < dis.length; j++) {
+                            if (ids[i] === dis[j])
+                                return true
+                        }
+                    }
+            
+                    return false
+                }
+            
+            
+                userHasFullAccess = setting => {
+                    const ids = this.state.me.userGroups.map(group => group.id)
+                    const dis = setting.fullAccessGroups.map(group => group.id)
+            
+                    for (let i = 0; i < ids.length; i++) {
+                        for (let j = 0; j < dis.length; j++) {
+                            if (ids[i] === dis[j])
+                                return true
+                        }
+                    }
+            
+                    return false
+                }
+            
+
     removeSettingFromDataStore   = () => {
                 const settingsList = this.state.settingsList.filter(setting => setting.id !== this.state.setting.id)
 
                     axios.put(SETTINGS_ROUTE, settingsList)
                         .then(() => axios.get(SETTINGS_ROUTE)
-                            .then(response => this.setState({ displaySettingList: false, setting: null, settings:[], settingsList: response.data, settingName: null, indicatorsSettings: [] }, () => this.retrieveSettingsFromDataStore() ))
+                            .then(response => this.setState({ displaySettingList: false,
+                                 setting: null, 
+                                 settings:[],
+                                  settingsList: response.data.filter(setting => setting.me.id === this.state.me.id ||
+                                this.userHasPartialAccess(setting) ||
+                                this.userHasFullAccess(setting)
+                            ), settingName: null, indicatorsSettings: [] }, () => this.retrieveSettingsFromDataStore() ))
                             .catch(error => NotificationManager.error(error.message, null, 3000)))
                         .catch(error => NotificationManager.error(error.message, null, 3000))
     }
@@ -612,9 +648,7 @@ export class Settings extends Component {
         {
             this.state.setting &&    <div className="row text-center alert alert-primary m-1 mt-3">
                 
-                <button onClick={() => this.removeSettingFromDataStore()} className="btn btn-sm btn-dark m-2">
-                    Delete
-                </button>
+                { (this.state.me.id === this.state.setting.me.id || this.userHasFullAccess(this.state.setting)) && <button onClick={() => this.removeSettingFromDataStore()} className="btn btn-sm btn-dark m-2"> Delete </button>  }
                 
                 <button className="btn btn-link m-2">
                     <strong className="text-uppercase"> {this.state.setting.name} </strong>
