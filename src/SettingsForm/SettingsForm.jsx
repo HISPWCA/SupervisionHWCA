@@ -12,11 +12,8 @@ export class SettingsForm extends Component {
         name: '',
         label: '',
         weight: 0,
-        best: 0,
-        worst: 0,
         me: null,
         categories: [],
-        usePercentages: true,
         selectedIndicators: [],
         selectedTrackerProgram: SELECT,
         hightIsGood: this.props.currentSelectedIndicator.hightIsGood,
@@ -26,11 +23,8 @@ export class SettingsForm extends Component {
         {
             label: this.props.currentSelectedIndicator.label ? this.props.currentSelectedIndicator.label : this.props.currentSelectedIndicator.name,
             weight: this.props.currentSelectedIndicator.weight ? this.props.currentSelectedIndicator.weight : 0,
-            worst: this.props.currentSelectedIndicator.weight ? this.props.currentSelectedIndicator.worst : 0,
-            best: this.props.currentSelectedIndicator.best ? this.props.currentSelectedIndicator.best : 0,
             name: this.props.currentSelectedIndicator ? this.props.currentSelectedIndicator.name : '',
             selectedTrackerProgram: this.props.currentSelectedIndicator.selectedTrackerProgram,
-            usePercentages: this.props.currentSelectedIndicator.usePercentages,
             hightIsGood: this.props.currentSelectedIndicator.hightIsGood,
             id: this.props.currentSelectedIndicator.id,
             categories: this.props.categoriesForm,
@@ -247,36 +241,6 @@ export class SettingsForm extends Component {
                             </div>
                         </div>
 
-                        <div className="row m-2">
-                            <div className="col p-1">
-                                <label className="form-label" for="best">Best</label>
-                                <input
-                                    id="best"
-                                    name="best"
-                                    placeholder="Best"
-                                    autoComplete="off"
-                                    type="number"
-                                    value={this.state.best}
-                                    onChange={this.handleChange}
-                                    className="form-control input-sm" />
-                            </div>
-                        </div>
-
-                        <div className="row m-2">
-                            <div className="col p-1">
-                                <label className="form-label" for="worst">Worst</label>
-                                <input
-                                    id="worst"
-                                    name="worst"
-                                    placeholder="Worst"
-                                    autoComplete="off"
-                                    type="number"
-                                    value={this.state.worst}
-                                    onChange={this.handleChange}
-                                    className="form-control input-sm" />
-                            </div>
-                        </div>
-
                         <div className="row m-3">
                             <div className="row p-1">
                                 <div className="col">
@@ -291,23 +255,6 @@ export class SettingsForm extends Component {
                                             className="form-check-input input-sm" />
 
                                         <label className="form-check-label" for="hightIsGood">High is Good</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="row p-1">
-                                <div className="col">
-                                    <div className="form-check text-left">
-                                        <input
-                                            id="usePercentages"
-                                            name="usePercentages"
-                                            type="checkbox"
-                                            checked={this.state.usePercentages}
-                                            value={this.state.usePercentages}
-                                            onChange={this.handleChange}
-                                            className="form-check-input input-sm" />
-
-                                        <label className="form-check-label" for="usePercentages">Use Percentages</label>
                                     </div>
                                 </div>
                             </div>

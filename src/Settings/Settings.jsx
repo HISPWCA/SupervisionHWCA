@@ -173,41 +173,37 @@ export class Settings extends Component {
 
     programClassNameProvider = program => this.state.selectedProgram && this.state.selectedProgram.id === program.id ? 'col text-left SelectedSetting  m-1 p-3' : 'col text-left Settings  m-1 p-3'
 
-    displayAggregatedIndicators = () => {
-        if (this.state.currentAction === C_AGGREGATED_INDICATORS) {
-            return (
-                this.state.initialAggregatedIndicatorsWithGroups
-                    .filter((i, index) => index >= this.state.aggregatedFirstPage && index <= (this.state.aggregatedFirstPage + 5))
-                    .filter(group => group.displayName.toLowerCase().includes(this.state.indicatorGroupNameFilter.toLowerCase()))
-                    .map(indicatorGroup => (
-                        <div className="row" key={indicatorGroup.id}>
-                            <div className={this.aggregatedIndicatorClassNameProvider(indicatorGroup)}
-                                onClick={() => this.handleAggregatedIndicatorsClick(indicatorGroup)}>
-                                {indicatorGroup.displayName}
-                            </div>
-                        </div>
-                    ))
+    displayAggregatedIndicators = () =>  this.state.currentAction === C_AGGREGATED_INDICATORS && 
+    <div style={ { maxHeight: '600px', overflow:'auto' } } >
+        {
+            this.state.initialAggregatedIndicatorsWithGroups
+            .filter(group => group.displayName.toLowerCase().includes(this.state.indicatorGroupNameFilter.toLowerCase()))
+            .map(indicatorGroup => 
+                <div className="row" key={indicatorGroup.id}>
+                    <div className={this.aggregatedIndicatorClassNameProvider(indicatorGroup)}
+                        onClick={() => this.handleAggregatedIndicatorsClick(indicatorGroup)}>
+                        {indicatorGroup.displayName}
+                    </div>
+                </div>
             )
         }
-    }
-
-    displayPrograms = () => {
-        if (this.state.currentAction === C_PROGRAM_INDICATORS) {
-            return (
-                this.state.initialAggregatedIndicatorsWithGroups
-                    .filter((i, index) => index >= this.state.programsFirstPage && index <= (this.state.programsFirstPage + 5))
-                    .filter(group => group.displayName.toLowerCase().includes(this.state.programGroupNameFilter.toLowerCase()))
-                    .map(program => (
-                        <div className="row" key={program.id}>
-                            <div className={this.programClassNameProvider(program)}
-                                onClick={() => this.handleProgramClick(program)}>
-                                {program.displayName}
-                            </div>
-                        </div>
-                    ))
+    </div>
+    
+    displayPrograms = () =>  this.state.currentAction === C_PROGRAM_INDICATORS && 
+    <div style={ { maxHeight: '600px', overflow:'auto' } } >
+        {
+            this.state.initialAggregatedIndicatorsWithGroups
+            .filter(group => group.displayName.toLowerCase().includes(this.state.programGroupNameFilter.toLowerCase()))
+            .map(program => 
+                <div className="row" key={program.id}>
+                    <div className={this.programClassNameProvider(program)}
+                        onClick={() => this.handleProgramClick(program)}>
+                        {program.displayName}
+                    </div>
+                </div>
             )
         }
-    }
+    </div>
 
     handleAggregatedIndicatorsClick = indicator => this.setState({ selectedAggregatedIndicator: indicator })
 
@@ -375,14 +371,14 @@ export class Settings extends Component {
                     .filter(i => !this.state.selectedIndicators.filter(indicator => indicator.me.id === this.state.me.id)
                     .map(ai => ai.id).includes(i.id))
                     .filter(indicator => indicator.displayName.toLowerCase().includes(this.state.aggregatedIndicatorNameFilter.toLowerCase()))
-                    .map(indicator => (
+                    .map(indicator => 
                         <div className="row" key={indicator.id}>
                             <div className={'col text-left Settings m-1 p-3'}
                                 onClick={() => this.handleCurrentSelectedIndicator(indicator)}>
                                 {indicator.displayName}
                             </div>
                         </div>
-                    ))
+                    )
             }
 
             {this.state.selectedAggregatedIndicator.indicators.length === 0 && <div className='alert alert-warning'> Nothing to display</div>}
@@ -418,14 +414,14 @@ export class Settings extends Component {
                             this.state.selectedProgramIndicators
                                 .filter(i => !this.state.selectedIndicators.map(ai => ai.id).includes(i.id))
                                 .filter(indicator => indicator.displayName.toLowerCase().includes(this.state.programIndicatorNameFilter.toLowerCase()))
-                                .map(indicator => (
+                                .map(indicator => 
                                     <div className="row" key={indicator.id}>
                                         <div className={'col text-left Settings m-1 p-3'}
                                             onClick={() => this.handleCurrentSelectedIndicator(indicator)}>
                                             {indicator.displayName}
                                         </div>
                                     </div>
-                                ))
+                                )
                         }
                     </div>
                 )
@@ -444,14 +440,14 @@ export class Settings extends Component {
             {
                 this.state.selectedIndicators
                 .filter(indicator => indicator.me.id === this.state.me.id)
-                .map(indicator => (
+                .map(indicator => 
                     <div className="row" key={indicator}>
                         <div className={'col text-left Settings m-1 p-3'}
                             onClick={() => this.handleCurrentSelectedIndicator(indicator)}>
                             {indicator.label}
                         </div>
                     </div>
-                ))
+                )
             }
         </div>
     )
@@ -497,15 +493,15 @@ export class Settings extends Component {
 
     displayIndicatorsSettingForm = () => this.state.currentSelectedIndicator && 
          <SettingsForm
-            removeCurrentSelectedIndicator={this.removeCurrentSelectedIndicator}
-            handleIndicatorsUpdateFromServer={this.handleIndicatorsUpdateFromServer}
             reloadCategories={this.reloadCategories}
+            categoriesForm={this.state.categoriesForm}
+            trackerPrograms={this.state.trackerPrograms}
             handleIndicatorRemoval={this.handleIndicatorRemoval}
             updateSelectedIndicators={this.updateSelectedIndicators}
-            trackerPrograms={this.state.trackerPrograms}
-            categoriesForm={this.state.categoriesForm}
-            selectedIndicators={this.state.selectedIndicators.filter(indicator => indicator.me.id === this.state.me.id)}
-            currentSelectedIndicator={this.state.currentSelectedIndicator} />
+            currentSelectedIndicator={this.state.currentSelectedIndicator} 
+            removeCurrentSelectedIndicator={this.removeCurrentSelectedIndicator}
+            handleIndicatorsUpdateFromServer={this.handleIndicatorsUpdateFromServer}
+            selectedIndicators={this.state.selectedIndicators.filter(indicator => indicator.me.id === this.state.me.id)} />
 
     onAggragatedIndicatorPageChange = event => this.setState({ aggregatedFirstPage: event.first, aggregatedNumRows: event.rows })
 
@@ -577,7 +573,12 @@ export class Settings extends Component {
             .get(SETTINGS_ROUTE)
             .then(response => this.setState({ settingsList: response.data }, () => {
                 const settingsList = this.state.settingsList
-                settingsList.push({ id: uuidv4(),me: this.state.me, name: this.state.settingName, indicators: this.state.indicatorsSettings})
+                settingsList.push({ id: uuidv4(),me: this.state.me, name: this.state.settingName, indicators: this.state.indicatorsSettings.map(indicator => {
+                    if(!indicator.hightIsGood)
+                        indicator.weight = '-'.concat(indicator.weight)
+
+                    return indicator
+                })})
 
                 axios.put(SETTINGS_ROUTE, settingsList)
                 .then(() => axios.get(SETTINGS_ROUTE)
@@ -675,16 +676,17 @@ export class Settings extends Component {
                                 <td>{setting.best}</td>
                                 <td>{setting.worst}</td>
                                 <td>{setting.weight}</td>
-                                <td>{setting.categories.map(c =>
+                                <td> { setting.categories.map(c =>
                                     <div className="row m-1 Settings">
                                         <div className="col">{c.category}</div>
                                         <div className="col"><span style={{ width: '100px', minWidth: '100px', maxWidth: '100px', height: '50px', backgroundColor: c.color }}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
                                         <div className="col font-weight-bold">Min: {c.min}</div>
                                         <div className="col font-weight-bold">Max: {c.max}</div>
                                     </div>
-                                )}
+                                ) }
                                 </td>
-                            </tr>)
+                            </tr>
+                            )
                         }
                     </tbody>
                 </table>
@@ -694,7 +696,6 @@ export class Settings extends Component {
             {
                 <div className="row m-1 text-center alert alert-primary" style={{ maxHeight: '300px', overflow: 'auto' }} >
                     
-
                     <table className="table table-sm table-hover text-left table-primary table-striped">
                         <thead>
                             <th>Name</th>
@@ -755,7 +756,7 @@ render = () => (
                         <button className="btn btn-primary"
                             disabled={!this.state.settingName || this.state.settingName.length === 0  || this.state.indicatorsSettings.length === 0}
                             onClick={this.handleSettingCreation}>
-                            Save setting
+                            Save Setting
                         </button>
 
                         <button className="btn btn-light" onClick={() => this.retrieveSettingsFromDataStore() }>
@@ -766,20 +767,17 @@ render = () => (
 
             <div className="row m-1 mt-0 alert alert-primary">
                 <div className="col">
-
                     {this.displayParentTitle()}
                     
                     { this.state.currentAction === C_AGGREGATED_INDICATORS && <input type="search" className="my-2 form-control input-sm" onChange={e => this.setState({ indicatorGroupNameFilter: e.target.value })} /> } 
-                     { this.state.currentAction === C_PROGRAM_INDICATORS && <input type="search" className="my-2 form-control input-sm" onChange={e => this.setState({ programGroupNameFilter: e.target.value })} /> }
+                  
+                    { this.state.currentAction === C_PROGRAM_INDICATORS && <input type="search" className="my-2 form-control input-sm" onChange={e => this.setState({ programGroupNameFilter: e.target.value })} /> }
 
                     {this.displayAggregatedIndicators()}
 
                     {this.displayPrograms()}
 
-                    {this.handlePagination()}
-
                     {this.createCategoryForm()}
-
                 </div>
 
                 {this.displayAggregatedIndicatorChildrens()}

@@ -719,14 +719,14 @@ export class Scheduler extends Component {
                             <button
                                 disabled
                                 onClick={() => this.setState({ selectedConfig: C_BASED_ON_SUPERVISION_FREQUENCIES })}
-                                className="btn btn-sm btn-primary m-1">
+                                className="btn btn-sm btn-primary m-1 d-none">
                                 {C_BASED_ON_SUPERVISION_FREQUENCIES}
                             </button>
 
                             <button
                                 disabled
                                 onClick={() => this.setState({ selectedConfig: C_BASED_ON_SUPERVISION_PERIOD })}
-                                className="btn btn-sm btn-primary m-1">
+                                className="btn btn-sm btn-primary m-1 d-none">
                                 {C_BASED_ON_SUPERVISION_PERIOD}
                             </button>
                         </div>
