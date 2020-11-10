@@ -243,7 +243,7 @@ export class Settings extends Component {
                             onSubmit={async values => {
 
                                 const category = values.category
-                                if (category && category !== null && category !== undefined && category.trim().length > 0) {
+                                if (category && category.trim().length > 0) {
                                     const defaultColor = '#eb1111'
 
                                     values.id = uuidv4()
@@ -454,8 +454,8 @@ export class Settings extends Component {
 
 
     handleIndicatorRemoval = indicator => {
-        if (indicator && indicator !== null && indicator !== undefined) {
-            const indicators = [...this.state.selectedIndicators.filter(indicator => indicator.me.id === this.state.me.id)]
+        if (indicator) {
+            const indicators = [...this.state.selectedIndicators.filter(i => i.me.id === this.state.me.id)]
             const updatedIndicators = indicators.filter(i => i.id !== indicator.id)
 
             this.setState({ currentSelectedIndicator: null }, () => this.handleIndicatorsUpdateFromServer(updatedIndicators))
@@ -513,13 +513,12 @@ export class Settings extends Component {
 
     displayUsePercentage = () => {
         const usePercentage = this.state.globalSettings.usePercentage
-        if (usePercentage === null || usePercentage === undefined) {
+        if (usePercentage === null || usePercentage === undefined) 
             return 'Not yet defined (Default is True)'
-        } else if (usePercentage) {
+         else if (usePercentage) 
             return 'True'
-        } else {
+         else 
             return 'False'
-        }
     }
 
     handlePagination = () => {
@@ -582,7 +581,7 @@ export class Settings extends Component {
 
                 axios.put(SETTINGS_ROUTE, settingsList)
                 .then(() => axios.get(SETTINGS_ROUTE)
-                                 .then(response => this.setState({ settingsList: response.data, settingName: null, indicatorsSettings: [] }, () => NotificationManager.success( 'Settings successfully saved', null, 3000)))
+                                 .then(resp => this.setState({ settingsList: resp.data, settingName: null, indicatorsSettings: [] }, () => NotificationManager.success( 'Settings successfully saved', null, 3000)))
                                  .catch(error => NotificationManager.error(error.message, null, 3000)))
                 .catch(error => NotificationManager.error(error.message, null, 3000))
             }))
@@ -661,8 +660,6 @@ export class Settings extends Component {
                         <th>Label</th>
                         <th>Name</th>
                         <th>Hight is Good</th>
-                        <th>Best</th>
-                        <th>Worst</th>
                         <th>Weight</th>
                         <th>Categories</th>
                     </thead>
@@ -673,8 +670,6 @@ export class Settings extends Component {
                                 <td className="text-left">{setting.label}</td>
                                 <td className="text-left">{setting.name}</td>
                                 <td>{setting.hightIsGood ? 'Yes' : 'No'}</td>
-                                <td>{setting.best}</td>
-                                <td>{setting.worst}</td>
                                 <td>{setting.weight}</td>
                                 <td> { setting.categories.map(c =>
                                     <div className="row m-1 Settings">

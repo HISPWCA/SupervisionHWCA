@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { Component } from 'react';
-import { INDICATORS_ROUTE, ME_ROUTE } from '../api.routes';
+import { INDICATORS_ROUTE } from '../api.routes';
 import { NotificationManager } from 'react-notifications';
 
 const SELECT = 'Select ..'
@@ -34,11 +34,11 @@ export class SettingsForm extends Component {
     handleChange = event => {
         const name = event.target.name
 
-        if (event.target.type === 'select-one') {
+        if (event.target.type === 'select-one') 
             this.setState({ [name]: event.target.value === SELECT ? event.target.value : JSON.parse(event.target.value) })
-        } else if (event.target.type === 'checkbox') {
+        else if (event.target.type === 'checkbox') 
             this.setState({ [name]: event.target.checked })
-        } else if (name.endsWith('min') && name !== 'min') {
+         else if (name.endsWith('min') && name !== 'min') {
             const categories = [...this.props.categoriesForm]
 
             const category = categories.find(c => name === c.category.concat('_min'))
@@ -59,9 +59,8 @@ export class SettingsForm extends Component {
 
             this.setState({ categories }, () => this.props.reloadCategories(categories))
 
-        } else {
+        } else 
             this.setState({ [name]: event.target.value })
-        }
     }
 
 
@@ -85,31 +84,29 @@ export class SettingsForm extends Component {
         const indicator = indicators.find(i => i.id === this.state.id)
         const index = indicators.indexOf(indicator)
 
-        if (indicators.length === 0 || index === -1) {
+        if (indicators.length === 0 || index === -1) 
             indicators.push(this.state)
-        } else {
+         else 
             indicators[index] = this.state
-        }
+
         this.props.handleIndicatorsUpdateFromServer(indicators)
     }
 
 
     retrieveMinValue = id => {
         const category = this.state.categories.filter(c => c.id === id)[0]
-        if (category) {
+        if (category) 
             return category.min
-        } else {
+         else 
             return 0
-        }
     }
 
     retrieveMaxValue = id => {
         const category = this.state.categories.filter(c => c.id === id)[0]
-        if (category) {
+        if (category) 
             return category.max
-        } else {
+         else 
             return 100
-        }
     }
 
     deleteCategory = id => {

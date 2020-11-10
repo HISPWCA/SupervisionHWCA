@@ -2,14 +2,13 @@ import axios from 'axios'
 import { Tree } from 'primereact/tree'
 import React, { Component } from 'react'
 import { NotificationManager } from 'react-notifications'
-import { SUPERVISORS_ROUTE, ME_ROUTE, SUPERVISIONS_ROUTE, TRACKER_PROGRAMS_ROUTE } from '../api.routes'
+import { SUPERVISORS_ROUTE, ME_ROUTE, SUPERVISIONS_ROUTE, TRACKER_PROGRAMS_ROUTE, TRACKED_ENTITY_ATTRIBUTES_ROUTE,ENROLLMENTS_ROUTE, EVENTS_ROUTE, TRACKED_ENTITY_INSTANCES_ROUTE } from '../api.routes'
 import { Calendar } from 'primereact/calendar'
 import { v4 as uuidv4 } from 'uuid'
 import LoadingOverlay from 'react-loading-overlay'
 import { MultiSelect } from 'primereact/multiselect'
 import moment from 'moment'
 import { Dropdown } from 'primereact/dropdown'
-
 
 
 
@@ -20,6 +19,8 @@ export class Supervision extends Component {
         dates: null,
         loading: false,
         supervisors: [],
+        
+        profileID: null,
 
         supervisions: [],
         settingsList: [],
@@ -80,19 +81,19 @@ export class Supervision extends Component {
 
 
     handleSupervisionCreation = () => this.setState({ loading: true }, () => {
-        if (this.state.dates === null) {
+        if (this.state.dates === null) 
             this.setState({ loading: false }, () => NotificationManager.error('Please Select date or Period', null, 3000))
-        } else if (!this.state.description || this.state.description.length === 0) {
+         else if (!this.state.description || this.state.description.length === 0) 
             this.setState({ loading: false }, () => NotificationManager.error('Please you should fill descripton', null, 3000))
-        } else if (!this.props.selectedNode) {
+         else if (!this.props.selectedNode) 
             this.setState({ loading: false }, () => NotificationManager.error('Please Select organisation unit', null, 3000))
-        } else if (this.state.selectedSupervisors.length === 0) {
+         else if (this.state.selectedSupervisors.length === 0) 
             this.setState({ loading: false }, () => NotificationManager.error('Please Select Supervisors', null, 3000))
-        } else if (!this.state.trackerProgram) {
+         else if (!this.state.trackerProgram) 
             this.setState({ loading: false }, () => NotificationManager.error('Please Select Supervision Type', null, 3000))
-        } else if (this.props.supervisions.find(supervision => supervision.organisationUnit.id === this.props.selectedNode.id && moment(supervision.period[0]).format('Do MMMM, YYYY') === moment(this.state.dates[0]).format('Do MMMM, YYYY') && moment(supervision.period[1]).format('Do MMMM, YYYY') === moment(this.state.dates[1]).format('Do MMMM, YYYY'))) {
+        else if (this.props.supervisions.find(supervision => supervision.organisationUnit.id === this.props.selectedNode.id && moment(supervision.period[0]).format('Do MMMM, YYYY') === moment(this.state.dates[0]).format('Do MMMM, YYYY') && moment(supervision.period[1]).format('Do MMMM, YYYY') === moment(this.state.dates[1]).format('Do MMMM, YYYY'))) 
             this.setState({ loading: false }, () => NotificationManager.error('It seems this supervision already exists', null, 3000))
-        } else {
+         else {
             const supervision = {}
             supervision.id = uuidv4()
             supervision.status = 'Planned'
@@ -105,9 +106,56 @@ export class Supervision extends Component {
             supervision.otherSupervisors = this.state.otherSupervisors
             supervision.program = this.state.trackerPrograms.find(program => program.id === this.state.trackerProgram)
 
-            this.setState({ loading: false }, () => this.createSupervision(supervision))
+            this.setState({ loading: false }, () => this.generateTrackedEntityInstanceWithEnrollmentAndEvent(supervision) )
         }
     })
+
+    generateTrackedEntityInstanceWithEnrollmentAndEvent = supervision => this.setState({loading: true },
+        ()=> axios.get(TRACKED_ENTITY_ATTRIBUTES_ROUTE.concat(supervision.program.programTrackedEntityAttributes[0].trackedEntityAttribute.id).concat('/generate.json'))
+                    .then(response => this.setState({loading:false}, () => {
+                        const tei = {}
+                        tei.trackedEntityType = supervision.program.trackedEntityType.id 
+                        tei.orgUnit = supervision.organisationUnit.id
+                        tei.attributes= [{attribute: response.data.ownerUid, value: response.data.value}]
+
+                        this.teiGenerator(tei, supervision)                         
+                    })).catch(error => this.setState({loading: false} , ()=> NotificationManager.error(error.message, null, 3000))))
+
+    teiGenerator = (tei, supervision) =>  axios.post(TRACKED_ENTITY_INSTANCES_ROUTE, tei)
+                    .then(resp => this.setState({ loading: false }, () => {
+                        const trackedEntityInstance = resp.data.response.importSummaries[0].reference
+                        const orgUnit = supervision.organisationUnit.id
+                        const program = supervision.program.id
+
+                        const enrollment = {}
+                            enrollment.trackedEntityInstance = trackedEntityInstance
+                            enrollment.program = program
+                            enrollment.orgUnit = orgUnit
+                            
+                            axios.post(ENROLLMENTS_ROUTE, enrollment)
+                            .then(res => {
+                                const e = {}
+                                e.events = supervision.program.programStages.map(programStage => ({
+                                    enrollment: res.data.response.importSummaries[0].reference,
+                                    dueDate: supervision.period[0],
+                                    programStage: programStage.id,
+                                    trackedEntityInstance,
+                                    status: 'SCHEDULE',
+                                    program,
+                                    orgUnit,
+                                }))
+
+                                this.eventsGenerator(e, supervision)                                    
+
+                            }).catch(error => this.setState({loading: false} , () => NotificationManager.error(error.message, null, 3000)))
+                            
+                    })).catch(error => this.setState({loading: false} , ()=> NotificationManager.error(error.message, null, 3000)))  
+
+
+    eventsGenerator = (e, supervision) => axios.post(EVENTS_ROUTE, e)
+        .then(() => this.setState({loading:false}, () => this.createSupervision(supervision)))
+        .catch(error => this.setState({loading: false} , () => NotificationManager.error(error.message, null, 3000)))
+
 
     handleChange = event =>  this.setState({ description: event.target.value })
 

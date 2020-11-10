@@ -23,7 +23,7 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import listPlugin from '@fullcalendar/list'
 import interactionPlugin from "@fullcalendar/interaction"
 
-import { DatePicker, Space } from 'antd'
+import { DatePicker } from 'antd'
 
 const C_PAGINATION_ROWS_PER_PAGE = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 const C_INDICATORS_BASED_CONFIGURATION = 'Indicators Based Configuration'
@@ -93,11 +93,11 @@ export class Scheduler extends Component {
         .catch(error => NotificationManager.error(error.message, null, 3000))
 
 
-    loadSupervisions = () => this.setState({ loading: true }, () => {
-        axios.get(SUPERVISIONS_ROUTE)
+    loadSupervisions = () => this.setState({ loading: true }, 
+        () =>    axios.get(SUPERVISIONS_ROUTE)
             .then(response => this.setState({ supervisions: [] }, () => this.setState({ supervisions: response.data, loading: false })))
             .catch(error => this.setState({ loading: false }, () => NotificationManager.error(error.message, null, 3000)))
-    })
+    )
 
 
     loadMe = () => axios.get(ME_ROUTE)
@@ -120,7 +120,7 @@ export class Scheduler extends Component {
                         <td>{s.owner.displayName}</td>
                         <td>{s.status}</td>
                         <td>
-                            <button className="btn btn-light rounded" >
+                            <button className="btn btn-light rounded">
                                 Details
                             </button>
                         </td>
@@ -153,9 +153,8 @@ export class Scheduler extends Component {
         }
     )
 
-    processSupervisionDeletion = supervision => this.setState({ loading: true }, () => {
-
-        axios.get(SUPERVISIONS_ROUTE)
+    processSupervisionDeletion = supervision => this.setState({ loading: true }, 
+        () => axios.get(SUPERVISIONS_ROUTE)
             .then(response => this.setState({ supervisions: response.data }, () => {
                 const supervisions = response.data.filter(s => s.id !== supervision.id)
 
@@ -172,7 +171,7 @@ export class Scheduler extends Component {
                         })
                     }).catch(error => this.setState({ loading: false }, () => NotificationManager.error(error.message, null, 3000)))
             })).catch(error => this.setState({ loading: false }, () => NotificationManager.error(error.message, null, 3000)))
-    })
+    )
 
     handleSupervisionDetails = selectedSupervision => this.setState({ displaySupervisionFormCreation: false, selectedSupervision })
 
@@ -255,7 +254,7 @@ export class Scheduler extends Component {
 
     onHandlePageChange = event => this.setState({ supervisionFirstPage: event.first, supervisionNumRows: event.rows })
 
-    renderPaginator = () => (this.state.supervisions.length > 0 && (
+    renderPaginator = () => (this.state.supervisions.length > 0 && 
         <div className='row'>
             <div className='col-3'>
                 <Paginator
@@ -267,7 +266,7 @@ export class Scheduler extends Component {
                     template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink" />
             </div>
         </div>
-    ))
+    )
 
 
     retrieveSettingsFromDataStore = () => axios.get(SETTINGS_ROUTE)
@@ -419,7 +418,6 @@ export class Scheduler extends Component {
             axios.get(route)
                 .then(response => this.setState({ filteredResults: response.data }, () => {
                     const indicatorScoreSuffix = ' Score'
-                    // const indicators = [...new Set(this.state.filteredResults.rows.map(row => row[0]))]
                     const indicators = [...new Set(this.state.selectedSetting.indicators.map(indicator => indicator.name))]
                     const organisationUnits = [...new Set(this.state.filteredResults.rows.map(row => row[1]))]
 
@@ -717,16 +715,14 @@ export class Scheduler extends Component {
                             </button>
 
                             <button
-                                disabled
                                 onClick={() => this.setState({ selectedConfig: C_BASED_ON_SUPERVISION_FREQUENCIES })}
-                                className="btn btn-sm btn-primary m-1 d-none">
+                                className="btn btn-sm btn-primary m-1 d-none-">
                                 {C_BASED_ON_SUPERVISION_FREQUENCIES}
                             </button>
 
                             <button
-                                disabled
                                 onClick={() => this.setState({ selectedConfig: C_BASED_ON_SUPERVISION_PERIOD })}
-                                className="btn btn-sm btn-primary m-1 d-none">
+                                className="btn btn-sm btn-primary m-1 d-none-">
                                 {C_BASED_ON_SUPERVISION_PERIOD}
                             </button>
                         </div>
@@ -743,8 +739,6 @@ export class Scheduler extends Component {
                                 <th>Label</th>
                                 <th>Name</th>
                                 <th>Hight is Good</th>
-                                <th>Best</th>
-                                <th>Worst</th>
                                 <th>Weight</th>
                                 <th>Categories</th>
                             </thead>
@@ -755,8 +749,6 @@ export class Scheduler extends Component {
                                         <td className="text-left">{setting.label}</td>
                                         <td className="text-left">{setting.name}</td>
                                         <td>{setting.hightIsGood ? 'Yes' : 'No'}</td>
-                                        <td>{setting.best}</td>
-                                        <td>{setting.worst}</td>
                                         <td>{setting.weight}</td>
                                         <td>{setting.categories.map(c =>
                                             <div className="row m-1 Settings">
