@@ -127,6 +127,8 @@ export class Supervision extends Component {
                         const orgUnit = supervision.organisationUnit.id
                         const program = supervision.program.id
 
+                        supervision.program.trackedEntityInstance = trackedEntityInstance
+
                         const enrollment = {}
                             enrollment.trackedEntityInstance = trackedEntityInstance
                             enrollment.program = program
@@ -134,6 +136,9 @@ export class Supervision extends Component {
                             
                             axios.post(ENROLLMENTS_ROUTE, enrollment)
                             .then(res => {
+
+                                supervision.program.enrollment = res.data.response.importSummaries[0].reference
+
                                 const e = {}
                                 e.events = supervision.program.programStages.map(programStage => ({
                                     enrollment: res.data.response.importSummaries[0].reference,

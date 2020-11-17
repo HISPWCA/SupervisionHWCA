@@ -402,7 +402,7 @@ export class Scheduler extends Component {
 
     performResultsLoading = () => {
         this.setState({ loading: true, resultLoadingPerformed: true }, () => {
-            const route = ANALYTICS_ROUTE.concat(this.state.selectedSetting.indicators.map(indicator => indicator.id).join(';'))
+            const route =  ANALYTICS_ROUTE.concat(this.state.selectedSetting.indicators.map(indicator => indicator.id).join(';')) 
                 .concat('&dimension=ou:OU_GROUP-')
                 .concat(this.state.selectedOrganisationUnitGroup.id)
                 .concat(';')
@@ -714,15 +714,15 @@ export class Scheduler extends Component {
                                 {C_ALL_ORGANISATION_UNITS}
                             </button>
 
-                            <button
+                             <button
                                 onClick={() => this.setState({ selectedConfig: C_BASED_ON_SUPERVISION_FREQUENCIES })}
-                                className="btn btn-sm btn-primary m-1 d-none-">
+                                className="btn btn-sm btn-primary m-1 d-none">
                                 {C_BASED_ON_SUPERVISION_FREQUENCIES}
-                            </button>
+                            </button> 
 
                             <button
                                 onClick={() => this.setState({ selectedConfig: C_BASED_ON_SUPERVISION_PERIOD })}
-                                className="btn btn-sm btn-primary m-1 d-none-">
+                                className="btn btn-sm btn-primary m-1 d-none">
                                 {C_BASED_ON_SUPERVISION_PERIOD}
                             </button>
                         </div>
@@ -773,9 +773,9 @@ export class Scheduler extends Component {
                 }
 
                 {
-                    this.state.selectedSetting &&
-                    this.state.displaySupervisionFormCreation &&
-                    this.state.selectedConfig === C_INDICATORS_BASED_CONFIGURATION &&
+                     this.state.selectedSetting &&
+                        this.state.displaySupervisionFormCreation &&
+                         this.state.selectedConfig === C_INDICATORS_BASED_CONFIGURATION   &&
                     <React.Fragment>
 
                         <div className="row m-1 alert alert-primary">
@@ -798,7 +798,7 @@ export class Scheduler extends Component {
                             </div>
 
                             <div className="col form-group">
-                                <strong className="d-block mt-2">Best</strong>
+                                <strong className="d-block mt-2">Best</strong> 
                                 <input
                                     type="number"
                                     placeholder="Best"
@@ -806,16 +806,21 @@ export class Scheduler extends Component {
                                     onChange={e => this.setState({ best: e.target.value })}
                                 />
 
-                                <strong className="d-block mt-2">Worst</strong>
+                                
+                                    <strong className="d-block mt-2">Worst</strong> 
+                                
                                 <input
                                     type="number"
                                     placeholder="Worst"
                                     className="form-control"
                                     onChange={e => this.setState({ worst: e.target.value })} />
 
-                                <label className="d-block mt-2">
-                                    <input type="checkbox" checked={this.state.hightIsGood} onChange={e => this.setState({ hightIsGood: e.target.checked })} /> <strong>Hight is good </strong>
-                                </label>
+                                {
+                                    this.state.selectedConfig === C_INDICATORS_BASED_CONFIGURATION && 
+                                    <label className="d-block mt-2">
+                                        <input type="checkbox" checked={this.state.hightIsGood} onChange={e => this.setState({ hightIsGood: e.target.checked })} /> <strong>Hight is good </strong>
+                                    </label>
+                                }
                             </div>
 
                             <div className="col px-3">
@@ -902,7 +907,7 @@ export class Scheduler extends Component {
                                         <span>Selected Period:</span> <strong> {moment(this.state.selectedPeriod).format(' MMMM, YYYY')} </strong>
                                         <span>Hight Is Good:</span> <strong> {this.state.hightIsGood ? 'Yes' : 'No'} </strong>
 
-                                        {this.state.selectedSetting.indicators.map(indicator => <React.Fragment> <span className="ml-2">{indicator.name}:</span> <strong>{indicator.weight}</strong> </React.Fragment>)}
+                                        { this.state.selectedConfig === C_INDICATORS_BASED_CONFIGURATION && this.state.selectedSetting.indicators.map(indicator => <React.Fragment> <span className="ml-2">{indicator.name}:</span> <strong>{indicator.weight}</strong> </React.Fragment>)}
                                     </div>
                                 }
 
