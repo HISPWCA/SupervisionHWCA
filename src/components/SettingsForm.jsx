@@ -2,8 +2,9 @@ import axios from 'axios';
 import React, { Component } from 'react';
 import { INDICATORS_ROUTE } from '../api.routes';
 import { NotificationManager } from 'react-notifications';
+import translate from '../utils/translator';
 
-const SELECT = 'Select ..'
+const SELECT = translate('Select')
 
 export class SettingsForm extends Component {
 
@@ -11,8 +12,8 @@ export class SettingsForm extends Component {
         id: '',
         name: '',
         label: '',
-        weight: 0,
         me: null,
+        weight: 0,
         categories: [],
         selectedIndicators: [],
         selectedTrackerProgram: SELECT,
@@ -128,8 +129,8 @@ export class SettingsForm extends Component {
 
                     <div className="col text-left m-2">
                         <div style={{ textTransform: 'capitalize' }}>
-                            <strong title="Delete this Category"
-                                class="m-3 font-weight-bold text-danger cursorPointer"
+                            <strong title={translate('DeleteThisCategory')}
+                                className="m-3 font-weight-bold text-danger cursorPointer"
                                 onClick={() => this.deleteCategory(c.id)}>
                                 x
                             </strong>
@@ -138,7 +139,7 @@ export class SettingsForm extends Component {
 
                         <div className="row">
                             <div className="col-2 mt-2">
-                                Min
+                                {translate('Min')}
                             </div>
                             <div className="col">
                                 <input type="number"
@@ -148,7 +149,7 @@ export class SettingsForm extends Component {
                                     className="form-control" />
                             </div>
                             <div className="col-2 mt-2">
-                                Max
+                                {translate('Max')}
                             </div>
 
                             <div className="col">
@@ -172,14 +173,13 @@ export class SettingsForm extends Component {
                     <div className="col">
                         <div className="mb-1 px-1 text-left">
                             <strong>
-                                Settings
+                                {translate('Settings')}
                             </strong>
                         </div>
                     </div>
                 </div>
 
                 <div className="form-group alert alert-secondary" role="alert">
-
                     <form onSubmit={this.handleSubmit} className="form-group text-left">
 
                         <input
@@ -191,12 +191,12 @@ export class SettingsForm extends Component {
                         <div className="row m-2">
                             <div className="col p-1">
 
-                                <label className="form-label" for="name">Name</label>
+                                <label className="form-label" for="name">{translate('Name')}</label>
                                 <input
                                     id="name"
                                     name="name"
                                     type="text"
-                                    placeholder="Name"
+                                    placeholder={translate('Name')}
                                     autoComplete="off"
                                     readOnly
                                     disabled
@@ -209,12 +209,11 @@ export class SettingsForm extends Component {
 
                         <div className="row m-2">
                             <div className="col p-1">
-
-                                <label className="form-label" for="label">Label</label>
+                                <label className="form-label" for="label">{translate('Label')}</label>
                                 <input
                                     id="label"
                                     name="label"
-                                    placeholder="Label"
+                                    placeholder={translate('Label')}
                                     autoComplete="off"
                                     type="text"
                                     value={this.state.label}
@@ -225,11 +224,11 @@ export class SettingsForm extends Component {
 
                         <div className="row m-2">
                             <div className="col p-1">
-                                <label className="form-label" for="weight">Weight</label>
+                                <label className="form-label" for="weight">{translate('Weight')}</label>
                                 <input
                                     id="weight"
                                     name="weight"
-                                    placeholder="Weight"
+                                    placeholder={translate('Weight')}
                                     autoComplete="off"
                                     type="number"
                                     value={this.state.weight}
@@ -251,7 +250,7 @@ export class SettingsForm extends Component {
                                             onChange={this.handleChange}
                                             className="form-check-input input-sm" />
 
-                                        <label className="form-check-label" for="hightIsGood">High is Good</label>
+                                        <label className="form-check-label" for="hightIsGood">{translate('HighIsGood')}</label>
                                     </div>
                                 </div>
                             </div>
@@ -266,7 +265,7 @@ export class SettingsForm extends Component {
 
                                         <div className="row m-2">
                                             <div className="col">
-                                                Categories
+                                                {translate('Categories')}
                                             </div>
                                         </div>
 
@@ -276,30 +275,28 @@ export class SettingsForm extends Component {
                             )
                         }
 
-
                         <hr />
                         <div className="row p-3">
                             <div className="col">
                                 <div className="btn-group">
-
                                     <button
                                         className="btn btn-danger btn-sm"
                                         type="button"
                                         onClick={() => this.props.handleIndicatorRemoval(this.props.currentSelectedIndicator)}>
-                                        Delete Indicator
+                                        {translate('DeleteIndicator')}
                                     </button>
 
                                     <button
                                         onClick={() => this.props.removeCurrentSelectedIndicator()}
                                         type="button"
                                         className="btn btn-light btn-sm">
-                                        Close
+                                        {translate('Close')}
                                     </button>
 
                                     <button
                                         type="submit"
                                         className="btn btn-primary btn-sm">
-                                        Save Indicator
+                                        {translate('SaveIndicator')}
                                     </button>
 
                                 </div>

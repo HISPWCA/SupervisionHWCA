@@ -1,6 +1,6 @@
 import React from 'react';
-import Settings from '../Settings/Settings';
-import Scheduler from '../Scheduler/Scheduler';
+import Settings from '../pages/Settings';
+import Scheduler from '../pages/Scheduler';
 import './Body.css'
 
 const Body = () =>

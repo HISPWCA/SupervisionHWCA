@@ -2,14 +2,14 @@ import axios from 'axios'
 import { Tree } from 'primereact/tree'
 import React, { Component } from 'react'
 import { NotificationManager } from 'react-notifications'
-import { SUPERVISORS_ROUTE, ME_ROUTE, SUPERVISIONS_ROUTE, TRACKER_PROGRAMS_ROUTE, TRACKED_ENTITY_ATTRIBUTES_ROUTE,ENROLLMENTS_ROUTE, EVENTS_ROUTE, TRACKED_ENTITY_INSTANCES_ROUTE } from '../api.routes'
+import { SUPERVISORS_ROUTE, ME_ROUTE, SUPERVISIONS_ROUTE, TRACKER_PROGRAMS_ROUTE, TRACKED_ENTITY_ATTRIBUTES_ROUTE, ENROLLMENTS_ROUTE, EVENTS_ROUTE, TRACKED_ENTITY_INSTANCES_ROUTE } from '../api.routes'
 import { Calendar } from 'primereact/calendar'
 import { v4 as uuidv4 } from 'uuid'
 import LoadingOverlay from 'react-loading-overlay'
 import { MultiSelect } from 'primereact/multiselect'
 import moment from 'moment'
 import { Dropdown } from 'primereact/dropdown'
-
+import translate from '../utils/translator'
 
 
 export class Supervision extends Component {
@@ -19,7 +19,7 @@ export class Supervision extends Component {
         dates: null,
         loading: false,
         supervisors: [],
-        
+
         profileID: null,
 
         supervisions: [],
@@ -68,7 +68,7 @@ export class Supervision extends Component {
                         this.setState({ loading: false }, () => {
                             this.props.loadSupervisions()
 
-                            NotificationManager.success('Supervision planned successfully', null, 3000)
+                            NotificationManager.success(translate('SupervisionPlannedSuccessfully'), null, 3000)
                         })
                     }).catch(error => this.setState({ loading: false }, () => NotificationManager.error(error.message, null, 3000)))
             })).catch(error => this.setState({ loading: false }, () => NotificationManager.error(error.message, null, 3000)))
@@ -82,18 +82,18 @@ export class Supervision extends Component {
 
     handleSupervisionCreation = () => this.setState({ loading: true }, () => {
         if (this.state.dates === null) 
-            this.setState({ loading: false }, () => NotificationManager.error('Please Select date or Period', null, 3000))
-         else if (!this.state.description || this.state.description.length === 0) 
-            this.setState({ loading: false }, () => NotificationManager.error('Please you should fill descripton', null, 3000))
-         else if (!this.props.selectedNode) 
-            this.setState({ loading: false }, () => NotificationManager.error('Please Select organisation unit', null, 3000))
-         else if (this.state.selectedSupervisors.length === 0) 
-            this.setState({ loading: false }, () => NotificationManager.error('Please Select Supervisors', null, 3000))
-         else if (!this.state.trackerProgram) 
-            this.setState({ loading: false }, () => NotificationManager.error('Please Select Supervision Type', null, 3000))
+            this.setState({ loading: false }, () => NotificationManager.error(translate('PleaseSelectDateOrPeriod'), null, 3000))
+        else if (!this.state.description || this.state.description.length === 0) 
+            this.setState({ loading: false }, () => NotificationManager.error(translate('PleaseYouShouldFillDescripton'), null, 3000))
+        else if (!this.props.selectedNode) 
+            this.setState({ loading: false }, () => NotificationManager.error(translate('PleaseSelectOrganisationUnit'), null, 3000))
+        else if (this.state.selectedSupervisors.length === 0) 
+            this.setState({ loading: false }, () => NotificationManager.error(translate('PleaseSelectSupervisors'), null, 3000))
+        else if (!this.state.trackerProgram) 
+            this.setState({ loading: false }, () => NotificationManager.error(translate('PleaseSelectTrackerProgram'), null, 3000))
         else if (this.props.supervisions.find(supervision => supervision.organisationUnit.id === this.props.selectedNode.id && moment(supervision.period[0]).format('Do MMMM, YYYY') === moment(this.state.dates[0]).format('Do MMMM, YYYY') && moment(supervision.period[1]).format('Do MMMM, YYYY') === moment(this.state.dates[1]).format('Do MMMM, YYYY'))) 
-            this.setState({ loading: false }, () => NotificationManager.error('It seems this supervision already exists', null, 3000))
-         else {
+            this.setState({ loading: false }, () => NotificationManager.error(translate('ItSeemsThisSupervisionAlreadyExists'), null, 3000))
+        else {
             const supervision = {}
             supervision.id = uuidv4()
             supervision.status = 'Planned'
@@ -106,63 +106,61 @@ export class Supervision extends Component {
             supervision.otherSupervisors = this.state.otherSupervisors
             supervision.program = this.state.trackerPrograms.find(program => program.id === this.state.trackerProgram)
 
-            this.setState({ loading: false }, () => this.generateTrackedEntityInstanceWithEnrollmentAndEvent(supervision) )
+            this.setState({ loading: false }, () => this.generateTrackedEntityInstanceWithEnrollmentAndEvent(supervision))
         }
     })
 
-    generateTrackedEntityInstanceWithEnrollmentAndEvent = supervision => this.setState({loading: true },
-        ()=> axios.get(TRACKED_ENTITY_ATTRIBUTES_ROUTE.concat(supervision.program.programTrackedEntityAttributes[0].trackedEntityAttribute.id).concat('/generate.json'))
-                    .then(response => this.setState({loading:false}, () => {
-                        const tei = {}
-                        tei.trackedEntityType = supervision.program.trackedEntityType.id 
-                        tei.orgUnit = supervision.organisationUnit.id
-                        tei.attributes= [{attribute: response.data.ownerUid, value: response.data.value}]
 
-                        this.teiGenerator(tei, supervision)                         
-                    })).catch(error => this.setState({loading: false} , ()=> NotificationManager.error(error.message, null, 3000))))
+    generateTrackedEntityInstanceWithEnrollmentAndEvent = supervision => this.setState({ loading: true },
+        () => axios.get(TRACKED_ENTITY_ATTRIBUTES_ROUTE.concat(supervision.program.programTrackedEntityAttributes[0].trackedEntityAttribute.id).concat('/generate.json'))
+            .then(response => this.setState({ loading: false }, () => {
+                const tei = {}
+                tei.trackedEntityType = supervision.program.trackedEntityType.id
+                tei.orgUnit = supervision.organisationUnit.id
+                tei.attributes = [{ attribute: response.data.ownerUid, value: response.data.value }]
 
-    teiGenerator = (tei, supervision) =>  axios.post(TRACKED_ENTITY_INSTANCES_ROUTE, tei)
-                    .then(resp => this.setState({ loading: false }, () => {
-                        const trackedEntityInstance = resp.data.response.importSummaries[0].reference
-                        const orgUnit = supervision.organisationUnit.id
-                        const program = supervision.program.id
+                this.teiGenerator(tei, supervision)
+            })).catch(error => this.setState({ loading: false }, () => NotificationManager.error(error.message, null, 3000))))
 
-                        supervision.program.trackedEntityInstance = trackedEntityInstance
 
-                        const enrollment = {}
-                            enrollment.trackedEntityInstance = trackedEntityInstance
-                            enrollment.program = program
-                            enrollment.orgUnit = orgUnit
-                            
-                            axios.post(ENROLLMENTS_ROUTE, enrollment)
-                            .then(res => {
+    teiGenerator = (tei, supervision) => axios.post(TRACKED_ENTITY_INSTANCES_ROUTE, tei)
+        .then(resp => this.setState({ loading: false }, () => {
+            const trackedEntityInstance = resp.data.response.importSummaries[0].reference
+            const orgUnit = supervision.organisationUnit.id
+            const program = supervision.program.id
 
-                                supervision.program.enrollment = res.data.response.importSummaries[0].reference
+            const enrollment = {}
+            enrollment.trackedEntityInstance = trackedEntityInstance
+            enrollment.program = program
+            enrollment.orgUnit = orgUnit
 
-                                const e = {}
-                                e.events = supervision.program.programStages.map(programStage => ({
-                                    enrollment: res.data.response.importSummaries[0].reference,
-                                    dueDate: supervision.period[0],
-                                    programStage: programStage.id,
-                                    trackedEntityInstance,
-                                    status: 'SCHEDULE',
-                                    program,
-                                    orgUnit,
-                                }))
+            axios.post(ENROLLMENTS_ROUTE, enrollment)
+                .then(res => {
+                    // const e = {}
+                    // e.events = supervision.program.programStages.map(programStage => ({
+                    //     enrollment: res.data.response.importSummaries[0].reference,
+                    //     dueDate: supervision.period[0],
+                    //     programStage: programStage.id,
+                    //     trackedEntityInstance,
+                    //     status: 'SCHEDULE',
+                    //     program,
+                    //     orgUnit,
+                    // }))
 
-                                this.eventsGenerator(e, supervision)                                    
+                    // this.eventsGenerator(e, supervision)
+                    this.createSupervision(supervision)
 
-                            }).catch(error => this.setState({loading: false} , () => NotificationManager.error(error.message, null, 3000)))
-                            
-                    })).catch(error => this.setState({loading: false} , ()=> NotificationManager.error(error.message, null, 3000)))  
+                }).catch(error => this.setState({ loading: false }, () => NotificationManager.error(error.message, null, 3000)))
+
+        })).catch(error => this.setState({ loading: false }, () => NotificationManager.error(error.message, null, 3000)))
 
 
     eventsGenerator = (e, supervision) => axios.post(EVENTS_ROUTE, e)
-        .then(() => this.setState({loading:false}, () => this.createSupervision(supervision)))
-        .catch(error => this.setState({loading: false} , () => NotificationManager.error(error.message, null, 3000)))
+        .then(() => this.setState({ loading: false }, () => this.createSupervision(supervision)))
+        .catch(error => this.setState({ loading: false }, () => NotificationManager.error(error.message, null, 3000)))
 
 
-    handleChange = event =>  this.setState({ description: event.target.value })
+    handleChange = event => this.setState({ description: event.target.value })
 
     handleOtherSupervisorsChange = event => this.setState({ otherSupervisors: event.target.value })
 
@@ -174,7 +172,7 @@ export class Supervision extends Component {
                     <h3> {this.props.selectedNode.displayName} </h3>
                 </strong>
 
-                <label for="period" className="form-label font-weight-bold mt-2 d-block">Select Period</label>
+                <label for="period" className="form-label font-weight-bold mt-2 d-block"> {translate('SelectPeriod')} </label>
                 <Calendar
                     id="period"
                     className="d-block"
@@ -184,27 +182,25 @@ export class Supervision extends Component {
                     readOnlyInput={true} />
 
 
-                <label for="trackerProgram" className="form-label font-weight-bold mt-2 d-block">Tracker Program</label>
+                <label for="trackerProgram" className="form-label font-weight-bold mt-2 d-block"> {translate('TrackerProgram')} </label>
                 <Dropdown
                     filter
                     className="d-block"
                     optionLabel="name"
                     optionValue="code"
                     value={this.state.trackerProgram}
-                    options={this.state.trackerPrograms.map(program => {
-                        return { name: program.displayName, code: program.id }
-                    })}
-                    onChange={e => { this.setState({ trackerProgram: e.value }) }}
-                    placeholder="Select a Tracker Program" />
+                    options={this.state.trackerPrograms.map(program => ({ name: program.displayName, code: program.id }))}
+                    onChange={e =>  this.setState({ trackerProgram: e.value }) }
+                    placeholder={translate('SelectATrackerProgram')} />
 
-                <label for="description" className="form-label font-weight-bold mt-2 d-block">Description Label</label>
+                <label for="description" className="form-label font-weight-bold mt-2 d-block">{translate('Description')}</label>
                 <textarea
                     id="description"
                     className="form-control"
                     onChange={this.handleChange}
                     value={this.state.description} ></textarea>
 
-                <label for="mainSupervisors" className="form-label font-weight-bold mt-2 d-block">Supervisors</label>
+                <label for="mainSupervisors" className="form-label font-weight-bold mt-2 d-block">{translate('Supervisors')}</label>
 
                 <MultiSelect
                     id="mainSupervisors"
@@ -215,7 +211,7 @@ export class Supervision extends Component {
                     onChange={e => this.setState({ selectedSupervisors: e.value })}
                     filter />
 
-                <label for="otherSupervisors" className="form-label font-weight-bold mt-2">Other Supervisors</label>
+                <label for="otherSupervisors" className="form-label font-weight-bold mt-2">{translate('OtherSupervisors')}</label>
 
                 <textarea id="otherSupervisors" className="form-control" onChange={this.handleOtherSupervisorsChange}>{this.state.otherSupervisors}</textarea>
 
@@ -224,7 +220,7 @@ export class Supervision extends Component {
                 <button
                     className="btn btn-sm btn-primary"
                     onClick={this.handleSupervisionCreation}>
-                    Schedule
+                    {translate('Schedule')}
                 </button>
 
             </div>
@@ -237,13 +233,12 @@ export class Supervision extends Component {
         this.setState({ selectedSupervisors })
     }
 
-    displaySelectedSupervisors = () => this.props.selectedNode &&
-        this.state.selectedSupervisors.length > 0 &&
+    displaySelectedSupervisors = () => this.props.selectedNode && this.state.selectedSupervisors.length > 0 &&
         (
             <div className="col">
                 <div className="mx-1 alert alert-primary">
                     <h4 className="d-block m-1">
-                        Selected Supervisors
+                        {translate('SelectedSupervisors')}
                     </h4>
 
                     {this.state.selectedSupervisors.map(s => <btn key={s.id} className="btn btn-sm btn-primary m-1" onClick={() => this.removeHandleSupervisorsSelection(s)}>{s.displayName}</btn>)}
@@ -254,7 +249,7 @@ export class Supervision extends Component {
 
     render = () => (
         <React.Fragment>
-            <LoadingOverlay spinner active={this.state.loading} text='Processing ...' >
+            <LoadingOverlay spinner active={this.state.loading} text={translate('Processing')} >
 
                 <div className='row'>
                     <div className='col'>
@@ -278,11 +273,7 @@ export class Supervision extends Component {
                                 </div>
                             }
 
-
                             {this.displayForms()}
-
-
-
                         </div>
                     </div>
                 </div>
