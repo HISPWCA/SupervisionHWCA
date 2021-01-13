@@ -33,7 +33,6 @@ const C_BASED_ON_SUPERVISION_FREQUENCIES = translate('C_BASED_ON_SUPERVISION_FRE
 const C_BASED_ON_SUPERVISION_PERIOD = translate('C_BASED_ON_SUPERVISION_PERIOD')
 
 
-
 export class Scheduler extends Component {
 
     state = {
