@@ -70,7 +70,7 @@
     "CalendarView": "Vue Calendaire",
     "TimelineView": "Vue Chronologique",
     "OrgUnit": "Unite d'Org.",
-    "TrackerProgram": "Programme Tracker",
+    "TrackerProgram": "Programme",
     "StartDate": "Date Debut",
     "EndDate": "Date Fin",
     "NothingPlannedFor": "Aucune Plannification pour",
@@ -130,5 +130,8 @@
     "SelectATrackerProgram": "Choisir le Tracker",
     "Description": "Description",
     "OtherSupervisors": "Autres Superviseurs",
-    "SelectedSupervisors": "Superviseurs selectionnes"
+    "SelectedSupervisors": "Superviseurs selectionnes",
+    "TEI": "Tracker Entity Instance",
+    "ASC": "ASC",
+    "Actor": "Acteur"
 }

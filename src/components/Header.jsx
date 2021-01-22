@@ -15,6 +15,8 @@ class Header extends Component {
         me: null,
         settings: [],
 
+        headerBarInMaintenance: true,
+
         setting: null,
         loading: false,
         sharing: false,
@@ -324,24 +326,27 @@ class Header extends Component {
                         </h1>
                     </div>
 
-                    <div className="col text-right">
-                        <button
-                            onClick={()=> this.setState({displayReportingTool: !this.state.displayReportingTool, displayReportResults: false})}
-                            className={this.state.displayReportingTool ? 'btn btn-sm btn-link- btn-danger my-2 mx-1' : 'btn btn-sm btn-link- btn-primary my-2 mx-1'} >
-                            {this.state.displayReportingTool ? translate('CloseReportingTool') : translate('DisplayReportingTool')}
-                        </button>
+                    {
+                       ! this.state.headerBarInMaintenance && 
+                        <div className="col text-right d-none">
+                            <button
+                                onClick={()=> this.setState({displayReportingTool: !this.state.displayReportingTool, displayReportResults: false})}
+                                className={this.state.displayReportingTool ? 'btn btn-sm btn-link- btn-danger my-2 mx-1 d-none' : 'btn btn-sm btn-link- btn-primary my-2 mx-1 d-none'} >
+                                {this.state.displayReportingTool ? translate('CloseReportingTool') : translate('DisplayReportingTool')}
+                            </button>
 
-                        <button className={ 'btn btn-sm btn-secondary my-2 mx-1' } onClick={()=> this.setState({displayReportResultsApproval: true})}>
-                                {translate('ReportingApprovalOptions')}
-                        </button>
+                            <button className={ 'btn btn-sm btn-secondary my-2 mx-1 d-none' } 
+                                    onClick={()=> this.setState({displayReportResultsApproval: true})}>
+                                    {translate('ReportingApprovalOptions')}
+                            </button>
 
-                        <button
-                            onClick={() => this.setState({ displaySharingOptions: !this.state.displaySharingOptions, selectedFull: [], selectedPartials: [] },
-                                () => this.state.displaySharingOptions && this.retrieveSettingsFromDataStore())}
-                            className={this.state.displaySharingOptions ? 'btn btn-sm btn-link btn-primary my-2 mx-1' : 'btn btn-sm btn-link btn-secondary my-2 mx-1'} >
-                            {this.state.displaySharingOptions ? translate('CloseIndicatorsSharingOptions') : translate('DisplayIndicatorsSharingOptions')}
-                        </button>
-                    </div>
+                            <button
+                                onClick={() => this.setState({ displaySharingOptions: !this.state.displaySharingOptions, selectedFull: [], selectedPartials: [] },
+                                    () => this.state.displaySharingOptions && this.retrieveSettingsFromDataStore())}
+                                className={this.state.displaySharingOptions ? 'btn btn-sm btn-link btn-primary my-2 mx-1 d-none' : 'btn btn-sm btn-link btn-secondary my-2 mx-1 d-none'} >
+                                {this.state.displaySharingOptions ? translate('CloseIndicatorsSharingOptions') : translate('DisplayIndicatorsSharingOptions')}
+                            </button>
+                        </div>}
                 </div>
 
                 {
@@ -390,9 +395,10 @@ class Header extends Component {
 
                                                     <td className="text-right">
                                                         <button
+                                                            disabled
                                                             onClick={() => this.setState({ displaySharingBox: true, setting, selectedPartials: setting.partialAccessGroups, selectedFull: setting.fullAccessGroups })}
-                                                            disabled={this.props.me.id !== setting.me.id && !this.userHasFullAccess(setting)}
-                                                            className="btn btn-sm btn-primary">
+                                                            // disabled={this.props.me.id !== setting.me.id && !this.userHasFullAccess(setting)}
+                                                            className="btn btn-sm btn-primary d-none-">
                                                             {translate('SharingOptions')}
                                                     </button>
                                                     </td>

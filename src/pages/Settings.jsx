@@ -17,8 +17,6 @@ import './Settings.css'
 import translate from '../utils/translator'
 
 
-const C_PROGRAM_INDICATORS = translate('C_PROGRAM_INDICATORS')
-const C_AGGREGATED_INDICATORS = translate('C_AGGREGATED_INDICATORS')
 const C_PAGINATION_ROWS_PER_PAGE = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 
 export class Settings extends Component {
@@ -35,7 +33,7 @@ export class Settings extends Component {
 
         settings: [],
         
-        currentAction: C_AGGREGATED_INDICATORS,
+        currentAction: translate('C_AGGREGATED_INDICATORS'),
         trackerPrograms: [],
 
         indicatorGroupNameFilter: '',
@@ -76,9 +74,9 @@ export class Settings extends Component {
     componentDidMount = () => {        
         this.loadMe()
 
-        if (this.state.currentAction === C_PROGRAM_INDICATORS) 
+        if (this.state.currentAction === translate('C_PROGRAM_INDICATORS')) 
             this.loadPrograms()
-         else if (this.state.currentAction === C_AGGREGATED_INDICATORS) 
+         else if (this.state.currentAction === translate('C_AGGREGATED_INDICATORS')) 
             this.loadAggregatedIndicatorsWithGroups()
     }
 
@@ -99,7 +97,7 @@ export class Settings extends Component {
     axios.get(API_BASE_ROUTE.concat(AGGREGATED_INDICATORS_ROUTE))
             .then(response => {
                 this.setState({
-                    currentAction: C_AGGREGATED_INDICATORS,
+                    currentAction: translate('C_AGGREGATED_INDICATORS'),
                     initialAggregatedIndicatorsWithGroups: response.data.indicatorGroups
                 })
             }).catch(error => NotificationManager.error(error.message, null, 3000))
@@ -109,7 +107,7 @@ export class Settings extends Component {
         axios.get(API_BASE_ROUTE.concat(PROGRAMS_ROUTE))
             .then(response => {
                 this.setState({
-                    currentAction: C_PROGRAM_INDICATORS,
+                    currentAction: translate('C_PROGRAM_INDICATORS'),
                     initialPrograms: response.data.programs,
                     initialAggregatedIndicatorsWithGroups: response.data.programs,
                 })
@@ -139,7 +137,7 @@ export class Settings extends Component {
         axios.get(route)
         .then(response => {
             this.setState({
-                currentAction: C_PROGRAM_INDICATORS,
+                currentAction: translate('C_PROGRAM_INDICATORS'),
                 selectedProgramIndicators: response.data.programIndicators
             })
         }).catch(error => NotificationManager.error(error.message, null, 3000))
@@ -168,7 +166,7 @@ export class Settings extends Component {
 
     programClassNameProvider = program => this.state.selectedProgram && this.state.selectedProgram.id === program.id ? 'col text-left SelectedSetting  m-1 p-3' : 'col text-left Settings  m-1 p-3'
 
-    displayAggregatedIndicators = () =>  this.state.currentAction === C_AGGREGATED_INDICATORS && 
+    displayAggregatedIndicators = () =>  this.state.currentAction === translate('C_AGGREGATED_INDICATORS') && 
     <div style={ { maxHeight: '600px', overflow:'auto' } } >
         {
             this.state.initialAggregatedIndicatorsWithGroups
@@ -184,7 +182,7 @@ export class Settings extends Component {
         }
     </div>
     
-    displayPrograms = () =>  this.state.currentAction === C_PROGRAM_INDICATORS && 
+    displayPrograms = () =>  this.state.currentAction === translate('C_PROGRAM_INDICATORS') && 
     <div style={ { maxHeight: '600px', overflow:'auto' } } >
         {
             this.state.initialAggregatedIndicatorsWithGroups
@@ -349,7 +347,7 @@ export class Settings extends Component {
         }
     }
 
-    displayAggregatedIndicatorChildrens = () => this.state.currentAction === C_AGGREGATED_INDICATORS && this.state.selectedAggregatedIndicator !== null && (
+    displayAggregatedIndicatorChildrens = () => this.state.currentAction === translate('C_AGGREGATED_INDICATORS') && this.state.selectedAggregatedIndicator !== null && (
         <div className="col my-1" style={{ overflow: 'auto', maxHeight: '600px' }} >
             <div className="m-1 text-left">
                 <strong>
@@ -379,7 +377,7 @@ export class Settings extends Component {
 
 
     displayProgramIndicators = () => {
-        if (this.state.currentAction === C_PROGRAM_INDICATORS &&
+        if (this.state.currentAction === translate('C_PROGRAM_INDICATORS') &&
             this.state.selectedProgram !== null) {
             if (this.state.selectedProgramIndicators.length === 0) {
                 return (
@@ -470,9 +468,9 @@ export class Settings extends Component {
 
 
     displayParentTitle = () => {
-        if (this.state.currentAction === C_AGGREGATED_INDICATORS) 
+        if (this.state.currentAction === translate('C_AGGREGATED_INDICATORS')) 
             return <div className="mb-1 text-left"><strong> {translate('IndicatorGroups')} </strong></div>
-         else if (this.state.currentAction === C_PROGRAM_INDICATORS) 
+         else if (this.state.currentAction === translate('C_PROGRAM_INDICATORS')) 
             return <div className="mb-1 text-left"> <strong>{translate('Programs')}</strong></div>
     }
 
@@ -513,7 +511,7 @@ export class Settings extends Component {
     }
 
     handlePagination = () => {
-        if (this.state.currentAction === C_AGGREGATED_INDICATORS) {
+        if (this.state.currentAction === translate('C_AGGREGATED_INDICATORS')) {
             return (
                 <div className="row">
                     <div style={{ marginLeft: '-12px' }} className="col my-1">
@@ -528,7 +526,7 @@ export class Settings extends Component {
                     </div>
                 </div>
                     )
-                } else if (this.state.currentAction === C_PROGRAM_INDICATORS) {
+                } else if (this.state.currentAction === translate('C_PROGRAM_INDICATORS')) {
                     return (
                         <div className="row">
                             <div style={{ marginLeft: '-12px' }} className="col my-1">
@@ -708,13 +706,13 @@ render = () => (
 
                     <button
                         onClick={this.loadAggregatedIndicatorsWithGroups}
-                        className={this.classNameProvider(C_AGGREGATED_INDICATORS)}>
+                        className={this.classNameProvider(translate('C_AGGREGATED_INDICATORS'))}>
                         {translate('C_AGGREGATED_INDICATORS')}
                     </button>
 
                     <button
                         onClick={this.loadPrograms}
-                        className={this.classNameProvider(C_PROGRAM_INDICATORS)}>
+                        className={this.classNameProvider(translate('C_PROGRAM_INDICATORS'))}>
                         {translate('C_PROGRAM_INDICATORS')}
                     </button>
                 </div>
@@ -756,9 +754,9 @@ render = () => (
                 <div className="col">
                     {this.displayParentTitle()}
                     
-                    { this.state.currentAction === C_AGGREGATED_INDICATORS && <input type="search" className="my-2 form-control input-sm" onChange={e => this.setState({ indicatorGroupNameFilter: e.target.value })} /> } 
+                    { this.state.currentAction === translate('C_AGGREGATED_INDICATORS') && <input type="search" className="my-2 form-control input-sm" onChange={e => this.setState({ indicatorGroupNameFilter: e.target.value })} /> } 
                   
-                    { this.state.currentAction === C_PROGRAM_INDICATORS && <input type="search" className="my-2 form-control input-sm" onChange={e => this.setState({ programGroupNameFilter: e.target.value })} /> }
+                    { this.state.currentAction === translate('C_PROGRAM_INDICATORS') && <input type="search" className="my-2 form-control input-sm" onChange={e => this.setState({ programGroupNameFilter: e.target.value })} /> }
 
                     {this.displayAggregatedIndicators()}
 

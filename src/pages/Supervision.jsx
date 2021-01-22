@@ -24,6 +24,9 @@ export class Supervision extends Component {
 
         supervisions: [],
         settingsList: [],
+        
+        selectedTEI: null,
+        availableTEIs: [],
 
         description: null,
         trackerPrograms: [],
@@ -94,19 +97,82 @@ export class Supervision extends Component {
         else if (this.props.supervisions.find(supervision => supervision.organisationUnit.id === this.props.selectedNode.id && moment(supervision.period[0]).format('Do MMMM, YYYY') === moment(this.state.dates[0]).format('Do MMMM, YYYY') && moment(supervision.period[1]).format('Do MMMM, YYYY') === moment(this.state.dates[1]).format('Do MMMM, YYYY'))) 
             this.setState({ loading: false }, () => NotificationManager.error(translate('ItSeemsThisSupervisionAlreadyExists'), null, 3000))
         else {
-            const supervision = {}
-            supervision.id = uuidv4()
-            supervision.status = 'Planned'
-            supervision.owner = this.state.me
-            supervision.period = this.state.dates
-            supervision.description = this.state.description
-            supervision.supervisors = this.state.selectedSupervisors
-            supervision.organisationUnit = this.props.selectedNode
-            supervision.indicators = this.props.indicators
-            supervision.otherSupervisors = this.state.otherSupervisors
-            supervision.program = this.state.trackerPrograms.find(program => program.id === this.state.trackerProgram)
+            const supervisionProgram = this.state.trackerPrograms.find(program => program.id === this.state.trackerProgram)
 
-            this.setState({ loading: false }, () => this.generateTrackedEntityInstanceWithEnrollmentAndEvent(supervision))
+            if (!this.state.selectedTEI){
+                const TEI_ROUTE = TRACKED_ENTITY_ATTRIBUTES_ROUTE.concat(supervisionProgram.programTrackedEntityAttributes[0].trackedEntityAttribute.id).concat('/generate.json')
+                this.setState({loading: true}, () => {
+                    axios.get(TEI_ROUTE)
+                            .then(response => this.setState({ loading: false }, () => {
+                                const tei = {}
+                                      tei.orgUnit = this.props.selectedNode.id
+                                      tei.trackedEntityType = supervisionProgram.trackedEntityType.id
+                                      tei.attributes = [{ attribute: response.data.ownerUid, value: response.data.value }]
+
+                                this.setState({loading: true}, () => axios.post(TRACKED_ENTITY_INSTANCES_ROUTE, tei)
+                                .then(resp => this.setState({ loading: false }, () => {
+                                    const enrollment = {}
+                                    enrollment.trackedEntityInstance = resp.data.response.importSummaries[0].reference
+                                    enrollment.orgUnit = this.props.selectedNode.id
+                                    enrollment.program = supervisionProgram.id
+
+                                    this.setState({loading: true}, () => axios.post(ENROLLMENTS_ROUTE, enrollment)
+                                        .then(() => this.setState({loading: false}, () => {
+                                            
+                                            this.setState({loading: true}, () => {
+                                                const URL = TRACKED_ENTITY_INSTANCES_ROUTE.concat('.json?program=').concat(this.state.trackerProgram).concat('&ou=').concat(this.props.selectedNode.id).concat('&ouMode=SELECTED&order=created:desc&fields=*,enrollments[*]')
+                                    
+                                                axios.get(URL)
+                                                .then(response => this.setState({loading: false}, () => this.setState({
+                                                    availableTEIs: (response.data.trackedEntityInstances.length === 0 || response.data.trackedEntityInstances.length === 1) ? 
+                                                    response.data.trackedEntityInstances :  
+                                                    response.data.trackedEntityInstances.map(tei => {
+                                                        const nomActeurObject = tei.attributes.find(attribute => attribute.displayName === 'Nom acteur')
+                                                        const typeActeurObject = tei.attributes.find(attribute => attribute.displayName === "Type d'acteur")
+                                                        const name = typeActeurObject.value.concat(' - ').concat(nomActeurObject.value)
+                                                        tei.name = name
+                                        
+                                                        return tei
+                                                    }) }, () => this.state.availableTEIs.length === 1 && this.setState({selectedTEI: this.state.availableTEIs[0]}, () => this.handleSupervisionCreation()))))
+                                                    .catch(error => this.setState({loading: false}, () => NotificationManager.error(error.message, null, 3000)))
+                                            })
+                                            
+                                        })).catch(error => this.setState({ loading: false }, () => NotificationManager.error(error.message, null, 3000))))
+
+                                })).catch(error => this.setState({ loading: false }, () => NotificationManager.error(error.message, null, 3000))))
+
+                            })).catch(error => this.setState({ loading: false }, () => NotificationManager.error(error.message, null, 3000)))})
+            } else {
+
+                const supervision = {}
+                    supervision.id = uuidv4()
+                    supervision.status = 'Planned'
+                    supervision.owner = this.state.me
+                    supervision.period = this.state.dates
+                    supervision.tei = this.state.selectedTEI
+                    supervision.description = this.state.description
+                    supervision.supervisors = this.state.selectedSupervisors
+                    supervision.organisationUnit = this.props.selectedNode
+                    supervision.indicators = this.props.indicators
+                    supervision.otherSupervisors = this.state.otherSupervisors
+                    supervision.program = supervisionProgram
+
+                this.setState({ loading: false }, () => {
+                    const enrollment = this.state.selectedTEI.enrollments[0]
+                    const events = supervision.program.programStages.map(programStage => ({
+                        enrollment: enrollment.enrollment,
+                        dueDate: supervision.period[1] ? supervision.period[1]: supervision.period[0],
+                        programStage: programStage.id,
+                        trackedEntityInstance: this.state.selectedTEI.trackedEntityInstance,
+                        status: 'SCHEDULE',
+                        program: enrollment.program,
+                        orgUnit: enrollment.orgUnit,
+                    }))
+
+                    enrollment.events = enrollment.events.concat(events)
+                    this.eventsGenerator(enrollment, supervision)    
+                })
+            }
         }
     })
 
@@ -159,13 +225,12 @@ export class Supervision extends Component {
         .then(() => this.setState({ loading: false }, () => this.createSupervision(supervision)))
         .catch(error => this.setState({ loading: false }, () => NotificationManager.error(error.message, null, 3000)))
 
-
     handleChange = event => this.setState({ description: event.target.value })
 
     handleOtherSupervisorsChange = event => this.setState({ otherSupervisors: event.target.value })
 
     displayForms = () => this.props.selectedNode && (
-        <div className="col">
+        <div className="col-3">
             <div className="form-group alert alert-primary m-1" role="alert">
 
                 <strong className="d-block p-3 alert alert-secondary">
@@ -190,8 +255,24 @@ export class Supervision extends Component {
                     optionValue="code"
                     value={this.state.trackerProgram}
                     options={this.state.trackerPrograms.map(program => ({ name: program.displayName, code: program.id }))}
-                    onChange={e =>  this.setState({ trackerProgram: e.value }) }
+                    onChange={e =>  this.setState({ trackerProgram: e.value }, () => this.loadTEIs()) }
                     placeholder={translate('SelectATrackerProgram')} />
+
+                {
+                    this.state.availableTEIs.length > 1 && 
+                    <React.Fragment>
+                        <label for="teiSelection" className="form-label font-weight-bold mt-2 d-block"> {translate('Actor')} </label>
+                        <Dropdown
+                            filter
+                            className="d-block"
+                            optionLabel="name"
+                            optionValue="code"
+                            value={this.state.selectedTEI}
+                            options={this.state.availableTEIs.map(tei => ({ name: tei.name, code: tei })).sort((a, b) => a.name - b.name )}
+                            onChange={e =>  this.setState({ selectedTEI: e.value }) }
+                            placeholder={translate('Actor')} />
+                    </React.Fragment>
+                }
 
                 <label for="description" className="form-label font-weight-bold mt-2 d-block">{translate('Description')}</label>
                 <textarea
@@ -233,7 +314,8 @@ export class Supervision extends Component {
         this.setState({ selectedSupervisors })
     }
 
-    displaySelectedSupervisors = () => this.props.selectedNode && this.state.selectedSupervisors.length > 0 &&
+    displaySelectedSupervisors = () => this.props.selectedNode && 
+    this.state.selectedSupervisors.length > 0 &&
         (
             <div className="col">
                 <div className="mx-1 alert alert-primary">
@@ -246,8 +328,25 @@ export class Supervision extends Component {
             </div>
         )
 
+        loadTEIs = () => this.setState({loading: true}, () => {
+            const URL = TRACKED_ENTITY_INSTANCES_ROUTE.concat('.json?program=').concat(this.state.trackerProgram).concat('&ou=').concat(this.props.selectedNode.id).concat('&ouMode=SELECTED&order=created:desc&fields=*,enrollments[*]')
 
-    render = () => (
+            axios.get(URL)
+            .then(response => this.setState({loading: false}, () => this.setState({
+                availableTEIs: (response.data.trackedEntityInstances.length === 0 || response.data.trackedEntityInstances.length === 1) ? 
+                response.data.trackedEntityInstances :  
+                response.data.trackedEntityInstances.map(tei => {
+                    const nomActeurObject = tei.attributes.find(attribute => attribute.displayName === 'Nom acteur')
+                    const typeActeurObject = tei.attributes.find(attribute => attribute.displayName === "Type d'acteur")
+                    const name = typeActeurObject.value.concat(' - ').concat(nomActeurObject.value)
+                    tei.name = name
+    
+                    return tei
+                }) }, () => this.state.availableTEIs.length === 1 && this.setState({selectedTEI: this.state.availableTEIs[0]}))))
+                .catch(error => this.setState({loading: false}, () => NotificationManager.error(error.message, null, 3000)))
+        })
+
+        render = () => (
         <React.Fragment>
             <LoadingOverlay spinner active={this.state.loading} text={translate('Processing')} >
 
@@ -261,7 +360,7 @@ export class Supervision extends Component {
                         <div className="row text-left my-3">
                             {
                                 this.props.displayTree &&
-                                <div className="col">
+                                <div className="col-3">
                                     <div className="font-weight-bold">Organisation Units</div>
 
                                     <Tree value={this.props.nodes}

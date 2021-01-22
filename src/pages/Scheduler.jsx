@@ -1,6 +1,6 @@
 import axios from 'axios'
 import React, { Component } from 'react'
-import { ME_ROUTE, ORGANISATION_UNITS_ROUTE, ORGANISATION_UNIT_GROUP_ROUTE, ORGANISATION_UNIT_GROUP_SET_ROUTE, SETTINGS_ROUTE, SUPERVISIONS_ROUTE, PERIOD_TYPE_ROUTE, ANALYTICS_ROUTE } from '../api.routes'
+import { ME_ROUTE, ORGANISATION_UNITS_ROUTE, ORGANISATION_UNIT_GROUP_ROUTE, ORGANISATION_UNIT_GROUP_SET_ROUTE, API_BASE_ROUTE, SETTINGS_ROUTE, SUPERVISIONS_ROUTE, PERIOD_TYPE_ROUTE, ANALYTICS_ROUTE } from '../api.routes'
 import NotificationManager from 'react-notifications/lib/NotificationManager'
 import Supervision from './Supervision'
 import moment from 'moment'
@@ -27,10 +27,6 @@ import { DatePicker } from 'antd'
 import translate from '../utils/translator'
 
 const C_PAGINATION_ROWS_PER_PAGE = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-const C_INDICATORS_BASED_CONFIGURATION = translate('C_INDICATORS_BASED_CONFIGURATION')
-const C_ALL_ORGANISATION_UNITS = translate('C_ALL_ORGANISATION_UNITS')
-const C_BASED_ON_SUPERVISION_FREQUENCIES = translate('C_BASED_ON_SUPERVISION_FREQUENCIES')
-const C_BASED_ON_SUPERVISION_PERIOD = translate('C_BASED_ON_SUPERVISION_PERIOD')
 
 
 export class Scheduler extends Component {
@@ -120,7 +116,7 @@ export class Scheduler extends Component {
                         <td>{s.owner.displayName}</td>
                         <td>{s.status}</td>
                         <td>
-                            <button className="btn btn-light rounded">
+                            <button className="btn btn-light rounded mx-1">
                                 {translate('Details')}
                             </button>
                         </td>
@@ -678,10 +674,12 @@ export class Scheduler extends Component {
                                                     <td>
                                                         <button
                                                             onClick={() => this.handleSupervisionDetails(s)}
-                                                            className="btn btn-sm btn-light"
+                                                            className="btn btn-sm btn-light m-1"
                                                             title="Display details">
                                                             {translate('Details')}
                                                         </button>
+
+                                                        {s.tei && s.tei.trackedEntityInstance && <a target="_blank" className="btn btn-sm btn-primary m-1" href={ API_BASE_ROUTE.substring(0, API_BASE_ROUTE.indexOf('/api')).concat ('/dhis-web-tracker-capture/index.html#/dashboard?tei=').concat(s.tei.trackedEntityInstance).concat('&ou=').concat(s.organisationUnit.id).concat('&program=').concat(s.program.id) } >Open</a>}
                                                     </td>
                                                 </tr>
                                             ))}
@@ -701,34 +699,34 @@ export class Scheduler extends Component {
                     this.state.displaySupervisionFormCreation && <div className="row text-center alert alert-primary m-1 mt-3">
                         <div className="col">
                             <button
-                                onClick={() => this.setState({ selectedConfig: C_INDICATORS_BASED_CONFIGURATION, displayTree: false })}
+                                onClick={() => this.setState({ selectedConfig: translate('C_INDICATORS_BASED_CONFIGURATION'), displayTree: false })}
                                 className="btn btn-sm btn-primary m-1">
-                                    {C_INDICATORS_BASED_CONFIGURATION}
+                                    { translate('C_INDICATORS_BASED_CONFIGURATION') }
                             </button>
 
                             <button
-                                onClick={() => this.setState({ selectedConfig: C_ALL_ORGANISATION_UNITS, selectedSetting: null, displayTree: true })}
+                                onClick={() => this.setState({ selectedConfig: translate('C_ALL_ORGANISATION_UNITS'), selectedSetting: null, displayTree: true })}
                                 className="btn btn-sm btn-primary m-1">
-                                {C_ALL_ORGANISATION_UNITS}
+                                {translate('C_ALL_ORGANISATION_UNITS')}
                             </button>
 
                              <button
-                                onClick={() => this.setState({ selectedConfig: C_BASED_ON_SUPERVISION_FREQUENCIES })}
+                                onClick={() => this.setState({ selectedConfig: translate('C_BASED_ON_SUPERVISION_FREQUENCIES') })}
                                 className="btn btn-sm btn-primary m-1 d-none">
-                                {C_BASED_ON_SUPERVISION_FREQUENCIES}
+                                {translate('C_BASED_ON_SUPERVISION_FREQUENCIES')}
                             </button> 
 
                             <button
-                                onClick={() => this.setState({ selectedConfig: C_BASED_ON_SUPERVISION_PERIOD })}
+                                onClick={() => this.setState({ selectedConfig: translate('C_BASED_ON_SUPERVISION_PERIOD') })}
                                 className="btn btn-sm btn-primary m-1 d-none">
-                                {C_BASED_ON_SUPERVISION_PERIOD}
+                                {translate('C_BASED_ON_SUPERVISION_PERIOD')}
                             </button>
                         </div>
                     </div>
                 }
 
                 {
-                    this.state.displaySupervisionFormCreation && this.state.selectedConfig === C_INDICATORS_BASED_CONFIGURATION && this.state.selectedSetting && this.state.selectedConfig &&
+                    this.state.displaySupervisionFormCreation && this.state.selectedConfig === translate('C_INDICATORS_BASED_CONFIGURATION') && this.state.selectedSetting && this.state.selectedConfig &&
                     <div className="row text-center alert alert-primary m-1 mt-3">
                         <strong> {this.state.selectedSetting.name} </strong>
 
@@ -765,7 +763,7 @@ export class Scheduler extends Component {
                 }
 
                 {
-                    this.state.displaySupervisionFormCreation && this.state.selectedConfig === C_INDICATORS_BASED_CONFIGURATION && <div className="row m-1 text-center alert alert-primary" style={{ maxHeight: '300px', overflow: 'auto' }} >
+                    this.state.displaySupervisionFormCreation && this.state.selectedConfig === translate('C_INDICATORS_BASED_CONFIGURATION') && <div className="row m-1 text-center alert alert-primary" style={{ maxHeight: '300px', overflow: 'auto' }} >
                         {this.state.settingsList.filter(setting => setting.me.id === this.state.me.id).map(setting => <div className="col-3 p-1">  <button key={setting.id} onClick={() => this.setState({ selectedSetting: setting })} className=" text-uppercase d-block border btn btn-primary Settings align-middle" style={{ height: '100px', width: '100%' }}> {setting.name} </button>   </div>)}
                     </div>
                 }
@@ -773,7 +771,7 @@ export class Scheduler extends Component {
                 {
                      this.state.selectedSetting &&
                         this.state.displaySupervisionFormCreation &&
-                         this.state.selectedConfig === C_INDICATORS_BASED_CONFIGURATION  &&
+                         this.state.selectedConfig === translate('C_INDICATORS_BASED_CONFIGURATION')  &&
                     <React.Fragment>
 
                         <div className="row m-1 alert alert-primary">
@@ -814,7 +812,7 @@ export class Scheduler extends Component {
                                     onChange={e => this.setState({ worst: e.target.value })} />
 
                                 {
-                                    this.state.selectedConfig === C_INDICATORS_BASED_CONFIGURATION && 
+                                    this.state.selectedConfig === translate('C_INDICATORS_BASED_CONFIGURATION') && 
                                     <label className="d-block mt-2">
                                         <input type="checkbox" checked={this.state.hightIsGood} onChange={e => this.setState({ hightIsGood: e.target.checked })} /> <strong> {translate('HighIsGood')} </strong>
                                     </label>
@@ -905,7 +903,7 @@ export class Scheduler extends Component {
                                         <span>Selected Period:</span> <strong> {moment(this.state.selectedPeriod).format(' MMMM, YYYY')} </strong>
                                         <span>Hight Is Good:</span> <strong> {this.state.hightIsGood ? translate('Yes') : translate('No')} </strong>
 
-                                        { this.state.selectedConfig === C_INDICATORS_BASED_CONFIGURATION && this.state.selectedSetting.indicators.map(indicator => <React.Fragment> <span className="ml-2">{indicator.name}:</span> <strong>{indicator.weight}</strong> </React.Fragment>)}
+                                        { this.state.selectedConfig === translate('C_INDICATORS_BASED_CONFIGURATION') && this.state.selectedSetting.indicators.map(indicator => <React.Fragment> <span className="ml-2">{indicator.name}:</span> <strong>{indicator.weight}</strong> </React.Fragment>)}
                                     </div>
                                 }
 
@@ -977,7 +975,7 @@ export class Scheduler extends Component {
                     </React.Fragment>
                 }
 
-                {(this.state.displaySupervisionFormCreation && (this.state.selectedConfig === C_ALL_ORGANISATION_UNITS || this.state.selectedNode)) && <Supervision supervisions={this.state.supervisions} nodes={this.state.nodes} displayTree={this.state.displayTree} selectedNode={this.state.selectedNode} nodeHandler={this.nodeHandler} indicators={this.state.selectedSetting ? this.state.selectedSetting.indicators : []} loadSupervisions={this.loadSupervisions} />}
+                {(this.state.displaySupervisionFormCreation && (this.state.selectedConfig === translate('C_ALL_ORGANISATION_UNITS') || this.state.selectedNode)) && <Supervision supervisions={this.state.supervisions} nodes={this.state.nodes} displayTree={this.state.displayTree} selectedNode={this.state.selectedNode} nodeHandler={this.nodeHandler} indicators={this.state.selectedSetting ? this.state.selectedSetting.indicators : []} loadSupervisions={this.loadSupervisions} />}
 
             </LoadingOverlay>
         </React.Fragment>
