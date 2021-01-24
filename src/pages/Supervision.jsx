@@ -11,6 +11,8 @@ import moment from 'moment'
 import { Dropdown } from 'primereact/dropdown'
 import translate from '../utils/translator'
 
+const NOM_ACTEUR = 'Nom acteur'
+const TYPE_ACTEUR = "Type d'acteur"
 
 export class Supervision extends Component {
 
@@ -127,9 +129,13 @@ export class Supervision extends Component {
                                                     availableTEIs: (response.data.trackedEntityInstances.length === 0 || response.data.trackedEntityInstances.length === 1) ? 
                                                     response.data.trackedEntityInstances :  
                                                     response.data.trackedEntityInstances.map(tei => {
-                                                        const nomActeurObject = tei.attributes.find(attribute => attribute.displayName === 'Nom acteur')
-                                                        const typeActeurObject = tei.attributes.find(attribute => attribute.displayName === "Type d'acteur")
-                                                        const name = typeActeurObject.value.concat(' - ').concat(nomActeurObject.value)
+                                                        let nomActeurObject = tei.attributes.find(attribute => attribute.displayName === NOM_ACTEUR)
+                                                        let typeActeurObject = tei.attributes.find(attribute => attribute.displayName === TYPE_ACTEUR)
+                                                      
+                                                        nomActeurObject = nomActeurObject ? nomActeurObject : NOM_ACTEUR
+                                                        typeActeurObject = typeActeurObject ? typeActeurObject : TYPE_ACTEUR
+
+                                                        const name = typeActeurObject?.value.concat(' - ').concat(nomActeurObject?.value)
                                                         tei.name = name
                                         
                                                         return tei
@@ -336,9 +342,13 @@ export class Supervision extends Component {
                 availableTEIs: (response.data.trackedEntityInstances.length === 0 || response.data.trackedEntityInstances.length === 1) ? 
                 response.data.trackedEntityInstances :  
                 response.data.trackedEntityInstances.map(tei => {
-                    const nomActeurObject = tei.attributes.find(attribute => attribute.displayName === 'Nom acteur')
-                    const typeActeurObject = tei.attributes.find(attribute => attribute.displayName === "Type d'acteur")
-                    const name = typeActeurObject.value.concat(' - ').concat(nomActeurObject.value)
+                    let nomActeurObject = tei.attributes.find(attribute => attribute.displayName === NOM_ACTEUR)
+                    let typeActeurObject = tei.attributes.find(attribute => attribute.displayName === TYPE_ACTEUR)
+                 
+                    nomActeurObject = nomActeurObject ? nomActeurObject : NOM_ACTEUR
+                    typeActeurObject = typeActeurObject ? typeActeurObject : TYPE_ACTEUR
+
+                    const name = typeActeurObject?.value.concat(' - ').concat(nomActeurObject?.value)
                     tei.name = name
     
                     return tei
