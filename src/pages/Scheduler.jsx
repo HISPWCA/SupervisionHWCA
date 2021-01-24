@@ -698,16 +698,17 @@ export class Scheduler extends Component {
                 {
                     this.state.displaySupervisionFormCreation && <div className="row text-center alert alert-primary m-1 mt-3">
                         <div className="col">
-                            <button
-                                onClick={() => this.setState({ selectedConfig: translate('C_INDICATORS_BASED_CONFIGURATION'), displayTree: false })}
-                                className="btn btn-sm btn-primary m-1">
-                                    { translate('C_INDICATORS_BASED_CONFIGURATION') }
-                            </button>
 
                             <button
                                 onClick={() => this.setState({ selectedConfig: translate('C_ALL_ORGANISATION_UNITS'), selectedSetting: null, displayTree: true })}
                                 className="btn btn-sm btn-primary m-1">
                                 {translate('C_ALL_ORGANISATION_UNITS')}
+                            </button>
+
+                            <button
+                                onClick={() => this.setState({ selectedConfig: translate('C_INDICATORS_BASED_CONFIGURATION'), displayTree: false })}
+                                className="btn btn-sm btn-primary m-1">
+                                    { translate('C_INDICATORS_BASED_CONFIGURATION') }
                             </button>
 
                              <button
