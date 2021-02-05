@@ -18,7 +18,7 @@ class Header extends Component {
         settings: [],
 
         selectedTmpDate: null,
-        event: null,
+        results: [],
 
         nodes: [],
         selectedNode: null,
@@ -243,7 +243,7 @@ class Header extends Component {
         .concat('&ouMode=SELECTED&order=created:desc&fields=*,enrollments[*]')
 
         axios.get(URL)
-            .then(response => this.setState({event: null, loading: false}, () => {
+            .then(response => this.setState({results: [], loading: false}, () => {
                 // console.log('les tei correspondantes sont alor ce que nous voyons here == ', response.data)
 
                 const trackedEntityInstances = response.data.trackedEntityInstances
@@ -255,39 +255,46 @@ class Header extends Component {
                     return event
                 }).filter (event => event.tmpDate === this.state.selectedTmpDate)
 
-                if (events.length > 0) {
-                    const event = events[0]
-                    const trackedEntityInstance = trackedEntityInstances.find(tei => tei.trackedEntityInstance === event.trackedEntityInstance)
-                    const supervisorName = event.dataValues.find(dataValue => dataValue.dataElement === 'xt4RajdoLfr')?.value
-                    const ascName = trackedEntityInstance.attributes.find (attribute => attribute.attribute === 'Wjb3loRDIpE')?.value
-                    const ascPhoneNumber = trackedEntityInstance.attributes.find (attribute => attribute.attribute === 'mVOHrA5DRVl')?.value
+                // if (events.length > 0) {
 
+                    events.forEach(event => {
+                        
+                        const trackedEntityInstance = trackedEntityInstances.find(tei => tei.trackedEntityInstance === event.trackedEntityInstance)
+                        const supervisorName = event.dataValues.find(dataValue => dataValue.dataElement === 'xt4RajdoLfr')?.value
+                        const ascName = trackedEntityInstance.attributes.find (attribute => attribute.attribute === 'Wjb3loRDIpE')?.value
+                        const ascPhoneNumber = trackedEntityInstance.attributes.find (attribute => attribute.attribute === 'mVOHrA5DRVl')?.value
+                        
+                        const URI = API_BASE_ROUTE.concat("/analytics.json?dimension=dx:Lq3KIp6wqzJ;mvbYARUF4iZ;Ni35jPYuJQF;N0iJtCKzYhc&dimension=ou:LEVEL-5;")
+                        .concat(this.state.selectedNode.id)
+                        .concat("&filter=pe:").concat(this.state.selectedTmpDate.replace('-', ''))
+                        .concat("&displayProperty=NAME&tableLayout=true&columns=dx&rows=ou&hideEmptyColumns=true&hideEmptyRows=true&showHierarchy=true")
+                        
+                        this.setState({loading: true}, 
+                            () =>   axios.get(URI)
+                            .then(response => {
+                                
+                                response.data.rows.forEach(row => {
 
-                    const URI = API_BASE_ROUTE.concat("/analytics.json?dimension=dx:Lq3KIp6wqzJ;mvbYARUF4iZ;Ni35jPYuJQF;N0iJtCKzYhc&dimension=ou:LEVEL-5;")
-                    .concat(this.state.selectedNode.id)
-                    .concat("&filter=pe:").concat(this.state.selectedTmpDate.replace('-', ''))
-                    .concat("&displayProperty=NAME&tableLayout=true&columns=dx&rows=ou&hideEmptyColumns=true&hideEmptyRows=true&showHierarchy=true")
+                                    event.ascName = ascName.concat(' (').concat(row[6]).concat(') ')
+                                    event.ascPhoneNumber = ascPhoneNumber
+                                    event.supervisorName = supervisorName
+                                    event.vad = row[7]
+                                    event.cdg = row[8]
+                                    event.pecadom = row[9]
+                                    event.sp3 = row[10]
+                                    event.montantSp3 = row[10] ? parseInt(row[10]) * 750 : 0  
+                                    event.district = row[2]
+                                    event.bonus = event.montantSp3 + 20000
+                                    event.mobileMoney = 700
+                                    event.totalBonus = event.mobileMoney + event.bonus
 
-                    this.setState({loading: true}, () => 
-                                                        axios.get(URI)
-                                                        .then(response => {
-                                                            event.ascName = ascName
-                                                            event.ascPhoneNumber = ascPhoneNumber
-                                                            event.supervisorName = supervisorName
-                                                            event.vad = response.data.rows[0][7]
-                                                            event.cdg = response.data.rows[0][8]
-                                                            event.pecadom = response.data.rows[0][9]
-                                                            event.sp3 = response.data.rows[0][10]
-                                                            event.montantSp3 = response.data.rows[0][10] ? parseInt(response.data.rows[0][10]) * 750 : 0  
-                                                            event.district = response.data.rows[0][2]
-                                                            event.bonus = event.montantSp3 + 20000
-                                                            event.mobileMoney = 700
-                                                            event.totalBonus = event.mobileMoney + event.bonus
-                                                            
-                                                            this.setState ({event, loading: false})
-                                                        }).catch(error => this.setState({loading: false}, () => NotificationManager.error(error.message, null, 3000)))
-                    )
-                }
+                                    // results = results.concat(event)
+                                    this.setState ({results: this.state.results.concat(event), loading: false})
+                                })
+                            }).catch(error => this.setState({loading: false}, () => NotificationManager.error(error.message, null, 3000)))
+                        )
+                    })
+                // }
 
                 // console.log('la liste des events est donc ce que voici ', events)
 
@@ -483,7 +490,14 @@ class Header extends Component {
                 </div>
 
             {
-                this.state.displayReportResults && 
+                this.state.displayReportResults && this.state.results.length === 0 &&
+                <div className="alert alert-primary m-3">
+                    No results were found
+                </div>
+            }
+
+            {
+                this.state.displayReportResults && this.state.results.length > 0 && 
                             <div className="row my-3">
                                 <div className="col">
                                     <table className="table table-striped table-hover table-sm table-bordered">
@@ -508,28 +522,29 @@ class Header extends Component {
 
                                         <tbody>
                                             {
-                                                this.state.event &&
+                                                this.state.results.map( (result, index) =>
                                                 <tr>
-                                                    <td>01</td>
-                                                    <td>{this.state.event.district}</td>
-                                                    <td>{this.state.event.supervisorName}</td>
-                                                    <td>{this.state.event.ascName}</td>
-                                                    <td>{this.state.event.ascPhoneNumber}</td>
-                                                    <td>{this.state.event.ascPhoneNumber}</td>
-                                                    <td>{this.state.event.vad}</td>
-                                                    <td>{this.state.event.cdg}</td>
-                                                    <td>{this.state.event.pecadom}</td>
-                                                    <td>{this.state.event.sp3}</td>
-                                                    <td>{'ReportStatus'}</td>
-                                                    <td>{ this.state.event.montantSp3 }</td>
-                                                    <td>{ this.state.event.bonus }</td>
-                                                    <td>{ this.state.event.mobileMoney }</td>
-                                                    <td>{ this.state.event.totalBonus }</td>
+                                                    <td>{ index + 1 }</td>
+                                                    <td>{ result.district}</td>
+                                                    <td>{ result.supervisorName}</td>
+                                                    <td>{ result.ascName}</td>
+                                                    <td>{ result.ascPhoneNumber}</td>
+                                                    <td>{ result.ascPhoneNumber}</td>
+                                                    <td>{ result.vad}</td>
+                                                    <td>{ result.cdg}</td>
+                                                    <td>{ result.pecadom}</td>
+                                                    <td>{ result.sp3}</td>
+                                                    <td>{ 'Status' }</td>
+                                                    <td>{ result.montantSp3 }</td>
+                                                    <td>{ result.bonus }</td>
+                                                    <td>{ result.mobileMoney }</td>
+                                                    <td>{ result.totalBonus }</td>
                                                     <td>
                                                         <i className="bi bi-check2-all text-success m-1 Settings" title="Valider"></i>
                                                         <i className="bi bi-x-octagon text-danger m-1 Settings" title="InValider"></i>
                                                     </td>
-                                                </tr> }                                            
+                                                </tr>
+                                                ) }                                            
                                         </tbody>
                                     </table>
                                 </div>
