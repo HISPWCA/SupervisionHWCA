@@ -243,7 +243,7 @@ class Header extends Component {
         .concat('&ouMode=SELECTED&order=created:desc&fields=*,enrollments[*]')
 
         axios.get(URL)
-            .then(response => this.setState({loading: false}, () => {
+            .then(response => this.setState({event: null, loading: false}, () => {
                 // console.log('les tei correspondantes sont alor ce que nous voyons here == ', response.data)
 
                 const trackedEntityInstances = response.data.trackedEntityInstances
@@ -263,7 +263,8 @@ class Header extends Component {
                     const ascPhoneNumber = trackedEntityInstance.attributes.find (attribute => attribute.attribute === 'mVOHrA5DRVl')?.value
 
 
-                    const URI = API_BASE_ROUTE.concat("/analytics.json?dimension=dx:Lq3KIp6wqzJ;mvbYARUF4iZ;Ni35jPYuJQF;N0iJtCKzYhc&dimension=ou:").concat(this.state.selectedNode.id)
+                    const URI = API_BASE_ROUTE.concat("/analytics.json?dimension=dx:Lq3KIp6wqzJ;mvbYARUF4iZ;Ni35jPYuJQF;N0iJtCKzYhc&dimension=ou:LEVEL-5;")
+                    .concat(this.state.selectedNode.id)
                     .concat("&filter=pe:").concat(this.state.selectedTmpDate.replace('-', ''))
                     .concat("&displayProperty=NAME&tableLayout=true&columns=dx&rows=ou&hideEmptyColumns=true&hideEmptyRows=true&showHierarchy=true")
 
@@ -276,7 +277,12 @@ class Header extends Component {
                                                             event.vad = response.data.rows[0][7]
                                                             event.cdg = response.data.rows[0][8]
                                                             event.pecadom = response.data.rows[0][9]
+                                                            event.sp3 = response.data.rows[0][10]
+                                                            event.montantSp3 = response.data.rows[0][10] ? parseInt(response.data.rows[0][10]) * 750 : 0  
                                                             event.district = response.data.rows[0][2]
+                                                            event.bonus = event.montantSp3 + 20000
+                                                            event.mobileMoney = 700
+                                                            event.totalBonus = event.mobileMoney + event.bonus
                                                             
                                                             this.setState ({event, loading: false})
                                                         }).catch(error => this.setState({loading: false}, () => NotificationManager.error(error.message, null, 3000)))
@@ -497,6 +503,7 @@ class Header extends Component {
                                             <th className=' align-middle'>{translate('Bonus')}</th>
                                             <th className=' align-middle'>{translate('MobileMoneyFees')}</th>
                                             <th className=' align-middle'>{translate('TotalBonus')}</th>
+                                            <th className=' align-middle'>{translate('Action')}</th>
                                         </thead>
 
                                         <tbody>
@@ -508,19 +515,22 @@ class Header extends Component {
                                                     <td>{this.state.event.supervisorName}</td>
                                                     <td>{this.state.event.ascName}</td>
                                                     <td>{this.state.event.ascPhoneNumber}</td>
-                                                    <td>{'Orange'}</td>
+                                                    <td>{this.state.event.ascPhoneNumber}</td>
                                                     <td>{this.state.event.vad}</td>
                                                     <td>{this.state.event.cdg}</td>
                                                     <td>{this.state.event.pecadom}</td>
-                                                    <td>{'SP3'}</td>
+                                                    <td>{this.state.event.sp3}</td>
                                                     <td>{'ReportStatus'}</td>
-                                                    <td>{'SP3Amount'}</td>
-                                                    <td>{'Bonus'}</td>
-                                                    <td>{'MobileMoneyFees'}</td>
-                                                    <td>{'TotalBonus'}</td>
+                                                    <td>{ this.state.event.montantSp3 }</td>
+                                                    <td>{ this.state.event.bonus }</td>
+                                                    <td>{ this.state.event.mobileMoney }</td>
+                                                    <td>{ this.state.event.totalBonus }</td>
+                                                    <td>
+                                                        <i className="bi bi-check2-all text-success m-1 Settings" title="Valider"></i>
+                                                        <i className="bi bi-x-octagon text-danger m-1 Settings" title="InValider"></i>
+                                                    </td>
                                                 </tr> }                                            
                                         </tbody>
-
                                     </table>
                                 </div>
                             </div>
