@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
 import axios from 'axios'
 import { NotificationManager } from 'react-notifications'
-import { SETTINGS_ROUTE, USER_GROUPS_ROUTE } from '../api.routes'
+import { SETTINGS_ROUTE, API_BASE_ROUTE, USER_GROUPS_ROUTE, TRACKED_ENTITY_INSTANCES_ROUTE, TRACKER_PROGRAMS_ROUTE, ORGANISATION_UNITS_ROUTE } from '../api.routes'
 import LoadingOverlay from 'react-loading-overlay'
 import { Dialog } from 'primereact/dialog'
 import MultiSelect from "@khanacademy/react-multi-select"
 import { DatePicker } from 'antd'
+import { Tree } from 'primereact/tree'
+import moment from 'moment'
 
 import translate from '../utils/translator'
 
@@ -15,7 +17,17 @@ class Header extends Component {
         me: null,
         settings: [],
 
+        selectedTmpDate: null,
+        event: null,
+
+        nodes: [],
+        selectedNode: null,
+        selectedProgram: null,
+        trackerPrograms : [],
+
         headerBarInMaintenance: true,
+        trackedEntityInstances: [],
+        events: [],
 
         setting: null,
         loading: false,
@@ -39,6 +51,8 @@ class Header extends Component {
 
     componentDidMount() {
         this.loadUserGroups()
+        this.loadTrackerPrograms()
+        this.loadOrganisationUnits()
     }
 
 
@@ -213,15 +227,204 @@ class Header extends Component {
                 </div>
         </Dialog>
 
-    handleReportingMonth = (date, dateString) => {
-        console.log('Month is then this')
+    handleReportingMonth = (date, dateString) => this.setState({selectedTmpDate: dateString})
 
-        console.log(date, dateString)
-    }
-    
-    displayReportingBox = () =>
-        this.state.displayReportingTool &&
-        <Dialog header={translate('PaymentStatus')}
+    loadTrackerPrograms = ()=>this.setState({loading: true},
+         ()=> axios.get(TRACKER_PROGRAMS_ROUTE)
+         .then(response => this.setState({loading: false, trackerPrograms: response.data.programs, selectedProgram: response.data.programs.length > 0 ? response.data.programs[0]: null}))
+         .catch(error => this.setState({loading: false}, () => NotificationManager.error(error.message, null, 3000))))
+
+    loadTEIs = () =>  this.state.selectedNode &&   this.state.selectedNode.id && this.state.selectedProgram  &&  this.state.selectedProgram.id &&  this.setState({loading: true}, () => {
+        const URL = TRACKED_ENTITY_INSTANCES_ROUTE
+        .concat('.json?program=')
+        .concat(this.state.selectedProgram.id)
+        .concat('&ou=')
+        .concat(this.state.selectedNode.id)
+        .concat('&ouMode=SELECTED&order=created:desc&fields=*,enrollments[*]')
+
+        axios.get(URL)
+            .then(response => this.setState({loading: false}, () => {
+                // console.log('les tei correspondantes sont alor ce que nous voyons here == ', response.data)
+
+                const trackedEntityInstances = response.data.trackedEntityInstances
+                // const events = response.data.trackedEntityInstances.map(tei =>  tei.enrollments.map(enrollment => enrollment.events)).flat(30)
+                const events = this.flatDeep(trackedEntityInstances.map(tei =>  tei.enrollments.map(enrollment => enrollment.events))).filter (e => e.eventDate !== undefined &&  e.eventDate !== null  )
+                .map(event => { 
+                    event.tmpDate = moment(event.eventDate).format('YYYY-MM')
+
+                    return event
+                }).filter (event => event.tmpDate === this.state.selectedTmpDate)
+
+                if (events.length > 0) {
+                    const event = events[0]
+                    const trackedEntityInstance = trackedEntityInstances.find(tei => tei.trackedEntityInstance === event.trackedEntityInstance)
+                    const supervisorName = event.dataValues.find(dataValue => dataValue.dataElement === 'xt4RajdoLfr')?.value
+                    const ascName = trackedEntityInstance.attributes.find (attribute => attribute.attribute === 'Wjb3loRDIpE')?.value
+                    const ascPhoneNumber = trackedEntityInstance.attributes.find (attribute => attribute.attribute === 'mVOHrA5DRVl')?.value
+
+
+                    const URI = API_BASE_ROUTE.concat("/analytics.json?dimension=dx:Lq3KIp6wqzJ;mvbYARUF4iZ;Ni35jPYuJQF;N0iJtCKzYhc&dimension=ou:").concat(this.state.selectedNode.id)
+                    .concat("&filter=pe:").concat(this.state.selectedTmpDate.replace('-', ''))
+                    .concat("&displayProperty=NAME&tableLayout=true&columns=dx&rows=ou&hideEmptyColumns=true&hideEmptyRows=true&showHierarchy=true")
+
+                    this.setState({loading: true}, () => 
+                                                        axios.get(URI)
+                                                        .then(response => {
+                                                            event.ascName = ascName
+                                                            event.ascPhoneNumber = ascPhoneNumber
+                                                            event.supervisorName = supervisorName
+                                                            event.vad = response.data.rows[0][7]
+                                                            event.cdg = response.data.rows[0][8]
+                                                            event.pecadom = response.data.rows[0][9]
+                                                            event.district = response.data.rows[0][2]
+                                                            
+                                                            this.setState ({event, loading: false})
+                                                        }).catch(error => this.setState({loading: false}, () => NotificationManager.error(error.message, null, 3000)))
+                    )
+                }
+
+                // console.log('la liste des events est donc ce que voici ', events)
+
+            })).catch(error => this.setState({loading: false}, () => NotificationManager.error(error.message, null, 3000)))
+    })
+
+    flatDeep = arr => arr.reduce((acc, val) => acc.concat(Array.isArray(val) ? this.flatDeep(val) : val), []);
+     
+
+    loadOrganisationUnits = () => this.setState({loading: true}, 
+        () =>  axios.get(ORGANISATION_UNITS_ROUTE)
+        .then(response => {
+            this.setState({loading: false, organisationUnits: response.data.organisationUnits }, () => {
+                const organisationUnits = response.data.organisationUnits
+                    .map(o => {
+                        return {
+                            key: o.id,
+                            label: o.displayName,
+                            data: o,
+                            children: [],
+                            parent: (o.parent !== null && o.parent !== undefined) ? o.parent.id : null
+                        }
+                    })
+
+                const nodes = organisationUnits.filter(o => o.parent === null)
+
+                nodes.forEach(o => {
+                    o.children = organisationUnits.filter(org => org.parent === o.key)
+
+                    o.children.forEach(a => {
+                        a.children = organisationUnits.filter(org => org.parent === a.key)
+
+                        a.children.forEach(b => {
+                            b.children = organisationUnits.filter(org => org.parent === b.key)
+
+                            b.children.forEach(c => {
+                                c.children = organisationUnits.filter(org => org.parent === c.key)
+
+                                c.children.forEach(d => {
+                                    d.children = organisationUnits.filter(org => org.parent === d.key)
+
+                                    d.children.forEach(e => {
+                                        e.children = organisationUnits.filter(org => org.parent === e.key)
+
+                                        e.children.forEach(f => {
+                                            f.children = organisationUnits.filter(org => org.parent === f.key)
+
+                                            f.children.forEach(g => {
+                                                g.children = organisationUnits.filter(org => org.parent === g.key)
+
+                                                g.children.forEach(h => {
+                                                    h.children = organisationUnits.filter(org => org.parent === h.key)
+
+                                                    h.children.forEach(i => {
+                                                        i.children = organisationUnits.filter(org => org.parent === i.key)
+
+                                                        i.children.forEach(j => {
+                                                            j.children = organisationUnits.filter(org => org.parent === j.key)
+
+                                                            j.children.forEach(k => {
+                                                                k.children = organisationUnits.filter(org => org.parent === k.key)
+
+                                                                k.children.forEach(l => {
+                                                                    l.children = organisationUnits.filter(org => org.parent === l.key)
+
+                                                                    l.children.forEach(m => {
+                                                                        m.children = organisationUnits.filter(org => org.parent === m.key)
+
+                                                                        m.children.forEach(n => {
+                                                                            n.children = organisationUnits.filter(org => org.parent === n.key)
+
+                                                                            n.children.forEach(p => {
+                                                                                p.children = organisationUnits.filter(org => org.parent === p.key)
+
+                                                                                p.children.forEach(q => {
+                                                                                    q.children = organisationUnits.filter(org => org.parent === q.key)
+
+                                                                                    q.children.forEach(r => {
+                                                                                        r.children = organisationUnits.filter(org => org.parent === r.key)
+
+                                                                                        r.children.forEach(s => {
+                                                                                            s.children = organisationUnits.filter(org => org.parent === s.key)
+
+                                                                                            s.children.forEach(t => {
+                                                                                                t.children = organisationUnits.filter(org => org.parent === t.key)
+
+                                                                                                t.children.forEach(u => {
+                                                                                                    u.children = organisationUnits.filter(org => org.parent === u.key)
+
+                                                                                                    u.children.forEach(v => {
+                                                                                                        v.children = organisationUnits.filter(org => org.parent === v.key)
+
+                                                                                                        v.children.forEach(w => {
+                                                                                                            w.children = organisationUnits.filter(org => org.parent === w.key)
+
+                                                                                                            w.children.forEach(x => {
+                                                                                                                x.children = organisationUnits.filter(org => org.parent === x.key)
+
+                                                                                                                x.children.forEach(y => {
+                                                                                                                    y.children = organisationUnits.filter(org => org.parent === y.key)
+
+                                                                                                                    y.children.forEach(z => {
+                                                                                                                        z.children = organisationUnits.filter(org => org.parent === z.key)
+                                                                                                                    })
+                                                                                                                })
+                                                                                                            })
+                                                                                                        })
+                                                                                                    })
+                                                                                                })
+                                                                                            })
+                                                                                        })
+                                                                                    })
+                                                                                })
+                                                                            })
+                                                                        })
+                                                                    })
+                                                                })
+                                                            })
+                                                        })
+                                                    })
+                                                })
+                                            })
+                                        })
+                                    })
+                                })
+                            })
+                        })
+                    })
+                })
+
+                this.setState({ nodes })
+            })
+
+        }).catch(error => this.setState({loading: false}, () => NotificationManager.error(error.message, null, 3000))))
+
+    nodeHandler = e => this.setState({ selectedNode: this.state.organisationUnits.find(o => e === o.id) })
+
+    displayRepotingTitle  = () => this.state.selectedNode ?  
+        translate('PaymentStatus').concat (' - ').concat(this.state.selectedProgram.displayName).concat (' - ').concat(this.state.selectedNode?.displayName)  : 
+            translate('PaymentStatus').concat (' - ').concat(this.state.selectedProgram.displayName) 
+
+    displayReportingBox = () =>  this.state.displayReportingTool &&
+        <Dialog header={this.displayRepotingTitle()}
             visible={this.state.displayReportingTool}
             style={{ width: '75vw' }}
             onHide={() => this.setState({ displayReportingTool: false })}>
@@ -235,17 +438,39 @@ class Header extends Component {
                 </div>
 
                 <div className="row my-1">
-                    <div className="col text-right font-weight-bold">{ translate('Month')}</div>
-                    <div className="col text-left"><DatePicker onChange={this.handleReportingMonth} picker="month" /></div>
-                    
-                    <div className="col text-right font-weight-bold">{ translate('Area')}</div>
-                    <div className="col text-left">{ translate('DirectImplementation')} </div>
+                    <div className="col text-left">
+                        { 
+                            this.state.nodes.length > 0 &&
+                            <>
+                                <strong>{translate('OrganisationUnit')}</strong>
 
-                    <div className="col text-right font-weight-bold">{translate('TechOfficerName')}:</div>
-                    <div className="col text-left">JIMMY Kofi kofi</div>
+                                <Tree value={this.state.nodes}
+                                    selectionMode="single"
+                                    filter={true}
+                                    selectionKeys={this.state.selectedNode}
+                                    onSelectionChange={e => this.nodeHandler(e.value)} />
+                            </>
+                        }
+                    </div>
+                    
+                    <div className="col text-left">
+                        <strong className="col font-weight-bold">{ translate('Month')}</strong>
+                        <DatePicker onChange={this.handleReportingMonth} picker="month" />
+                    </div>
+                    
+                    
+                    <div className="col text-left">
+                        <strong className="col font-weight-bold">{ translate('Area')}</strong>
+                        { translate('DirectImplementation')}
+                    </div>
+
+                    <div className="col text-left">
+                        <strong className="col font-weight-bold">{translate('TechOfficerName')}:</strong>
+                        JIMMY Kofi kofi
+                    </div>
 
                     <div className="col text-right">
-                        <button className="btn btn-sm btn-primary" onClick={()=> this.setState({displayReportResults: true})}>
+                        <button className="btn btn-sm btn-primary" onClick={()=> this.setState({displayReportResults: true}, () => this.loadTEIs ())}>
                             {translate('Generate')}
                         </button>
                     </div>
@@ -273,6 +498,29 @@ class Header extends Component {
                                             <th className=' align-middle'>{translate('MobileMoneyFees')}</th>
                                             <th className=' align-middle'>{translate('TotalBonus')}</th>
                                         </thead>
+
+                                        <tbody>
+                                            {
+                                                this.state.event &&
+                                                <tr>
+                                                    <td>01</td>
+                                                    <td>{this.state.event.district}</td>
+                                                    <td>{this.state.event.supervisorName}</td>
+                                                    <td>{this.state.event.ascName}</td>
+                                                    <td>{this.state.event.ascPhoneNumber}</td>
+                                                    <td>{'Orange'}</td>
+                                                    <td>{this.state.event.vad}</td>
+                                                    <td>{this.state.event.cdg}</td>
+                                                    <td>{this.state.event.pecadom}</td>
+                                                    <td>{'SP3'}</td>
+                                                    <td>{'ReportStatus'}</td>
+                                                    <td>{'SP3Amount'}</td>
+                                                    <td>{'Bonus'}</td>
+                                                    <td>{'MobileMoneyFees'}</td>
+                                                    <td>{'TotalBonus'}</td>
+                                                </tr> }                                            
+                                        </tbody>
+
                                     </table>
                                 </div>
                             </div>
@@ -288,7 +536,7 @@ class Header extends Component {
         for (let i = 0; i < ids.length; i++) {
             for (let j = 0; j < dis.length; j++) {
                 if (ids[i] === dis[j])
-                return true
+                   return true
             }
         }
         
@@ -326,16 +574,15 @@ class Header extends Component {
                         </h1>
                     </div>
 
-                    {
-                       ! this.state.headerBarInMaintenance && 
-                        <div className="col text-right d-none">
+                    {/* { ! this.state.headerBarInMaintenance &&  */}
+                        <div className="col text-right d-none-">
                             <button
                                 onClick={()=> this.setState({displayReportingTool: !this.state.displayReportingTool, displayReportResults: false})}
-                                className={this.state.displayReportingTool ? 'btn btn-sm btn-link- btn-danger my-2 mx-1 d-none' : 'btn btn-sm btn-link- btn-primary my-2 mx-1 d-none'} >
+                                className={this.state.displayReportingTool ? 'btn btn-sm btn-link- btn-danger my-2 mx-1 d-none-' : 'btn btn-sm btn-link- btn-primary my-2 mx-1 d-none-'} >
                                 {this.state.displayReportingTool ? translate('CloseReportingTool') : translate('DisplayReportingTool')}
                             </button>
 
-                            <button className={ 'btn btn-sm btn-secondary my-2 mx-1 d-none' } 
+                            {/* <button className={ 'btn btn-sm btn-secondary my-2 mx-1 d-none' } 
                                     onClick={()=> this.setState({displayReportResultsApproval: true})}>
                                     {translate('ReportingApprovalOptions')}
                             </button>
@@ -345,8 +592,9 @@ class Header extends Component {
                                     () => this.state.displaySharingOptions && this.retrieveSettingsFromDataStore())}
                                 className={this.state.displaySharingOptions ? 'btn btn-sm btn-link btn-primary my-2 mx-1 d-none' : 'btn btn-sm btn-link btn-secondary my-2 mx-1 d-none'} >
                                 {this.state.displaySharingOptions ? translate('CloseIndicatorsSharingOptions') : translate('DisplayIndicatorsSharingOptions')}
-                            </button>
-                        </div>}
+                            </button> */}
+                        </div>
+                         {/* } */}
                 </div>
 
                 {

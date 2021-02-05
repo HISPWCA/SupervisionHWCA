@@ -4,7 +4,6 @@ import { INDICATORS_ROUTE } from '../api.routes';
 import { NotificationManager } from 'react-notifications';
 import translate from '../utils/translator';
 
-const SELECT = translate('Select')
 
 export class SettingsForm extends Component {
 
@@ -16,7 +15,7 @@ export class SettingsForm extends Component {
         weight: 0,
         categories: [],
         selectedIndicators: [],
-        selectedTrackerProgram: SELECT,
+        selectedTrackerProgram: translate('Select'),
         hightIsGood: this.props.currentSelectedIndicator.hightIsGood,
     }
 
@@ -36,7 +35,7 @@ export class SettingsForm extends Component {
         const name = event.target.name
 
         if (event.target.type === 'select-one') 
-            this.setState({ [name]: event.target.value === SELECT ? event.target.value : JSON.parse(event.target.value) })
+            this.setState({ [name]: event.target.value === translate('Select') ? event.target.value : JSON.parse(event.target.value) })
         else if (event.target.type === 'checkbox') 
             this.setState({ [name]: event.target.checked })
          else if (name.endsWith('min') && name !== 'min') {
