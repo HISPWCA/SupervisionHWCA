@@ -489,12 +489,7 @@ class Header extends Component {
                     </div>
                 </div>
 
-            {
-                this.state.displayReportResults && this.state.results.length === 0 &&
-                <div className="alert alert-primary m-3">
-                    No results were found
-                </div>
-            }
+            { this.state.displayReportResults && this.state.results.length === 0 && <div className="alert alert-primary my-2"> No results were found </div> }
 
             {
                 this.state.displayReportResults && this.state.results.length > 0 && 
@@ -540,11 +535,13 @@ class Header extends Component {
                                                     <td>{ result.mobileMoney }</td>
                                                     <td>{ result.totalBonus }</td>
                                                     <td>
-                                                        <i className="bi bi-check2-all text-success m-1 Settings" title="Valider"></i>
-                                                        <i className="bi bi-x-octagon text-danger m-1 Settings" title="InValider"></i>
+                                                        <div className="form-group">
+                                                            <i className="bi bi-check2-all text-success m-1-- btn btn-sm btm-primary" title="Valider"></i>
+                                                            <i className="bi bi-x-octagon text-danger m-1-- btn btn-sm btm-danger" title="InValider"></i>
+                                                        </div>
                                                     </td>
                                                 </tr>
-                                                ) }                                            
+                                                )}
                                         </tbody>
                                     </table>
                                 </div>
