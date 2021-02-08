@@ -8,7 +8,6 @@ import { HeaderBar } from '@dhis2/ui'
 import axios from 'axios'
 import { NotificationContainer } from 'react-notifications'
 import { NotificationManager } from 'react-notifications'
-import ColumnGroup from 'antd/lib/table/ColumnGroup'
 
 const BASE_ROUTE = API_BASE_ROUTE.substring(0, API_BASE_ROUTE.indexOf('/api'))
 
@@ -20,11 +19,12 @@ class App extends Component {
     globalSettingsCreated: false,
   }
 
-  constructor() {
-    super()
+  // constructor() {
+    // super()
+componentDidMount() {
 
 
-    axios.get(SETTINGS_ROUTE)
+  axios.get(SETTINGS_ROUTE)
     .then(() => this.setState({ settingsCreated: true }, () => console.clear()))
     .catch(() => axios.post(SETTINGS_ROUTE, []).then(() => this.setState({ settingsCreated: true }, () => console.clear())).catch(() => this.setState({ settingsCreated: false }, () => console.clear())))
 
@@ -46,10 +46,7 @@ class App extends Component {
     
   }
 
-  // componentDidMount() { console.clear() }
-
-  render() {
-    return (
+  render = () => 
       <Provider config={{ apiVersion: 29, baseUrl: BASE_ROUTE }}>
         <HeaderBar appName='Supervision Management' />
         {
@@ -80,8 +77,6 @@ class App extends Component {
           </div>
         }
       </Provider>
-    )
-  }
 }
 
 export default App

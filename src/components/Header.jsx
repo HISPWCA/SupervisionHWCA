@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import axios from 'axios'
 import { NotificationManager } from 'react-notifications'
-import { SETTINGS_ROUTE, API_BASE_ROUTE, USER_GROUPS_ROUTE, TRACKED_ENTITY_INSTANCES_ROUTE, TRACKER_PROGRAMS_ROUTE, ORGANISATION_UNITS_ROUTE } from '../api.routes'
+import { SETTINGS_ROUTE, API_BASE_ROUTE, USER_GROUPS_ROUTE, GLOBAL_SETTINGS_ROUTE, TRACKED_ENTITY_INSTANCES_ROUTE, TRACKER_PROGRAMS_ROUTE, ORGANISATION_UNITS_ROUTE } from '../api.routes'
 import LoadingOverlay from 'react-loading-overlay'
 import { Dialog } from 'primereact/dialog'
 import MultiSelect from "@khanacademy/react-multi-select"
@@ -29,6 +29,8 @@ class Header extends Component {
         trackedEntityInstances: [],
         events: [],
 
+        globalSettings: null,
+
         setting: null,
         loading: false,
         sharing: false,
@@ -50,6 +52,7 @@ class Header extends Component {
 
 
     componentDidMount() {
+        this.retrieveGlobalSettingsFromServer()
         this.loadUserGroups()
         this.loadTrackerPrograms()
         this.loadOrganisationUnits()
@@ -234,6 +237,12 @@ class Header extends Component {
          .then(response => this.setState({loading: false, trackerPrograms: response.data.programs, selectedProgram: response.data.programs.length > 0 ? response.data.programs[0]: null}))
          .catch(error => this.setState({loading: false}, () => NotificationManager.error(error.message, null, 3000))))
 
+
+    retrieveGlobalSettingsFromServer = () => axios.get(GLOBAL_SETTINGS_ROUTE)
+         .then(response => this.setState({ globalSettings: null }, () => this.setState({ globalSettings: response.data })))
+         .catch(error => NotificationManager.error(error.message, null, 3000))
+
+
     loadTEIs = () =>  this.state.selectedNode &&   this.state.selectedNode.id && this.state.selectedProgram  &&  this.state.selectedProgram.id &&  this.setState({loading: true}, () => {
         const URL = TRACKED_ENTITY_INSTANCES_ROUTE
         .concat('.json?program=')
@@ -259,8 +268,9 @@ class Header extends Component {
 
                     events.forEach(event => {
                         
+                        let supervisorName = event.dataValues.find(dataValue => dataValue.dataElement === 'xt4RajdoLfr')?.value
+                        supervisorName = supervisorName ? supervisorName : event.storedBy
                         const trackedEntityInstance = trackedEntityInstances.find(tei => tei.trackedEntityInstance === event.trackedEntityInstance)
-                        const supervisorName = event.dataValues.find(dataValue => dataValue.dataElement === 'xt4RajdoLfr')?.value
                         const ascName = trackedEntityInstance.attributes.find (attribute => attribute.attribute === 'Wjb3loRDIpE')?.value
                         const ascPhoneNumber = trackedEntityInstance.attributes.find (attribute => attribute.attribute === 'mVOHrA5DRVl')?.value
                         
@@ -278,14 +288,14 @@ class Header extends Component {
                                     event.ascName = ascName.concat(' (').concat(row[6]).concat(') ')
                                     event.ascPhoneNumber = ascPhoneNumber
                                     event.supervisorName = supervisorName
-                                    event.vad = row[7]
-                                    event.cdg = row[8]
-                                    event.pecadom = row[9]
-                                    event.sp3 = row[10]
-                                    event.montantSp3 = row[10] ? parseInt(row[10]) * 750 : 0  
-                                    event.district = row[2]
-                                    event.bonus = event.montantSp3 + 20000
-                                    event.mobileMoney = 700
+                                    event.vad = parseInt(row[7]) ? parseInt(row[7]): 0  
+                                    event.cdg = parseInt(row[8]) ? parseInt(row[8]) : 0  
+                                    event.pecadom = parseInt(row[9]) ? parseInt(row[9]) : 0  
+                                    event.sp3 = parseInt(row[10]) ? parseInt(row[10]) : 0   
+                                    event.montantSp3 = parseInt(row[10]) ? parseInt(row[10]) * this.state.globalSettings.sp3Rate : 0  
+                                    event.district = parseInt(row[2]) ? parseInt(row[2]) : 0  
+                                    event.bonus = event.montantSp3 + this.state.globalSettings.bonus
+                                    event.mobileMoney = this.state.globalSettings.mobileMoney
                                     event.totalBonus = event.mobileMoney + event.bonus
 
                                     // results = results.concat(event)
