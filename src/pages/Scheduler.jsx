@@ -653,7 +653,7 @@ export class Scheduler extends Component {
                                         <th>{translate('ProgramForm')}</th>
                                         <th>{translate('StartDate')} - {translate('EndDate')}</th>
                                         <th>{translate('Status')}</th>
-                                        <th>{translate('Action')}</th>
+                                        <th className="text-right">{translate('Action')}</th>
                                     </thead>
                                     <tbody>
 
@@ -671,7 +671,7 @@ export class Scheduler extends Component {
                                                         {moment(s.period[1]).format('Do MMMM, YYYY') === 'Invalid date' ? moment(s.period[0]).format('Do MMMM, YYYY') : moment(s.period[1]).format('Do MMMM, YYYY')}
                                                     </td>
                                                     <td>{s.status}</td>
-                                                    <td>
+                                                    <td  className="text-right">
                                                         <button
                                                             onClick={() => this.handleSupervisionDetails(s)}
                                                             className="btn btn-sm btn-light m-1"
