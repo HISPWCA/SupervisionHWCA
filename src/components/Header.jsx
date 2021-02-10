@@ -293,7 +293,7 @@ class Header extends Component {
                                     event.pecadom = parseInt(row[9]) ? parseInt(row[9]) : 0  
                                     event.sp3 = parseInt(row[10]) ? parseInt(row[10]) : 0   
                                     event.montantSp3 = parseInt(row[10]) ? parseInt(row[10]) * this.state.globalSettings.sp3Rate : 0  
-                                    event.district = parseInt(row[2]) ? parseInt(row[2]) : 0  
+                                    event.district = parseInt(row[2]) ? parseInt(row[2]) : ''  
                                     event.bonus = event.montantSp3 + this.state.globalSettings.bonus
                                     event.mobileMoney = this.state.globalSettings.mobileMoney
                                     event.totalBonus = event.mobileMoney + event.bonus
@@ -546,8 +546,8 @@ class Header extends Component {
                                                     <td>{ result.totalBonus }</td>
                                                     <td>
                                                         <div className="form-group">
-                                                            <i className="bi bi-check2-all text-success m-1-- btn btn-sm btm-primary" title="Valider"></i>
-                                                            <i className="bi bi-x-octagon text-danger m-1-- btn btn-sm btm-danger" title="InValider"></i>
+                                                            <button className="btn btn-sm btm-primary" title="Valider">Valider</button>
+                                                            <button className="btn btn-sm btm-danger" title="InValider">Invalider</button>
                                                         </div>
                                                     </td>
                                                 </tr>
