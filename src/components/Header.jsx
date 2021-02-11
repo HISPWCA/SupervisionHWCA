@@ -8,8 +8,11 @@ import MultiSelect from "@khanacademy/react-multi-select"
 import { DatePicker } from 'antd'
 import { Tree } from 'primereact/tree'
 import moment from 'moment'
-
 import translate from '../utils/translator'
+
+import * as FileSaver from 'file-saver'
+import * as XLSX from 'xlsx'
+import { CSVLink } from 'react-csv'
 
 class Header extends Component {
 
@@ -441,6 +444,19 @@ class Header extends Component {
         translate('PaymentStatus').concat (' - ').concat(this.state.selectedProgram.displayName).concat (' - ').concat(this.state.selectedNode?.displayName)  : 
             translate('PaymentStatus').concat (' - ').concat(this.state.selectedProgram.displayName) 
 
+    exportToExcel = () => {
+        const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+        const fileExtension = '.xlsx';
+        const fileName = 'Report'
+        const csvData = [...this.state.results]
+
+        const ws = XLSX.utils.json_to_sheet(csvData);
+        const wb = { Sheets: { 'data': ws }, SheetNames: ['data'] };
+        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const data = new Blob([excelBuffer], {type: fileType});
+        FileSaver.saveAs(data, fileName + fileExtension);
+    }
+
     displayReportingBox = () =>  this.state.displayReportingTool &&
         <Dialog header={this.displayRepotingTitle()}
             visible={this.state.displayReportingTool}
@@ -500,6 +516,24 @@ class Header extends Component {
                 this.state.displayReportResults && this.state.results.length > 0 && 
                             <div className="row my-3">
                                 <div className="col">
+
+                                    <div className="row my-1">
+                                        <div className="col">
+                                            <div className="text-right form-group">
+                                                <CSVLink data={[...this.state.results]} className="btn btn-sm btn-secondary" filename={'report.csv'}>Export CSV</CSVLink>
+
+                                                <button className="btn btn-sm btn-success m-1" onClick={() => this.exportToExcel()}>
+                                                    Export Excel
+                                                </button>
+
+
+                                                <button className="btn btn-sm btn-primary">
+                                                    Approuver
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <table className="table table-striped table-hover table-sm table-bordered">
                                         <thead className="bg-secondary text-light">
                                             <th className=' align-middle'>{'N°'}</th>
@@ -541,8 +575,8 @@ class Header extends Component {
                                                     <td>{ result.totalBonus }</td>
                                                     <td>
                                                         <div className="form-group">
-                                                            <button className="btn btn-sm btm-primary" title="Valider">Valider</button>
-                                                            <button className="btn btn-sm btm-danger" title="InValider">Invalider</button>
+                                                            <button className="btn btn-sm btn-primary" title="Valider">Valider</button>
+                                                            <button className="btn btn-sm btn-danger" title="InValider">Invalider</button>
                                                         </div>
                                                     </td>
                                                 </tr>
