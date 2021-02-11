@@ -282,32 +282,27 @@ class Header extends Component {
                         this.setState({loading: true}, 
                             () =>   axios.get(URI)
                             .then(response => {
-                                
                                 response.data.rows.forEach(row => {
+                                    const e = {}
 
-                                    event.ascName = ascName.concat(' (').concat(row[6]).concat(') ')
-                                    event.ascPhoneNumber = ascPhoneNumber
-                                    event.supervisorName = supervisorName
-                                    event.vad = parseInt(row[7]) ? parseInt(row[7]): 0  
-                                    event.cdg = parseInt(row[8]) ? parseInt(row[8]) : 0  
-                                    event.pecadom = parseInt(row[9]) ? parseInt(row[9]) : 0  
-                                    event.sp3 = parseInt(row[10]) ? parseInt(row[10]) : 0   
-                                    event.montantSp3 = parseInt(row[10]) ? parseInt(row[10]) * this.state.globalSettings.sp3Rate : 0  
-                                    event.district = parseInt(row[2]) ? parseInt(row[2]) : ''  
-                                    event.bonus = event.montantSp3 + this.state.globalSettings.bonus
-                                    event.mobileMoney = this.state.globalSettings.mobileMoney
-                                    event.totalBonus = event.mobileMoney + event.bonus
+                                    e.ascName = ascName.concat(' (').concat(row[6]).concat(') ')
+                                    e.ascPhoneNumber = ascPhoneNumber
+                                    e.supervisorName = supervisorName
+                                    e.vad = parseInt(row[7]) ? parseInt(row[7]): 0  
+                                    e.cdg = parseInt(row[8]) ? parseInt(row[8]) : 0  
+                                    e.pecadom = parseInt(row[9]) ? parseInt(row[9]) : 0  
+                                    e.sp3 = parseInt(row[10]) ? parseInt(row[10]) : 0   
+                                    e.montantSp3 = parseInt(row[10]) ? parseInt(row[10]) * this.state.globalSettings.sp3Rate : 0  
+                                    e.district = row[2] ? row[2] : ''  
+                                    e.bonus = e.montantSp3 + this.state.globalSettings.bonus
+                                    e.mobileMoney = this.state.globalSettings.mobileMoney
+                                    e.totalBonus = e.mobileMoney + e.bonus
 
-                                    // results = results.concat(event)
-                                    this.setState ({results: this.state.results.concat(event), loading: false})
+                                    this.setState ({results: this.state.results.concat(e), loading: false})
                                 })
                             }).catch(error => this.setState({loading: false}, () => NotificationManager.error(error.message, null, 3000)))
                         )
                     })
-                // }
-
-                // console.log('la liste des events est donc ce que voici ', events)
-
             })).catch(error => this.setState({loading: false}, () => NotificationManager.error(error.message, null, 3000)))
     })
 
