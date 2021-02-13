@@ -9,10 +9,14 @@ import { DatePicker } from 'antd'
 import { Tree } from 'primereact/tree'
 import moment from 'moment'
 import translate from '../utils/translator'
-
+import { FaFileExcel, FaFileCsv } from 'react-icons/fa'
+import { GrValidate } from 'react-icons/gr'
+import { GiReturnArrow } from 'react-icons/gi'
+import { CSVLink } from 'react-csv'
+import { BsCursorFill, BsOctagonFill } from 'react-icons/bs'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
-import { CSVLink } from 'react-csv'
+
 
 class Header extends Component {
 
@@ -519,17 +523,13 @@ class Header extends Component {
 
                                     <div className="row my-1">
                                         <div className="col">
-                                            <div className="text-right form-group">
-                                                <CSVLink data={[...this.state.results]} className="btn btn-sm btn-secondary" filename={'report.csv'}>Export CSV</CSVLink>
+                                            <div className="text-right">
+                                                {/* <CSVLink data={[...this.state.results]} className="btn btn-sm btn-secondary" filename={'report.csv'}>Export CSV</CSVLink> */}
+                                                <CSVLink data={[...this.state.results]} className="d-none" filename={'report.csv'}  id="csvElement"   />
+                                                <FaFileExcel style={{cursor: 'pointer', fontSize: '18px' }} title="Exporter au format Excel" className="text-success m-1" onClick={() => this.exportToExcel()} />
+                                                <FaFileCsv style={{cursor: 'pointer', fontSize: '18px'}} title="Exporter au format CSV"  className="text-success m-1" onClick={() => document.getElementById('csvElement').click()()} />
 
-                                                <button className="btn btn-sm btn-success m-1" onClick={() => this.exportToExcel()}>
-                                                    Export Excel
-                                                </button>
-
-
-                                                <button className="btn btn-sm btn-primary">
-                                                    Approuver
-                                                </button>
+                                                <BsCursorFill style={{cursor: 'pointer', fontSize: '18px'}} title="Approuver"  className="text-primary m-1"  />
                                             </div>
                                         </div>
                                     </div>
@@ -573,11 +573,9 @@ class Header extends Component {
                                                     <td>{ result.bonus }</td>
                                                     <td>{ result.mobileMoney }</td>
                                                     <td>{ result.totalBonus }</td>
-                                                    <td>
-                                                        <div className="form-group">
-                                                            <button className="btn btn-sm btn-primary" title="Valider">Valider</button>
-                                                            <button className="btn btn-sm btn-danger" title="InValider">Invalider</button>
-                                                        </div>
+                                                    <td className="text-right">
+                                                        <GrValidate style={{cursor: 'pointer', fontSize: '18px'}} title="Valider" className="m--1 text-primary" />
+                                                        <BsOctagonFill style={{cursor: 'pointer', fontSize: '18px'}} title="Invalider" className="m-1 text-danger" />
                                                     </td>
                                                 </tr>
                                                 )}
