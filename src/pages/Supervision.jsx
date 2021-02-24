@@ -335,7 +335,7 @@ export class Supervision extends Component {
         )
 
         loadTEIs = () => this.setState({loading: true}, () => {
-            const URL = TRACKED_ENTITY_INSTANCES_ROUTE.concat('.json?program=').concat(this.state.trackerProgram).concat('&ou=').concat(this.props.selectedNode.id).concat('&ouMode=SELECTED&order=created:desc&fields=*,enrollments[*]')
+            const URL = TRACKED_ENTITY_INSTANCES_ROUTE.concat('.json?program=').concat(this.state.trackerProgram).concat('&ou=').concat(this.props.selectedNode.id).concat('&ouMode=DESCENDANTS&order=created:desc&fields=*,enrollments[*]')
 
             axios.get(URL)
             .then(response => this.setState({loading: false}, () => this.setState({

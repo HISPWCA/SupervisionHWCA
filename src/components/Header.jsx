@@ -16,6 +16,7 @@ import { CSVLink } from 'react-csv'
 import { BsCursorFill, BsOctagonFill } from 'react-icons/bs'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
+import ReactDatatable from '@ashvin27/react-datatable'
 
 
 class Header extends Component {
@@ -57,7 +58,6 @@ class Header extends Component {
         displayReportResultsApproval: false,
     }
 
-
     componentDidMount() {
         this.retrieveGlobalSettingsFromServer()
         this.loadUserGroups()
@@ -85,7 +85,6 @@ class Header extends Component {
 
 
     handlePartialsSelection = selectedPartials => this.setState({ selectedPartials })
-
 
     updatePartials = selectedPartials => {
         const setting = this.state.setting
@@ -180,7 +179,7 @@ class Header extends Component {
                                         <MultiSelect
                                             options={this.state.userGroups.map(group =>  ({ label: group.displayName, value: group }) )}
                                             selected={this.state.choosenApprovers}
-                                            onSelectedChanged={selected => this.setState({ choosenApprovers: selected }, () => console.log(this.state.choosenApprovers) )} /> 
+                                            onSelectedChanged={selected => this.setState({ choosenApprovers: selected })} /> 
                                     </th>
                                 </tr>
 
@@ -251,19 +250,16 @@ class Header extends Component {
 
 
     loadTEIs = () =>  this.state.selectedNode &&   this.state.selectedNode.id && this.state.selectedProgram  &&  this.state.selectedProgram.id &&  this.setState({loading: true}, () => {
-        const URL = TRACKED_ENTITY_INSTANCES_ROUTE
+        const TEI_URL = TRACKED_ENTITY_INSTANCES_ROUTE
         .concat('.json?program=')
         .concat(this.state.selectedProgram.id)
         .concat('&ou=')
         .concat(this.state.selectedNode.id)
-        .concat('&ouMode=SELECTED&order=created:desc&fields=*,enrollments[*]')
+        .concat('&ouMode=DESCENDANTS&order=created:desc&fields=*,enrollments[*]')
 
-        axios.get(URL)
+        axios.get(TEI_URL)
             .then(response => this.setState({results: [], loading: false}, () => {
-                // console.log('les tei correspondantes sont alor ce que nous voyons here == ', response.data)
-
                 const trackedEntityInstances = response.data.trackedEntityInstances
-                // const events = response.data.trackedEntityInstances.map(tei =>  tei.enrollments.map(enrollment => enrollment.events)).flat(30)
                 const events = this.flatDeep(trackedEntityInstances.map(tei =>  tei.enrollments.map(enrollment => enrollment.events))).filter (e => e.eventDate !== undefined &&  e.eventDate !== null  )
                 .map(event => { 
                     event.tmpDate = moment(event.eventDate).format('YYYY-MM')
@@ -271,45 +267,51 @@ class Header extends Component {
                     return event
                 }).filter (event => event.tmpDate === this.state.selectedTmpDate)
 
-                // if (events.length > 0) {
+                        // const ANALYTICS_URL = API_BASE_ROUTE.concat('/analytics.json?dimension=dx:Lq3KIp6wqzJ;mvbYARUF4iZ;Ni35jPYuJQF;N0iJtCKzYhc;cTg9GGbABjR&dimension=ou:LEVEL-5;')
+                        // .concat(this.state.selectedNode.id)
+                        // .concat("&filter=pe:").concat(this.state.selectedTmpDate.replace('-', ''))
+                        // .concat("&displayProperty=NAME&tableLayout=true&columns=dx&rows=ou&hideEmptyColumns=true&hideEmptyRows=true&showHierarchy=true")
 
-                    events.forEach(event => {
-                        
-                        let supervisorName = event.dataValues.find(dataValue => dataValue.dataElement === 'xt4RajdoLfr')?.value
-                        supervisorName = supervisorName ? supervisorName : event.storedBy
-                        const trackedEntityInstance = trackedEntityInstances.find(tei => tei.trackedEntityInstance === event.trackedEntityInstance)
-                        const ascName = trackedEntityInstance.attributes.find (attribute => attribute.attribute === 'Wjb3loRDIpE')?.value
-                        const ascPhoneNumber = trackedEntityInstance.attributes.find (attribute => attribute.attribute === 'mVOHrA5DRVl')?.value
-                        
-                        const URI = API_BASE_ROUTE.concat("/analytics.json?dimension=dx:Lq3KIp6wqzJ;mvbYARUF4iZ;Ni35jPYuJQF;N0iJtCKzYhc&dimension=ou:LEVEL-5;")
+                        const ANALYTICS_URL = API_BASE_ROUTE.concat('/analytics.json?dimension=dx:Lq3KIp6wqzJ;mvbYARUF4iZ;Ni35jPYuJQF;N0iJtCKzYhc;cTg9GGbABjR&dimension=ou:LEVEL-5;')
                         .concat(this.state.selectedNode.id)
-                        .concat("&filter=pe:").concat(this.state.selectedTmpDate.replace('-', ''))
-                        .concat("&displayProperty=NAME&tableLayout=true&columns=dx&rows=ou&hideEmptyColumns=true&hideEmptyRows=true&showHierarchy=true")
-                        
-                        this.setState({loading: true}, 
-                            () =>   axios.get(URI)
-                            .then(response => {
-                                response.data.rows.forEach(row => {
+                        .concat('&dimension=reckBszm8Ya:Cn9tb8RhoUl;iNAASUDrPpn;nr2rGqWAMNr;ZTx960UbAOd;wGtkSrnEmOI;mqZP6KOfkuN&filter=pe:')
+                        .concat(this.state.selectedTmpDate.replace('-', ''))
+                        .concat('&displayProperty=NAME&tableLayout=true&columns=dx&rows=ou;reckBszm8Ya&hideEmptyColumns=true&hideEmptyRows=true&showHierarchy=true')
+
+                        axios.get(ANALYTICS_URL)
+                        .then(response => 
+                            response.data.rows.forEach(row => {
+                                const event = events.find(event => event.orgUnitName === row[6])
+
+                                if(event){
+                                    let supervisorName = event.dataValues.find(dataValue => dataValue.dataElement === 'xt4RajdoLfr')?.value
+                                    supervisorName = supervisorName ? supervisorName : event.storedBy
+                                    const trackedEntityInstance = trackedEntityInstances.find(tei => tei.trackedEntityInstance === event.trackedEntityInstance)
+                                    const ascName = trackedEntityInstance.attributes.find (attribute => attribute.attribute === 'Wjb3loRDIpE')?.value
+                                    const ascPhoneNumber = trackedEntityInstance.attributes.find (attribute => attribute.attribute === 'mVOHrA5DRVl')?.value
+
                                     const e = {}
-
-                                    e.ascName = ascName.concat(' (').concat(row[6]).concat(') ')
-                                    e.ascPhoneNumber = ascPhoneNumber
-                                    e.supervisorName = supervisorName
-                                    e.vad = parseInt(row[7]) ? parseInt(row[7]): 0  
-                                    e.cdg = parseInt(row[8]) ? parseInt(row[8]) : 0  
-                                    e.pecadom = parseInt(row[9]) ? parseInt(row[9]) : 0  
-                                    e.sp3 = parseInt(row[10]) ? parseInt(row[10]) : 0   
-                                    e.montantSp3 = parseInt(row[10]) ? parseInt(row[10]) * this.state.globalSettings.sp3Rate : 0  
-                                    e.district = row[2] ? row[2] : ''  
-                                    e.bonus = e.montantSp3 + this.state.globalSettings.bonus
-                                    e.mobileMoney = this.state.globalSettings.mobileMoney
-                                    e.totalBonus = e.mobileMoney + e.bonus
-
+                        
+                                        e.ascName = ascName.concat(' (').concat(row[6]).concat(') ')
+                                        e.ascPhoneNumber = ascPhoneNumber
+                                        e.supervisorName = supervisorName
+                                        e.vad = parseInt(row[9]) ? parseInt(row[9]): 0  
+                                        e.cdg = parseInt(row[10]) ? parseInt(row[10]) : 0  
+                                        e.pecadom = parseInt(row[11]) ? parseInt(row[11]) : 0  
+                                        e.sp3 = parseInt(row[12]) ? parseInt(row[12]) : 0   
+                                        e.montantSp3 = parseInt(row[12]) ? parseInt(row[12]) * this.state.globalSettings.sp3Rate : 0  
+                                        e.district = row[2] ? row[2] : ''  
+                                        e.zone = row[8] ? row[8] : ''  
+                                        e.bonus = e.montantSp3 + this.state.globalSettings.bonus
+                                        e.mobileMoney = this.state.globalSettings.mobileMoney
+                                        e.totalBonus = e.mobileMoney + e.bonus
+                                        e.status = parseFloat(row[13]) >= 1.0 ? 'VALIDE' : 'INVALIDE'
+                        
                                     this.setState ({results: this.state.results.concat(e), loading: false})
-                                })
-                            }).catch(error => this.setState({loading: false}, () => NotificationManager.error(error.message, null, 3000)))
-                        )
-                    })
+                                }
+
+                            })).catch(error => this.setState({loading: false}, () => NotificationManager.error(error.message, null, 3000)))
+
             })).catch(error => this.setState({loading: false}, () => NotificationManager.error(error.message, null, 3000)))
     })
 
@@ -538,6 +540,7 @@ class Header extends Component {
                                         <thead className="bg-secondary text-light">
                                             <th className=' align-middle'>{'N°'}</th>
                                             <th className=' align-middle'>{translate('District')}</th>
+                                            <th className=' align-middle'>{translate('Zone')}</th>
                                             <th className=' align-middle'>{translate('SupervisorFullName')}</th>
                                             <th className=' align-middle'>{translate('ASCName')}</th>
                                             <th className=' align-middle'>{translate('ASCContact')}</th>
@@ -551,32 +554,28 @@ class Header extends Component {
                                             <th className=' align-middle'>{translate('Bonus')}</th>
                                             <th className=' align-middle'>{translate('MobileMoneyFees')}</th>
                                             <th className=' align-middle'>{translate('TotalBonus')}</th>
-                                            <th className=' align-middle'>{translate('Action')}</th>
                                         </thead>
 
                                         <tbody>
                                             {
                                                 this.state.results.map( (result, index) =>
                                                 <tr>
-                                                    <td>{ index + 1 }</td>
-                                                    <td>{ result.district}</td>
-                                                    <td>{ result.supervisorName}</td>
-                                                    <td>{ result.ascName}</td>
-                                                    <td>{ result.ascPhoneNumber}</td>
-                                                    <td>{ result.ascPhoneNumber}</td>
-                                                    <td>{ result.vad}</td>
-                                                    <td>{ result.cdg}</td>
-                                                    <td>{ result.pecadom}</td>
-                                                    <td>{ result.sp3}</td>
-                                                    <td>{ 'Status' }</td>
-                                                    <td>{ result.montantSp3 }</td>
-                                                    <td>{ result.bonus }</td>
-                                                    <td>{ result.mobileMoney }</td>
-                                                    <td>{ result.totalBonus }</td>
-                                                    <td className="text-right">
-                                                        <GrValidate style={{cursor: 'pointer', fontSize: '18px'}} title="Valider" className="m--1 text-primary" />
-                                                        <BsOctagonFill style={{cursor: 'pointer', fontSize: '18px'}} title="Invalider" className="m-1 text-danger" />
-                                                    </td>
+                                                    <td className='text-center'>{ index + 1 }</td>
+                                                    <td className='text-left'>{ result.district}</td>
+                                                    <td className='text-left'>{ result.zone}</td>
+                                                    <td className='text-left'>{ result.supervisorName}</td>
+                                                    <td className='text-left'>{ result.ascName}</td>
+                                                    <td className='text-right'>{ result.ascPhoneNumber}</td>
+                                                    <td className='text-right'>{ result.ascPhoneNumber}</td>
+                                                    <td className='text-right'>{ result.vad}</td>
+                                                    <td className='text-right'>{ result.cdg}</td>
+                                                    <td className='text-right'>{ result.pecadom}</td>
+                                                    <td className='text-right'>{ result.sp3}</td>
+                                                    <td className='text-left font-weight-bold'>{ result.status}</td>
+                                                    <td className='text-right'>{ result.montantSp3 }</td>
+                                                    <td className='text-right'>{ result.bonus }</td>
+                                                    <td className='text-right'>{ result.mobileMoney }</td>
+                                                    <td className='text-right'>{ result.totalBonus }</td>
                                                 </tr>
                                                 )}
                                         </tbody>
@@ -585,7 +584,6 @@ class Header extends Component {
                             </div>
             }
         </Dialog>
-
 
     userHasPartialAccess = setting => {
         !setting.partialAccessGroups && (setting.partialAccessGroups = [])
