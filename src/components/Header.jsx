@@ -10,20 +10,26 @@ import { Tree } from 'primereact/tree'
 import moment from 'moment'
 import translate from '../utils/translator'
 import { FaFileExcel, FaFileCsv } from 'react-icons/fa'
-import { GrValidate } from 'react-icons/gr'
-import { GiReturnArrow } from 'react-icons/gi'
 import { CSVLink } from 'react-csv'
-import { BsCursorFill, BsOctagonFill } from 'react-icons/bs'
+import { BsCursorFill } from 'react-icons/bs'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
-import ReactDatatable from '@ashvin27/react-datatable'
+import { Select, Switch } from 'antd'
 
+
+const { Option } = Select
 
 class Header extends Component {
 
     state = {
         me: null,
         settings: [],
+        zones: [],
+        selectedZones: [],
+
+        displayGFReport: true,
+        displaySupReport: true,
+        displayASCReport: true,
 
         selectedTmpDate: null,
         results: [],
@@ -59,6 +65,7 @@ class Header extends Component {
     }
 
     componentDidMount() {
+        this.loadZones()
         this.retrieveGlobalSettingsFromServer()
         this.loadUserGroups()
         this.loadTrackerPrograms()
@@ -267,11 +274,6 @@ class Header extends Component {
                     return event
                 }).filter (event => event.tmpDate === this.state.selectedTmpDate)
 
-                        // const ANALYTICS_URL = API_BASE_ROUTE.concat('/analytics.json?dimension=dx:Lq3KIp6wqzJ;mvbYARUF4iZ;Ni35jPYuJQF;N0iJtCKzYhc;cTg9GGbABjR&dimension=ou:LEVEL-5;')
-                        // .concat(this.state.selectedNode.id)
-                        // .concat("&filter=pe:").concat(this.state.selectedTmpDate.replace('-', ''))
-                        // .concat("&displayProperty=NAME&tableLayout=true&columns=dx&rows=ou&hideEmptyColumns=true&hideEmptyRows=true&showHierarchy=true")
-
                         const ANALYTICS_URL = API_BASE_ROUTE.concat('/analytics.json?dimension=dx:Lq3KIp6wqzJ;mvbYARUF4iZ;Ni35jPYuJQF;N0iJtCKzYhc;cTg9GGbABjR&dimension=ou:LEVEL-5;')
                         .concat(this.state.selectedNode.id)
                         .concat('&dimension=reckBszm8Ya:Cn9tb8RhoUl;iNAASUDrPpn;nr2rGqWAMNr;ZTx960UbAOd;wGtkSrnEmOI;mqZP6KOfkuN&filter=pe:')
@@ -288,12 +290,14 @@ class Header extends Component {
                                     supervisorName = supervisorName ? supervisorName : event.storedBy
                                     const trackedEntityInstance = trackedEntityInstances.find(tei => tei.trackedEntityInstance === event.trackedEntityInstance)
                                     const ascName = trackedEntityInstance.attributes.find (attribute => attribute.attribute === 'Wjb3loRDIpE')?.value
+                                    const ascType = trackedEntityInstance.attributes.find (attribute => attribute.attribute === 'RyJDoYBq0KZ')?.value
                                     const ascPhoneNumber = trackedEntityInstance.attributes.find (attribute => attribute.attribute === 'mVOHrA5DRVl')?.value
 
                                     const e = {}
                         
                                         e.ascName = ascName.concat(' (').concat(row[6]).concat(') ')
                                         e.ascPhoneNumber = ascPhoneNumber
+                                        e.ascType = ascType
                                         e.supervisorName = supervisorName
                                         e.vad = parseInt(row[9]) ? parseInt(row[9]): 0  
                                         e.cdg = parseInt(row[10]) ? parseInt(row[10]) : 0  
@@ -302,6 +306,7 @@ class Header extends Component {
                                         e.montantSp3 = parseInt(row[12]) ? parseInt(row[12]) * this.state.globalSettings.sp3Rate : 0  
                                         e.district = row[2] ? row[2] : ''  
                                         e.zone = row[8] ? row[8] : ''  
+                                        e.zoneID = row[7] ? row[7] : ''  
                                         e.bonus = e.montantSp3 + this.state.globalSettings.bonus
                                         e.mobileMoney = this.state.globalSettings.mobileMoney
                                         e.totalBonus = e.mobileMoney + e.bonus
@@ -309,7 +314,6 @@ class Header extends Component {
                         
                                     this.setState ({results: this.state.results.concat(e), loading: false})
                                 }
-
                             })).catch(error => this.setState({loading: false}, () => NotificationManager.error(error.message, null, 3000)))
 
             })).catch(error => this.setState({loading: false}, () => NotificationManager.error(error.message, null, 3000)))
@@ -455,6 +459,8 @@ class Header extends Component {
         const fileExtension = '.xlsx';
         const fileName = 'Report'
         const csvData = [...this.state.results]
+        .filter(result => this.state.displayASCReport && result.ascType === 'ASC' || this.state.displayGFReport && result.ascType === 'GF' )
+        .filter(result => this.state.selectedZones.length === 0 || (this.state.selectedZones.length > 0 && this.state.selectedZones.includes(result.zoneID)))
 
         const ws = XLSX.utils.json_to_sheet(csvData);
         const wb = { Sheets: { 'data': ws }, SheetNames: ['data'] };
@@ -462,6 +468,13 @@ class Header extends Component {
         const data = new Blob([excelBuffer], {type: fileType});
         FileSaver.saveAs(data, fileName + fileExtension);
     }
+
+    loadZones = () => this.setState({loading: true}, 
+        () => axios.get(API_BASE_ROUTE.concat('/organisationUnitGroups?filter=name:ne:default&fields=displayName%7Crename(name)%2Cid%2Clevel&paging=false'))
+        .then(response => this.setState({loading: false, zones: response.data.organisationUnitGroups }))
+        .catch(error => this.setState({loading: false}, () => NotificationManager.error(error.message, null, 3000))))
+
+    parsePhoneNumber = number => number && `${number?.substring(0, 2)} ${number?.substring(2, 4)} ${number?.substring(4, 6)} ${number?.substring(6, 8)} ${number?.substring(8, 10)} ${number?.substring(10, number?.length)}`
 
     displayReportingBox = () =>  this.state.displayReportingTool &&
         <Dialog header={this.displayRepotingTitle()}
@@ -494,45 +507,86 @@ class Header extends Component {
                     </div>
                     
                     <div className="col text-left">
-                        <strong className="col font-weight-bold">{ translate('Month')}</strong>
-                        <DatePicker onChange={this.handleReportingMonth} picker="month" />
-                    </div>
-                    
-                    
-                    <div className="col text-left">
-                        <strong className="col font-weight-bold">{ translate('Area')}</strong>
-                        { translate('DirectImplementation')}
-                    </div>
+                        <strong className="col font-weight-bold d-block">{ translate('Month')}</strong>
+                        <DatePicker style={{ width: '100%' }} onChange={this.handleReportingMonth} picker="month" />
 
-                    <div className="col text-left">
-                        <strong className="col font-weight-bold">{translate('TechOfficerName')}:</strong>
+                        <strong className="col font-weight-bold d-block mt-1">{ translate('Area')}</strong>
+                        <Select
+                            mode="multiple"
+                            allowClear
+                            style={{ width: '100%' }}
+                            placeholder='Choose a Zone'
+                            onChange={selectedZones => this.setState({selectedZones})} >
+                            {this.state.zones.map(zone => <Option key={zone.id}>{zone.name}</Option>)}
+                        </Select>
+
+                        <strong className="col font-weight-bold d-block mt-1">{translate('TechOfficerName')}:</strong>
                         JIMMY Kofi kofi
                     </div>
 
-                    <div className="col text-right">
-                        <button className="btn btn-sm btn-primary" onClick={()=> this.setState({displayReportResults: true}, () => this.loadTEIs ())}>
-                            {translate('Generate')}
-                        </button>
+                    <div className="col form-group">
+                        <div className="row">
+                            <div className="col">
+                                <button className="float-left btn btn-sm btn-outline-primary" onClick={()=> this.setState({displayReportResults: true, displaySupReport: true})}>
+                                    {translate('GenerateSupervisorReport')}
+                                </button>
+
+                                <button className="float-right btn btn-sm btn-outline-primary" onClick={()=> this.setState({displayReportResults: true, displaySupReport: false}, () => this.loadTEIs ())}>
+                                    {translate('GenerateASCORGFReport')}
+                                </button>
+                            </div>
+                        </div>
+
+                        {
+                            ! this.state.displaySupReport && 
+                            <div className="row clearfix mt-3">
+                                <div className="col d-block text-left my-1">
+                                    <strong className="text-left form-group font-weight-bold d-inline">
+                                        Report Filters 
+                                    </strong>
+
+                                    <label className="m-1 font-weight-bold d-inline">
+                                        <Switch defaultChecked onChange={e => this.setState({displayGFReport: e, displaySupReport: false})} title='GF' /> GF
+                                    </label>
+
+                                    <label className="m-1 font-weight-bold d-inline">
+                                        <Switch defaultChecked onChange={e => this.setState({displayASCReport: e, displaySupReport: false})} title='ASC' /> ASC
+                                    </label>
+                                </div>
+                            </div>
+                        }
                     </div>
                 </div>
 
-            { this.state.displayReportResults && this.state.results.length === 0 && <div className="alert alert-primary my-2"> No results were found </div> }
+            { 
+                this.state.displayReportResults && 
+                this.state.results
+                .filter(result => this.state.displayASCReport && result.ascType === 'ASC' || this.state.displayGFReport && result.ascType === 'GF' )
+                .filter(result => this.state.selectedZones.length === 0 || (this.state.selectedZones.length > 0 && this.state.selectedZones.includes(result.zoneID)))
+                .length === 0 && <div className="alert alert-primary my-2"> No results were found </div>
+            }
 
             {
-                this.state.displayReportResults && this.state.results.length > 0 && 
+                this.state.displayReportResults && 
+                this.state.results
+                .filter(result => this.state.displayASCReport && result.ascType === 'ASC' || this.state.displayGFReport && result.ascType === 'GF' )
+                .filter(result => this.state.selectedZones.length === 0 || (this.state.selectedZones.length > 0 && this.state.selectedZones.includes(result.zoneID)))
+                .length > 0 && 
                             <div className="row my-3">
                                 <div className="col">
 
                                     <div className="row my-1">
-                                        <div className="col">
-                                            <div className="text-right">
-                                                {/* <CSVLink data={[...this.state.results]} className="btn btn-sm btn-secondary" filename={'report.csv'}>Export CSV</CSVLink> */}
-                                                <CSVLink data={[...this.state.results]} className="d-none" filename={'report.csv'}  id="csvElement"   />
-                                                <FaFileExcel style={{cursor: 'pointer', fontSize: '18px' }} title="Exporter au format Excel" className="text-success m-1" onClick={() => this.exportToExcel()} />
-                                                <FaFileCsv style={{cursor: 'pointer', fontSize: '18px'}} title="Exporter au format CSV"  className="text-success m-1" onClick={() => document.getElementById('csvElement').click()()} />
+                                       
 
-                                                <BsCursorFill style={{cursor: 'pointer', fontSize: '18px'}} title="Approuver"  className="text-primary m-1"  />
-                                            </div>
+                                        <div className="col text-right">
+                                            <CSVLink data={[...this.state.results]
+                                                .filter(result => this.state.displayASCReport && result.ascType === 'ASC' || this.state.displayGFReport && result.ascType === 'GF' )
+                                                .filter(result => this.state.selectedZones.length === 0 || (this.state.selectedZones.length > 0 && this.state.selectedZones.includes(result.zoneID)))} 
+                                                className="d-none" filename={'report.csv'}  id="csvElement"   />
+                                            <FaFileExcel style={{cursor: 'pointer', fontSize: '18px' }} title="Exporter au format Excel" className="text-success m-1" onClick={() => this.exportToExcel()} />
+                                            <FaFileCsv style={{cursor: 'pointer', fontSize: '18px'}} title="Exporter au format CSV"  className="text-success m-1" onClick={() => document.getElementById('csvElement').click()()} />
+
+                                            <BsCursorFill style={{cursor: 'pointer', fontSize: '18px'}} title="Approuver"  className="text-primary m-1"  />
                                         </div>
                                     </div>
 
@@ -541,10 +595,10 @@ class Header extends Component {
                                             <th className=' align-middle'>{'N°'}</th>
                                             <th className=' align-middle'>{translate('District')}</th>
                                             <th className=' align-middle'>{translate('Zone')}</th>
+                                            <th className=' align-middle'>{translate('Type')}</th>
                                             <th className=' align-middle'>{translate('SupervisorFullName')}</th>
                                             <th className=' align-middle'>{translate('ASCName')}</th>
                                             <th className=' align-middle'>{translate('ASCContact')}</th>
-                                            <th className=' align-middle'>{'Orange'}</th>
                                             <th className=' align-middle'>{'VAD'}</th>
                                             <th className=' align-middle'>{translate('GroupTalk')}</th>
                                             <th className=' align-middle'>{'PECADOM'}</th>
@@ -558,15 +612,18 @@ class Header extends Component {
 
                                         <tbody>
                                             {
-                                                this.state.results.map( (result, index) =>
+                                                this.state.results
+                                                .filter(result => this.state.displayASCReport && result.ascType === 'ASC' || this.state.displayGFReport && result.ascType === 'GF' )
+                                                .filter(result => this.state.selectedZones.length === 0 || (this.state.selectedZones.length > 0 && this.state.selectedZones.includes(result.zoneID)))
+                                                .map( (result, index) =>
                                                 <tr>
                                                     <td className='text-center'>{ index + 1 }</td>
                                                     <td className='text-left'>{ result.district}</td>
                                                     <td className='text-left'>{ result.zone}</td>
+                                                    <td className='text-left'>{ result.ascType }</td>
                                                     <td className='text-left'>{ result.supervisorName}</td>
                                                     <td className='text-left'>{ result.ascName}</td>
-                                                    <td className='text-right'>{ result.ascPhoneNumber}</td>
-                                                    <td className='text-right'>{ result.ascPhoneNumber}</td>
+                                                    <td className='text-right'>{this.parsePhoneNumber(result.ascPhoneNumber)}</td>
                                                     <td className='text-right'>{ result.vad}</td>
                                                     <td className='text-right'>{ result.cdg}</td>
                                                     <td className='text-right'>{ result.pecadom}</td>

@@ -15,11 +15,13 @@
     "ApproversGroup": "Approver's Group",
     "SupervisorsGroup": "Supervisor's Group",
     "TechnicalOfficerGroup": "Technical Officer's Group",
-    "PaymentStatus": "ASC Payment Status",
+    "PaymentStatus": "Payment Status",
     "Day": "Day",
     "Month": "Month",
     "Year": "Year",
     "Generate": "Generate",
+    "GenerateASCORGFReport": "ASC/GF Report",
+    "GenerateSupervisorReport": "Supervisor's Report",
     "Area": "Area",
     "TechOfficerName": "Tech. Officer Name",
     "DirectImplementation": "Direct Implementation",
@@ -135,5 +137,6 @@
     "TEI": "Tracker Entity Instance",
     "ASC": "ASC",
     "Actor": "Actor",
+    "Type": "Type",
     "Zone": "Zone"
 }

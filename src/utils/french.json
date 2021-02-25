@@ -14,11 +14,13 @@
     "ApproversGroup": "Groupe d'Approbateurs",
     "SupervisorsGroup": "Groupe de Superviseurs",
     "TechnicalOfficerGroup": "Groupe de l'Officier Technique",
-    "PaymentStatus": "Statut de Paiement des ASC",
+    "PaymentStatus": "Statut de Paiement",
     "Day": "Jour",
     "Month": "Mois",
     "Year": "Annee",
     "Generate": "Générer",
+    "GenerateASCORGFReport": "Rapport des ASC/GF",
+    "GenerateSupervisorReport": "Rapport Superviseur",
     "Area": "Zone",
     "TechOfficerName": "Nom de l'Officier Technique",
     "DirectImplementation": "Mise en Oeuvre directe",
@@ -134,5 +136,6 @@
     "TEI": "Tracker Entity Instance",
     "ASC": "ASC",
     "Actor": "Acteur",
+    "Type": "Type",
     "Zone": "Zone"
 }
