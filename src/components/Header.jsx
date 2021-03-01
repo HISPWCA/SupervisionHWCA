@@ -257,7 +257,7 @@ class Header extends Component {
          .catch(error => NotificationManager.error(error.message, null, 3000))
 
 
-    loadTEIs = () =>  this.state.selectedNode &&   this.state.selectedNode.id && this.state.selectedProgram  &&  this.state.selectedProgram.id &&  this.setState({loadingReport: true}, () => {
+    loadTEIs = () =>  this.state.selectedNode &&  this.state.selectedTmpDate && this.state.selectedNode.id && this.state.selectedProgram  &&  this.state.selectedProgram.id &&  this.setState({loadingReport: true}, () => {
         const TEI_URL = TRACKED_ENTITY_INSTANCES_ROUTE
         .concat('.json?program=')
         .concat(this.state.selectedProgram.id)
@@ -296,14 +296,14 @@ class Header extends Component {
 
                                     const e = {}
                         
-                                        e.ascName = ascName.concat(' (').concat(row[6]).concat(') ')
-                                        e.ascPhoneNumber = ascPhoneNumber
                                         e.ascType = ascType
+                                        e.ascPhoneNumber = ascPhoneNumber
                                         e.supervisorName = supervisorName
                                         e.vad = parseInt(row[9]) ? parseInt(row[9]): 0  
                                         e.cdg = parseInt(row[10]) ? parseInt(row[10]) : 0  
                                         e.pecadom = parseInt(row[11]) ? parseInt(row[11]) : 0  
                                         e.sp3 = parseInt(row[12]) ? parseInt(row[12]) : 0   
+                                        e.ascName = ascName.concat(' (').concat(row[6]).concat(') ')
                                         e.montantSp3 = parseInt(row[12]) ? parseInt(row[12]) * this.retrieveSP3(ascType) : 0  
                                         e.district = row[2] ? row[2] : ''  
                                         e.zone = row[8] ? row[8] : ''  
@@ -312,13 +312,24 @@ class Header extends Component {
                                         e.mobileMoney = this.retrieveMobileMoney(ascType)
                                         e.totalBonus = e.mobileMoney + e.bonus
                                         e.status = parseFloat(row[13]) >= 1.0 ? 'VALIDE' : 'INVALIDE'
-                        
+                                        e.nbrSupervisions = events.filter(event => event.orgUnitName === row[6]).length
+                                      
                                     this.setState ({results: this.state.results.concat(e), loadingReport: false})
                                 }
                             })).catch(error => this.setState({loadingReport: false}, () => NotificationManager.error(error.message, null, 3000)))
 
             })).catch(error => this.setState({loadingReport: false}, () => NotificationManager.error(error.message, null, 3000)))
     })
+
+_objectWithoutProperties = (obj, keys) => {
+  let target = {};
+  for (const i in obj) {
+    if (keys.indexOf(i) >= 0) continue
+    if (!Object.prototype.hasOwnProperty.call(obj, i)) continue
+    target[i] = obj[i]
+  }
+  return target
+}
 
     retrieveMobileMoney = ascType => {
         if(this.state.displaySupReport)
@@ -510,7 +521,7 @@ class Header extends Component {
     }
 
     loadZones = () => this.setState({loading: true}, 
-        () => axios.get(API_BASE_ROUTE.concat('/organisationUnitGroups?filter=name:ne:default&fields=displayName%7Crename(name)%2Cid%2Clevel&paging=false'))
+        () => axios.get(API_BASE_ROUTE.concat('/organisationUnitGroupSets/reckBszm8Ya.json?fields=organisationUnitGroups[id,displayName]'))
         .then(response => this.setState({loading: false, zones: response.data.organisationUnitGroups }))
         .catch(error => this.setState({loading: false}, () => NotificationManager.error(error.message, null, 3000))))
 
@@ -557,7 +568,7 @@ class Header extends Component {
                             style={{ width: '100%' }}
                             placeholder='Choose a Zone'
                             onChange={selectedZones => this.setState({selectedZones})} >
-                            {this.state.zones.map(zone => <Option key={zone.id}>{zone.name}</Option>)}
+                            {this.state.zones.map(zone => <Option key={zone.id}>{zone.displayName}</Option>)}
                         </Select>
 
                         <strong className="col font-weight-bold d-block mt-1">{translate('TechOfficerName')}:</strong>
@@ -623,7 +634,7 @@ class Header extends Component {
                                                 <FaFileExcel style={{cursor: 'pointer', fontSize: '18px' }} title="Exporter au format Excel" className="text-success m-1" onClick={() => this.exportToExcel()} />
                                                 <FaFileCsv style={{cursor: 'pointer', fontSize: '18px'}} title="Exporter au format CSV"  className="text-success m-1" onClick={() => document.getElementById('csvElement').click()()} />
 
-                                                <BsCursorFill style={{cursor: 'pointer', fontSize: '18px'}} title="Approuver"  className="text-primary m-1"  />
+                                                {0 > 1 && <BsCursorFill style={{cursor: 'pointer', fontSize: '18px'}} title="Approuver"  className="text-primary m-1"  />}
                                             </div>
                                         </div>
 
@@ -639,9 +650,10 @@ class Header extends Component {
                                                 {! this.state.displaySupReport && <th className=' align-middle'>{'VAD'}</th>}
                                                 {! this.state.displaySupReport && <th className=' align-middle'>{translate('GroupTalk')}</th>}
                                                 {! this.state.displaySupReport && <th className=' align-middle'>{'PECADOM'}</th>}
-                                                <th className=' align-middle'>{'SP3'}</th>
+                                                {! this.state.displaySupReport && <th className=' align-middle'>{'SP3'}</th>}
                                                 <th className=' align-middle'>{translate('ReportStatus')}</th>
-                                                <th className=' align-middle'>{translate('SP3Amount')}</th>
+                                                {! this.state.displaySupReport && <th className=' align-middle'>{translate('SP3Amount')}</th>}
+                                                { this.state.displaySupReport && <th className=' align-middle'>{translate('NbrSupervisions')}</th>}
                                                 <th className=' align-middle'>{translate('Bonus')}</th>
                                                 <th className=' align-middle'>{translate('MobileMoneyFees')}</th>
                                                 <th className=' align-middle'>{translate('TotalBonus')}</th>
@@ -664,9 +676,10 @@ class Header extends Component {
                                                         {! this.state.displaySupReport && <td className='text-right'>{ result.vad}</td>}
                                                         {! this.state.displaySupReport && <td className='text-right'>{ result.cdg}</td>}
                                                         {! this.state.displaySupReport && <td className='text-right'>{ result.pecadom}</td>}
-                                                        <td className='text-right'>{ result.sp3}</td>
+                                                        {! this.state.displaySupReport && <td className='text-right'>{ result.sp3}</td>}
                                                         <td className='text-left font-weight-bold'>{ result.status}</td>
-                                                        <td className='text-right'>{ result.montantSp3 }</td>
+                                                        {! this.state.displaySupReport && <td className='text-right'>{ result.montantSp3 }</td>}
+                                                        { this.state.displaySupReport && <td className='text-right'>{ result.nbrSupervisions }</td>}
                                                         <td className='text-right'>{ result.bonus }</td>
                                                         <td className='text-right'>{ result.mobileMoney }</td>
                                                         <td className='text-right'>{ result.totalBonus }</td>

@@ -138,5 +138,6 @@
     "ASC": "ASC",
     "Actor": "Actor",
     "Type": "Type",
-    "Zone": "Zone"
+    "Zone": "Zone",
+    "NbrSupervisions": "Sup. Nbr"
 }
