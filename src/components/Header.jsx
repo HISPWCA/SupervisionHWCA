@@ -47,6 +47,7 @@ class Header extends Component {
 
         setting: null,
         loading: false,
+        loadingReport: false,
         sharing: false,
 
         userGroups: [],
@@ -256,7 +257,7 @@ class Header extends Component {
          .catch(error => NotificationManager.error(error.message, null, 3000))
 
 
-    loadTEIs = () =>  this.state.selectedNode &&   this.state.selectedNode.id && this.state.selectedProgram  &&  this.state.selectedProgram.id &&  this.setState({loading: true}, () => {
+    loadTEIs = () =>  this.state.selectedNode &&   this.state.selectedNode.id && this.state.selectedProgram  &&  this.state.selectedProgram.id &&  this.setState({loadingReport: true}, () => {
         const TEI_URL = TRACKED_ENTITY_INSTANCES_ROUTE
         .concat('.json?program=')
         .concat(this.state.selectedProgram.id)
@@ -265,7 +266,7 @@ class Header extends Component {
         .concat('&ouMode=DESCENDANTS&order=created:desc&fields=*,enrollments[*]')
 
         axios.get(TEI_URL)
-            .then(response => this.setState({results: [], loading: false}, () => {
+            .then(response => this.setState({results: [], loadingReport: false}, () => {
                 const trackedEntityInstances = response.data.trackedEntityInstances
                 const events = this.flatDeep(trackedEntityInstances.map(tei =>  tei.enrollments.map(enrollment => enrollment.events))).filter (e => e.eventDate !== undefined &&  e.eventDate !== null  )
                 .map(event => { 
@@ -303,21 +304,60 @@ class Header extends Component {
                                         e.cdg = parseInt(row[10]) ? parseInt(row[10]) : 0  
                                         e.pecadom = parseInt(row[11]) ? parseInt(row[11]) : 0  
                                         e.sp3 = parseInt(row[12]) ? parseInt(row[12]) : 0   
-                                        e.montantSp3 = parseInt(row[12]) ? parseInt(row[12]) * this.state.globalSettings.sp3Rate : 0  
+                                        e.montantSp3 = parseInt(row[12]) ? parseInt(row[12]) * this.retrieveSP3(ascType) : 0  
                                         e.district = row[2] ? row[2] : ''  
                                         e.zone = row[8] ? row[8] : ''  
                                         e.zoneID = row[7] ? row[7] : ''  
-                                        e.bonus = e.montantSp3 + this.state.globalSettings.bonus
-                                        e.mobileMoney = this.state.globalSettings.mobileMoney
+                                        e.bonus = e.montantSp3 + this.retrieveBonus(ascType)
+                                        e.mobileMoney = this.retrieveMobileMoney(ascType)
                                         e.totalBonus = e.mobileMoney + e.bonus
                                         e.status = parseFloat(row[13]) >= 1.0 ? 'VALIDE' : 'INVALIDE'
                         
-                                    this.setState ({results: this.state.results.concat(e), loading: false})
+                                    this.setState ({results: this.state.results.concat(e), loadingReport: false})
                                 }
-                            })).catch(error => this.setState({loading: false}, () => NotificationManager.error(error.message, null, 3000)))
+                            })).catch(error => this.setState({loadingReport: false}, () => NotificationManager.error(error.message, null, 3000)))
 
-            })).catch(error => this.setState({loading: false}, () => NotificationManager.error(error.message, null, 3000)))
+            })).catch(error => this.setState({loadingReport: false}, () => NotificationManager.error(error.message, null, 3000)))
     })
+
+    retrieveMobileMoney = ascType => {
+        if(this.state.displaySupReport)
+            return this.state.globalSettings.supMobileMoney
+        else {
+            if(this.state.displayASCReport)
+                return this.state.globalSettings.ascMobileMoney
+            else if (this.state.displayGFReport)
+                return this.state.globalSettings.gfMobileMoney
+        }
+        
+        return 0
+    }
+
+    retrieveBonus = ascType => {
+        if(this.state.displaySupReport)
+            return this.state.globalSettings.supBonus
+        else {
+            if(this.state.displayASCReport)
+                return this.state.globalSettings.ascBonus
+            else if (this.state.displayGFReport)
+                return this.state.globalSettings.gfBonus
+        }
+        
+        return 0
+    }
+
+    retrieveSP3 = ascType => {
+        if(this.state.displaySupReport)
+            return this.state.globalSettings.supSp3Rate
+        else {
+            if(this.state.displayASCReport)
+                return this.state.globalSettings.ascSp3Rate
+            else if (this.state.displayGFReport)
+                return this.state.globalSettings.gfSp3Rate
+        }
+        
+        return 0
+    }
 
     flatDeep = arr => arr.reduce((acc, val) => acc.concat(Array.isArray(val) ? this.flatDeep(val) : val), []);
      
@@ -481,7 +521,7 @@ class Header extends Component {
             visible={this.state.displayReportingTool}
             style={{ width: '75vw' }}
             onHide={() => this.setState({ displayReportingTool: false })}>
-
+            <LoadingOverlay spinner active={this.state.loadingReport} text={translate('Processing Report')}>
                 <div className="row">
                     <div className="col text-center p-3 font-weight-bold" style={{backgroundColor: '#d8d8d8'}}>
                         <strong>
@@ -527,11 +567,11 @@ class Header extends Component {
                     <div className="col form-group">
                         <div className="row">
                             <div className="col">
-                                <button className="float-left btn btn-sm btn-outline-primary" onClick={()=> this.setState({displayReportResults: true, displaySupReport: true})}>
+                                <button className="float-left btn btn-sm btn-outline-primary" onClick={()=> this.setState({displayReportResults: true, displaySupReport: true, results: []}, () => this.loadTEIs ())}>
                                     {translate('GenerateSupervisorReport')}
                                 </button>
 
-                                <button className="float-right btn btn-sm btn-outline-primary" onClick={()=> this.setState({displayReportResults: true, displaySupReport: false}, () => this.loadTEIs ())}>
+                                <button className="float-right btn btn-sm btn-outline-primary" onClick={()=> this.setState({displayReportResults: true, displaySupReport: false, results: []}, () => this.loadTEIs ())}>
                                     {translate('GenerateASCORGFReport')}
                                 </button>
                             </div>
@@ -558,88 +598,86 @@ class Header extends Component {
                     </div>
                 </div>
 
-            { 
-                this.state.displayReportResults && 
-                this.state.results
-                .filter(result => this.state.displayASCReport && result.ascType === 'ASC' || this.state.displayGFReport && result.ascType === 'GF' )
-                .filter(result => this.state.selectedZones.length === 0 || (this.state.selectedZones.length > 0 && this.state.selectedZones.includes(result.zoneID)))
-                .length === 0 && <div className="alert alert-primary my-2"> No results were found </div>
-            }
+                { 
+                    this.state.displayReportResults && 
+                    this.state.results
+                    .filter(result => this.state.displayASCReport && result.ascType === 'ASC' || this.state.displayGFReport && result.ascType === 'GF' )
+                    .filter(result => this.state.selectedZones.length === 0 || (this.state.selectedZones.length > 0 && this.state.selectedZones.includes(result.zoneID)))
+                    .length === 0 && <div className="alert alert-primary my-2"> No results were found </div>
+                }
 
-            {
-                this.state.displayReportResults && 
-                this.state.results
-                .filter(result => this.state.displayASCReport && result.ascType === 'ASC' || this.state.displayGFReport && result.ascType === 'GF' )
-                .filter(result => this.state.selectedZones.length === 0 || (this.state.selectedZones.length > 0 && this.state.selectedZones.includes(result.zoneID)))
-                .length > 0 && 
-                            <div className="row my-3">
-                                <div className="col">
+                {
+                    this.state.displayReportResults && 
+                    this.state.results
+                    .filter(result => this.state.displayASCReport && result.ascType === 'ASC' || this.state.displayGFReport && result.ascType === 'GF' )
+                    .filter(result => this.state.selectedZones.length === 0 || (this.state.selectedZones.length > 0 && this.state.selectedZones.includes(result.zoneID)))
+                    .length > 0 && 
+                                <div className="row my-3">
+                                    <div className="col">
+                                        <div className="row my-1">
+                                            <div className="col text-right">
+                                                <CSVLink data={[...this.state.results]
+                                                    .filter(result => this.state.displayASCReport && result.ascType === 'ASC' || this.state.displayGFReport && result.ascType === 'GF' )
+                                                    .filter(result => this.state.selectedZones.length === 0 || (this.state.selectedZones.length > 0 && this.state.selectedZones.includes(result.zoneID)))} 
+                                                    className="d-none" filename={'report.csv'}  id="csvElement"   />
+                                                <FaFileExcel style={{cursor: 'pointer', fontSize: '18px' }} title="Exporter au format Excel" className="text-success m-1" onClick={() => this.exportToExcel()} />
+                                                <FaFileCsv style={{cursor: 'pointer', fontSize: '18px'}} title="Exporter au format CSV"  className="text-success m-1" onClick={() => document.getElementById('csvElement').click()()} />
 
-                                    <div className="row my-1">
-                                       
-
-                                        <div className="col text-right">
-                                            <CSVLink data={[...this.state.results]
-                                                .filter(result => this.state.displayASCReport && result.ascType === 'ASC' || this.state.displayGFReport && result.ascType === 'GF' )
-                                                .filter(result => this.state.selectedZones.length === 0 || (this.state.selectedZones.length > 0 && this.state.selectedZones.includes(result.zoneID)))} 
-                                                className="d-none" filename={'report.csv'}  id="csvElement"   />
-                                            <FaFileExcel style={{cursor: 'pointer', fontSize: '18px' }} title="Exporter au format Excel" className="text-success m-1" onClick={() => this.exportToExcel()} />
-                                            <FaFileCsv style={{cursor: 'pointer', fontSize: '18px'}} title="Exporter au format CSV"  className="text-success m-1" onClick={() => document.getElementById('csvElement').click()()} />
-
-                                            <BsCursorFill style={{cursor: 'pointer', fontSize: '18px'}} title="Approuver"  className="text-primary m-1"  />
+                                                <BsCursorFill style={{cursor: 'pointer', fontSize: '18px'}} title="Approuver"  className="text-primary m-1"  />
+                                            </div>
                                         </div>
+
+                                        <table className="table table-striped table-hover table-sm table-bordered">
+                                            <thead className="bg-secondary text-light">
+                                                <th className=' align-middle'>{'N°'}</th>
+                                                <th className=' align-middle'>{translate('District')}</th>
+                                                <th className=' align-middle'>{translate('Zone')}</th>
+                                                {! this.state.displaySupReport && <th className=' align-middle'>{translate('Type')}</th>}
+                                                <th className=' align-middle'>{translate('SupervisorFullName')}</th>
+                                                {! this.state.displaySupReport && <th className=' align-middle'>{translate('ASCName')}</th>}
+                                                {! this.state.displaySupReport && <th className=' align-middle'>{translate('ASCContact')}</th>}
+                                                {! this.state.displaySupReport && <th className=' align-middle'>{'VAD'}</th>}
+                                                {! this.state.displaySupReport && <th className=' align-middle'>{translate('GroupTalk')}</th>}
+                                                {! this.state.displaySupReport && <th className=' align-middle'>{'PECADOM'}</th>}
+                                                <th className=' align-middle'>{'SP3'}</th>
+                                                <th className=' align-middle'>{translate('ReportStatus')}</th>
+                                                <th className=' align-middle'>{translate('SP3Amount')}</th>
+                                                <th className=' align-middle'>{translate('Bonus')}</th>
+                                                <th className=' align-middle'>{translate('MobileMoneyFees')}</th>
+                                                <th className=' align-middle'>{translate('TotalBonus')}</th>
+                                            </thead>
+
+                                            <tbody>
+                                                {
+                                                    this.state.results
+                                                    .filter(result => this.state.displayASCReport && result.ascType === 'ASC' || this.state.displayGFReport && result.ascType === 'GF' )
+                                                    .filter(result => this.state.selectedZones.length === 0 || (this.state.selectedZones.length > 0 && this.state.selectedZones.includes(result.zoneID)))
+                                                    .map( (result, index) =>
+                                                    <tr>
+                                                        <td className='text-center'>{ index + 1 }</td>
+                                                        <td className='text-left'>{ result.district}</td>
+                                                        <td className='text-left'>{ result.zone}</td>
+                                                        {! this.state.displaySupReport && <td className='text-left'>{ result.ascType }</td>}
+                                                        <td className='text-left'>{ result.supervisorName}</td>
+                                                        {! this.state.displaySupReport && <td className='text-left'>{ result.ascName}</td>}
+                                                        {! this.state.displaySupReport && <td className='text-right'>{this.parsePhoneNumber(result.ascPhoneNumber)}</td>}
+                                                        {! this.state.displaySupReport && <td className='text-right'>{ result.vad}</td>}
+                                                        {! this.state.displaySupReport && <td className='text-right'>{ result.cdg}</td>}
+                                                        {! this.state.displaySupReport && <td className='text-right'>{ result.pecadom}</td>}
+                                                        <td className='text-right'>{ result.sp3}</td>
+                                                        <td className='text-left font-weight-bold'>{ result.status}</td>
+                                                        <td className='text-right'>{ result.montantSp3 }</td>
+                                                        <td className='text-right'>{ result.bonus }</td>
+                                                        <td className='text-right'>{ result.mobileMoney }</td>
+                                                        <td className='text-right'>{ result.totalBonus }</td>
+                                                    </tr>
+                                                    )}
+                                            </tbody>
+                                        </table>
                                     </div>
-
-                                    <table className="table table-striped table-hover table-sm table-bordered">
-                                        <thead className="bg-secondary text-light">
-                                            <th className=' align-middle'>{'N°'}</th>
-                                            <th className=' align-middle'>{translate('District')}</th>
-                                            <th className=' align-middle'>{translate('Zone')}</th>
-                                            <th className=' align-middle'>{translate('Type')}</th>
-                                            <th className=' align-middle'>{translate('SupervisorFullName')}</th>
-                                            <th className=' align-middle'>{translate('ASCName')}</th>
-                                            <th className=' align-middle'>{translate('ASCContact')}</th>
-                                            <th className=' align-middle'>{'VAD'}</th>
-                                            <th className=' align-middle'>{translate('GroupTalk')}</th>
-                                            <th className=' align-middle'>{'PECADOM'}</th>
-                                            <th className=' align-middle'>{'SP3'}</th>
-                                            <th className=' align-middle'>{translate('ReportStatus')}</th>
-                                            <th className=' align-middle'>{translate('SP3Amount')}</th>
-                                            <th className=' align-middle'>{translate('Bonus')}</th>
-                                            <th className=' align-middle'>{translate('MobileMoneyFees')}</th>
-                                            <th className=' align-middle'>{translate('TotalBonus')}</th>
-                                        </thead>
-
-                                        <tbody>
-                                            {
-                                                this.state.results
-                                                .filter(result => this.state.displayASCReport && result.ascType === 'ASC' || this.state.displayGFReport && result.ascType === 'GF' )
-                                                .filter(result => this.state.selectedZones.length === 0 || (this.state.selectedZones.length > 0 && this.state.selectedZones.includes(result.zoneID)))
-                                                .map( (result, index) =>
-                                                <tr>
-                                                    <td className='text-center'>{ index + 1 }</td>
-                                                    <td className='text-left'>{ result.district}</td>
-                                                    <td className='text-left'>{ result.zone}</td>
-                                                    <td className='text-left'>{ result.ascType }</td>
-                                                    <td className='text-left'>{ result.supervisorName}</td>
-                                                    <td className='text-left'>{ result.ascName}</td>
-                                                    <td className='text-right'>{this.parsePhoneNumber(result.ascPhoneNumber)}</td>
-                                                    <td className='text-right'>{ result.vad}</td>
-                                                    <td className='text-right'>{ result.cdg}</td>
-                                                    <td className='text-right'>{ result.pecadom}</td>
-                                                    <td className='text-right'>{ result.sp3}</td>
-                                                    <td className='text-left font-weight-bold'>{ result.status}</td>
-                                                    <td className='text-right'>{ result.montantSp3 }</td>
-                                                    <td className='text-right'>{ result.bonus }</td>
-                                                    <td className='text-right'>{ result.mobileMoney }</td>
-                                                    <td className='text-right'>{ result.totalBonus }</td>
-                                                </tr>
-                                                )}
-                                        </tbody>
-                                    </table>
                                 </div>
-                            </div>
-            }
+                }
+            </LoadingOverlay>
         </Dialog>
 
     userHasPartialAccess = setting => {
