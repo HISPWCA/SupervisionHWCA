@@ -135,11 +135,11 @@ export class Supervision extends Component {
                                                         nomActeurObject = nomActeurObject ? nomActeurObject : NOM_ACTEUR
                                                         typeActeurObject = typeActeurObject ? typeActeurObject : TYPE_ACTEUR
 
-                                                        const name = typeActeurObject?.value.concat(' - ').concat(nomActeurObject?.value)
+                                                        const name = typeActeurObject?.value?.concat(' - ')?.concat(nomActeurObject?.value)
                                                         tei.name = name
                                         
                                                         return tei
-                                                    }) }, () => this.state.availableTEIs.length === 1 && this.setState({selectedTEI: this.state.availableTEIs[0]}, () => this.handleSupervisionCreation()))))
+                                                    }) }, () => this.state.availableTEIs.length === 1 ? this.setState({selectedTEI: this.state.availableTEIs[0]}, () => this.handleSupervisionCreation()): NotificationManager.error('La configuration actuelle ne permet pas de poursuivre cette operation'))))
                                                     .catch(error => this.setState({loading: false}, () => NotificationManager.error(error.message, null, 3000)))
                                             })
                                             
@@ -266,6 +266,7 @@ export class Supervision extends Component {
 
                 {
                     this.state.availableTEIs.length > 1 && 
+                    this.state.availableTEIs.map(tei => ({ name: tei.name, code: tei })).filter(tei => tei.name && tei.code).sort((a, b) => a.name - b.name ).length > 0 &&
                     <React.Fragment>
                         <label for="teiSelection" className="form-label font-weight-bold mt-2 d-block"> {translate('Actor')} </label>
                         <Dropdown
@@ -348,7 +349,7 @@ export class Supervision extends Component {
                     nomActeurObject = nomActeurObject ? nomActeurObject : NOM_ACTEUR
                     typeActeurObject = typeActeurObject ? typeActeurObject : TYPE_ACTEUR
 
-                    const name = typeActeurObject?.value.concat(' - ').concat(nomActeurObject?.value)
+                    const name = typeActeurObject?.value?.concat(' - ')?.concat(nomActeurObject?.value)
                     tei.name = name
     
                     return tei

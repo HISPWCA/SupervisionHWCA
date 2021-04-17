@@ -523,7 +523,7 @@ _objectWithoutProperties = (obj, keys) => {
     loadZones = () => this.setState({loading: true}, 
         () => axios.get(API_BASE_ROUTE.concat('/organisationUnitGroupSets/reckBszm8Ya.json?fields=organisationUnitGroups[id,displayName]'))
         .then(response => this.setState({loading: false, zones: response.data.organisationUnitGroups }))
-        .catch(error => this.setState({loading: false}, () => NotificationManager.error(error.message, null, 3000))))
+        .catch(error => this.setState({loading: false})))
 
     parsePhoneNumber = number => number && `${number?.substring(0, 2)} ${number?.substring(2, 4)} ${number?.substring(4, 6)} ${number?.substring(6, 8)} ${number?.substring(8, 10)} ${number?.substring(10, number?.length)}`
 
@@ -571,8 +571,8 @@ _objectWithoutProperties = (obj, keys) => {
                             {this.state.zones.map(zone => <Option key={zone.id}>{zone.displayName}</Option>)}
                         </Select>
 
-                        <strong className="col font-weight-bold d-block mt-1">{translate('TechOfficerName')}:</strong>
-                        JIMMY Kofi kofi
+                        { 0 > 1 && <strong className="col font-weight-bold d-block mt-1">{translate('TechOfficerName')}:</strong>}
+                        { 0 > 1 && 'JIMMY Kofi kofi'}
                     </div>
 
                     <div className="col form-group">
