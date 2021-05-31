@@ -954,7 +954,6 @@ export class Scheduler extends Component {
                                                 {this.state.worst}
                                             </strong>
                                             {translate('Worst')}
-
                                         </div>
                                         <table className="table table-sm table-striped table-primary table-hover text-left align-middle">
                                             <thead> {Object.keys(this.state.finalResults[0]).map(key => <th className="text-capitalize text-left align-middle"> {key} </th>)} <th className="text-left align-middle">Action</th> </thead>

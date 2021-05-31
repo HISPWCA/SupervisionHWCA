@@ -370,7 +370,7 @@ _objectWithoutProperties = (obj, keys) => {
         return 0
     }
 
-    flatDeep = arr => arr.reduce((acc, val) => acc.concat(Array.isArray(val) ? this.flatDeep(val) : val), []);
+    flatDeep = arr => arr.reduce((acc, val) => acc.concat(Array.isArray(val) ? this.flatDeep(val) : val), [])
      
 
     loadOrganisationUnits = () => this.setState({loading: true}, 
