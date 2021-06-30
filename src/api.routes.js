@@ -41,3 +41,5 @@ export const TRACKED_ENTITY_INSTANCES_ROUTE = API_BASE_ROUTE.concat('/trackedEnt
 export const ENROLLMENTS_ROUTE = API_BASE_ROUTE.concat('/enrollments')
 
 export const EVENTS_ROUTE = API_BASE_ROUTE.concat('/events')
+
+export const PROGRAM_TESTS_ROUTE = API_BASE_ROUTE.concat('/programs-tests.json?paging=false')
