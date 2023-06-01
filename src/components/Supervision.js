@@ -3,7 +3,7 @@ import { MantineReactTable } from 'mantine-react-table'
 import { Card, Col, DatePicker, Divider, FloatButton, Input, InputNumber, List, Popconfirm, Row, Select, Steps, Table } from 'antd'
 import { IoMdAdd } from 'react-icons/io'
 import { IoListCircleOutline } from 'react-icons/io5'
-import { Button, Checkbox, CircularLoader, Radio } from '@dhis2/ui'
+import { Button, Checkbox, CircularLoader, Modal, ModalActions, ModalContent, ModalTitle, Radio } from '@dhis2/ui'
 import {
     DAY,
     INDICATOR,
@@ -39,7 +39,9 @@ import { BsArrowLeft } from 'react-icons/bs'
 import { Stepper } from 'react-form-stepper'
 import { FiSave } from 'react-icons/fi'
 import { ImCancelCircle } from 'react-icons/im'
-
+import { CgCloseO } from 'react-icons/cg'
+import { TbSelect } from 'react-icons/tb'
+import { DataDimension } from '@dhis2/analytics'
 
 
 import dayjs from 'dayjs';
@@ -63,8 +65,9 @@ const Supervision = ({ me }) => {
     const [mappingConfigs, setMappingConfigs] = useState([])
     const [indicatorGroups, setIndicatorGroups] = useState([])
     const [notification, setNotification] = useState({ show: false, message: null, type: null })
-    const [selectedStep, setSelectedStep] = useState(0)
+    const [visibleAnalyticComponentModal, setVisibleAnalyticComponentModal] = useState(false)
 
+    const [selectedStep, setSelectedStep] = useState(0)
     const [selectedSupervisionType, setSelectedSupervisionType] = useState(null)
     const [selectedSupervisionFiche, setSelectedSupervisionFiche] = useState(null)
     const [selectedPlanificationType, setSelectedPlanificationType] = useState(null)
@@ -79,11 +82,15 @@ const Supervision = ({ me }) => {
     const [selectedIndicatorGroup, setSelectedIndicatorGroup] = useState(null)
     const [selectedIndicatorType, setSelectedIndicatorType] = useState(PROGRAM_INDICATOR)
     const [selectedIndicator, setSelectedIndicator] = useState(null)
+    const [selectedMetaDatas, setSelectedMetaDatas] = useState([])
+
 
     const [inputMeilleur, setInputMeilleur] = useState('')
     const [inputMauvais, setInputMauvais] = useState('')
     const [inputMeilleurPositif, setInputMeilleurPositif] = useState(true)
     const [inputFields, setInputFields] = useState([])
+    const [inputSourceText, setInputSourceText] = useState('')
+
 
     const [loadingDataStoreSupervisionConfigs, setLoadingDataStoreSupervisionConfigs] = useState(false)
     const [loadingDataStoreIndicatorConfigs, setLoadingDataStoreIndicatorConfigs] = useState(false)
@@ -455,10 +462,11 @@ const Supervision = ({ me }) => {
     const handleClickSupervisionItem = (sup) => {
         setSelectedProgramStage(null)
         setSelectedDataElement(null)
+        setSelectedIndicator(null)
 
         loadProgramStages(sup.program?.id)
-        selectedIndicatorType === PROGRAM_INDICATOR && loadProgramIndicatorGroups()
-        selectedIndicatorType === INDICATOR_GROUP && loadIndicatorGroups()
+        // selectedIndicatorType === PROGRAM_INDICATOR && loadProgramIndicatorGroups()
+        // selectedIndicatorType === INDICATOR_GROUP && loadIndicatorGroups()
 
         setSelectedSupervisionFiche(sup)
     }
@@ -567,8 +575,6 @@ const Supervision = ({ me }) => {
                     enrollment: enrollment_id,
                     programStage: stage,
                     trackedEntityInstance: tei_id,
-
-
                 }
 
                 if (payload.events?.length > 0) {
@@ -1432,6 +1438,38 @@ const Supervision = ({ me }) => {
         </div>
     )
 
+    const handleOkAnalyticComponentModal = () => {
+        setVisibleAnalyticComponentModal(false)
+    }
+
+    const RenderAnalyticComponentModal = () => visibleAnalyticComponentModal ? (
+        <Modal onClose={() => handleOkAnalyticComponentModal()} large>
+            <ModalTitle>
+                Source de donnée
+            </ModalTitle>
+            <ModalContent>
+                <div>
+                    <DataDimension
+                        selectedDimensions={selectedMetaDatas}
+                        onSelect={value => {
+                            console.log("Value : ", value)
+                            setSelectedMetaDatas(value.items)
+                        }}
+                        displayNameProp="displayName"
+                    />
+                </div>
+            </ModalContent>
+            <ModalActions>
+                <ButtonStrip end>
+                    <Button primary onClick={() => handleOkAnalyticComponentModal()} icon={<CgCloseO style={{ fontSize: "16px" }} />}>
+                        Ok
+                    </Button>
+                </ButtonStrip>
+            </ModalActions>
+        </Modal>
+    ) : <></>
+
+
     const RenderDataElementConfigContent = () => <>
         <div className='my-shadow' style={{ padding: '20px', background: '#FFF', marginBottom: '2px', borderRadius: '8px', marginTop: '10px' }}>
             <Row gutter={[10, 10]}>
@@ -1454,7 +1492,8 @@ const Supervision = ({ me }) => {
                         />
                     </div>
                 </Col>
-                <Col md={12}>
+
+                {/* <Col md={12}>
                     <Row gutter={[8, 8]}>
                         <Col md={24}>
                             <div style={{ marginBottom: '5px' }}>Type d'indicateurs</div>
@@ -1480,7 +1519,7 @@ const Supervision = ({ me }) => {
                             </div>
                         </Col>
                     </Row>
-                </Col>
+                </Col> */}
 
                 <Col md={12}>
                     <div>
@@ -1497,10 +1536,11 @@ const Supervision = ({ me }) => {
                             disabled={loadingIndicatorGroups}
                         />
                     </div>
-
                 </Col>
+
+                {/* selectedIndicatorGroup && selectedProgramStage && ( */}
                 {
-                    selectedIndicatorGroup && selectedProgramStage && (
+                    selectedProgramStage && (
                         <Col md={24} xs={24}>
                             <Divider style={{ margin: '5px auto' }} />
 
@@ -1536,7 +1576,7 @@ const Supervision = ({ me }) => {
                                                 )
                                             }
 
-                                            {
+                                            {/* {
                                                 selectedIndicatorGroup && (
                                                     <Col md={12} xs={24}>
                                                         <div>
@@ -1556,6 +1596,21 @@ const Supervision = ({ me }) => {
                                                                 optionFilterProp='label'
                                                                 showSearch
                                                             />
+                                                        </div>
+                                                    </Col>
+                                                )
+                                            }  */}
+                                            {
+                                                selectedIndicatorGroup && (
+                                                    <Col md={12} xs={24}>
+                                                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                            <Input
+                                                                placeholder='Source de donnée'
+                                                                style={{ width: '100%' }}
+                                                            />
+                                                            <span style={{ marginLeft: '10px' }}>
+                                                                <Button icon={<TbSelect style={{ fontSize: '18px', color: '#fff' }} />} onClick={() => setVisibleAnalyticComponentModal(true)}>Choisir</Button>
+                                                            </span>
                                                         </div>
                                                     </Col>
                                                 )
@@ -1706,6 +1761,7 @@ const Supervision = ({ me }) => {
                     </>
                 )
             }
+            {RenderAnalyticComponentModal()}
             {RenderNoticeBox()}
             <MyNotification notification={notification} setNotification={setNotification} />
         </>
