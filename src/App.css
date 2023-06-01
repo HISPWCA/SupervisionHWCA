@@ -1,0 +1,104 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    /* overflow: hidden; */
+}
+
+.app {
+    background-color: #f3f5f7;
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+}
+
+.menu-item {
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    margin-top: 2px;
+}
+
+.menu-item:hover {
+    background-color: #d5dde560;
+}
+
+.menu-item.active {
+    background-color: #d5dde5;
+}
+
+
+.my-shadow {
+    box-shadow: rgb(64 75 90 / 20%) 0px 0px 1px 0px,
+        rgb(64 75 90 / 28%) 0px 2px 1px 0px;
+}
+
+
+
+.my-scrollable::-webkit-scrollbar {
+    overflow: auto;
+    width: 5px;
+}
+
+.my-scrollable::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px rgba(184, 183, 183, 0.578);
+    border-radius: 10px;
+}
+
+.my-scrollable::-webkit-scrollbar-thumb {
+    background: rgba(199, 199, 199, 0.593);
+    border-radius: 20px;
+}
+
+.my-scrollable::-webkit-scrollbar-thumb:hover {
+    background: #484848;
+}
+
+
+.setting-menu-item {
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    margin-top: 2px;
+}
+
+.setting-menu-item:hover {
+    background-color: #d5dde560;
+}
+
+.setting-menu-item.active {
+    background-color: #d5dde5;
+    border-left: 3px solid rgb(0, 134, 129);
+}
+
+.supervision-item {
+    transition: background 0.3s ease-in-out;
+    cursor: pointer;
+    padding: 10px 5px;
+}
+
+.supervision-item:hover {
+    background: rgba(1, 176, 170, 0.291);
+}
+
+.supervision-item.active {
+    background: rgba(0, 157, 152, 0.299);
+    font-weight: bold;
+    border-left: 3px solid rgb(0, 134, 129);
+}
+
+.stepper__step {
+    border: 1px solid #2c6693 !important;
+    cursor: default !important;
+    transition: all 0.3s ease-in-out;
+}
+
+.stepper__step+div>span {
+    color: #2c6693 !important;
+    transition: all 0.3s ease-in-out;
+}
+
+.stepper {
+    padding: 0px !important;
+    transition: all 0.3s ease-in-out;
+}
