@@ -3,7 +3,7 @@ import { MantineReactTable } from 'mantine-react-table'
 import { Card, Col, DatePicker, Divider, FloatButton, Input, InputNumber, List, Popconfirm, Row, Select, Steps, Table } from 'antd'
 import { IoMdAdd } from 'react-icons/io'
 import { IoListCircleOutline } from 'react-icons/io5'
-import { Button, Checkbox, CircularLoader, Modal, ModalActions, ModalContent, ModalTitle, Radio } from '@dhis2/ui'
+import { Button, ButtonStrip, Checkbox, CircularLoader, Modal, ModalActions, ModalContent, ModalTitle, Radio } from '@dhis2/ui'
 import {
     DAY,
     INDICATOR,
@@ -30,7 +30,7 @@ import { ENROLLMENTS_ROUTE, EVENTS_ROUTE, INDICATORS_GROUP_ROUTE, ORGANISATION_U
 import axios from 'axios'
 import OrganisationUnitsTree from './OrganisationUnitsTree'
 import { GREEN } from '../utils/couleurs'
-import { QuestionCircleOutlined } from '@ant-design/icons'
+import { QuestionCircleOutlined, SaveFilled } from '@ant-design/icons'
 import { RiDeleteBinLine } from 'react-icons/ri'
 import MyNotification from './MyNotification'
 import { v1 as uuid } from 'uuid'
@@ -1450,7 +1450,7 @@ const Supervision = ({ me }) => {
             <ModalContent>
                 <div>
                     <DataDimension
-                        selectedDimensions={selectedMetaDatas}
+                        selectedDimensions={selectedMetaDatas.map(it => ({ ...it , isDeactivated : true }))}
                         onSelect={value => {
                             console.log("Value : ", value)
                             setSelectedMetaDatas(value.items)
@@ -1461,8 +1461,8 @@ const Supervision = ({ me }) => {
             </ModalContent>
             <ModalActions>
                 <ButtonStrip end>
-                    <Button primary onClick={() => handleOkAnalyticComponentModal()} icon={<CgCloseO style={{ fontSize: "16px" }} />}>
-                        Ok
+                    <Button primary onClick={() => handleOkAnalyticComponentModal()} icon={<FiSave style={{ fontSize: "18px" }} />}>
+                        Enrégistrer
                     </Button>
                 </ButtonStrip>
             </ModalActions>
@@ -1521,7 +1521,7 @@ const Supervision = ({ me }) => {
                     </Row>
                 </Col> */}
 
-                <Col md={12}>
+                {/* <Col md={12}>
                     <div>
                         <div style={{ marginBottom: '5px' }}>Group d'indicateurs</div>
                         <Select
@@ -1536,7 +1536,7 @@ const Supervision = ({ me }) => {
                             disabled={loadingIndicatorGroups}
                         />
                     </div>
-                </Col>
+                </Col> */}
 
                 {/* selectedIndicatorGroup && selectedProgramStage && ( */}
                 {
@@ -1559,7 +1559,7 @@ const Supervision = ({ me }) => {
                                         <Row gutter={[8, 8]}>
                                             {
                                                 selectedProgramStage && (
-                                                    <Col md={12} xs={24}>
+                                                    <Col md={10} xs={24}>
                                                         <div>
                                                             <div style={{ marginBottom: '5px' }}>Eléments de données</div>
                                                             <Select
@@ -1600,21 +1600,22 @@ const Supervision = ({ me }) => {
                                                     </Col>
                                                 )
                                             }  */}
-                                            {
-                                                selectedIndicatorGroup && (
-                                                    <Col md={12} xs={24}>
-                                                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                            <Input
-                                                                placeholder='Source de donnée'
-                                                                style={{ width: '100%' }}
-                                                            />
-                                                            <span style={{ marginLeft: '10px' }}>
-                                                                <Button icon={<TbSelect style={{ fontSize: '18px', color: '#fff' }} />} onClick={() => setVisibleAnalyticComponentModal(true)}>Choisir</Button>
-                                                            </span>
-                                                        </div>
-                                                    </Col>
-                                                )
-                                            }
+                                            <Col md={10} xs={24}>
+                                                <div>
+                                                    <div style={{ marginBottom: '5px' }}>Source de donnée</div>
+                                                    <Input
+                                                        placeholder='Source de donnée'
+                                                        style={{ width: '100%' }}
+                                                        value={inputSourceText}
+                                                        onChange={event => setInputSourceText(''.concat(event.target.value))}
+                                                    />
+                                                </div>
+                                            </Col>
+                                            <Col md={4} xs={24}>
+                                                <div style={{ marginTop: '22px' }}>
+                                                    <Button small primary icon={<TbSelect style={{ fontSize: '18px', color: '#fff', }} />} onClick={() => setVisibleAnalyticComponentModal(true)}>Choisir</Button>
+                                                </div>
+                                            </Col>
                                             <Col md={24} xs={24}>
                                                 <div style={{ marginTop: '18px' }}>
                                                     <Button loading={loadingSaveDateElementMappingConfig} disabled={loadingSaveDateElementMappingConfig} primary onClick={handleSaveNewMappingConfig}>+ Ajouter </Button>
