@@ -89,7 +89,8 @@ const Supervision = ({ me }) => {
     const [inputMauvais, setInputMauvais] = useState('')
     const [inputMeilleurPositif, setInputMeilleurPositif] = useState(true)
     const [inputFields, setInputFields] = useState([])
-    const [inputSourceText, setInputSourceText] = useState('')
+    const [inputDataSourceDisplayName, setInputDataSourceDisplayName] = useState('')
+    const [inputDataSourceID, setInputDataSourceID] = useState(null)
 
 
     const [loadingDataStoreSupervisionConfigs, setLoadingDataStoreSupervisionConfigs] = useState(false)
@@ -376,17 +377,17 @@ const Supervision = ({ me }) => {
         try {
             setLoadingSaveDateElementMappingConfig(true)
             if (!selectedDataElement)
-                throw new Error("L'élément de donnée est obligatoire ")
+                throw new Error("L'élément de donnée est obligatoire !")
 
-            if (!selectedIndicator)
-                throw new Error("L'indicateur est obligatoire ")
+            if (!inputDataSourceDisplayName || inputDataSourceDisplayName?.trim().length === 0)
+                throw new Error("La donnée source est obligatoire !")
 
             if (!selectedProgramStage)
-                throw new Error("Le programme stage est obligatoire ")
+                throw new Error("Le programme stage est obligatoire !")
 
-            if (selectedDataElement && selectedIndicator && selectedProgramStage) {
+            if (selectedDataElement && selectedProgramStage) {
                 const existingConfig = mappingConfigs.find(mapping => mapping.dataElement?.id === selectedDataElement.id &&
-                    mapping.indicator?.id === selectedIndicator.id &&
+                    // mapping.indicator?.displayName === inputDataSourceDisplayName &&
                     mapping.programStage?.id === selectedProgramStage.id
                 )
 
@@ -394,16 +395,18 @@ const Supervision = ({ me }) => {
                     const payload = {
                         id: uuid(),
                         dataElement: selectedDataElement,
-                        indicator: selectedIndicator,
+                        indicator: { displayName: inputDataSourceDisplayName, id: inputDataSourceID },
                         programStage: { id: selectedProgramStage.id, displayName: selectedProgramStage.displayName },
                         program: { id: selectedSupervisionFiche?.program?.id, displayName: selectedSupervisionFiche?.program?.displayName }
                     }
                     const newList = [...mappingConfigs, payload]
                     setMappingConfigs(newList)
                     setSelectedDataElement(null)
-                    setSelectedIndicator(null)
+                    setInputDataSourceDisplayName('')
+                    setInputDataSourceID(null)
+                    // setSelectedIndicator(null)
                     setSelectedProgramStage(null)
-                    setSelectedIndicatorGroup(null)
+                    // setSelectedIndicatorGroup(null)
                     setNotification({ show: true, type: NOTIFICATON_SUCCESS, message: 'Configuration ajoutée !' })
                     setLoadingSaveDateElementMappingConfig(false)
                 } else {
@@ -1439,21 +1442,29 @@ const Supervision = ({ me }) => {
     )
 
     const handleOkAnalyticComponentModal = () => {
+        setInputDataSourceDisplayName(selectedMetaDatas[0]?.name)
+        setInputDataSourceID(selectedMetaDatas[0]?.id)
+        setSelectedMetaDatas([])
+        setVisibleAnalyticComponentModal(false)
+    }
+
+    const handleCancelAnalyticComponentModal = () => {
+        setSelectedMetaDatas([])
         setVisibleAnalyticComponentModal(false)
     }
 
     const RenderAnalyticComponentModal = () => visibleAnalyticComponentModal ? (
-        <Modal onClose={() => handleOkAnalyticComponentModal()} large>
+        <Modal onClose={() => handleCancelAnalyticComponentModal()} large>
             <ModalTitle>
                 Source de donnée
             </ModalTitle>
             <ModalContent>
                 <div>
                     <DataDimension
-                        selectedDimensions={selectedMetaDatas.map(it => ({ ...it , isDeactivated : true }))}
+                        selectedDimensions={selectedMetaDatas.map(it => ({ ...it, isDeactivated: true }))}
                         onSelect={value => {
                             console.log("Value : ", value)
-                            setSelectedMetaDatas(value.items)
+                            setSelectedMetaDatas(value?.items?.length > 0 ? [value.items[0]] : [])
                         }}
                         displayNameProp="displayName"
                     />
@@ -1461,6 +1472,9 @@ const Supervision = ({ me }) => {
             </ModalContent>
             <ModalActions>
                 <ButtonStrip end>
+                    <Button destructive onClick={() => handleCancelAnalyticComponentModal()} icon={<CgCloseO style={{ fontSize: "18px" }} />}>
+                        Annuler
+                    </Button>
                     <Button primary onClick={() => handleOkAnalyticComponentModal()} icon={<FiSave style={{ fontSize: "18px" }} />}>
                         Enrégistrer
                     </Button>
@@ -1606,8 +1620,10 @@ const Supervision = ({ me }) => {
                                                     <Input
                                                         placeholder='Source de donnée'
                                                         style={{ width: '100%' }}
-                                                        value={inputSourceText}
-                                                        onChange={event => setInputSourceText(''.concat(event.target.value))}
+                                                        value={inputDataSourceDisplayName}
+                                                        onChange={event => {
+                                                            setInputDataSourceDisplayName(''.concat(event.target.value))
+                                                        }}
                                                     />
                                                 </div>
                                             </Col>

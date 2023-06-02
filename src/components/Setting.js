@@ -118,7 +118,6 @@ const Setting = () => {
         }
     }
 
-
     const handleChangeIndicatorConfigType = ({ value }) => {
         setSelectedProgram(null)
         setSelectedIndicator(null)
@@ -224,7 +223,6 @@ const Setting = () => {
     //     }
     // }
 
-
     const handleSelectIndicatorGroupIND = (value) => {
         setSelectedIndicator(null)
         setSelectedIndicatorGroup(indicatorGroups.find(indGroup => indGroup.id === value))
@@ -242,7 +240,6 @@ const Setting = () => {
         selectedIndicatorType === INDICATOR_GROUP && loadIndicatorGroups()
         selectedIndicatorType === PROGRAM_INDICATOR && loadProgramIndicatorGroups()
     }
-
 
     const handleSelectIndicatorIND = (value) => {
         let currentIndicator = null
@@ -262,7 +259,6 @@ const Setting = () => {
             setIndicatorName(currentIndicator.displayName)
         }
     }
-
 
     const handleSupervisionGenerationType = ({ value }) => {
         setSelectedSupervisionGenerationType(value)
@@ -660,7 +656,6 @@ const Setting = () => {
                                         checked={selectedSupervisionGenerationType === TYPE_GENERATION_AS_EVENT}
                                     />
                                 </div>
-
                             </div>
 
                             <div style={{ marginTop: '20px' }}>
@@ -1362,7 +1357,6 @@ const Setting = () => {
             </div>
         </>
     )
-
 
 
     useEffect(() => {
