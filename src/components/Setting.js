@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { AlertBar, Button, Radio, Tab, TabBar } from "@dhis2/ui"
+import { Button, Radio, Tab, TabBar } from "@dhis2/ui"
 import { AGGREGATE_INDICATOR, NOTIFICATON_CRITICAL, NOTIFICATON_SUCCESS, INDICATOR_GROUP, PAGE_CONFIGURATION_TYPE_SUPERVISIONS, PAGE_CONFIGURATION_USER_AUTHORIZATIONS, PAGE_CONFIG_INDICATORS, PAGE_CONFIG_SUPERVISION, PAGPE_CONFIGURATION_INDICATEURS, PROGRAM_INDICATOR, TYPE_GENERATION_AS_ENROLMENT, TYPE_GENERATION_AS_EVENT, TYPE_GENERATION_AS_TEI, PAGE_SUPERVISIONS, TYPE_ANALYSE_DATA_ELEMENT, PAGE_CONFIG_ANALYSE, TYPE_ANALYSE_INDICATOR } from "../utils/constants"
-import { Checkbox, Col, Divider, Input, InputNumber, Popconfirm, Row, Select, Table } from 'antd'
+import { Card, Checkbox, Col, Divider, Input, InputNumber, Popconfirm, Row, Select, Table } from 'antd'
 import { DATA_ELEMENTS_ROUTE, INDICATORS_GROUP_ROUTE, INDICATORS_ROUTE, PROGRAMS_ROUTE, PROGRAMS_STAGE_ROUTE, PROGRAM_INDICATOR_GROUPS } from '../utils/api.routes'
 import axios from 'axios'
 import { v1 as uuid } from 'uuid'
@@ -9,9 +9,11 @@ import { FiSave } from 'react-icons/fi'
 import { RiDeleteBinLine } from 'react-icons/ri'
 import { QuestionCircleOutlined } from '@ant-design/icons'
 import { FiEdit } from 'react-icons/fi'
+import { RxInfoCircled } from 'react-icons/rx'
 import { MdOutlineCancel } from 'react-icons/md'
 import { loadDataStore, saveDataToDataStore } from '../utils/functions'
 import { BLUE } from '../utils/couleurs'
+import { CgCloseO } from 'react-icons/cg'
 import MyNotification from './MyNotification'
 
 
@@ -27,6 +29,8 @@ const Setting = () => {
     const [indicators, setIndicators] = useState([])
     const [dataElements, setDataElements] = useState([])
     const [analyseConfigs, setAnalyseConfigs] = useState([])
+    const [programStages, setProgramStages] = useState([])
+    const [isFieldEditingMode, setFieldEditingMode] = useState(false)
 
     const [indicatorName, setIndicatorName] = useState('')
     const [indicatorEtiquette, setIndicatorEtiquette] = useState('')
@@ -37,12 +41,14 @@ const Setting = () => {
     const [selectedIndicatorGroup, setSelectedIndicatorGroup] = useState(null)
     const [selectedIndicatorType, setSelectedIndicatorType] = useState(PROGRAM_INDICATOR)
     const [selectedTEIProgram, setSelectedTEIProgram] = useState(null)
-    const [selectedSupervisionGenerationType, setSelectedSupervisionGenerationType] = useState(TYPE_GENERATION_AS_EVENT)
+    const [selectedSupervisionGenerationType, setSelectedSupervisionGenerationType] = useState(TYPE_GENERATION_AS_TEI)
     const [selectedProgram, setSelectedProgram] = useState(null)
     const [selectedTypeSupervisionPage, setSelectedTypeSupervisionPage] = useState(PAGE_CONFIG_INDICATORS)
     const [selectedAnalyseType, setSelectedAnalyseType] = useState(TYPE_ANALYSE_DATA_ELEMENT)
     const [selectedAnalyseIndicator, setSelectedAnalyseIndicator] = useState(null)
     const [selectedAnalyseDataElement, setSelectedAnalyseDataElement] = useState(null)
+    const [selectedProgramStage, setSelectedProgramStage] = useState(null)
+    const [selectedDataElements, setSelectedDataElements] = useState([])
 
     const [loadingPrograms, setLoadingPrograms] = useState(false)
     const [loadingIndicatorGroups, setLoadingIndicatorGroups] = useState(false)
@@ -51,6 +57,7 @@ const Setting = () => {
     const [loadingIndicators, setLoadingIndicators] = useState(false)
     const [loadingDataElements, setLoadingDataElements] = useState(false)
     const [loadingAddAnalyseConfigs, setLoadingAddAnalyseConfigs] = useState(false)
+    const [loadingProgramStages, setLoadingProgramStages] = useState(false)
 
 
     const loadPrograms = async () => {
@@ -117,6 +124,25 @@ const Setting = () => {
             setLoadingIndicatorGroups(false)
         }
     }
+
+    const loadProgramStages = async (programID) => {
+        try {
+            setLoadingProgramStages(true)
+
+            let route = `${PROGRAMS_STAGE_ROUTE},program,programStageDataElements[dataElement[id,displayName]]`
+            if (programID)
+                route = `${route}&filter=program.id:eq:${programID}`
+
+            const response = await axios.get(route)
+
+            setProgramStages(response.data.programStages)
+            setLoadingProgramStages(false)
+            return response.data.programStages
+        } catch (err) {
+            setLoadingProgramStages(false)
+        }
+    }
+
 
     const handleChangeIndicatorConfigType = ({ value }) => {
         setSelectedProgram(null)
@@ -236,9 +262,12 @@ const Setting = () => {
     const handleSelectedTEIProgram = (value) => {
         setSelectedIndicatorGroup(null)
         setIndicatorGroups([])
+        setSelectedProgramStage(null)
+        setSelectedDataElements([])
         setSelectedTEIProgram(programs.find(p => p.id === value))
-        selectedIndicatorType === INDICATOR_GROUP && loadIndicatorGroups()
-        selectedIndicatorType === PROGRAM_INDICATOR && loadProgramIndicatorGroups()
+        // selectedIndicatorType === INDICATOR_GROUP && loadIndicatorGroups()
+        // selectedIndicatorType === PROGRAM_INDICATOR && loadProgramIndicatorGroups()
+        loadProgramStages(value)
     }
 
     const handleSelectIndicatorIND = (value) => {
@@ -343,7 +372,7 @@ const Setting = () => {
             setAnalyseConfigs([])
             setMappingConfigSupervisions([])
             setSelectedTEIProgram(null)
-            setSelectedSupervisionGenerationType(TYPE_GENERATION_AS_EVENT)
+            setSelectedSupervisionGenerationType(TYPE_GENERATION_AS_TEI)
             setSelectedIndicatorType(PROGRAM_INDICATOR)
             setSelectedIndicatorGroup(null)
             setSelectedIndicator(null)
@@ -424,27 +453,57 @@ const Setting = () => {
             setLoadingSaveSupervionsConfig(true)
 
             if (!selectedTEIProgram)
-                throw new Error("Veuillez selectionner le programme tracker")
+                throw new Error("Veuillez selectionner le programme tracker !")
 
             if (selectedTEIProgram && selectedSupervisionGenerationType) {
                 const existingConfig = mappingConfigSupervisions.find(mapping => mapping.program?.id === selectedTEIProgram.id)
 
-                if (!existingConfig) {
-                    const payload = {
-                        id: uuid(),
-                        generationType: selectedSupervisionGenerationType,
-                        program: { id: selectedTEIProgram.id, displayName: selectedTEIProgram.displayName },
-                    }
-                    const newList = [...mappingConfigSupervisions, payload]
-                    await saveDataToDataStore(process.env.REACT_APP_SUPERVISIONS_KEY, newList, setLoadingSaveSupervionsConfig, null, null)
+                if (existingConfig && !isFieldEditingMode)
+                    throw new Error('Cette configuration à déjà été ajoutée !')
 
-                    setMappingConfigSupervisions(newList)
-                    setNotification({ show: true, type: NOTIFICATON_SUCCESS, message: 'Configuration ajoutée !' })
-                    setLoadingSaveSupervionsConfig(false)
-                } else {
-                    throw new Error('Cette configuration à déjà été ajoutée')
+                if (!existingConfig && isFieldEditingMode)
+                    throw new Error('Programme non trouvé !')
+
+                const payload = {
+                    generationType: selectedSupervisionGenerationType,
+                    program: { id: selectedTEIProgram.id, displayName: selectedTEIProgram.displayName },
+                    fieldConfig: null
                 }
+
+                if (selectedProgramStage && selectedDataElements.length > 0) {
+                    payload.fieldConfig = {
+                        supervisor: {
+                            programStage: { id: selectedProgramStage.id, displayName: selectedProgramStage.displayName },
+                            dataElements: selectedDataElements
+                        }
+                    }
+                }
+
+                let newList = []
+
+                if (isFieldEditingMode) {
+                    newList = mappingConfigSupervisions.map(m => {
+                        if (m.id === existingConfig?.id) {
+                            return { ...m, ...payload }
+                        }
+                        return m
+                    })
+                } else {
+                    payload.id = uuid()
+                    newList = [...mappingConfigSupervisions, payload]
+                }
+
+                await saveDataToDataStore(process.env.REACT_APP_SUPERVISIONS_KEY, newList, setLoadingSaveSupervionsConfig, null, null)
+
+                setMappingConfigSupervisions(newList)
+                setSelectedTEIProgram(null)
+                setSelectedProgramStage(null)
+                setFieldEditingMode(false)
+                setSelectedDataElements([])
+                setNotification({ show: true, type: NOTIFICATON_SUCCESS, message: isFieldEditingMode ? 'Mise à jour éffectuée' : 'Configuration ajoutée !' })
+                setLoadingSaveSupervionsConfig(false)
             }
+
         } catch (err) {
             setNotification({ show: true, type: NOTIFICATON_CRITICAL, message: err.response?.data?.message || err.message })
             setLoadingSaveSupervionsConfig(false)
@@ -565,10 +624,6 @@ const Setting = () => {
             if (selectedAnalyseType === TYPE_ANALYSE_INDICATOR && !selectedAnalyseIndicator)
                 throw new Error("L'indicateur est obligatoire !")
 
-
-            console.log("selectedAnalyseDataElement:", selectedAnalyseDataElement)
-            console.log("selectedAnalyseIndicator:", selectedAnalyseIndicator)
-
             const existingConfig = analyseConfigs.find(config => {
                 if (selectedAnalyseType === TYPE_ANALYSE_DATA_ELEMENT) {
                     return config.dataElement?.id === selectedAnalyseDataElement.id
@@ -611,64 +666,172 @@ const Setting = () => {
         }
     }
 
+    const handleSelectDataElements = (values) => {
+        setSelectedDataElements(values.map(value => selectedProgramStage.programStageDataElements?.map(p => p.dataElement).find(dataElement => dataElement.id === value)))
+    }
+    const handleSelectProgramStage = (value) => {
+        setSelectedProgramStage(programStages.find(pstage => pstage.id === value))
+        setSelectedDataElements([])
+    }
+
+    const RenderSupervisorFieldConfiguration = () => (
+        <div style={{ marginTop: '20px' }}>
+            <Card bodyStyle={{ padding: '0px' }} className="my-shadow" size='small'>
+                <div style={{ padding: '10px', borderBottom: '1px solid #ccc' }}>
+                    <div style={{ fontWeight: 'bold' }}>
+                        Configuration des champs superviseurs
+                    </div>
+                    <div style={{ marginTop: '10px', color: '#00000080', fontSize: '13px' }}>
+                        Cette configuration permettra de faire la correspondance entre les éléments de données sélectionnées,
+                        et les superviseurs qui seront sélectionnés lors de la planification en respectant l'ordre de sélection.
+                    </div>
+                </div>
+                <div style={{ padding: '10px' }}>
+                    <Row gutter={[10, 10]}>
+                        <Col md={12}>
+                            <div>
+                                <div style={{ marginBottom: '5px' }}>Programmes Stage</div>
+                                <Select
+                                    options={programStages.map(programStage => ({ label: programStage.displayName, value: programStage.id }))}
+                                    placeholder="Choisir le program stage"
+                                    style={{ width: '100%' }}
+                                    optionFilterProp='label'
+                                    value={selectedProgramStage?.id}
+                                    onChange={handleSelectProgramStage}
+                                    showSearch
+                                    allowClear
+                                    loading={loadingProgramStages}
+                                    disabled={loadingProgramStages}
+                                />
+                            </div>
+                        </Col>
+                        {
+                            selectedProgramStage && (
+                                <Col md={12} xs={24}>
+                                    <div>
+                                        <div style={{ marginBottom: '5px' }}>Eléments de données</div>
+                                        <Select
+                                            options={selectedProgramStage?.programStageDataElements?.map(progStageDE => ({ label: progStageDE.dataElement?.displayName, value: progStageDE.dataElement?.id }))}
+                                            placeholder="Element de donnée"
+                                            style={{ width: '100%' }}
+                                            mode="multiple"
+                                            onChange={handleSelectDataElements}
+                                            value={selectedDataElements.map(s => s.id)}
+                                            optionFilterProp='label'
+                                            showSearch
+                                            allowClear
+                                        />
+                                    </div>
+                                </Col>
+                            )
+                        }
+                    </Row>
+                </div>
+            </Card>
+        </div>
+    )
+
+    const RenderSupervisionConfiguration = () => (
+        <>
+            <div className='my-shadow' style={{ padding: '20px', background: '#FFF', marginBottom: '2px', borderRadius: '8px' }}>
+                <div>
+                    <div style={{ marginBottom: '5px' }}>Programmes Tracker</div>
+                    <Select
+                        options={programs.map(program => ({ label: program.displayName, value: program.id }))}
+                        loading={loadingPrograms}
+                        showSearch
+                        placeholder="Choisir les programmes concerné"
+                        style={{ width: '100%' }}
+                        optionFilterProp='label'
+                        onChange={handleSelectedTEIProgram}
+                        value={selectedTEIProgram?.id}
+                        allowClear
+                    />
+                </div>
+                <div style={{ marginTop: '10px' }}>
+                    <div style={{ marginTop: '5px' }}>
+                        <Radio
+                            label="Générer les supervisions comme Tracked Entity Instances"
+                            onChange={handleSupervisionGenerationType}
+                            value={TYPE_GENERATION_AS_TEI}
+                            checked={selectedSupervisionGenerationType === TYPE_GENERATION_AS_TEI}
+                        />
+                    </div>
+                    <div style={{ marginTop: '5px' }}>
+                        <Radio
+                            label="Générer les supervisions comme Enrôlements"
+                            onChange={handleSupervisionGenerationType}
+                            value={TYPE_GENERATION_AS_ENROLMENT}
+                            checked={selectedSupervisionGenerationType === TYPE_GENERATION_AS_ENROLMENT}
+                        />
+                    </div>
+                    <div style={{ marginTop: '5px' }}>
+                        <Radio
+
+                            label="Générer les supervisions comme Evènements"
+                            onChange={handleSupervisionGenerationType}
+                            value={TYPE_GENERATION_AS_EVENT}
+                            checked={selectedSupervisionGenerationType === TYPE_GENERATION_AS_EVENT}
+                        />
+                    </div>
+                </div>
+            </div>
+        </>
+    )
+
+    const handleEditProgramSup = async (prog) => {
+        try {
+            setSelectedTEIProgram(prog.program)
+            const programStageList = await loadProgramStages(prog?.program?.id)
+            setSelectedProgramStage(programStageList.find(psg => psg.id === prog.fieldConfig?.supervisor?.programStage.id))
+            setSelectedDataElements(prog.fieldConfig?.supervisor?.dataElements)
+            setSelectedSupervisionGenerationType(prog.generationType)
+            setFieldEditingMode(true)
+        } catch (err) {
+            console.log(err)
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
+        }
+    }
+
     const RenderPageSupervisionConfig = () => (
         <>
             <Row gutter={[8, 10]} >
                 <Col md={12} sm={24}>
-                    <div style={{ position: 'sticky', top: 30 }}>
-                        <div className='my-shadow' style={{ padding: '20px', background: '#FFF', marginBottom: '2px', borderRadius: '8px' }}>
-                            <div>
-                                <div style={{ marginBottom: '5px' }}>Programmes Tracker</div>
-                                <Select
-                                    options={programs.map(program => ({ label: program.displayName, value: program.id }))}
-                                    loading={loadingPrograms}
-                                    showSearch
-                                    placeholder="Choisir les programmes concerné"
-                                    style={{ width: '100%' }}
-                                    optionFilterProp='label'
-                                    onChange={handleSelectedTEIProgram}
-                                    value={selectedTEIProgram?.id}
-                                />
-                            </div>
-                            <div style={{ marginTop: '10px' }}>
-                                <div style={{ marginTop: '5px' }}>
-                                    <Radio
-                                        label="Générer les supervisions comme Tracked Entity Instances"
-                                        onChange={handleSupervisionGenerationType}
-                                        value={TYPE_GENERATION_AS_TEI}
-                                        checked={selectedSupervisionGenerationType === TYPE_GENERATION_AS_TEI}
-                                    />
-                                </div>
-                                <div style={{ marginTop: '5px' }}>
-                                    <Radio
-                                        label="Générer les supervisions comme Enrôlements"
-                                        onChange={handleSupervisionGenerationType}
-                                        value={TYPE_GENERATION_AS_ENROLMENT}
-                                        checked={selectedSupervisionGenerationType === TYPE_GENERATION_AS_ENROLMENT}
-                                    />
-                                </div>
-                                <div style={{ marginTop: '5px' }}>
-                                    <Radio
+                    <div >
+                        {RenderSupervisionConfiguration()}
+                        {selectedTEIProgram && RenderSupervisorFieldConfiguration()}
 
-                                        label="Générer les supervisions comme Evènements"
-                                        onChange={handleSupervisionGenerationType}
-                                        value={TYPE_GENERATION_AS_EVENT}
-                                        checked={selectedSupervisionGenerationType === TYPE_GENERATION_AS_EVENT}
-                                    />
+                        <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center' }}>
+                            {
+                                isFieldEditingMode && <div>
+                                    <Button
+                                        icon={<CgCloseO style={{ color: '#fff', fontSize: '18px' }} />}
+                                        destructive
+                                        onClick={() => {
+                                            setFieldEditingMode(false)
+                                            setSelectedTEIProgram(null)
+                                            setSelectedProgramStage(null)
+                                            setSelectedDataElements([])
+                                            setSelectedSupervisionGenerationType(TYPE_GENERATION_AS_TEI)
+                                        }}
+                                    >
+                                        Annuler
+                                    </Button>
                                 </div>
-                            </div>
-
-                            <div style={{ marginTop: '20px' }}>
+                            }
+                            <div style={{ marginLeft: '10px' }}>
                                 <Button
                                     loading={loadingSaveSupervionsConfig}
                                     disabled={loadingSaveSupervionsConfig || !selectedTEIProgram}
                                     icon={<FiSave style={{ color: '#FFF', fontSize: '18px' }} />}
                                     primary
                                     onClick={handleSaveSupConfig}
-                                >Enrégistrer</Button>
+                                >
+                                    {isFieldEditingMode && <span>Mise à jour</span>}
+                                    {!isFieldEditingMode && <span>Enrégistrer</span>}
+                                </Button>
                             </div>
                         </div>
-
                         {/* {
                             selectedTEIProgram && (
                                 <div className='my-shadow' style={{ padding: '20px', background: '#FFF', marginBottom: '2px', borderRadius: '8px', marginTop: '10px' }}>
@@ -851,16 +1014,21 @@ const Setting = () => {
                                                 dataIndex: 'action',
                                                 width: '80px',
                                                 render: value => (
-                                                    <Popconfirm
-                                                        title="Suppression de la configuration"
-                                                        description="Voulez-vous vraiment supprimer cette configuration "
-                                                        icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
-                                                        onConfirm={() => handleDeleteSupervisionConfig(value)}
-                                                    >
-                                                        <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                                            <RiDeleteBinLine style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }} />
+                                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                        <div style={{ marginRight: '10px' }}>
+                                                            <RxInfoCircled style={{ color: BLUE, fontSize: '20px', cursor: 'pointer' }} onClick={() => handleEditProgramSup(value)} />
                                                         </div>
-                                                    </Popconfirm>
+                                                        <Popconfirm
+                                                            title="Suppression de la configuration"
+                                                            description="Voulez-vous vraiment supprimer cette configuration "
+                                                            icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+                                                            onConfirm={() => handleDeleteSupervisionConfig(value)}
+                                                        >
+                                                            <div>
+                                                                <RiDeleteBinLine style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }} />
+                                                            </div>
+                                                        </Popconfirm>
+                                                    </div>
                                                 )
                                             },
                                         ]
@@ -939,6 +1107,7 @@ const Setting = () => {
                                                     value={selectedIndicatorGroup?.id}
                                                     optionFilterProp='label'
                                                     showSearch
+                                                    allowClear
                                                     loading={loadingIndicatorGroups}
                                                     disabled={loadingIndicatorGroups}
                                                 />
@@ -958,6 +1127,7 @@ const Setting = () => {
                                                             value={selectedIndicator?.id}
                                                             optionFilterProp='label'
                                                             showSearch
+                                                            allowClear
                                                         />
                                                     </div>
                                                 </Col>
@@ -985,6 +1155,7 @@ const Setting = () => {
                                                     showSearch
                                                     loading={loadingPrograms}
                                                     disabled={loadingPrograms}
+                                                    allowClear
                                                 />
                                             </div>
                                         </Col>
@@ -1002,6 +1173,7 @@ const Setting = () => {
                                                             value={selectedIndicator?.id}
                                                             optionFilterProp='label'
                                                             showSearch
+                                                            allowClear
                                                         />
                                                     </div>
                                                 </Col>
@@ -1204,6 +1376,7 @@ const Setting = () => {
                                                     showSearch
                                                     loading={loadingDataElements}
                                                     disabled={loadingDataElements}
+                                                    allowClear
                                                 />
                                             </div>
                                         )
@@ -1222,6 +1395,7 @@ const Setting = () => {
                                                     showSearch
                                                     disabled={loadingIndicators}
                                                     loading={loadingIndicators}
+                                                    allowClear
                                                 />
                                             </div>
                                         )

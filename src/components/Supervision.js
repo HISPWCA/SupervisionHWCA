@@ -30,7 +30,7 @@ import { ENROLLMENTS_ROUTE, EVENTS_ROUTE, INDICATORS_GROUP_ROUTE, ORGANISATION_U
 import axios from 'axios'
 import OrganisationUnitsTree from './OrganisationUnitsTree'
 import { GREEN } from '../utils/couleurs'
-import { QuestionCircleOutlined, SaveFilled } from '@ant-design/icons'
+import { QuestionCircleOutlined } from '@ant-design/icons'
 import { RiDeleteBinLine } from 'react-icons/ri'
 import MyNotification from './MyNotification'
 import { v1 as uuid } from 'uuid'
@@ -564,9 +564,16 @@ const Supervision = ({ me }) => {
             const availableProgramStages = []
             const newEventsList = []
 
-            for (let mapping of payload.events) {
+            //  Récuperation dans une list les programmes stage
+            for (let mapping of mappingConfigs) {
                 if (!availableProgramStages.includes(mapping.programStage?.id)) {
                     availableProgramStages.push(mapping.programStage.id)
+                }
+            }
+
+            if (payload.fieldConfig?.supervisor?.programStage?.id) {
+                if (!availableProgramStages.includes(payload.fieldConfig?.supervisor?.programStage?.id)) {
+                    availableProgramStages.push(payload.fieldConfig?.supervisor?.programStage?.id)
                 }
             }
 
@@ -578,23 +585,120 @@ const Supervision = ({ me }) => {
                     enrollment: enrollment_id,
                     programStage: stage,
                     trackedEntityInstance: tei_id,
+                    dataValues: []
                 }
 
-                if (payload.events?.length > 0) {
+                if (mappingConfigs?.length > 0) {
                     eventPayload.status = 'ACTIVE'
                     eventPayload.eventDate = payload.period ? dayjs(payload.period).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')
                     eventPayload.dueDate = payload.period ? dayjs(payload.period).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')
-                    eventPayload.dataValues = payload
-                        .events
-                        .filter(ev => ev.programStage?.id === stage)
-                        .map(ev => ({ dataElement: ev.dataElement?.id, value: ev.indicator?.displayName }))
+                    eventPayload.dataValues = mappingConfigs.filter(ev => ev.programStage?.id === stage)
+                        .map(ev => ({
+                            dataElement: ev.dataElement?.id,
+                            value: ev.indicator?.displayName
+                        }))
                 } else {
                     eventPayload.status = 'SCHEDULE'
                     eventPayload.dueDate = payload.period ? dayjs(payload.period).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')
-                    eventPayload.dataValues = payload
-                        .events
-                        .filter(ev => ev.programStage?.id === stage)
-                        .map(ev => ({ dataElement: ev.dataElement?.id, value: ev.indicator?.displayName }))
+                }
+
+                // Ajoute des dataValues superviseurs
+                if (payload.fieldConfig?.supervisor?.programStage?.id === stage && payload.fieldConfig?.supervisor?.dataElements?.length > 0) {
+                    const newDataValues = []
+
+                    /*
+                    * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son INFÉRIEUR au nombres de superviseurs sélectionnés
+                    */
+                    if (payload.fieldConfig?.supervisor?.dataElements?.length < payload.supervisors?.length) {
+                        const supervisorArrayCurrent = payload.supervisors?.slice(0, payload.fieldConfig?.supervisor?.dataElements?.length)
+                        const supervisorArraylast = payload.supervisors?.slice(payload.fieldConfig?.supervisor?.dataElements?.length)
+
+                        for (let i = 0; i < payload.fieldConfig?.supervisor?.dataElements?.length; i++) {
+                            for (let j = 0; j < supervisorArrayCurrent.length; j++) {
+                                if (i === j) {
+                                    const currentDE = payload.fieldConfig?.supervisor?.dataElements[i]
+                                    const currentSUP = supervisorArrayCurrent[j]
+                                    if (currentDE && currentSUP && !newDataValues.map(dv => dv.dataElement).includes(currentDE.id)) {
+
+                                        if (i === payload.fieldConfig?.supervisor?.dataElements?.length - 1) {
+                                            newDataValues.push({
+                                                dataElement: currentDE.id,
+                                                value: `${currentSUP.displayName},${supervisorArraylast?.map(s => s.displayName)?.join(',')},${payload.otherSupervisors?.join(',')}`
+                                            })
+                                        } else {
+                                            newDataValues.push({
+                                                dataElement: currentDE.id,
+                                                value: currentSUP.displayName
+                                            })
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    /*
+                   * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son EGALE au nombres de superviseurs sélectionnés
+                   */
+                    if (payload.fieldConfig?.supervisor?.dataElements?.length === payload.supervisors?.length) {
+                        for (let i = 0; i < payload.fieldConfig?.supervisor?.dataElements?.length; i++) {
+                            for (let j = 0; j < payload.supervisors.length; j++) {
+                                if (i === j) {
+                                    const currentDE = payload.fieldConfig?.supervisor?.dataElements[i]
+                                    const currentSUP = payload.supervisors[j]
+                                    if (currentDE && currentSUP && !newDataValues.map(dv => dv.dataElement).includes(currentDE.id)) {
+
+                                        if (i === payload.fieldConfig?.supervisor?.dataElements?.length - 1) {
+                                            newDataValues.push({
+                                                dataElement: currentDE.id,
+                                                value: `${currentSUP.displayName},${payload.otherSupervisors?.join(',')}`
+                                            })
+                                        } else {
+                                            newDataValues.push({
+                                                dataElement: currentDE.id,
+                                                value: currentSUP.displayName
+                                            })
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    /*
+                  * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son SUPERIEUR au nombres de superviseurs sélectionnés
+                  */
+                    if (payload.fieldConfig?.supervisor?.dataElements?.length > payload.supervisors?.length) {
+                        for (let i = 0; i < payload.fieldConfig?.supervisor?.dataElements?.length; i++) {
+                            for (let j = 0; j < payload.supervisors.length; j++) {
+                                if (i === j) {
+                                    const currentDE = payload.fieldConfig?.supervisor?.dataElements[i]
+                                    const currentSUP = payload.supervisors[j]
+                                    if (currentDE && currentSUP && !newDataValues.map(dv => dv.dataElement).includes(currentDE.id)) {
+
+                                        if (i === payload.supervisors.length - 1) {
+                                            newDataValues.push({
+                                                dataElement: currentDE.id,
+                                                value: `${currentSUP.displayName},${payload.otherSupervisors?.join(',')}`
+                                            })
+                                        } else {
+                                            newDataValues.push({
+                                                dataElement: currentDE.id,
+                                                value: currentSUP.displayName
+                                            })
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (newDataValues.length > 0) {
+                        eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValues]
+                    }
                 }
 
                 if (!newEventsList.map(ev => ev.programStage).includes(stage)) {
@@ -602,10 +706,7 @@ const Supervision = ({ me }) => {
                 }
             }
 
-
             const createdEvent = await createEvents({ events: newEventsList })
-            console.log(createdEvent)
-
         } catch (err) {
             throw err
         }
@@ -617,13 +718,12 @@ const Supervision = ({ me }) => {
         try {
             if (inputFieldsList.length > 0) {
                 for (let item of inputFieldsList) {
-                    console.log("period item.preriod: ", item.period)
-                    console.log("period: ", dayjs(item.period).format('YYYY-MM-DD'))
                     const payload = {
+                        ...item,
                         orgUnit: item.organisationUnit?.id,
                         period: item.period,
                         program: item.program?.id,
-                        events: mappingConfigs.filter(mapping => mapping.program?.id === item.program?.id),
+                        fieldConfig: item.fieldConfig
                     }
                     await generateTeiWithEnrollmentWithEvents(payload)
                 }
@@ -639,8 +739,6 @@ const Supervision = ({ me }) => {
         try {
             if (inputFieldsList.length > 0) {
                 for (let item of inputFieldsList) {
-                    console.log("period item.preriod: ", item.period)
-                    console.log("period: ", dayjs(item.period).format('YYYY-MM-DD'))
                     const payload = {
                         orgUnit: item.organisationUnit?.id,
                         period: item.period,
@@ -1016,7 +1114,6 @@ const Supervision = ({ me }) => {
         )
     }
     const handleCloseOrgUnitForm = (org, index) => {
-        alert("close org: ")
         console.log(org)
     }
 
@@ -1041,9 +1138,9 @@ const Supervision = ({ me }) => {
     const RenderOrganisationUnitForm = () => (
         <div>
             <Row gutter={[10, 10]}>
-                <Col md={24}>
+                {/* <Col md={24}>
                     {RenderEntryInputConfiguration()}
-                </Col>
+                </Col> */}
                 {
                     selectedOrganisationUnits.map((org, index) => (
                         <Col md={12} sm={24} key={index}>
@@ -1463,7 +1560,6 @@ const Supervision = ({ me }) => {
                     <DataDimension
                         selectedDimensions={selectedMetaDatas.map(it => ({ ...it, isDeactivated: true }))}
                         onSelect={value => {
-                            console.log("Value : ", value)
                             setSelectedMetaDatas(value?.items?.length > 0 ? [value.items[0]] : [])
                         }}
                         displayNameProp="displayName"
@@ -1731,6 +1827,8 @@ const Supervision = ({ me }) => {
                     {
                         organisationUnit: { id: org.id, displayName: org.displayName },
                         program: { id: selectedSupervisionFiche.program?.id, displayName: selectedSupervisionFiche.program?.displayName },
+                        fieldConfig: selectedSupervisionFiche.fieldConfig,
+                        generationType: selectedSupervisionFiche.generationType,
                         libelle: '',
                         period: null,
                         supervisors: [],
