@@ -397,6 +397,12 @@ const Setting = () => {
                 await saveDataToDataStore(process.env.REACT_APP_SUPERVISIONS_KEY, newList, null, null, null)
                 setMappingConfigSupervisions(newList)
                 setNotification({ show: true, message: 'Suppression éffectuée !', type: NOTIFICATON_SUCCESS })
+               
+                setFieldEditingMode(false)
+                setSelectedTEIProgram(null)
+                setSelectedProgramStage(null)
+                setSelectedDataElements([])
+                setSelectedSupervisionGenerationType(TYPE_GENERATION_AS_TEI)
             }
         } catch (err) {
             setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
@@ -716,7 +722,7 @@ const Setting = () => {
                                             style={{ width: '100%' }}
                                             mode="multiple"
                                             onChange={handleSelectDataElements}
-                                            value={selectedDataElements.map(s => s.id)}
+                                            value={selectedDataElements?.map(s => s.id)}
                                             optionFilterProp='label'
                                             showSearch
                                             allowClear
@@ -784,7 +790,7 @@ const Setting = () => {
             setSelectedTEIProgram(prog.program)
             const programStageList = await loadProgramStages(prog?.program?.id)
             setSelectedProgramStage(programStageList.find(psg => psg.id === prog.fieldConfig?.supervisor?.programStage.id))
-            setSelectedDataElements(prog.fieldConfig?.supervisor?.dataElements)
+            setSelectedDataElements(prog.fieldConfig?.supervisor?.dataElements || [])
             setSelectedSupervisionGenerationType(prog.generationType)
             setFieldEditingMode(true)
         } catch (err) {
@@ -1016,7 +1022,7 @@ const Setting = () => {
                                                 render: value => (
                                                     <div style={{ display: 'flex', alignItems: 'center' }}>
                                                         <div style={{ marginRight: '10px' }}>
-                                                            <RxInfoCircled style={{ color: BLUE, fontSize: '20px', cursor: 'pointer' }} onClick={() => handleEditProgramSup(value)} />
+                                                            <FiEdit style={{ color: BLUE, fontSize: '20px', cursor: 'pointer' }} onClick={() => handleEditProgramSup(value)} />
                                                         </div>
                                                         <Popconfirm
                                                             title="Suppression de la configuration"

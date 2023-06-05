@@ -102,3 +102,30 @@
     padding: 0px !important;
     transition: all 0.3s ease-in-out;
 }
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.delete-sup {
+    cursor: pointer;
+    background: #fff;
+    font-weight: bold;
+    color: #ff0000;
+    font-size: 16px;
+    border-radius: 20px;
+    position: absolute;
+    top: -10px;
+    width: 30px;
+    height: 30px;
+    right: -10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 1px 1px 10px #00000060;
+    transition: all 0.3 ease-in-out;
+}
+
+.delete-sup:hover {
+    box-shadow: 1px 1px 10px #ff000080;
+}

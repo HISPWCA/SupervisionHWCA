@@ -24,7 +24,7 @@ export const Body = () => {
             setLoadingDataStoreInitialization(true)
             await loadDataStore(process.env.REACT_APP_SUPERVISIONS_KEY, null, null, [])
             await loadDataStore(process.env.REACT_APP_INDICATORS_CONFIG_KEY, null, null, [])
-            // await loadDataStore(process.env.REACT_APP_FIELDS_CONFIG_KEY, null, null, {})
+            await loadDataStore(process.env.REACT_APP_SUPERVISION_PLANIFICATION_KEY, null, null, [])
             await loadDataStore(process.env.REACT_APP_ANALYSES_CONFIG_KEY, null, null, [])
             await loadMe()
             setDataStoreInitialized(true)

@@ -244,6 +244,8 @@ export const Dashboard = () => {
     const users = usersStore(state => state.users)
     const setUsers = usersStore(state => state.setUsers)
     const [dataStoreAnalyses, setDataStoreAnalyses] = useState([])
+    const [dataStoreSupervisionPlanifications, setDataStoreSupervisionPlanifications] = useState([])
+    const [calendarEvents, setCalendarEvents] = useState([])
 
     const [selectedOrganisationUnit, setSelectedOrganisationUnit] = useState(null)
     const [selectedPlanification, setSelectedPlanification] = useState(PLANIFICATION_PAR_MOI)
@@ -255,6 +257,7 @@ export const Dashboard = () => {
     const [loadingUsers, setLoadingUsers] = useState(false)
     const [loadingDataStoreAnalyses, setLoadingDataStoreAnalyses] = useState(false)
     const [loadingAnalyticsAnalysisConfigData, setLoadingAnalyticsAnalysisConfigData] = useState(false)
+    const [loadingDataStoreSupervisionPlanifications, setLoadingDataStoreSupervisionPlanifications] = useState(false)
 
     const colors = ['#5470C6', '#EE6666']
 
@@ -416,13 +419,54 @@ export const Dashboard = () => {
             setLoadingDataStoreAnalyses(true)
             const response = await loadDataStore(process.env.REACT_APP_ANALYSES_CONFIG_KEY, null, null, null)
             if (response.length > 0) {
-                await loadAnalyticsAnalysisConfigData()
+                // await loadAnalyticsAnalysisConfigData()
             }
             setLoadingDataStoreAnalyses(false)
         }
         catch (err) {
             console.log(err)
             setLoadingDataStoreAnalyses(false)
+        }
+    }
+
+    const loadDataStoreSupervisionPlanifications = async () => {
+        try {
+            setLoadingDataStoreSupervisionPlanifications(true)
+            const response = await loadDataStore(process.env.REACT_APP_SUPERVISION_PLANIFICATION_KEY, null, null, null)
+            console.log(response)
+
+            let supervisionList = []
+            const eventList = []
+
+
+
+            for (let planification of response) {
+                for (sup of planification.supervisions) {
+                    if (!supervisionList.map(s => s.id).includes(sup.id)) {
+                        supervisionList.push(sup)
+                    }
+                }
+            }
+
+            for (let sup of supervisionList) {
+                const payload = {
+                    id: sup.id,
+                    title: 'All Day Event very long title',
+                    allDay: true,
+                    start: new Date(2015, 3, 0),
+                    end: new Date(2015, 3, 1),
+                }
+
+                eventList.push(payload)
+            }
+            setCalendarEvents(eventList)
+
+            setDataStoreSupervisionPlanifications(response)
+            setLoadingDataStoreSupervisionPlanifications(false)
+        }
+        catch (err) {
+            console.log(err)
+            setLoadingDataStoreSupervisionPlanifications(false)
         }
     }
 
@@ -455,7 +499,7 @@ export const Dashboard = () => {
     }
 
     const handleSelectSupervisor = values => setSelectedSupervisors(values.map(sup => users.find(u => u.id === sup)))
-    
+
     const handleSelectPlanificationUser = value => setSelectedPlanificationUser(users.find(u => u.id === value))
 
     const RenderCalendar = () => (
@@ -624,6 +668,7 @@ export const Dashboard = () => {
     useEffect(() => {
         loadOrganisationUnits()
         loadDataStoreAnalyses()
+        loadDataStoreSupervisionPlanifications()
     }, [])
 
     return (
