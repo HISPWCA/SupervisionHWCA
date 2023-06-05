@@ -26,7 +26,7 @@ import {
 } from '../utils/constants'
 import { loadDataStore, saveDataToDataStore } from '../utils/functions'
 import { MyNoticeBox } from './MyNoticeBox'
-import { ENROLLMENTS_ROUTE, EVENTS_ROUTE, INDICATORS_GROUP_ROUTE, ORGANISATION_UNITS_ROUTE, ORGANISATION_UNIT_GROUP_SETS_ROUTE, PROGRAMS_STAGE_ROUTE, PROGRAM_INDICATOR_GROUPS, PROGS_ROUTE, TRACKED_ENTITY_ATTRIBUTES_ROUTE, TRACKED_ENTITY_INSTANCES_ROUTE, USERS_ROUTE } from '../utils/api.routes'
+import { ANALYTICS_ROUTE, ENROLLMENTS_ROUTE, EVENTS_ROUTE, INDICATORS_GROUP_ROUTE, ORGANISATION_UNITS_ROUTE, ORGANISATION_UNIT_GROUP_SETS_ROUTE, PROGRAMS_STAGE_ROUTE, PROGRAM_INDICATOR_GROUPS, PROGS_ROUTE, TRACKED_ENTITY_ATTRIBUTES_ROUTE, TRACKED_ENTITY_INSTANCES_ROUTE, USERS_ROUTE } from '../utils/api.routes'
 import axios from 'axios'
 import OrganisationUnitsTree from './OrganisationUnitsTree'
 import { GREEN } from '../utils/couleurs'
@@ -83,6 +83,7 @@ const Supervision = ({ me }) => {
     const [selectedIndicatorType, setSelectedIndicatorType] = useState(PROGRAM_INDICATOR)
     const [selectedIndicator, setSelectedIndicator] = useState(null)
     const [selectedMetaDatas, setSelectedMetaDatas] = useState([])
+    const [analyticIndicatorResults, setAnalyticIndicatorResults] = useState([])
 
 
     const [inputMeilleur, setInputMeilleur] = useState('')
@@ -102,6 +103,7 @@ const Supervision = ({ me }) => {
     const [loadingSaveDateElementMappingConfig, setLoadingSaveDateElementMappingConfig] = useState(false)
     const [loadingIndicatorGroups, setLoadingIndicatorGroups] = useState(false)
     const [loadingSupervisionPlanification, setLoadingSupervisionPlanification] = useState(false)
+    const [loadingAnalyticIndicatorResults, setLoadingAnalyticIndicatorResults] = useState(false)
 
     const data = [
         {
@@ -1385,9 +1387,13 @@ const Supervision = ({ me }) => {
 
     const handleDisplayIndicatorResult = () => {
         try {
+            setLoadingAnalyticIndicatorResults(true)
 
             if (!selectedOrganisationUnits)
                 throw new Error("L'unité d'organisation est obligatoire !")
+
+            if (!selectedIndicators || selectedIndicators.length === 0)
+                throw new Error("Veuillez sélectionner les indicateurs de recherches !")
 
             if (!selectedOrganisationUnitGroupSet)
                 throw new Error("Ensemble de Groupes d'Unitees d'Organisation est obligatoire ")
@@ -1395,8 +1401,21 @@ const Supervision = ({ me }) => {
             if (!selectedOrganisationUnitGroup)
                 throw new Error("Groupes d'Unitées d'Organisation")
 
+            const response = axios.get(ANALYTICS_ROUTE)
+            setAnalyticIndicatorResults(response.data.row)
+            setLoadingAnalyticIndicatorResults(false)
+
+            setSelectedOrganisationUnits(null)
+            setSelectedOrganisationUnitGroup(null)
+            setSelectedOrganisationUnitGroupSet(null)
+            setInputMeilleur('')
+            setSelectedPeriodType(null)
+            setSelectedPeriod(null)
+            setInputMauvais('')
+
         } catch (err) {
             setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
+            setLoadingAnalyticIndicatorResults(false)
         }
     }
 
