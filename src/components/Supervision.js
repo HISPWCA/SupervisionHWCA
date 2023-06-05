@@ -1377,7 +1377,28 @@ const Supervision = ({ me }) => {
 
     const handleSelectPeriode = value => setSelectedPeriod(value)
 
-    const handleSelectOrganisationUnitGroup = (value) => setSelectedOrganisationUnitGroup(selectedOrganisationUnitGroupSet.organisationUnitGroups?.find(org => org.id === value))
+    const handleSelectOrganisationUnitGroup = (value) => {
+        setSelectedPeriodType(null)
+        setSelectedPeriod(null)
+        setSelectedOrganisationUnitGroup(selectedOrganisationUnitGroupSet.organisationUnitGroups?.find(org => org.id === value))
+    }
+
+    const handleDisplayIndicatorResult = () => {
+        try {
+
+            if (!selectedOrganisationUnits)
+                throw new Error("L'unité d'organisation est obligatoire !")
+
+            if (!selectedOrganisationUnitGroupSet)
+                throw new Error("Ensemble de Groupes d'Unitees d'Organisation est obligatoire ")
+
+            if (!selectedOrganisationUnitGroup)
+                throw new Error("Groupes d'Unitées d'Organisation")
+
+        } catch (err) {
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
+        }
+    }
 
     const RenderIndicatorForm = () => (
         <div>
@@ -1486,7 +1507,7 @@ const Supervision = ({ me }) => {
                         }
                         <Col sm={24} md={24}>
                             <Divider style={{ margin: '10px' }} />
-                            <Button primary onClick={() => alert("Affichage des résultats")}>Afficher les résultats</Button>
+                            <Button primary onClick={handleDisplayIndicatorResult}>Afficher les résultats</Button>
                         </Col>
                     </Row>
                 </div>
