@@ -70,6 +70,7 @@ const Supervision = ({ me }) => {
     const [indicatorGroups, setIndicatorGroups] = useState([])
     const [notification, setNotification] = useState({ show: false, message: null, type: null })
     const [visibleAnalyticComponentModal, setVisibleAnalyticComponentModal] = useState(false)
+    const [analyticIndicatorResults, setAnalyticIndicatorResults] = useState([])
 
     const [selectedStep, setSelectedStep] = useState(0)
     const [selectedSupervisionType, setSelectedSupervisionType] = useState(null)
@@ -87,7 +88,7 @@ const Supervision = ({ me }) => {
     const [selectedIndicatorType, setSelectedIndicatorType] = useState(PROGRAM_INDICATOR)
     const [selectedIndicator, setSelectedIndicator] = useState(null)
     const [selectedMetaDatas, setSelectedMetaDatas] = useState([])
-    const [analyticIndicatorResults, setAnalyticIndicatorResults] = useState([])
+    const [selectedOrganisationUnitInd, setSelectedOrganisationUnitInd] = useState(null)
 
     const [inputMeilleur, setInputMeilleur] = useState('')
     const [inputMauvais, setInputMauvais] = useState('')
@@ -1437,18 +1438,43 @@ const Supervision = ({ me }) => {
 
             console.log("selectedIndicators ", selectedIndicators)
 
-            const route = `${ANALYTICS_ROUTE}?dimension=dx:${selectedIndicators.map(ind => ind.indicator?.id).join(';')},ou:${selectedOrganisationUnits?.id};OU_GROUP-${selectedOrganisationUnitGroup?.id}&filter=pe:${formatPeriod(selectedPeriod, selectedPeriodType)}&displayProperty=NAME&includeNumDen=true&skipMeta=false&skipData=true&includeMetadataDetails=true`
+            // const route = `${ANALYTICS_ROUTE}?dimension=dx:${selectedIndicators.map(ind => ind.indicator?.id).join(';')},ou:${selectedOrganisationUnitInd?.id};OU_GROUP-${selectedOrganisationUnitGroup?.id}&filter=pe:${formatPeriod(selectedPeriod, selectedPeriodType)}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=true&includeNumDen=true&skipRounding=false&completedOnly=false&outputIdScheme=UID&`
+            const route = `${ANALYTICS_ROUTE}/dataValueSet.json?dimension=dx:${selectedIndicators.map(ind => ind.indicator?.id).join(';')}&dimension=ou:${selectedOrganisationUnitInd?.id};OU_GROUP-${selectedOrganisationUnitGroup?.id}&dimension=pe:${formatPeriod(selectedPeriod, selectedPeriodType)}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=true&includeNumDen=true&skipRounding=false&completedOnly=false`
             const response = await axios.get(route)
-            setAnalyticIndicatorResults(response.data.rows)
-            setLoadingAnalyticIndicatorResults(false)
 
-            setSelectedOrganisationUnits(null)
-            setSelectedOrganisationUnitGroup(null)
-            setSelectedOrganisationUnitGroupSet(null)
-            setInputMeilleur('')
-            setSelectedPeriodType(null)
-            setSelectedPeriod(null)
-            setInputMauvais('')
+            console.log("response : ", response)
+
+
+            const dataValues = response.data.dataValues
+            let availableIndicators = []
+
+            for (let ind of selectedIndicators) {
+                const payload = {
+                    weight: ind.weight,
+                    dataValues: dataValues.filter(dv => dv.dataElement === ind.indicator?.id).map(i => (
+                        {
+                            dataElement: i.dataElement,
+                            period: i.period,
+                            value: i.value,
+                            orgUnit: i.orgUnit,
+                            score: parseFloat(i.value) * parseFloat(ind.weight || 1),
+                        }
+                    ))
+                }
+
+                availableIndicators.push(payload)
+            }
+
+            setAnalyticIndicatorResults(availableIndicators)
+
+            setLoadingAnalyticIndicatorResults(false)
+            // setSelectedOrganisationUnitInd(null)
+            // setSelectedOrganisationUnitGroup(null)
+            // setSelectedOrganisationUnitGroupSet(null)
+            // setInputMeilleur('')
+            // setSelectedPeriodType(null)
+            // setSelectedPeriod(null)
+            // setInputMauvais('')
 
         } catch (err) {
             setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
@@ -1472,8 +1498,8 @@ const Supervision = ({ me }) => {
                                 <OrganisationUnitsTree
                                     meOrgUnitId={me?.organisationUnits[0]?.id}
                                     orgUnits={organisationUnits}
-                                    currentOrgUnits={selectedOrganisationUnits}
-                                    setCurrentOrgUnits={setSelectedOrganisationUnits}
+                                    currentOrgUnits={selectedOrganisationUnitInd}
+                                    setCurrentOrgUnits={setSelectedOrganisationUnitInd}
                                     loadingOrganisationUnits={loadingOrganisationUnits}
                                 />
                             </div>
@@ -1565,7 +1591,7 @@ const Supervision = ({ me }) => {
                             <Divider style={{ margin: '10px' }} />
                             <Button
                                 loading={loadingAnalyticIndicatorResults}
-                                disabled={selectedOrganisationUnits && selectedOrganisationUnitGroup && selectedIndicators.length > 0 && selectedOrganisationUnitGroupSet && selectedPeriod ? false : true}
+                                disabled={selectedOrganisationUnitInd && selectedOrganisationUnitGroup && selectedIndicators.length > 0 && selectedOrganisationUnitGroupSet && selectedPeriod ? false : true}
                                 primary onClick={handleDisplayIndicatorResult}>Afficher les résultats</Button>
                         </Col>
                     </Row>
@@ -1894,30 +1920,39 @@ const Supervision = ({ me }) => {
                 </div>
             }
 
-            {/* {
-                this.state.finalResults.length > 0 &&
-                (parseInt(this.state.finalResults.length + 1) - (parseInt(this.state.best || 0) + parseInt(this.state.worst || 0)) > 0) &&
-                <table className="table table-sm table-striped table-secondary table-hover text-left align-middle">
-                    <thead> {Object.keys(this.state.finalResults[0]).map(key => <th className="text-capitalize text-left align-middle"> {key} </th>)} <th className="text-left align-middle">{translate('Action')}</th> </thead>
-                    {
+            {/* (parseInt(this.state.finalResults.length + 1) - (parseInt(this.state.best || 0) + parseInt(this.state.worst || 0)) > 0) && */}
+            <div style={{ marginTop: '20px' }}>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Organisation unit</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {/* {
                         this.state.finalResults.length > 1 &&
-                        <tbody>
-                            {this.state.hightIsGood && this.state.finalResults.sort((a, b) => b.score - a.score).slice(0, this.state.best).map((result, index) => <tr title={result.organisationUnit} > {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-success text-left align-middle"> {result[key]} </td>)}  <td className="text-left align-middle"><button className="btn btn-light btn-sm" onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {translate('Schedule')} </button></td></tr>)}
-                            {this.state.hightIsGood && this.state.finalResults.sort((a, b) => a.score - b.score).slice(0, this.state.worst).sort((a, b) => b.score - a.score).map((result, index) => <tr title={result.organisationUnit} > {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-danger text-left align-middle"> {result[key]} </td>)} <td className="text-left align-middle"><button className="btn btn-light btn-sm" onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {translate('Schedule')} </button></td> </tr>)}
+                        { this.state.hightIsGood && this.state.finalResults.sort((a, b) => b.score - a.score).slice(0, this.state.best).map((result, index) => <tr title={result.organisationUnit} > {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-success text-left align-middle"> {result[key]} </td>)}  <td className="text-left align-middle"><button className="btn btn-light btn-sm" onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {translate('Schedule')} </button></td></tr>) }
+                        {this.state.hightIsGood && this.state.finalResults.sort((a, b) => a.score - b.score).slice(0, this.state.worst).sort((a, b) => b.score - a.score).map((result, index) => <tr title={result.organisationUnit} > {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-danger text-left align-middle"> {result[key]} </td>)} <td className="text-left align-middle"><button className="btn btn-light btn-sm" onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {translate('Schedule')} </button></td> </tr>)}
 
-                            {!this.state.hightIsGood && this.state.finalResults.sort((a, b) => a.score - b.score).slice(0, this.state.best).map((result, index) => <tr title={result.organisationUnit} > {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-success text-left align-middle"> {result[key]} </td>)}  <td className="text-left align-middle"><button className="btn btn-light btn-sm" onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {translate('Schedule')} </button></td></tr>)}
-                            {!this.state.hightIsGood && this.state.finalResults.sort((a, b) => b.score - a.score).slice(0, this.state.worst).sort((a, b) => a.score - b.score).map((result, index) => <tr title={result.organisationUnit} > {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-danger text-left align-middle"> {result[key]} </td>)}  <td className="text-left align-middle"><button className="btn btn-light btn-sm" onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {translate('Schedule')} </button></td></tr>)}
-                        </tbody>
-                    }
+                    {!this.state.hightIsGood && this.state.finalResults.sort((a, b) => a.score - b.score).slice(0, this.state.best).map((result, index) => <tr title={result.organisationUnit} > {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-success text-left align-middle"> {result[key]} </td>)}  <td className="text-left align-middle"><button className="btn btn-light btn-sm" onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {translate('Schedule')} </button></td></tr>)}
+                    {!this.state.hightIsGood && this.state.finalResults.sort((a, b) => b.score - a.score).slice(0, this.state.worst).sort((a, b) => a.score - b.score).map((result, index) => <tr title={result.organisationUnit} > {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-danger text-left align-middle"> {result[key]} </td>)}  <td className="text-left align-middle"><button className="btn btn-light btn-sm" onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {translate('Schedule')} </button></td></tr>)}
+                } */}
 
-                    {
+
+                    </tbody>
+
+                    {/* {
                         this.state.finalResults.length === 1 &&
                         <tbody>
                             {this.state.finalResults.map((result, index) => <tr title={result.organisationUnit} > {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-primary text-left align-middle"> {result[key]} </td>)}  <td className="text-left align-middle"><button className="btn btn-light btn-sm" onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {translate('Schedule')} </button></td></tr>)}
                         </tbody>
-                    }
+                    } */}
                 </table>
-            }
+            </div>
+
+
+            {/* 
 
             {
                 this.state.finalResults.length > 0 &&
