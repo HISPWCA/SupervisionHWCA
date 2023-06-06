@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect, useState } from 'react'
 import { MantineReactTable } from 'mantine-react-table'
-import { Card, Col, DatePicker, Divider, FloatButton, Input, InputNumber, List, Popconfirm, Row, Select, Steps, Table } from 'antd'
+import { Card, Col, DatePicker, Divider, FloatButton, Input, InputNumber, List, Popconfirm, Row, Select, Checkbox as AntCheckbox, Table } from 'antd'
 import { IoMdAdd } from 'react-icons/io'
 import { IoListCircleOutline } from 'react-icons/io5'
 import { Button, ButtonStrip, Checkbox, CircularLoader, Modal, ModalActions, ModalContent, ModalTitle, Radio } from '@dhis2/ui'
@@ -90,8 +90,8 @@ const Supervision = ({ me }) => {
     const [selectedMetaDatas, setSelectedMetaDatas] = useState([])
     const [selectedOrganisationUnitInd, setSelectedOrganisationUnitInd] = useState(null)
 
-    const [inputMeilleur, setInputMeilleur] = useState('')
-    const [inputMauvais, setInputMauvais] = useState('')
+    const [inputMeilleur, setInputMeilleur] = useState(0)
+    const [inputMauvais, setInputMauvais] = useState(0)
     const [inputMeilleurPositif, setInputMeilleurPositif] = useState(true)
     const [inputFields, setInputFields] = useState([])
     const [inputDataSourceDisplayName, setInputDataSourceDisplayName] = useState('')
@@ -449,8 +449,8 @@ const Supervision = ({ me }) => {
             loadOrganisationUnitsGroupSets()
         }
 
-        setInputMauvais('')
-        setInputMeilleur('')
+        setInputMauvais(0)
+        setInputMeilleur(0)
         setInputMeilleurPositif(false)
 
         setSelectedIndicators([])
@@ -819,8 +819,8 @@ const Supervision = ({ me }) => {
         setSelectedIndicatorType(PROGRAM_INDICATOR)
         setSelectedIndicator(null)
         setSelectedMetaDatas([])
-        setInputMeilleur('')
-        setInputMauvais('')
+        setInputMeilleur(0)
+        setInputMauvais(0)
         setInputMeilleurPositif(true)
         setInputFields([])
         setInputDataSourceDisplayName('')
@@ -1215,15 +1215,12 @@ const Supervision = ({ me }) => {
         </div>
     )
 
-    const RenderOrganisationUnitForm = () => (
+    const RenderOrganisationUnitForm = (colMd = 12) => (
         <div>
             <Row gutter={[10, 10]}>
-                {/* <Col md={24}>
-                    {RenderEntryInputConfiguration()}
-                </Col> */}
                 {
                     selectedOrganisationUnits.map((org, index) => (
-                        <Col md={12} sm={24} key={index}>
+                        <Col md={colMd} sm={24} key={index}>
                             <Card bodyStyle={{ padding: '0px' }} className="my-shadow" size='small'>
                                 <div style={{ background: GREEN, color: '#FFF', fontWeight: 'bold', padding: '10px', position: 'relative' }}>
                                     <span>
@@ -1392,8 +1389,6 @@ const Supervision = ({ me }) => {
 
     const formatPeriod = (period, periodType) => {
 
-        console.log(dayjs(period).quarter())
-
         let currentPeriod = dayjs(period).format('YYYY')
 
         if (periodType === MONTH)
@@ -1410,9 +1405,6 @@ const Supervision = ({ me }) => {
 
         if (periodType === WEEK)
             currentPeriod = `${dayjs(period).format('YYYY')}W${dayjs(period).week()}`
-
-
-        console.log("Current period ", currentPeriod)
 
         return currentPeriod
     }
@@ -1436,13 +1428,9 @@ const Supervision = ({ me }) => {
             if (!selectedPeriod)
                 throw new Error("Veuillez sélectionner la période !")
 
-            console.log("selectedIndicators ", selectedIndicators)
-
             // const route = `${ANALYTICS_ROUTE}?dimension=dx:${selectedIndicators.map(ind => ind.indicator?.id).join(';')},ou:${selectedOrganisationUnitInd?.id};OU_GROUP-${selectedOrganisationUnitGroup?.id}&filter=pe:${formatPeriod(selectedPeriod, selectedPeriodType)}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=true&includeNumDen=true&skipRounding=false&completedOnly=false&outputIdScheme=UID&`
             const route = `${ANALYTICS_ROUTE}/dataValueSet.json?dimension=dx:${selectedIndicators.map(ind => ind.indicator?.id).join(';')}&dimension=ou:${selectedOrganisationUnitInd?.id};OU_GROUP-${selectedOrganisationUnitGroup?.id}&dimension=pe:${formatPeriod(selectedPeriod, selectedPeriodType)}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=true&includeNumDen=true&skipRounding=false&completedOnly=false`
             const response = await axios.get(route)
-
-            console.log("response : ", response)
 
 
             const dataValues = response.data.dataValues
@@ -1450,13 +1438,14 @@ const Supervision = ({ me }) => {
 
             for (let ind of selectedIndicators) {
                 const payload = {
+                    indicator: ind.indicator,
                     weight: ind.weight,
                     dataValues: dataValues.filter(dv => dv.dataElement === ind.indicator?.id).map(i => (
                         {
                             dataElement: i.dataElement,
                             period: i.period,
                             value: i.value,
-                            orgUnit: i.orgUnit,
+                            orgUnit: organisationUnits.find(o => o.id === i.orgUnit),
                             score: parseFloat(i.value) * parseFloat(ind.weight || 1),
                         }
                     ))
@@ -1510,13 +1499,13 @@ const Supervision = ({ me }) => {
                                 style={{ width: '100%' }}
                                 placeholder='Meilleur'
                                 value={inputMeilleur}
-                                onChange={value => setInputMeilleur(''.concat(value))}
+                                onChange={value => setInputMeilleur(value || 0)}
                             />
                         </Col>
                         <Col sm={24} md={6}>
                             <div style={{ marginBottom: '5px' }}>Mauvais</div>
                             <InputNumber
-                                onChange={value => setInputMauvais(''.concat(value))}
+                                onChange={value => setInputMauvais(value || 0)}
                                 value={inputMauvais}
                                 style={{ width: '100%' }}
                                 placeholder='Mauvais'
@@ -1559,18 +1548,21 @@ const Supervision = ({ me }) => {
                                 </Col>
                             )
                         }
-                        <Col sm={24} md={6}>
-                            <div style={{ marginTop: '20px' }}>
-                                <div style={{ marginBottom: '5px' }}>Type de Période</div>
-                                <Select
-                                    style={{ width: '100%' }}
-                                    options={periodTypesOptions()}
-                                    placeholder="Type de Période"
-                                    onChange={handleSelectPeriodType}
-                                    value={selectedPeriodType}
-                                />
-                            </div>
-                        </Col>
+                        {
+                            selectedOrganisationUnitGroup && (<Col sm={24} md={6}>
+                                <div style={{ marginTop: '20px' }}>
+                                    <div style={{ marginBottom: '5px' }}>Type de Période</div>
+                                    <Select
+                                        style={{ width: '100%' }}
+                                        options={periodTypesOptions()}
+                                        placeholder="Type de Période"
+                                        onChange={handleSelectPeriodType}
+                                        value={selectedPeriodType}
+                                    />
+                                </div>
+                            </Col>
+                            )
+                        }
                         {
                             selectedPeriodType && (
                                 <Col sm={24} md={6}>
@@ -1908,51 +1900,59 @@ const Supervision = ({ me }) => {
     </>
 
 
+    const handleSelectCheckbox = (orgUnit) => {
+        if (selectedIndicators.map(ou => ou.id).includes(orgUnit.id)) {
+            setSelectedOrganisationUnits(selectedOrganisationUnits.filter(ou => ou.id !== orgUnit.id))
+        } else {
+            setSelectedOrganisationUnits([...selectedOrganisationUnits, organisationUnits.find(ou => ou.id === orgUnit.id)])
+        }
+    }
+
     const RenderAnalyticIndicatorsResults = () => (
-        <div className="col">
-            {
-                selectedPeriod &&
+        <>
+            <Card size='small' className='my-shadow'>
                 <div>
-                    <span>Selected Period:</span> <strong> {dayjs(selectedPeriod).format(' MMMM, YYYY')} </strong>
-                    <span>Hight Is Good:</span> <strong> {inputMeilleurPositif ? 'Oui' : 'No'} </strong>
+                    {
+                        selectedPeriod &&
+                        <div>
+                            <span>Période sélectionnée:</span> <strong> {dayjs(selectedPeriod).format(' MMMM, YYYY')} </strong>
+                            <span>Meilleur Positif:</span> <strong> {inputMeilleurPositif ? 'Oui' : 'No'} </strong>
 
-                    {selectedIndicators.map(ind => <> <span className="ml-2">{ind.indicator?.displayName}:</span> <strong>{ind.weight}</strong> </>)}
-                </div>
-            }
+                            {analyticIndicatorResults.map(ind => <> <span className="ml-2">{ind.indicator?.displayName}:</span> <strong>{ind.weight}</strong> </>)}
+                        </div>
+                    }
 
-            {/* (parseInt(this.state.finalResults.length + 1) - (parseInt(this.state.best || 0) + parseInt(this.state.worst || 0)) > 0) && */}
-            <div style={{ marginTop: '20px' }}>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Organisation unit</th>
-                            <th>Score</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {/* {
-                        this.state.finalResults.length > 1 &&
-                        { this.state.hightIsGood && this.state.finalResults.sort((a, b) => b.score - a.score).slice(0, this.state.best).map((result, index) => <tr title={result.organisationUnit} > {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-success text-left align-middle"> {result[key]} </td>)}  <td className="text-left align-middle"><button className="btn btn-light btn-sm" onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {translate('Schedule')} </button></td></tr>) }
-                        {this.state.hightIsGood && this.state.finalResults.sort((a, b) => a.score - b.score).slice(0, this.state.worst).sort((a, b) => b.score - a.score).map((result, index) => <tr title={result.organisationUnit} > {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-danger text-left align-middle"> {result[key]} </td>)} <td className="text-left align-middle"><button className="btn btn-light btn-sm" onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {translate('Schedule')} </button></td> </tr>)}
+                    {/* (parseInt(this.state.finalResults.length + 1) - (parseInt(this.state.best || 0) + parseInt(this.state.worst || 0)) > 0) && */}
+                    <div style={{ marginTop: '20px' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <thead>
+                                <tr style={{ backgroundColor: '#fff' }}>
+                                    <th style={{ border: '1px solid #ccc', padding: '5px' }}></th>
+                                    <th style={{ border: '1px solid #ccc', padding: '5px' }}>Organisation unit</th>
+                                    {
+                                        analyticIndicatorResults.map((result, index) => (
+                                            <th key={index} style={{ border: '1px solid #ccc', padding: '5px' }}>{result.indicator?.displayName}</th>
+                                        ))
+                                    }
+                                    {
+                                        analyticIndicatorResults.map((result, index) => (
+                                            <th style={{ border: '1px solid #ccc', padding: '5px' }} key={index}>{result.indicator?.displayName}  Score</th>
+                                        ))
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {inputMeilleurPositif && [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].sort((a, b) => b.score - a.score).slice(0, parseInt(inputMeilleur || 0)).map((an, index) => (<tr style={{ backgroundColor: '#D3FFF3', color: '#000' }} key={index}> <td style={{ border: '1px solid #ccc', padding: '5px' }}><AntCheckbox onChange={() => handleSelectCheckbox(an?.orgUnit)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an.orgUnit?.id)} /></td> <td style={{ border: '1px solid #ccc', padding: '5px' }}>{an.orgUnit?.displayName}</td>{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.value) : '-'}</td>))}{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.score) : '-'}</td>))} </tr>))}
+                                {inputMeilleurPositif && [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].sort((a, b) => a.score - b.score).slice(0, parseInt(inputMauvais || 0)).map((an, index) => (<tr style={{ backgroundColor: '#FFDDD2', color: '#000' }} key={index}> <td style={{ border: '1px solid #ccc', padding: '5px' }}><AntCheckbox onChange={() => handleSelectCheckbox(an?.orgUnit)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an.orgUnit?.id)} /></td>  <td style={{ border: '1px solid #ccc', padding: '5px' }}>{an.orgUnit?.displayName}</td>{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.value) : '-'}</td>))}{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.score) : '-'}</td>))} </tr>))}
 
-                    {!this.state.hightIsGood && this.state.finalResults.sort((a, b) => a.score - b.score).slice(0, this.state.best).map((result, index) => <tr title={result.organisationUnit} > {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-success text-left align-middle"> {result[key]} </td>)}  <td className="text-left align-middle"><button className="btn btn-light btn-sm" onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {translate('Schedule')} </button></td></tr>)}
-                    {!this.state.hightIsGood && this.state.finalResults.sort((a, b) => b.score - a.score).slice(0, this.state.worst).sort((a, b) => a.score - b.score).map((result, index) => <tr title={result.organisationUnit} > {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-danger text-left align-middle"> {result[key]} </td>)}  <td className="text-left align-middle"><button className="btn btn-light btn-sm" onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {translate('Schedule')} </button></td></tr>)}
-                } */}
-
-
-                    </tbody>
-
-                    {/* {
-                        this.state.finalResults.length === 1 &&
-                        <tbody>
-                            {this.state.finalResults.map((result, index) => <tr title={result.organisationUnit} > {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-primary text-left align-middle"> {result[key]} </td>)}  <td className="text-left align-middle"><button className="btn btn-light btn-sm" onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {translate('Schedule')} </button></td></tr>)}
-                        </tbody>
-                    } */}
-                </table>
-            </div>
+                                {!inputMeilleurPositif && [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].sort((a, b) => a.score - b.score).slice(0, parseInt(inputMeilleur || 0)).map((an, index) => (<tr style={{ backgroundColor: '#D3FFF3', color: '#000' }} key={index}> <td style={{ border: '1px solid #ccc', padding: '5px' }}><AntCheckbox onChange={() => handleSelectCheckbox(an?.orgUnit)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an.orgUnit?.id)} /></td>  <td style={{ border: '1px solid #ccc', padding: '5px' }}>{an.orgUnit?.displayName}</td>{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.value) : '-'}</td>))}{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.score) : '-'}</td>))} </tr>))}
+                                {!inputMeilleurPositif && [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].sort((a, b) => b.score - a.score).slice(0, parseInt(inputMauvais || 0)).map((an, index) => (<tr style={{ backgroundColor: '#FFDDD2', color: '#000' }} key={index}><td style={{ border: '1px solid #ccc', padding: '5px' }}><AntCheckbox onChange={() => handleSelectCheckbox(an?.orgUnit)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an.orgUnit?.id)} /></td>  <td style={{ border: '1px solid #ccc', padding: '5px' }}>{an.orgUnit?.displayName}</td>{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.value) : '-'}</td>))}{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.score) : '-'}</td>))} </tr>))}
+                            </tbody>
+                        </table>
+                    </div>
 
 
-            {/* 
+                    {/* 
 
             {
                 this.state.finalResults.length > 0 &&
@@ -1989,7 +1989,9 @@ const Supervision = ({ me }) => {
                     </table>
                 </React.Fragment>
             } */}
-        </div>
+                </div>
+            </Card>
+        </>
     )
 
     const RenderStepsContent = () => <>
@@ -2047,18 +2049,32 @@ const Supervision = ({ me }) => {
                             {RenderPlanificationForm()}
                         </Col>
 
+                        {analyticIndicatorResults.length === 0 && (<Col md={24}>Pas de résultats</Col>)}
+                        {[...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].length >= parseInt(inputMeilleur || 0) + parseInt(inputMauvais || 0) && (<Col md={24}>Critères trop grands</Col>)}
+
                         {
-                            analyticIndicatorResults.length > 0 && (
+                            selectedPlanificationType === INDICATOR && selectedIndicators.length > 0 &&
+                            analyticIndicatorResults.length > 0 &&
+                            [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].length >= parseInt(inputMeilleur || 0) + parseInt(inputMauvais || 0) &&
+                            (
                                 <Col md={24}>{RenderAnalyticIndicatorsResults()} </Col>
                             )
                         }
 
+                        {
+                            selectedPlanificationType === INDICATOR && selectedIndicators.length > 0 && selectedOrganisationUnits.length > 0 && (
+                                <Col md={24}>
+                                    {RenderOrganisationUnitForm(8)}
+                                </Col>
+                            )
+                        }
                     </Row>
                 </>
             )
         }
 
     </>
+
 
     const RenderSupervisionForm = () => (
         <>
