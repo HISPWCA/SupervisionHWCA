@@ -397,7 +397,7 @@ const Setting = () => {
                 await saveDataToDataStore(process.env.REACT_APP_SUPERVISIONS_KEY, newList, null, null, null)
                 setMappingConfigSupervisions(newList)
                 setNotification({ show: true, message: 'Suppression éffectuée !', type: NOTIFICATON_SUCCESS })
-               
+
                 setFieldEditingMode(false)
                 setSelectedTEIProgram(null)
                 setSelectedProgramStage(null)
@@ -1541,9 +1541,9 @@ const Setting = () => {
 
     useEffect(() => {
         loadPrograms()
-        // loadDatastoreIndConf()
-        // loadDatastoreSupConf()
-        // loadDatastoreDataElementConf()
+        selectedTypeSupervisionPage === PAGE_CONFIG_INDICATORS && initIndicatorConfigStates()
+        selectedTypeSupervisionPage === PAGE_CONFIG_SUPERVISION && initSupConfigStates()
+        selectedTypeSupervisionPage === PAGE_CONFIG_ANALYSE && initAnalyseConfigStates()
     }, [])
 
     useEffect(() => {

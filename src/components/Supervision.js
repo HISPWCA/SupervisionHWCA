@@ -46,8 +46,12 @@ import { DataDimension } from '@dhis2/analytics'
 
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat'
+const quarterOfYear = require('dayjs/plugin/quarterOfYear')
+const weekOfYear = require('dayjs/plugin/weekOfYear')
 
 
+dayjs.extend(weekOfYear)
+dayjs.extend(quarterOfYear)
 dayjs.extend(customParseFormat);
 
 
@@ -85,14 +89,12 @@ const Supervision = ({ me }) => {
     const [selectedMetaDatas, setSelectedMetaDatas] = useState([])
     const [analyticIndicatorResults, setAnalyticIndicatorResults] = useState([])
 
-
     const [inputMeilleur, setInputMeilleur] = useState('')
     const [inputMauvais, setInputMauvais] = useState('')
     const [inputMeilleurPositif, setInputMeilleurPositif] = useState(true)
     const [inputFields, setInputFields] = useState([])
     const [inputDataSourceDisplayName, setInputDataSourceDisplayName] = useState('')
     const [inputDataSourceID, setInputDataSourceID] = useState(null)
-
 
     const [loadingDataStoreSupervisionConfigs, setLoadingDataStoreSupervisionConfigs] = useState(false)
     const [loadingDataStoreIndicatorConfigs, setLoadingDataStoreIndicatorConfigs] = useState(false)
@@ -1368,6 +1370,8 @@ const Supervision = ({ me }) => {
 
     const handleSelectOrganisationUnitGroupSet = (value) => {
         setSelectedOrganisationUnitGroup(null)
+        setSelectedPeriodType(null)
+        setSelectedPeriod(null)
 
         setSelectedOrganisationUnitGroupSet(organisationUnitGroupSets.find(org => org.id === value))
     }
@@ -1385,7 +1389,34 @@ const Supervision = ({ me }) => {
         setSelectedOrganisationUnitGroup(selectedOrganisationUnitGroupSet.organisationUnitGroups?.find(org => org.id === value))
     }
 
-    const handleDisplayIndicatorResult = () => {
+    const formatPeriod = (period, periodType) => {
+
+        console.log(dayjs(period).quarter())
+
+        let currentPeriod = dayjs(period).format('YYYY')
+
+        if (periodType === MONTH)
+            currentPeriod = dayjs(period).format('YYYYMM')
+
+        if (periodType === DAY)
+            currentPeriod = dayjs(period).format('YYYYMMDD')
+
+        if (periodType === YEAR)
+            currentPeriod = dayjs(period).format('YYYY')
+
+        if (periodType === QUARTER)
+            currentPeriod = `${dayjs(period).format('YYYY')}Q${dayjs(period).quarter()}`
+
+        if (periodType === WEEK)
+            currentPeriod = `${dayjs(period).format('YYYY')}W${dayjs(period).week()}`
+
+
+        console.log("Current period ", currentPeriod)
+
+        return currentPeriod
+    }
+
+    const handleDisplayIndicatorResult = async () => {
         try {
             setLoadingAnalyticIndicatorResults(true)
 
@@ -1399,10 +1430,16 @@ const Supervision = ({ me }) => {
                 throw new Error("Ensemble de Groupes d'Unitees d'Organisation est obligatoire ")
 
             if (!selectedOrganisationUnitGroup)
-                throw new Error("Groupes d'Unitées d'Organisation")
+                throw new Error("Groupes d'Unitées d'Organisation !")
 
-            const response = axios.get(ANALYTICS_ROUTE)
-            setAnalyticIndicatorResults(response.data.row)
+            if (!selectedPeriod)
+                throw new Error("Veuillez sélectionner la période !")
+
+            console.log("selectedIndicators ", selectedIndicators)
+
+            const route = `${ANALYTICS_ROUTE}?dimension=dx:${selectedIndicators.map(ind => ind.indicator?.id).join(';')},ou:${selectedOrganisationUnits?.id};OU_GROUP-${selectedOrganisationUnitGroup?.id}&filter=pe:${formatPeriod(selectedPeriod, selectedPeriodType)}&displayProperty=NAME&includeNumDen=true&skipMeta=false&skipData=true&includeMetadataDetails=true`
+            const response = await axios.get(route)
+            setAnalyticIndicatorResults(response.data.rows)
             setLoadingAnalyticIndicatorResults(false)
 
             setSelectedOrganisationUnits(null)
@@ -1526,7 +1563,10 @@ const Supervision = ({ me }) => {
                         }
                         <Col sm={24} md={24}>
                             <Divider style={{ margin: '10px' }} />
-                            <Button primary onClick={handleDisplayIndicatorResult}>Afficher les résultats</Button>
+                            <Button
+                                loading={loadingAnalyticIndicatorResults}
+                                disabled={selectedOrganisationUnits && selectedOrganisationUnitGroup && selectedIndicators.length > 0 && selectedOrganisationUnitGroupSet && selectedPeriod ? false : true}
+                                primary onClick={handleDisplayIndicatorResult}>Afficher les résultats</Button>
                         </Col>
                     </Row>
                 </div>
@@ -1841,6 +1881,82 @@ const Supervision = ({ me }) => {
         </div>
     </>
 
+
+    const RenderAnalyticIndicatorsResults = () => (
+        <div className="col">
+            {
+                selectedPeriod &&
+                <div>
+                    <span>Selected Period:</span> <strong> {dayjs(selectedPeriod).format(' MMMM, YYYY')} </strong>
+                    <span>Hight Is Good:</span> <strong> {inputMeilleurPositif ? 'Oui' : 'No'} </strong>
+
+                    {selectedIndicators.map(ind => <> <span className="ml-2">{ind.indicator?.displayName}:</span> <strong>{ind.weight}</strong> </>)}
+                </div>
+            }
+
+            {/* {
+                this.state.finalResults.length > 0 &&
+                (parseInt(this.state.finalResults.length + 1) - (parseInt(this.state.best || 0) + parseInt(this.state.worst || 0)) > 0) &&
+                <table className="table table-sm table-striped table-secondary table-hover text-left align-middle">
+                    <thead> {Object.keys(this.state.finalResults[0]).map(key => <th className="text-capitalize text-left align-middle"> {key} </th>)} <th className="text-left align-middle">{translate('Action')}</th> </thead>
+                    {
+                        this.state.finalResults.length > 1 &&
+                        <tbody>
+                            {this.state.hightIsGood && this.state.finalResults.sort((a, b) => b.score - a.score).slice(0, this.state.best).map((result, index) => <tr title={result.organisationUnit} > {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-success text-left align-middle"> {result[key]} </td>)}  <td className="text-left align-middle"><button className="btn btn-light btn-sm" onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {translate('Schedule')} </button></td></tr>)}
+                            {this.state.hightIsGood && this.state.finalResults.sort((a, b) => a.score - b.score).slice(0, this.state.worst).sort((a, b) => b.score - a.score).map((result, index) => <tr title={result.organisationUnit} > {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-danger text-left align-middle"> {result[key]} </td>)} <td className="text-left align-middle"><button className="btn btn-light btn-sm" onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {translate('Schedule')} </button></td> </tr>)}
+
+                            {!this.state.hightIsGood && this.state.finalResults.sort((a, b) => a.score - b.score).slice(0, this.state.best).map((result, index) => <tr title={result.organisationUnit} > {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-success text-left align-middle"> {result[key]} </td>)}  <td className="text-left align-middle"><button className="btn btn-light btn-sm" onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {translate('Schedule')} </button></td></tr>)}
+                            {!this.state.hightIsGood && this.state.finalResults.sort((a, b) => b.score - a.score).slice(0, this.state.worst).sort((a, b) => a.score - b.score).map((result, index) => <tr title={result.organisationUnit} > {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-danger text-left align-middle"> {result[key]} </td>)}  <td className="text-left align-middle"><button className="btn btn-light btn-sm" onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {translate('Schedule')} </button></td></tr>)}
+                        </tbody>
+                    }
+
+                    {
+                        this.state.finalResults.length === 1 &&
+                        <tbody>
+                            {this.state.finalResults.map((result, index) => <tr title={result.organisationUnit} > {Object.keys(this.state.finalResults[index]).map(key => <td className="alert alert-primary text-left align-middle"> {result[key]} </td>)}  <td className="text-left align-middle"><button className="btn btn-light btn-sm" onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {translate('Schedule')} </button></td></tr>)}
+                        </tbody>
+                    }
+                </table>
+            }
+
+            {
+                this.state.finalResults.length > 0 &&
+                (parseInt(this.state.finalResults.length + 1) - (parseInt(this.state.best || 0) + parseInt(this.state.worst || 0)) <= 0) &&
+                <React.Fragment>
+                    <div className="d-block alert alert-danger my-2">
+
+                        {translate('TheTotalResultsFromAnalyticsIs')}
+                        <strong className="mx-1">
+                            {this.state.finalResults.length}
+                        </strong>
+                        , {translate('ButYouSeemLookingFor')}
+
+                        <strong className="mx-1">
+                            {this.state.best}
+                        </strong>
+                        {translate('BestAnd')}
+
+                        <strong className="mx-1">
+                            {this.state.worst}
+                        </strong>
+                        {translate('Worst')}
+                    </div>
+                    <table className="table table-sm table-striped table-primary table-hover text-left align-middle">
+                        <thead> {Object.keys(this.state.finalResults[0]).map(key => <th className="text-capitalize text-left align-middle"> {key} </th>)} <th className="text-left align-middle">Action</th> </thead>
+                        {
+                            this.state.finalResults.length > 1 &&
+                            <tbody>
+                                {this.state.hightIsGood && this.state.finalResults.sort((a, b) => b.score - a.score).map((result, index) => <tr title={result.organisationUnit} > {Object.keys(this.state.finalResults[index]).map(key => <td className="text-left align-middle"> {result[key]} </td>)}  <td className="text-left align-middle"><button className="btn btn-light btn-sm" onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {translate('Schedule')} </button></td></tr>)}
+
+                                {!this.state.hightIsGood && this.state.finalResults.sort((a, b) => a.score - b.score).map((result, index) => <tr title={result.organisationUnit} > {Object.keys(this.state.finalResults[index]).map(key => <td className="text-left align-middle"> {result[key]} </td>)}  <td className="text-left align-middle"><button className="btn btn-light btn-sm" onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {translate('Schedule')} </button></td></tr>)}
+                            </tbody>
+                        }
+                    </table>
+                </React.Fragment>
+            } */}
+        </div>
+    )
+
     const RenderStepsContent = () => <>
         {
             selectedStep === 0 && (
@@ -1895,6 +2011,13 @@ const Supervision = ({ me }) => {
                         <Col sm={24} md={16}>
                             {RenderPlanificationForm()}
                         </Col>
+
+                        {
+                            analyticIndicatorResults.length > 0 && (
+                                <Col md={24}>{RenderAnalyticIndicatorsResults()} </Col>
+                            )
+                        }
+
                     </Row>
                 </>
             )
@@ -1905,7 +2028,6 @@ const Supervision = ({ me }) => {
     const RenderSupervisionForm = () => (
         <>
             <div style={{ width: '100%' }}>
-                {/* {RenderSteps()} */}
                 {RenderStepsContent()}
             </div>
         </>

@@ -668,7 +668,7 @@ export const Dashboard = () => {
     useEffect(() => {
         loadOrganisationUnits()
         loadDataStoreAnalyses()
-        loadDataStoreSupervisionPlanifications()
+        // loadDataStoreSupervisionPlanifications()
     }, [])
 
     return (
