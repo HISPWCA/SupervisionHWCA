@@ -8,6 +8,10 @@ import { loadDataStore } from '../utils/functions'
 import Dashboard from './Dashboard'
 import Setting from './Setting'
 import Supervision from './Supervision'
+import { AiOutlineSetting } from 'react-icons/ai'
+import { RxDashboard } from 'react-icons/rx'
+import { MdOutlineEditNote } from 'react-icons/md'
+
 
 
 export const Body = () => {
@@ -56,15 +60,18 @@ export const Body = () => {
     const RenderMenu = () => (
         <div style={{ borderRight: `1px solid ${BORDER_COLOR}`, width: '250px', height: '100%', padding: '2px 0px' }}>
             <div className={`menu-item ${renderPage === PAGE_DASHBOARD ? 'active' : ''}`} onClick={_ => handleClickMenu(PAGE_DASHBOARD)}>
-                <span>Dashboard</span>
+                <span><RxDashboard style={{ fontSize: '22px' }} /></span>
+                <span style={{ marginLeft: '10px' }}>Dashboard</span>
             </div>
 
             <div className={`menu-item ${renderPage === PAGE_SUPERVISIONS ? 'active' : ''}`} onClick={_ => handleClickMenu(PAGE_SUPERVISIONS)}>
-                <span>Supervisions</span>
+                <span><MdOutlineEditNote style={{ fontSize: '22px' }} /></span>
+                <span style={{ marginLeft: '10px' }}>Supervisions</span>
             </div>
 
             <div className={`menu-item ${renderPage === PAGE_SETTINGS ? 'active' : ''}`} onClick={_ => handleClickMenu(PAGE_SETTINGS)}>
-                <span>Settings</span>
+                <span><AiOutlineSetting style={{ fontSize: '22px' }} /></span>
+                <span style={{ marginLeft: '10px' }}>Settings</span>
             </div>
         </div>
     )

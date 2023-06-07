@@ -445,10 +445,6 @@ const Supervision = ({ me }) => {
 
     const handleChangePlanificationType = ({ value }) => {
 
-        if (value === INDICATOR && organisationUnitGroupSets.length === 0) {
-            loadOrganisationUnitsGroupSets()
-        }
-
         setInputMauvais(0)
         setInputMeilleur(0)
         setInputMeilleurPositif(false)
@@ -459,6 +455,10 @@ const Supervision = ({ me }) => {
         setSelectedOrganisationUnits([])
         setSelectedOrganisationUnitGroup(null)
         setSelectedOrganisationUnitGroupSet(null)
+
+        if (value === INDICATOR && organisationUnitGroupSets.length === 0) {
+            loadOrganisationUnitsGroupSets()
+        }
 
         setSelectedPlanificationType(value)
     }
@@ -799,7 +799,7 @@ const Supervision = ({ me }) => {
         }
     }
 
-    const cleanAllNewSupervisionStage = () => {
+    const cleanAllNewSupervisionState = () => {
         setIsNewMappingMode(false)
         setMappingConfigs([])
         setProgramStages([])
@@ -825,26 +825,21 @@ const Supervision = ({ me }) => {
         setInputFields([])
         setInputDataSourceDisplayName('')
         setInputDataSourceID(null)
+        setSelectedOrganisationUnitInd(null)
     }
 
     const handleSupervisionPlanificationSaveBtn = async () => {
         try {
             setLoadingSupervisionPlanification(true)
 
-            // const completePayloadList = inputFields.map(inputField => {
-            //     return inputField
-            // })
-
             if (selectedSupervisionFiche.generationType === TYPE_GENERATION_AS_TEI)
                 await saveSupervisionAsTEIStrategy(inputFields)
 
-            // if (selectedSupervisionFiche.generationType === TYPE_GENERATION_AS_ENROLMENT)
-            //     await saveSupervisionAsEnrollmentStrategy(inputFields)
 
             setLoadingSupervisionPlanification(false)
             setNotification({ show: true, message: 'Planification effectuée avec succès !', type: NOTIFICATON_SUCCESS })
             setEditionMode(false)
-            cleanAllNewSupervisionStage()
+            cleanAllNewSupervisionState()
         } catch (err) {
             console.log(err)
             setLoadingSupervisionPlanification(false)
@@ -910,7 +905,7 @@ const Supervision = ({ me }) => {
                             isEditionMode && inputFields.length > 0 && (
                                 <div style={{ marginTop: '15px' }}>
                                     <Button icon={<FiSave style={{ color: '#fff', fontSize: '18px' }} />} onClick={handleSupervisionPlanificationSaveBtn} primary disabled={loadingSupervisionPlanification} loading={loadingSupervisionPlanification}>
-                                        Planifier la supervision
+                                        Planifier la supervision(s)
                                     </Button>
                                 </div>
                             )
@@ -1428,27 +1423,35 @@ const Supervision = ({ me }) => {
             if (!selectedPeriod)
                 throw new Error("Veuillez sélectionner la période !")
 
-            // const route = `${ANALYTICS_ROUTE}?dimension=dx:${selectedIndicators.map(ind => ind.indicator?.id).join(';')},ou:${selectedOrganisationUnitInd?.id};OU_GROUP-${selectedOrganisationUnitGroup?.id}&filter=pe:${formatPeriod(selectedPeriod, selectedPeriodType)}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=true&includeNumDen=true&skipRounding=false&completedOnly=false&outputIdScheme=UID&`
-            const route = `${ANALYTICS_ROUTE}/dataValueSet.json?dimension=dx:${selectedIndicators.map(ind => ind.indicator?.id).join(';')}&dimension=ou:${selectedOrganisationUnitInd?.id};OU_GROUP-${selectedOrganisationUnitGroup?.id}&dimension=pe:${formatPeriod(selectedPeriod, selectedPeriodType)}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=true&includeNumDen=true&skipRounding=false&completedOnly=false`
+            const route = `${ANALYTICS_ROUTE}?dimension=dx:${selectedIndicators.map(ind => ind.indicator?.id).join(';')},ou:${selectedOrganisationUnitInd?.id};OU_GROUP-${selectedOrganisationUnitGroup?.id}&filter=pe:${formatPeriod(selectedPeriod, selectedPeriodType)}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=true&includeNumDen=true&skipRounding=false&completedOnly=false&outputIdScheme=UID`
+            // const route = `${ANALYTICS_ROUTE}/dataValueSet.json?dimension=dx:${selectedIndicators.map(ind => ind.indicator?.id).join(';')}&dimension=ou:${selectedOrganisationUnitInd?.id};OU_GROUP-${selectedOrganisationUnitGroup?.id}&dimension=pe:${formatPeriod(selectedPeriod, selectedPeriodType)}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=true&includeNumDen=true&skipRounding=false&completedOnly=false`
             const response = await axios.get(route)
 
-
-            const dataValues = response.data.dataValues
             let availableIndicators = []
 
             for (let ind of selectedIndicators) {
                 const payload = {
                     indicator: ind.indicator,
                     weight: ind.weight,
-                    dataValues: dataValues.filter(dv => dv.dataElement === ind.indicator?.id).map(i => (
-                        {
-                            dataElement: i.dataElement,
-                            period: i.period,
-                            value: i.value,
-                            orgUnit: organisationUnits.find(o => o.id === i.orgUnit),
-                            score: parseFloat(i.value) * parseFloat(ind.weight || 1),
+                    dataValues: response.data.rows.reduce((prev, cur) => {
+                        const currentElement = cur[0]
+                        const currentOrgUnit = cur[1]
+                        const currentValue = cur[2]
+
+                        if (ind.indicator?.id === currentElement) {
+                            const payload = {
+                                dataElement: currentElement,
+                                orgUnit: organisationUnits.find(ou => ou.id === currentOrgUnit),
+                                value: currentValue,
+                                period: selectedPeriod,
+                                score: parseFloat(currentValue) * parseFloat(ind.weight || 1),
+                            }
+
+                            prev.push(payload)
                         }
-                    ))
+
+                        return prev
+                    }, [])
                 }
 
                 availableIndicators.push(payload)
@@ -1583,7 +1586,7 @@ const Supervision = ({ me }) => {
                             <Divider style={{ margin: '10px' }} />
                             <Button
                                 loading={loadingAnalyticIndicatorResults}
-                                disabled={selectedOrganisationUnitInd && selectedOrganisationUnitGroup && selectedIndicators.length > 0 && selectedOrganisationUnitGroupSet && selectedPeriod ? false : true}
+                                disabled={selectedOrganisationUnitInd && selectedOrganisationUnitGroup && selectedIndicators.length > 0 && selectedOrganisationUnitGroupSet && selectedPeriod && (parseInt(inputMeilleur || 0) + parseInt(inputMauvais || 0)) > 0 ? false : true}
                                 primary onClick={handleDisplayIndicatorResult}>Afficher les résultats</Button>
                         </Col>
                     </Row>
@@ -1901,8 +1904,11 @@ const Supervision = ({ me }) => {
 
 
     const handleSelectCheckbox = (orgUnit) => {
-        if (selectedIndicators.map(ou => ou.id).includes(orgUnit.id)) {
+        console.log(orgUnit)
+        console.log("selected ou : ", selectedOrganisationUnits)
+        if (selectedOrganisationUnits.map(ou => ou.id).includes(orgUnit.id)) {
             setSelectedOrganisationUnits(selectedOrganisationUnits.filter(ou => ou.id !== orgUnit.id))
+            setInputFields(inputFields.filter(o => o.organisationUnit?.id !== orgUnit.id))
         } else {
             setSelectedOrganisationUnits([...selectedOrganisationUnits, organisationUnits.find(ou => ou.id === orgUnit.id)])
         }
@@ -1942,11 +1948,11 @@ const Supervision = ({ me }) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {inputMeilleurPositif && [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].sort((a, b) => b.score - a.score).slice(0, parseInt(inputMeilleur || 0)).map((an, index) => (<tr style={{ backgroundColor: '#D3FFF3', color: '#000' }} key={index}> <td style={{ border: '1px solid #ccc', padding: '5px' }}><AntCheckbox onChange={() => handleSelectCheckbox(an?.orgUnit)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an.orgUnit?.id)} /></td> <td style={{ border: '1px solid #ccc', padding: '5px' }}>{an.orgUnit?.displayName}</td>{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.value) : '-'}</td>))}{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.score) : '-'}</td>))} </tr>))}
-                                {inputMeilleurPositif && [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].sort((a, b) => a.score - b.score).slice(0, parseInt(inputMauvais || 0)).map((an, index) => (<tr style={{ backgroundColor: '#FFDDD2', color: '#000' }} key={index}> <td style={{ border: '1px solid #ccc', padding: '5px' }}><AntCheckbox onChange={() => handleSelectCheckbox(an?.orgUnit)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an.orgUnit?.id)} /></td>  <td style={{ border: '1px solid #ccc', padding: '5px' }}>{an.orgUnit?.displayName}</td>{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.value) : '-'}</td>))}{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.score) : '-'}</td>))} </tr>))}
+                                {inputMeilleurPositif && [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].sort((a, b) => b.score - a.score).slice(0, parseInt(inputMeilleur || 0)).map((an, index) => (<tr style={{ backgroundColor: '#D3FFF3', color: '#000' }} key={index}> <td style={{ border: '1px solid #ccc', padding: '5px' }}><AntCheckbox onChange={() => handleSelectCheckbox(an?.orgUnit)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an.orgUnit?.id)} /></td> <td style={{ border: '1px solid #ccc', padding: '5px' }}>{`${an.orgUnit?.displayName} (  ${an.orgUnit?.parent?.displayName}  ) `}</td>{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.value) : '-'}</td>))}{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.score) : '-'}</td>))} </tr>))}
+                                {inputMeilleurPositif && [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].sort((a, b) => a.score - b.score).slice(0, parseInt(inputMauvais || 0)).map((an, index) => (<tr style={{ backgroundColor: '#FFDDD2', color: '#000' }} key={index}> <td style={{ border: '1px solid #ccc', padding: '5px' }}><AntCheckbox onChange={() => handleSelectCheckbox(an?.orgUnit)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an.orgUnit?.id)} /></td>  <td style={{ border: '1px solid #ccc', padding: '5px' }}>{`${an.orgUnit?.displayName} (  ${an.orgUnit?.parent?.displayName}  ) `}</td>{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.value) : '-'}</td>))}{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.score) : '-'}</td>))} </tr>))}
 
-                                {!inputMeilleurPositif && [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].sort((a, b) => a.score - b.score).slice(0, parseInt(inputMeilleur || 0)).map((an, index) => (<tr style={{ backgroundColor: '#D3FFF3', color: '#000' }} key={index}> <td style={{ border: '1px solid #ccc', padding: '5px' }}><AntCheckbox onChange={() => handleSelectCheckbox(an?.orgUnit)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an.orgUnit?.id)} /></td>  <td style={{ border: '1px solid #ccc', padding: '5px' }}>{an.orgUnit?.displayName}</td>{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.value) : '-'}</td>))}{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.score) : '-'}</td>))} </tr>))}
-                                {!inputMeilleurPositif && [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].sort((a, b) => b.score - a.score).slice(0, parseInt(inputMauvais || 0)).map((an, index) => (<tr style={{ backgroundColor: '#FFDDD2', color: '#000' }} key={index}><td style={{ border: '1px solid #ccc', padding: '5px' }}><AntCheckbox onChange={() => handleSelectCheckbox(an?.orgUnit)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an.orgUnit?.id)} /></td>  <td style={{ border: '1px solid #ccc', padding: '5px' }}>{an.orgUnit?.displayName}</td>{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.value) : '-'}</td>))}{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.score) : '-'}</td>))} </tr>))}
+                                {!inputMeilleurPositif && [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].sort((a, b) => a.score - b.score).slice(0, parseInt(inputMeilleur || 0)).map((an, index) => (<tr style={{ backgroundColor: '#D3FFF3', color: '#000' }} key={index}> <td style={{ border: '1px solid #ccc', padding: '5px' }}><AntCheckbox onChange={() => handleSelectCheckbox(an?.orgUnit)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an.orgUnit?.id)} /></td>  <td style={{ border: '1px solid #ccc', padding: '5px' }}>{`${an.orgUnit?.displayName} (  ${an.orgUnit?.parent?.displayName}  ) `}</td>{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.value) : '-'}</td>))}{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.score) : '-'}</td>))} </tr>))}
+                                {!inputMeilleurPositif && [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].sort((a, b) => b.score - a.score).slice(0, parseInt(inputMauvais || 0)).map((an, index) => (<tr style={{ backgroundColor: '#FFDDD2', color: '#000' }} key={index}><td style={{ border: '1px solid #ccc', padding: '5px' }}><AntCheckbox onChange={() => handleSelectCheckbox(an?.orgUnit)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an.orgUnit?.id)} /></td>  <td style={{ border: '1px solid #ccc', padding: '5px' }}>{`${an.orgUnit?.displayName} (  ${an.orgUnit?.parent?.displayName}  ) `}</td>{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.value) : '-'}</td>))}{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.score) : '-'}</td>))} </tr>))}
                             </tbody>
                         </table>
                     </div>
@@ -2049,16 +2055,18 @@ const Supervision = ({ me }) => {
                             {RenderPlanificationForm()}
                         </Col>
 
-                        {analyticIndicatorResults.length === 0 && (<Col md={24}>Pas de résultats</Col>)}
-                        {[...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].length >= parseInt(inputMeilleur || 0) + parseInt(inputMauvais || 0) && (<Col md={24}>Critères trop grands</Col>)}
 
                         {
                             selectedPlanificationType === INDICATOR && selectedIndicators.length > 0 &&
-                            analyticIndicatorResults.length > 0 &&
-                            [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].length >= parseInt(inputMeilleur || 0) + parseInt(inputMauvais || 0) &&
-                            (
-                                <Col md={24}>{RenderAnalyticIndicatorsResults()} </Col>
-                            )
+                                analyticIndicatorResults.length > 0 &&
+                                [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].length >= parseInt(inputMeilleur || 0) + parseInt(inputMauvais || 0) ?
+                                (
+                                    <Col md={24}>{RenderAnalyticIndicatorsResults()} </Col>
+                                ) : selectedPlanificationType === INDICATOR && selectedIndicators.length > 0 &&
+                                analyticIndicatorResults.length &&
+                                (
+                                    <Col md={24}><div style={{ fontWeight: 'bold', }}>Liste vide !</div> </Col>
+                                )
                         }
 
                         {
@@ -2068,6 +2076,8 @@ const Supervision = ({ me }) => {
                                 </Col>
                             )
                         }
+
+
                     </Row>
                 </>
             )
@@ -2137,7 +2147,7 @@ const Supervision = ({ me }) => {
             {
                 !loadingDataStoreSupervisionConfigs && dataStoreSupervisionConfigs?.length > 0 && (
                     <>
-                        <div style={{ padding: '10px', height: '100%' }}>
+                        <div style={{ padding: '10px', height: '100%', marginBottom: '10px' }}>
                             {!isEditionMode && RenderSupervisionList()}
                             {isEditionMode && RenderSupervisionForm()}
                         </div>
