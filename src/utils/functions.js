@@ -47,7 +47,6 @@ export const saveDataToDataStore = async (key_string, payload, setLoading, setSt
 
     } catch (err) {
         setErrorMessage && setErrorMessage(err.message)
-        console.log(err)
         setLoading && setLoading(false)
         throw err
     }

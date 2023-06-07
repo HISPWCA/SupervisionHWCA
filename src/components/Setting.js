@@ -153,101 +153,6 @@ const Setting = () => {
         value === AGGREGATE_INDICATOR && loadIndicatorGroups()
     }
 
-    // const handleSelectIndicatorGroup = (value) => {
-    //     setSelectedIndicator(null)
-    //     setSelectedIndicatorGroup(indicatorGroups.find(indGroup => indGroup.id === value))
-    // }
-
-    // const handleChangeIndicatorType = ({ value }) => {
-    //     setSelectedIndicatorGroup(null)
-    //     setSelectedIndicator(null)
-    //     setSelectedDataElement(null)
-    //     setIndicatorGroups([])
-    //     setSelectedIndicatorType(value)
-
-    //     value === INDICATOR_GROUP && loadIndicatorGroups()
-    //     value === PROGRAM_INDICATOR && loadProgramIndicatorGroups()
-    // }
-
-    // const handleSelectDataElement = (value) => {
-    //     setSelectedDataElement(selectedProgramStage.programStageDataElements?.map(p => p.dataElement).find(dataElement => dataElement.id === value))
-    // }
-
-    // const handleSelectIndicator = (value) => {
-    //     setSelectedIndicator(null)
-    //     selectedIndicatorType === INDICATOR_GROUP && setSelectedIndicator(selectedIndicatorGroup.indicators?.find(ind => ind.id === value))
-    //     selectedIndicatorType === PROGRAM_INDICATOR && setSelectedIndicator(selectedIndicatorGroup.programIndicators?.find(progInd => progInd.id === value))
-    // }
-
-
-    // const handleAddNewMappingConfig = () => {
-    //     setIsNewMappingMode(!isNewMappingMode)
-
-    //     if (!isNewMappingMode) {
-    //         setSelectedDataElement(null)
-    //         setSelectedIndicator(null)
-    //     }
-    // }
-
-    // const handleSelectProgramStage = (value) => {
-    //     setSelectedProgramStage(programStages.find(pstage => pstage.id === value))
-    //     setSelectedDataElement(null)
-    // }
-
-    // const handleSaveNewMappingConfig = async () => {
-    //     try {
-    //         setLoadingSaveDateElementMappingConfig(true)
-    //         if (selectedDataElement && selectedIndicator && selectedProgramStage) {
-    //             const existingConfig = mappingConfigs.find(mapping => mapping.dataElement?.id === selectedDataElement.id &&
-    //                 mapping.indicator?.id === selectedIndicator.id &&
-    //                 mapping.programStage?.id === selectedProgramStage.id
-    //             )
-
-    //             if (!existingConfig) {
-    //                 const payload = {
-    //                     id: uuid(),
-    //                     dataElement: selectedDataElement,
-    //                     indicator: selectedIndicator,
-    //                     programStage: { id: selectedProgramStage.id, displayName: selectedProgramStage.displayName },
-    //                     program: { id: selectedTEIProgram.id, displayName: selectedTEIProgram.displayName }
-    //                 }
-    //                 const newList = [...mappingConfigs, payload]
-    //                 await saveDataToDataStore(process.env.REACT_APP_DATA_ELEMENTS_CONFIG_KEY, newList, null, setLoadingSaveDateElementMappingConfig, null)
-    //                 setMappingConfigs(newList)
-    //                 setSelectedDataElement(null)
-    //                 setSelectedIndicator(null)
-    //                 setSelectedProgramStage(null)
-    //                 setSelectedIndicatorGroup(null)
-    //                 setNotification({ show: true, type: NOTIFICATON_SUCCESS, message: 'Configuration ajoutée !' })
-    //                 setLoadingSaveDateElementMappingConfig(false)
-    //             } else {
-    //                 throw new Error('Cette configuration à déjà été ajoutée')
-    //             }
-    //         }
-    //     } catch (err) {
-    //         setNotification({ show: true, type: NOTIFICATON_CRITICAL, message: err.response?.data?.message || err.message })
-    //         setLoadingSaveDateElementMappingConfig(false)
-    //     }
-    // }
-
-
-    // const handleDeleteSupervisionConfig = async (item) => {
-    //     try {
-    //         if (item) {
-    //             const existingDXMappingOfPrograms = mappingConfigs.filter(mConfig => mConfig?.program?.id === item?.program?.id) || []
-
-    //             if (existingDXMappingOfPrograms.length > 0)
-    //                 throw new Error("La configuration que vous essayez de supprimer est déjà mappée avec les éléments de données. Veuillez supprimer d'abors ses éléments de données.")
-
-    //             const newList = mappingConfigSupervisions.filter(mapConf => mapConf.id !== item.id)
-    //             await saveDataToDataStore(process.env.REACT_APP_SUPERVISIONS_KEY, newList, null, null, null)
-    //             setMappingConfigSupervisions(newList)
-    //             setNotification({ show: true, message: 'Suppression éffectuée !', type: NOTIFICATON_SUCCESS })
-    //         }
-    //     } catch (err) {
-    //         setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
-    //     }
-    // }
 
     const handleSelectIndicatorGroupIND = (value) => {
         setSelectedIndicator(null)
@@ -377,7 +282,7 @@ const Setting = () => {
             setSelectedIndicatorGroup(null)
             setSelectedIndicator(null)
 
-            const responseSupervisionTracker = await loadDataStore(process.env.REACT_APP_SUPERVISIONS_KEY, null, null, null)
+            const responseSupervisionTracker = await loadDataStore(process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY, null, null, null)
             setMappingConfigSupervisions(responseSupervisionTracker)
         } catch (err) {
             console.log(err)
@@ -394,7 +299,7 @@ const Setting = () => {
                     throw new Error("La configuration que vous essayez de supprimer est déjà mappée avec les éléments de données. Veuillez supprimer d'abors ses éléments de données.")
 
                 const newList = mappingConfigSupervisions.filter(mapConf => mapConf.id !== item.id)
-                await saveDataToDataStore(process.env.REACT_APP_SUPERVISIONS_KEY, newList, null, null, null)
+                await saveDataToDataStore(process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY, newList, null, null, null)
                 setMappingConfigSupervisions(newList)
                 setNotification({ show: true, message: 'Suppression éffectuée !', type: NOTIFICATON_SUCCESS })
 
@@ -499,7 +404,7 @@ const Setting = () => {
                     newList = [...mappingConfigSupervisions, payload]
                 }
 
-                await saveDataToDataStore(process.env.REACT_APP_SUPERVISIONS_KEY, newList, setLoadingSaveSupervionsConfig, null, null)
+                await saveDataToDataStore(process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY, newList, setLoadingSaveSupervionsConfig, null, null)
 
                 setMappingConfigSupervisions(newList)
                 setSelectedTEIProgram(null)

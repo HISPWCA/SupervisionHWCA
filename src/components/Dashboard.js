@@ -432,7 +432,7 @@ export const Dashboard = () => {
     const loadDataStoreSupervisionPlanifications = async () => {
         try {
             setLoadingDataStoreSupervisionPlanifications(true)
-            const response = await loadDataStore(process.env.REACT_APP_SUPERVISION_PLANIFICATION_KEY, null, null, null)
+            const response = await loadDataStore(process.env.REACT_APP_SUPERVISIONS_KEY, null, null, null)
             console.log(response)
 
             let supervisionList = []

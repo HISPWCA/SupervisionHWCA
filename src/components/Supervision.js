@@ -43,21 +43,20 @@ import { CgCloseO } from 'react-icons/cg'
 import { TbSelect } from 'react-icons/tb'
 import { DataDimension } from '@dhis2/analytics'
 
-
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 const quarterOfYear = require('dayjs/plugin/quarterOfYear')
 const weekOfYear = require('dayjs/plugin/weekOfYear')
 
-
 dayjs.extend(weekOfYear)
 dayjs.extend(quarterOfYear)
-dayjs.extend(customParseFormat);
+dayjs.extend(customParseFormat)
 
 
 const Supervision = ({ me }) => {
 
     const [dataStoreSupervisionConfigs, setDataStoreSupervisionConfigs] = useState([])
+    const [dataStoreSupervisions, setDataStoreSupervisions] = useState([])
     const [dataStoreIndicatorConfigs, setDataStoreIndicatorConfigs] = useState([])
     const [isEditionMode, setEditionMode] = useState(true)
     const [noticeBox, setNoticeBox] = useState({ show: false, message: null, title: null, type: NOTICE_BOX_DEFAULT })
@@ -74,7 +73,7 @@ const Supervision = ({ me }) => {
 
     const [selectedStep, setSelectedStep] = useState(0)
     const [selectedSupervisionType, setSelectedSupervisionType] = useState(null)
-    const [selectedSupervisionFiche, setSelectedSupervisionFiche] = useState(null)
+    const [selectedProgram, setSelectedProgram] = useState(null)
     const [selectedPlanificationType, setSelectedPlanificationType] = useState(null)
     const [selectedOrganisationUnits, setSelectedOrganisationUnits] = useState([])
     const [selectedIndicators, setSelectedIndicators] = useState([])
@@ -98,6 +97,7 @@ const Supervision = ({ me }) => {
     const [inputDataSourceID, setInputDataSourceID] = useState(null)
 
     const [loadingDataStoreSupervisionConfigs, setLoadingDataStoreSupervisionConfigs] = useState(false)
+    const [loadingDataStoreSupervisions, setLoadingDataStoreSupervisions] = useState(false)
     const [loadingDataStoreIndicatorConfigs, setLoadingDataStoreIndicatorConfigs] = useState(false)
     const [loadingOrganisationUnits, setLoadingOrganisationUnits] = useState(false)
     const [loadingOrganisationUnitGroupSets, setLoadingOrganisationUnitGroupSets] = useState(false)
@@ -303,10 +303,10 @@ const Supervision = ({ me }) => {
         }
     }
 
-    const loadDataStoreSupervisions = async () => {
+    const loadDataStoreSupervisionConfigs = async () => {
         try {
             setLoadingDataStoreSupervisionConfigs(true)
-            const response = await loadDataStore(process.env.REACT_APP_SUPERVISIONS_KEY, null, null, null)
+            const response = await loadDataStore(process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY, null, null, null)
             if (!response || response.length === 0) {
                 setLoadingDataStoreSupervisionConfigs(false)
                 return setNoticeBox({
@@ -322,6 +322,19 @@ const Supervision = ({ me }) => {
         catch (err) {
             console.log(err)
             setLoadingDataStoreSupervisionConfigs(false)
+        }
+    }
+
+    const loadDataStoreSupervisions = async () => {
+        try {
+            setLoadingDataStoreSupervisions(true)
+            const response = await loadDataStore(process.env.REACT_APP_SUPERVISIONS_KEY, null, null, null)
+            setDataStoreSupervisions(response)
+            setLoadingDataStoreSupervisions(false)
+        }
+        catch (err) {
+            console.log(err)
+            setLoadingDataStoreSupervisions(false)
         }
     }
 
@@ -402,7 +415,7 @@ const Supervision = ({ me }) => {
                         dataElement: selectedDataElement,
                         indicator: { displayName: inputDataSourceDisplayName, id: inputDataSourceID },
                         programStage: { id: selectedProgramStage.id, displayName: selectedProgramStage.displayName },
-                        program: { id: selectedSupervisionFiche?.program?.id, displayName: selectedSupervisionFiche?.program?.displayName }
+                        program: { id: selectedProgram?.program?.id, displayName: selectedProgram?.program?.displayName }
                     }
                     const newList = [...mappingConfigs, payload]
                     setMappingConfigs(newList)
@@ -439,7 +452,7 @@ const Supervision = ({ me }) => {
     }
 
     const handleChangeSupervisionType = ({ value }) => {
-        setSelectedSupervisionFiche(null)
+        setSelectedProgram(null)
         setSelectedSupervisionType(value)
     }
 
@@ -476,7 +489,7 @@ const Supervision = ({ me }) => {
         // selectedIndicatorType === PROGRAM_INDICATOR && loadProgramIndicatorGroups()
         // selectedIndicatorType === INDICATOR_GROUP && loadIndicatorGroups()
 
-        setSelectedSupervisionFiche(sup)
+        setSelectedProgram(sup)
     }
 
     const handleDeleteOtherSupervisor = (item, index) => {
@@ -505,7 +518,6 @@ const Supervision = ({ me }) => {
         }
     }
 
-
     const createTei = async (tei) => {
         try {
             const response = await axios.post(`${TRACKED_ENTITY_INSTANCES_ROUTE}`, tei)
@@ -533,11 +545,9 @@ const Supervision = ({ me }) => {
         }
     }
 
-
-
     const generateTeiWithEnrollmentWithEvents = async (payload) => {
         try {
-            const currentProgram = await axios.get(`${PROGS_ROUTE}/${selectedSupervisionFiche?.program?.id}?fields=id,displayName,trackedEntityType,programStages[id,programStageDataElements[dataElement]],programTrackedEntityAttributes[trackedEntityAttribute]`)
+            const currentProgram = await axios.get(`${PROGS_ROUTE}/${selectedProgram?.program?.id}?fields=id,displayName,trackedEntityType,programStages[id,programStageDataElements[dataElement]],programTrackedEntityAttributes[trackedEntityAttribute]`)
             if (!currentProgram.data)
                 throw new Error("Program non trouver")
 
@@ -732,7 +742,7 @@ const Supervision = ({ me }) => {
     const savePanificationToDataStore = async (payload) => {
         try {
             if (payload) {
-                await saveDataToDataStore(process.env.REACT_APP_SUPERVISION_PLANIFICATION_KEY, payload)
+                await saveDataToDataStore(process.env.REACT_APP_SUPERVISIONS_KEY, payload)
             }
         } catch (err) {
             throw err
@@ -758,9 +768,11 @@ const Supervision = ({ me }) => {
                         supervisionsList.push({
                             ...item,
                             id: uuid(),
+                            planificationType: selectedPlanificationType,
+                            indicators: selectedIndicators,
                             orgUnit: item.organisationUnit?.id,
                             period: item.period,
-                            program: item.program?.id,
+                            program: item.program,
                             fieldConfig: item.fieldConfig,
                             tei: createdTEIObject
                         })
@@ -768,18 +780,17 @@ const Supervision = ({ me }) => {
                 }
                 let planificationPayload = {
                     id: uuid(),
-                    supervisionFiche: selectedSupervisionFiche,
+                    program: selectedProgram,
                     dataSources: mappingConfigs,
                     supervisions: supervisionsList,
                 }
-                await savePanificationToDataStore(planificationPayload)
+                await savePanificationToDataStore([...dataStoreSupervisions, planificationPayload])
+                await loadDataStoreSupervisions()
             }
         } catch (err) {
             throw err
         }
     }
-
-
 
     const saveSupervisionAsEnrollmentStrategy = async (inputFieldsList) => {
         try {
@@ -805,7 +816,7 @@ const Supervision = ({ me }) => {
         setProgramStages([])
         setSelectedStep(0)
         setSelectedSupervisionType(null)
-        setSelectedSupervisionFiche(null)
+        setSelectedProgram(null)
         setSelectedPlanificationType(null)
         setSelectedOrganisationUnits([])
         setSelectedIndicators([])
@@ -826,13 +837,14 @@ const Supervision = ({ me }) => {
         setInputDataSourceDisplayName('')
         setInputDataSourceID(null)
         setSelectedOrganisationUnitInd(null)
+        setAnalyticIndicatorResults([])
     }
 
     const handleSupervisionPlanificationSaveBtn = async () => {
         try {
             setLoadingSupervisionPlanification(true)
 
-            if (selectedSupervisionFiche.generationType === TYPE_GENERATION_AS_TEI)
+            if (selectedProgram.generationType === TYPE_GENERATION_AS_TEI)
                 await saveSupervisionAsTEIStrategy(inputFields)
 
 
@@ -916,23 +928,6 @@ const Supervision = ({ me }) => {
         </>
     )
 
-    // const RenderTopContent = () => (
-    //     <>
-    //         <div style={{ padding: '20px', borderBottom: '1px solid #ccc', background: '#FFF', position: 'sticky', top: 0, zIndex: 1000, display:'flex', jusityContent:'space-between' }}>
-    //             <div style={{ fontWeight: 'bold', fontSize: '18px' }}>Supervisions</div>
-    //             <div style={{ fontWeight: 'bold', fontSize: '18px' }}>
-    //                 {
-    //                     isEditionMode && inputFields.length > 0 && (
-    //                         <Button onClick={handleSupervisionPlanificationSaveBtn} primary disabled={loadingSupervisionPlanification} loading={loadingSupervisionPlanification}>
-    //                             Planifier la Supervision
-    //                         </Button>
-    //                     )
-    //                 }
-    //             </div>
-    //         </div>
-    //     </>
-    // )
-
     const RenderFloatingButton = () => (
         <>
             <FloatButton
@@ -999,7 +994,7 @@ const Supervision = ({ me }) => {
                             dataStoreSupervisionConfigs
                                 .filter(sup => sup.generationType === TYPE_GENERATION_AS_TEI)
                                 .map((sup, index) => (
-                                    <div key={index} className={`supervision-item ${selectedSupervisionFiche?.id === sup.id ? 'active' : ''}`} onClick={() => handleClickSupervisionItem(sup)}>
+                                    <div key={index} className={`supervision-item ${selectedProgram?.id === sup.id ? 'active' : ''}`} onClick={() => handleClickSupervisionItem(sup)}>
                                         {sup.program?.displayName}
                                     </div>
                                 ))
@@ -1009,7 +1004,7 @@ const Supervision = ({ me }) => {
                             dataStoreSupervisionConfigs
                                 .filter(sup => sup.generationType === TYPE_GENERATION_AS_ENROLMENT || sup.generationType === TYPE_GENERATION_AS_EVENT)
                                 .map((sup, index) => (
-                                    <div key={index} className={`supervision-item ${selectedSupervisionFiche?.id === sup.id ? 'active' : ''}`} onClick={() => handleClickSupervisionItem(sup)}>
+                                    <div key={index} className={`supervision-item ${selectedProgram?.id === sup.id ? 'active' : ''}`} onClick={() => handleClickSupervisionItem(sup)}>
                                         {sup.program?.displayName}
                                     </div>
                                 ))
@@ -1904,8 +1899,6 @@ const Supervision = ({ me }) => {
 
 
     const handleSelectCheckbox = (orgUnit) => {
-        console.log(orgUnit)
-        console.log("selected ou : ", selectedOrganisationUnits)
         if (selectedOrganisationUnits.map(ou => ou.id).includes(orgUnit.id)) {
             setSelectedOrganisationUnits(selectedOrganisationUnits.filter(ou => ou.id !== orgUnit.id))
             setInputFields(inputFields.filter(o => o.organisationUnit?.id !== orgUnit.id))
@@ -2005,7 +1998,7 @@ const Supervision = ({ me }) => {
             selectedStep === 0 && (
                 <>
                     <Row gutter={[12, 12]}>
-                        {selectedSupervisionFiche && (
+                        {selectedProgram && (
                             <Col md={24}>
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'right' }}>
                                     <div>
@@ -2020,10 +2013,10 @@ const Supervision = ({ me }) => {
                         <Col sm={24} md={8}>
                             {RenderSupervisionTypeContent()}
                             {selectedSupervisionType && RenderSelectedSupervisionTypeList()}
-                            {selectedSupervisionFiche && RenderDataElementConfigContent()}
+                            {selectedProgram && RenderDataElementConfigContent()}
                         </Col>
                         <Col sm={24} md={16}>
-                            {selectedSupervisionFiche && RenderDataElementConfigList()}
+                            {selectedProgram && RenderDataElementConfigList()}
                         </Col>
                     </Row>
                 </>
@@ -2034,7 +2027,7 @@ const Supervision = ({ me }) => {
             selectedStep === 1 && (
                 <>
                     <Row gutter={[10, 10]}>
-                        {selectedSupervisionFiche && (
+                        {selectedProgram && (
                             <Col md={24}>
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'right' }}>
                                     <div >
@@ -2047,7 +2040,7 @@ const Supervision = ({ me }) => {
                             </Col>
                         )}
                         <Col sm={24} md={8}>
-                            {selectedSupervisionFiche && RenderSupervisionPlanificationType()}
+                            {selectedProgram && RenderSupervisionPlanificationType()}
                             {selectedPlanificationType === INDICATOR && RenderSupervisionPlanificationIndicatorContent()}
                             {selectedPlanificationType === ORGANISATION_UNIT && RenderSupervisionPlanificationOrganisationUnitContent()}
                         </Col>
@@ -2062,7 +2055,8 @@ const Supervision = ({ me }) => {
                                 [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].length >= parseInt(inputMeilleur || 0) + parseInt(inputMauvais || 0) ?
                                 (
                                     <Col md={24}>{RenderAnalyticIndicatorsResults()} </Col>
-                                ) : selectedPlanificationType === INDICATOR && selectedIndicators.length > 0 &&
+                                ) :
+                                selectedPlanificationType === INDICATOR && selectedIndicators.length > 0 &&
                                 analyticIndicatorResults.length &&
                                 (
                                     <Col md={24}><div style={{ fontWeight: 'bold', }}>Liste vide !</div> </Col>
@@ -2105,9 +2099,9 @@ const Supervision = ({ me }) => {
                 newList.push(
                     {
                         organisationUnit: { id: org.id, displayName: org.displayName },
-                        program: { id: selectedSupervisionFiche.program?.id, displayName: selectedSupervisionFiche.program?.displayName },
-                        fieldConfig: selectedSupervisionFiche.fieldConfig,
-                        generationType: selectedSupervisionFiche.generationType,
+                        program: { id: selectedProgram.program?.id, displayName: selectedProgram.program?.displayName },
+                        fieldConfig: selectedProgram.fieldConfig,
+                        generationType: selectedProgram.generationType,
                         libelle: '',
                         period: null,
                         supervisors: [],
@@ -2122,6 +2116,7 @@ const Supervision = ({ me }) => {
 
     useEffect(() => {
         if (me) {
+            loadDataStoreSupervisionConfigs()
             loadDataStoreSupervisions()
             loadDataStoreIndicators()
             loadOrganisationUnits()
