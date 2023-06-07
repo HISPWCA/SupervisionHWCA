@@ -66,7 +66,7 @@ export const Body = () => {
 
             <div className={`menu-item ${renderPage === PAGE_SUPERVISIONS ? 'active' : ''}`} onClick={_ => handleClickMenu(PAGE_SUPERVISIONS)}>
                 <span><MdOutlineEditNote style={{ fontSize: '22px' }} /></span>
-                <span style={{ marginLeft: '10px' }}>Supervisions</span>
+                <span style={{ marginLeft: '10px' }}>Planifications</span>
             </div>
 
             <div className={`menu-item ${renderPage === PAGE_SETTINGS ? 'active' : ''}`} onClick={_ => handleClickMenu(PAGE_SETTINGS)}>

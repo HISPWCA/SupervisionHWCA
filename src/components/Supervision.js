@@ -3,7 +3,7 @@ import { MantineReactTable } from 'mantine-react-table'
 import { Card, Col, DatePicker, Divider, FloatButton, Input, InputNumber, List, Popconfirm, Row, Select, Checkbox as AntCheckbox, Table } from 'antd'
 import { IoMdAdd } from 'react-icons/io'
 import { IoListCircleOutline } from 'react-icons/io5'
-import { Button, ButtonStrip, Checkbox, CircularLoader, Modal, ModalActions, ModalContent, ModalTitle, Radio } from '@dhis2/ui'
+import { Button, ButtonStrip, Checkbox, CircularLoader, Modal, ModalActions, ModalContent, ModalTitle, NoticeBox, Radio } from '@dhis2/ui'
 import {
     DAY,
     INDICATOR,
@@ -70,6 +70,7 @@ const Supervision = ({ me }) => {
     const [notification, setNotification] = useState({ show: false, message: null, type: null })
     const [visibleAnalyticComponentModal, setVisibleAnalyticComponentModal] = useState(false)
     const [analyticIndicatorResults, setAnalyticIndicatorResults] = useState([])
+    const [analyticErrorMessage, setAnalyticErrorMessage] = useState(null)
 
     const [selectedStep, setSelectedStep] = useState(0)
     const [selectedSupervisionType, setSelectedSupervisionType] = useState(null)
@@ -838,6 +839,7 @@ const Supervision = ({ me }) => {
         setInputDataSourceID(null)
         setSelectedOrganisationUnitInd(null)
         setAnalyticIndicatorResults([])
+        setAnalyticErrorMessage(null)
     }
 
     const handleSupervisionPlanificationSaveBtn = async () => {
@@ -1402,6 +1404,7 @@ const Supervision = ({ me }) => {
     const handleDisplayIndicatorResult = async () => {
         try {
             setLoadingAnalyticIndicatorResults(true)
+            setAnalyticErrorMessage(null)
 
             if (!selectedOrganisationUnits)
                 throw new Error("L'unité d'organisation est obligatoire !")
@@ -1453,6 +1456,9 @@ const Supervision = ({ me }) => {
             }
 
             setAnalyticIndicatorResults(availableIndicators)
+            if (response.data.rows.length === 0) {
+                setAnalyticErrorMessage("Aucun donnés n'a été trouvé pour cette sélection")
+            }
 
             setLoadingAnalyticIndicatorResults(false)
             // setSelectedOrganisationUnitInd(null)
@@ -1466,6 +1472,7 @@ const Supervision = ({ me }) => {
         } catch (err) {
             setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
             setLoadingAnalyticIndicatorResults(false)
+            setAnalyticErrorMessage(null)
         }
     }
 
@@ -1908,21 +1915,10 @@ const Supervision = ({ me }) => {
     }
 
     const RenderAnalyticIndicatorsResults = () => (
-        <>
+        <div style={{ marginTop: '10px' }}>
             <Card size='small' className='my-shadow'>
                 <div>
-                    {
-                        selectedPeriod &&
-                        <div>
-                            <span>Période sélectionnée:</span> <strong> {dayjs(selectedPeriod).format(' MMMM, YYYY')} </strong>
-                            <span>Meilleur Positif:</span> <strong> {inputMeilleurPositif ? 'Oui' : 'No'} </strong>
-
-                            {analyticIndicatorResults.map(ind => <> <span className="ml-2">{ind.indicator?.displayName}:</span> <strong>{ind.weight}</strong> </>)}
-                        </div>
-                    }
-
-                    {/* (parseInt(this.state.finalResults.length + 1) - (parseInt(this.state.best || 0) + parseInt(this.state.worst || 0)) > 0) && */}
-                    <div style={{ marginTop: '20px' }}>
+                    <div>
                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <thead>
                                 <tr style={{ backgroundColor: '#fff' }}>
@@ -1949,48 +1945,9 @@ const Supervision = ({ me }) => {
                             </tbody>
                         </table>
                     </div>
-
-
-                    {/* 
-
-            {
-                this.state.finalResults.length > 0 &&
-                (parseInt(this.state.finalResults.length + 1) - (parseInt(this.state.best || 0) + parseInt(this.state.worst || 0)) <= 0) &&
-                <React.Fragment>
-                    <div className="d-block alert alert-danger my-2">
-
-                        {translate('TheTotalResultsFromAnalyticsIs')}
-                        <strong className="mx-1">
-                            {this.state.finalResults.length}
-                        </strong>
-                        , {translate('ButYouSeemLookingFor')}
-
-                        <strong className="mx-1">
-                            {this.state.best}
-                        </strong>
-                        {translate('BestAnd')}
-
-                        <strong className="mx-1">
-                            {this.state.worst}
-                        </strong>
-                        {translate('Worst')}
-                    </div>
-                    <table className="table table-sm table-striped table-primary table-hover text-left align-middle">
-                        <thead> {Object.keys(this.state.finalResults[0]).map(key => <th className="text-capitalize text-left align-middle"> {key} </th>)} <th className="text-left align-middle">Action</th> </thead>
-                        {
-                            this.state.finalResults.length > 1 &&
-                            <tbody>
-                                {this.state.hightIsGood && this.state.finalResults.sort((a, b) => b.score - a.score).map((result, index) => <tr title={result.organisationUnit} > {Object.keys(this.state.finalResults[index]).map(key => <td className="text-left align-middle"> {result[key]} </td>)}  <td className="text-left align-middle"><button className="btn btn-light btn-sm" onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {translate('Schedule')} </button></td></tr>)}
-
-                                {!this.state.hightIsGood && this.state.finalResults.sort((a, b) => a.score - b.score).map((result, index) => <tr title={result.organisationUnit} > {Object.keys(this.state.finalResults[index]).map(key => <td className="text-left align-middle"> {result[key]} </td>)}  <td className="text-left align-middle"><button className="btn btn-light btn-sm" onClick={() => this.setState({ selectedNode: this.state.organisationUnits.find(organisationUnit => organisationUnit.displayName === result.organisationUnit) })}> {translate('Schedule')} </button></td></tr>)}
-                            </tbody>
-                        }
-                    </table>
-                </React.Fragment>
-            } */}
                 </div>
             </Card>
-        </>
+        </div>
     )
 
     const RenderStepsContent = () => <>
@@ -2048,19 +2005,38 @@ const Supervision = ({ me }) => {
                             {RenderPlanificationForm()}
                         </Col>
 
+                        {
+                            selectedPlanificationType === INDICATOR && selectedIndicators.length > 0 &&
+                            selectedOrganisationUnitInd &&
+                            selectedOrganisationUnitGroup && selectedPeriod && (
+                                <Col md={24}>
+                                    <Card size='small' className='my-shadow'>
+                                        <div style={{ textAlign: 'center' }}>
+                                            {
+                                                selectedPeriod &&
+                                                <div>
+                                                    <span>Période sélectionnée:</span> <strong> {dayjs(selectedPeriod).format(' MMMM, YYYY')} </strong> /
+                                                    <span>Meilleur Positif:</span> <strong> {inputMeilleurPositif ? 'Oui' : 'No'} </strong> /
+                                                    {analyticIndicatorResults.map(ind => <> <span className="ml-2">{ind.indicator?.displayName}:</span> <strong>{ind.weight}</strong> </>)}
+                                                </div>
+                                            }
+                                        </div>
+
+                                        {analyticErrorMessage && <div style={{ marginTop: '20px' }}> <NoticeBox error > {analyticErrorMessage} </NoticeBox> </div>}
+                                    </Card>
+                                </Col>
+                            )
+                        }
 
                         {
                             selectedPlanificationType === INDICATOR && selectedIndicators.length > 0 &&
-                                analyticIndicatorResults.length > 0 &&
-                                [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].length >= parseInt(inputMeilleur || 0) + parseInt(inputMauvais || 0) ?
-                                (
-                                    <Col md={24}>{RenderAnalyticIndicatorsResults()} </Col>
-                                ) :
-                                selectedPlanificationType === INDICATOR && selectedIndicators.length > 0 &&
-                                analyticIndicatorResults.length &&
-                                (
-                                    <Col md={24}><div style={{ fontWeight: 'bold', }}>Liste vide !</div> </Col>
-                                )
+                            selectedOrganisationUnitInd &&
+                            selectedOrganisationUnitGroup && selectedPeriod &&
+                            analyticIndicatorResults.length > 0 &&
+                            [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].length >= parseInt(inputMeilleur || 0) + parseInt(inputMauvais || 0) &&
+                            (
+                                <Col md={24}>{RenderAnalyticIndicatorsResults()} </Col>
+                            )
                         }
 
                         {
