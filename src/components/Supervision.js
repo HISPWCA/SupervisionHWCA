@@ -731,7 +731,10 @@ const Supervision = ({ me }) => {
             await createEvents({ events: newEventsList })
 
             const currentTEI = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}/${tei_id}?program=${payload.program}`)
-            return currentTEI.data
+            const currentTEIData = currentTEI.data
+            return {
+                trackedEntityInstance
+            }
 
         } catch (err) {
             throw err

@@ -441,7 +441,7 @@ export const Dashboard = () => {
 
 
             for (let planification of response) {
-                for (sup of planification.supervisions) {
+                for (let sup of planification.supervisions) {
                     if (!supervisionList.map(s => s.id).includes(sup.id)) {
                         supervisionList.push(sup)
                     }
@@ -668,7 +668,7 @@ export const Dashboard = () => {
     useEffect(() => {
         loadOrganisationUnits()
         loadDataStoreAnalyses()
-        // loadDataStoreSupervisionPlanifications()
+        loadDataStoreSupervisionPlanifications()
     }, [])
 
     return (
