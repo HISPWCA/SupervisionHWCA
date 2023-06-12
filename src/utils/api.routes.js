@@ -18,7 +18,7 @@ export const PROGRAM_INDICATOR_GROUPS = API_BASE_ROUTE.concat('/programIndicator
 export const ORGANISATION_UNIT_GROUP_SETS_ROUTE = API_BASE_ROUTE.concat('/organisationUnitGroupSets.json?paging=false&fields=id,name,displayName,organisationUnitGroups[id,displayName]')
 export const ORGANISATION_UNIT_GROUPS_ROUTE = API_BASE_ROUTE.concat('/organisationUnitGroups.json?paging=false&fields=id,name,displayName')
 export const TRACKED_ENTITY_ATTRIBUTES_ROUTE = API_BASE_ROUTE.concat('/trackedEntityAttributes')
-export const TRACKED_ENTITY_INSTANCES_ROUTE = API_BASE_ROUTE.concat('/trackedEntityInstances')
+export const TRACKED_ENTITY_INSTANCES_ROUTE = API_BASE_ROUTE.concat('/trackedEntityInstances.json')
 export const ENROLLMENTS_ROUTE = API_BASE_ROUTE.concat('/enrollments')
 export const EVENTS_ROUTE = API_BASE_ROUTE.concat('/events')
 export const PROGS_ROUTE = API_BASE_ROUTE.concat('/programs')
