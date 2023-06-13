@@ -750,12 +750,10 @@ const Supervision = ({ me }) => {
 
                 const current_tei = existingTEI_List[0]
 
-                const enrollment_id = current_tei?.enrollments[0]?.enrollment
+                const enrollment_id = current_tei?.enrollments.filter(en => en.program === selectedProgram?.program?.id)[0]?.enrollment
 
                 if (!enrollment_id)
                     throw new Error("Erreur de création de l'enrôlement ")
-
-
 
                 const availableProgramStages = []
                 const newEventsList = []
@@ -918,6 +916,192 @@ const Supervision = ({ me }) => {
         }
     }
 
+
+    const generateEnrollmentsAsNewSupervision = async (payload) => {
+        try {
+            const existingTEI_List_response = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}?ou=${payload.orgUnit}&order=created:DESC&program=${selectedProgram?.program?.id}&fields=*`)
+            const existingTEI_List = existingTEI_List_response.data.trackedEntityInstances
+
+            if (existingTEI_List.length === 0) {
+                return await generateTeiWithEnrollmentWithEvents(payload)
+            } else {
+
+                const current_tei = existingTEI_List[0]
+
+                const enrollment = {
+                    orgUnit: payload.orgUnit,
+                    trackedEntityInstance: current_tei.trackedEntityInstance,
+                    program: payload.program
+                }
+
+                const createdEnrollment = await createEnrollment(enrollment)
+                const enrollment_id = createdEnrollment?.response?.importSummaries[0]?.reference
+
+                if (!enrollment_id)
+                    throw new Error("Erreur de création de l'enrôlement ")
+
+                const availableProgramStages = []
+                const newEventsList = []
+
+                //  Récuperation dans une list les programmes stage
+                for (let mapping of mappingConfigs) {
+                    if (!availableProgramStages.includes(mapping.programStage?.id)) {
+                        availableProgramStages.push(mapping.programStage.id)
+                    }
+                }
+
+                if (payload.fieldConfig?.supervisor?.programStage?.id) {
+                    if (!availableProgramStages.includes(payload.fieldConfig?.supervisor?.programStage?.id)) {
+                        availableProgramStages.push(payload.fieldConfig?.supervisor?.programStage?.id)
+                    }
+                }
+
+                for (let stage of availableProgramStages) {
+                    const eventPayload = {
+                        eventDate: payload.period ? dayjs(payload.period).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
+                        program: payload.program,
+                        orgUnit: payload.orgUnit,
+                        enrollment: enrollment_id,
+                        programStage: stage,
+                        trackedEntityInstance: current_tei.trackedEntityInstance,
+                        dataValues: []
+                    }
+
+                    if (mappingConfigs?.length > 0) {
+                        eventPayload.status = 'ACTIVE'
+                        eventPayload.eventDate = payload.period ? dayjs(payload.period).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')
+                        eventPayload.dueDate = payload.period ? dayjs(payload.period).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')
+                        eventPayload.dataValues = mappingConfigs.filter(ev => ev.programStage?.id === stage)
+                            .map(ev => ({
+                                dataElement: ev.dataElement?.id,
+                                value: ev.indicator?.displayName
+                            }))
+                    } else {
+                        eventPayload.status = 'SCHEDULE'
+                        eventPayload.dueDate = payload.period ? dayjs(payload.period).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')
+                    }
+
+                    // Ajoute des dataValues superviseurs
+                    if (payload.fieldConfig?.supervisor?.programStage?.id === stage && payload.fieldConfig?.supervisor?.dataElements?.length > 0) {
+                        const newDataValues = []
+
+                        /*
+                        * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son INFÉRIEUR au nombres de superviseurs sélectionnés
+                        */
+
+                        const newSupervisorsList = [...payload.supervisors?.map(s => s.displayName), ...payload.otherSupervisors]
+
+                        if (payload.fieldConfig?.supervisor?.dataElements?.length < newSupervisorsList?.length) {
+                            const supervisorArrayCurrent = newSupervisorsList?.slice(0, payload.fieldConfig?.supervisor?.dataElements?.length)
+                            const supervisorArraylast = newSupervisorsList?.slice(payload.fieldConfig?.supervisor?.dataElements?.length)
+
+                            for (let i = 0; i < payload.fieldConfig?.supervisor?.dataElements?.length; i++) {
+                                for (let j = 0; j < supervisorArrayCurrent.length; j++) {
+                                    if (i === j) {
+                                        const currentDE = payload.fieldConfig?.supervisor?.dataElements[i]
+                                        const currentSUP = supervisorArrayCurrent[j]
+                                        if (currentDE && currentSUP && !newDataValues.map(dv => dv.dataElement).includes(currentDE.id)) {
+
+                                            if (i === payload.fieldConfig?.supervisor?.dataElements?.length - 1) {
+                                                newDataValues.push({
+                                                    dataElement: currentDE.id,
+                                                    value: `${currentSUP},${supervisorArraylast?.join(',')}`
+                                                })
+                                            } else {
+                                                newDataValues.push({
+                                                    dataElement: currentDE.id,
+                                                    value: currentSUP
+                                                })
+                                            }
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        /*
+                       * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son EGALE au nombres de superviseurs sélectionnés
+                       */
+                        if (payload.fieldConfig?.supervisor?.dataElements?.length === newSupervisorsList?.length) {
+                            for (let i = 0; i < payload.fieldConfig?.supervisor?.dataElements?.length; i++) {
+                                for (let j = 0; j < newSupervisorsList.length; j++) {
+                                    if (i === j) {
+                                        const currentDE = payload.fieldConfig?.supervisor?.dataElements[i]
+                                        const currentSUP = newSupervisorsList[j]
+                                        if (currentDE && currentSUP && !newDataValues.map(dv => dv.dataElement).includes(currentDE.id)) {
+
+                                            // if (i === payload.fieldConfig?.supervisor?.dataElements?.length - 1) {
+                                            //     newDataValues.push({
+                                            //         dataElement: currentDE.id,
+                                            //         value: `${currentSUP},${newSupervisorsList?.join(',')}`
+                                            //     })
+                                            // } else {
+                                            newDataValues.push({
+                                                dataElement: currentDE.id,
+                                                value: currentSUP
+                                            })
+                                            // }
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        /*
+                      * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son SUPERIEUR au nombres de superviseurs sélectionnés
+                      */
+                        if (payload.fieldConfig?.supervisor?.dataElements?.length > newSupervisorsList?.length) {
+                            for (let i = 0; i < payload.fieldConfig?.supervisor?.dataElements?.length; i++) {
+                                for (let j = 0; j < newSupervisorsList?.length; j++) {
+                                    if (i === j) {
+                                        const currentDE = payload.fieldConfig?.supervisor?.dataElements[i]
+                                        const currentSUP = newSupervisorsList[j]
+                                        if (currentDE && currentSUP && !newDataValues.map(dv => dv.dataElement).includes(currentDE.id)) {
+
+                                            // if (i === newSupervisorsList?.length - 1) {
+                                            //     newDataValues.push({
+                                            //         dataElement: currentDE.id,
+                                            //         value: `${currentSUP},${newSupervisorsList?.join(',')}`
+                                            //     })
+                                            // } else {
+
+                                            // }
+
+                                            newDataValues.push({
+                                                dataElement: currentDE.id,
+                                                value: currentSUP
+                                            })
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if (newDataValues.length > 0) {
+                            eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValues]
+                        }
+                    }
+
+                    if (!newEventsList.map(ev => ev.programStage).includes(stage)) {
+                        newEventsList.push(eventPayload)
+                    }
+                }
+
+                await createEvents({ events: newEventsList })
+
+                const currentTEI = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}/${current_tei.trackedEntityInstance}?program=${selectedProgram.program?.id}`)
+                const currentTEIData = currentTEI.data
+                return currentTEIData
+            }
+        } catch (err) {
+            throw err
+        }
+    }
+
+
     const handleSelectIndicators = (values) => setSelectedIndicators(values.map(val => dataStoreIndicatorConfigs.find(dsInd => dsInd.indicator?.id === val)))
 
     const savePanificationToDataStore = async (payload) => {
@@ -976,6 +1160,9 @@ const Supervision = ({ me }) => {
     const saveSupervisionAsEventStrategy = async (inputFieldsList) => {
         try {
             if (inputFieldsList.length > 0) {
+
+                const supervisionsList = []
+
                 for (let item of inputFieldsList) {
                     const payload = {
                         ...item,
@@ -986,7 +1173,75 @@ const Supervision = ({ me }) => {
                     }
 
                     const createdTEIObject = await generateEventsAsNewSupervision(payload)
+                    if (createdTEIObject) {
+                        supervisionsList.push({
+                            ...item,
+                            id: uuid(),
+                            planificationType: selectedPlanificationType,
+                            indicators: selectedIndicators,
+                            orgUnit: item.organisationUnit?.id,
+                            period: item.period,
+                            program: item.program,
+                            fieldConfig: item.fieldConfig,
+                            tei: createdTEIObject
+                        })
+                    }
                 }
+
+                let planificationPayload = {
+                    id: uuid(),
+                    program: selectedProgram,
+                    dataSources: mappingConfigs,
+                    supervisions: supervisionsList,
+                }
+                await savePanificationToDataStore([...dataStoreSupervisions, planificationPayload])
+                await loadDataStoreSupervisions()
+            }
+        } catch (err) {
+            throw err
+        }
+    }
+
+
+    const saveSupervisionAsEnrollmentStrategy = async (inputFieldsList) => {
+        try {
+            if (inputFieldsList.length > 0) {
+
+                const supervisionsList = []
+
+                for (let item of inputFieldsList) {
+                    const payload = {
+                        ...item,
+                        orgUnit: item.organisationUnit?.id,
+                        period: item.period,
+                        program: item.program?.id,
+                        fieldConfig: item.fieldConfig
+                    }
+
+                    const createdTEIObject = await generateEnrollmentsAsNewSupervision(payload)
+                    if (createdTEIObject) {
+                        supervisionsList.push({
+                            ...item,
+                            id: uuid(),
+                            planificationType: selectedPlanificationType,
+                            indicators: selectedIndicators,
+                            orgUnit: item.organisationUnit?.id,
+                            period: item.period,
+                            program: item.program,
+                            fieldConfig: item.fieldConfig,
+                            tei: createdTEIObject
+                        })
+                    }
+                }
+
+                let planificationPayload = {
+                    id: uuid(),
+                    program: selectedProgram,
+                    dataSources: mappingConfigs,
+                    supervisions: supervisionsList,
+                }
+                await savePanificationToDataStore([...dataStoreSupervisions, planificationPayload])
+                await loadDataStoreSupervisions()
             }
         } catch (err) {
             throw err
@@ -1030,6 +1285,9 @@ const Supervision = ({ me }) => {
 
             if (selectedProgram.generationType === TYPE_GENERATION_AS_TEI)
                 await saveSupervisionAsTEIStrategy(inputFields)
+
+            if (selectedProgram.generationType === TYPE_GENERATION_AS_ENROLMENT)
+                await saveSupervisionAsEnrollmentStrategy(inputFields)
 
             if (selectedProgram.generationType === TYPE_GENERATION_AS_EVENT)
                 await saveSupervisionAsEventStrategy(inputFields)
@@ -1177,7 +1435,6 @@ const Supervision = ({ me }) => {
                         {
                             selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
                             dataStoreSupervisionConfigs
-                                .filter(sup => sup.generationType === TYPE_GENERATION_AS_TEI)
                                 .map((sup, index) => (
                                     <div key={index} className={`supervision-item ${selectedProgram?.id === sup.id ? 'active' : ''}`} onClick={() => handleClickSupervisionItem(sup)}>
                                         {sup.program?.displayName}
@@ -1187,7 +1444,6 @@ const Supervision = ({ me }) => {
                         {
                             selectedSupervisionType === TYPE_SUPERVISION_AGENT &&
                             dataStoreSupervisionConfigs
-                                .filter(sup => sup.generationType === TYPE_GENERATION_AS_ENROLMENT || sup.generationType === TYPE_GENERATION_AS_EVENT)
                                 .map((sup, index) => (
                                     <div key={index} className={`supervision-item ${selectedProgram?.id === sup.id ? 'active' : ''}`} onClick={() => handleClickSupervisionItem(sup)}>
                                         {sup.program?.displayName}
@@ -1196,16 +1452,14 @@ const Supervision = ({ me }) => {
                         }
                         {
                             selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
-                            dataStoreSupervisionConfigs
-                                .filter(sup => sup.generationType === TYPE_GENERATION_AS_TEI).length === 0 && (
+                            dataStoreSupervisionConfigs.length === 0 && (
                                 <div style={{ fontWeight: 'bold' }}> Aucune fiche de supervision disponible</div>
                             )
                         }
 
                         {
                             selectedSupervisionType === TYPE_SUPERVISION_AGENT &&
-                            dataStoreSupervisionConfigs
-                                .filter(sup => sup.generationType === TYPE_GENERATION_AS_ENROLMENT || sup.generationType === TYPE_GENERATION_AS_EVENT).length === 0 && (
+                            dataStoreSupervisionConfigs.length === 0 && (
                                 <div style={{ fontWeight: 'bold' }}> Aucune fiche de supervision disponible</div>
                             )
                         }
