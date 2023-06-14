@@ -1402,7 +1402,7 @@ const Supervision = ({ me }) => {
                         Que voulez-vous superviser ?
                     </div>
                     <div style={{ display: 'flex', marginTop: '10px' }}>
-                        <div >
+                        <div>
                             <Radio
                                 label="Unité d'organisation"
                                 className="cursor-pointer"
