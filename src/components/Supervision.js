@@ -71,6 +71,7 @@ const Supervision = ({ me }) => {
     const [visibleAnalyticComponentModal, setVisibleAnalyticComponentModal] = useState(false)
     const [analyticIndicatorResults, setAnalyticIndicatorResults] = useState([])
     const [analyticErrorMessage, setAnalyticErrorMessage] = useState(null)
+    const [teisList, setTeisList] = useState([])
 
     const [selectedStep, setSelectedStep] = useState(0)
     const [selectedSupervisionType, setSelectedSupervisionType] = useState(null)
@@ -89,6 +90,7 @@ const Supervision = ({ me }) => {
     const [selectedIndicator, setSelectedIndicator] = useState(null)
     const [selectedMetaDatas, setSelectedMetaDatas] = useState([])
     const [selectedOrganisationUnitInd, setSelectedOrganisationUnitInd] = useState(null)
+    const [selectedTEIs, setSelectedTEIs] = useState([])
 
     const [inputMeilleur, setInputMeilleur] = useState(0)
     const [inputMauvais, setInputMauvais] = useState(0)
@@ -108,6 +110,7 @@ const Supervision = ({ me }) => {
     const [loadingIndicatorGroups, setLoadingIndicatorGroups] = useState(false)
     const [loadingSupervisionPlanification, setLoadingSupervisionPlanification] = useState(false)
     const [loadingAnalyticIndicatorResults, setLoadingAnalyticIndicatorResults] = useState(false)
+    const [loadingTeiList, setLoadingTeiList] = useState(false)
 
     const data = [
         {
@@ -738,7 +741,6 @@ const Supervision = ({ me }) => {
         }
     }
 
-
     const generateEventsAsNewSupervision = async (payload) => {
         try {
             const existingTEI_List_response = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}?ou=${payload.orgUnit}&order=created:DESC&program=${selectedProgram?.program?.id}&fields=*`)
@@ -915,7 +917,6 @@ const Supervision = ({ me }) => {
             throw err
         }
     }
-
 
     const generateEnrollmentsAsNewSupervision = async (payload) => {
         try {
@@ -1101,7 +1102,6 @@ const Supervision = ({ me }) => {
         }
     }
 
-
     const handleSelectIndicators = (values) => setSelectedIndicators(values.map(val => dataStoreIndicatorConfigs.find(dsInd => dsInd.indicator?.id === val)))
 
     const savePanificationToDataStore = async (payload) => {
@@ -1201,7 +1201,6 @@ const Supervision = ({ me }) => {
             throw err
         }
     }
-
 
     const saveSupervisionAsEnrollmentStrategy = async (inputFieldsList) => {
         try {
@@ -1435,6 +1434,7 @@ const Supervision = ({ me }) => {
                         {
                             selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
                             dataStoreSupervisionConfigs
+                                .filter(sup => sup.generationType === TYPE_GENERATION_AS_EVENT)
                                 .map((sup, index) => (
                                     <div key={index} className={`supervision-item ${selectedProgram?.id === sup.id ? 'active' : ''}`} onClick={() => handleClickSupervisionItem(sup)}>
                                         {sup.program?.displayName}
@@ -1444,6 +1444,7 @@ const Supervision = ({ me }) => {
                         {
                             selectedSupervisionType === TYPE_SUPERVISION_AGENT &&
                             dataStoreSupervisionConfigs
+                                .filter(sup => sup.generationType === TYPE_GENERATION_AS_EVENT)
                                 .map((sup, index) => (
                                     <div key={index} className={`supervision-item ${selectedProgram?.id === sup.id ? 'active' : ''}`} onClick={() => handleClickSupervisionItem(sup)}>
                                         {sup.program?.displayName}
@@ -2175,7 +2176,6 @@ const Supervision = ({ me }) => {
         </Modal>
     ) : <></>
 
-
     const RenderDataElementConfigContent = () => <>
         <div className='my-shadow' style={{ padding: '20px', background: '#FFF', marginBottom: '2px', borderRadius: '8px', marginTop: '10px' }}>
             <Row gutter={[10, 10]}>
@@ -2341,7 +2341,6 @@ const Supervision = ({ me }) => {
         </div>
     </>
 
-
     const handleSelectCheckbox = (orgUnit) => {
         if (selectedOrganisationUnits.map(ou => ou.id).includes(orgUnit.id)) {
             setSelectedOrganisationUnits(selectedOrganisationUnits.filter(ou => ou.id !== orgUnit.id))
@@ -2387,6 +2386,68 @@ const Supervision = ({ me }) => {
         </div>
     )
 
+    const loadTEIs = async (orgUnitId) => {
+        try {
+            console.log("selected program : ", selectedProgram)
+            if (selectedProgram && orgUnitId) {
+                setLoadingTeiList(true)
+                const route = `${TRACKED_ENTITY_INSTANCES_ROUTE}.json?ou=${orgUnitId}&ouMode=SELECTED&program=${selectedProgram.program?.id}`
+                const response = await axios.get(route)
+                setTeisList(response.data.trackedEntityInstances)
+                setLoadingTeiList(false)
+            }
+        } catch (err) {
+            console.log(err)
+            setLoadingTeiList(false)
+        }
+    }
+
+    const onOrgUnitSelected = (value) => {
+        return loadTEIs(value.id)
+    }
+
+    const RenderAgentConfigList = () => (
+        <div style={{ marginBottom: '20px' }}>
+            <Card size='small' className='my-shadow'>
+                <div style={{ maxWidth: '500px' }}>
+                    <div style={{ marginBottom: '5px' }}>Unités d'organisation</div>
+                    <OrganisationUnitsTree
+                        meOrgUnitId={me?.organisationUnits[0]?.id}
+                        orgUnits={organisationUnits}
+                        currentOrgUnits={selectedOrganisationUnits}
+                        setCurrentOrgUnits={setSelectedOrganisationUnits}
+                        loadingOrganisationUnits={loadingOrganisationUnits}
+                        onChange={onOrgUnitSelected}
+                    />
+                </div>
+                <>
+                    {loadingTeiList && (
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <CircularLoader small />
+                            <span style={{ marginLeft: '20px' }}>Chargement...</span>
+                        </div>
+                    )}
+                    {
+                        teisList.length > 0 && (
+                            <div style={{ marginTop: '20px' }}>
+                                <div style={{ fontWeight: 'bold' }}>Liste des Agents</div>
+                                <div>
+                                    <Table
+                                        columns={[
+                                            { title: '' },
+                                            { title: 'Nom' },
+                                            { title: 'Téléphone' }
+                                        ]}
+                                    />
+                                </div>
+                            </div>
+                        )
+                    }
+                </>
+            </Card>
+        </div>
+    )
+
     const RenderStepsContent = () => <>
         {
             selectedStep === 0 && (
@@ -2410,6 +2471,7 @@ const Supervision = ({ me }) => {
                             {selectedProgram && RenderDataElementConfigContent()}
                         </Col>
                         <Col sm={24} md={16}>
+                            {selectedProgram && selectedSupervisionType === TYPE_SUPERVISION_AGENT && RenderAgentConfigList()}
                             {selectedProgram && RenderDataElementConfigList()}
                         </Col>
                     </Row>

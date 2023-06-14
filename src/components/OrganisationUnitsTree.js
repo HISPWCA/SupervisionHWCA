@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { CarryOutOutlined } from "@ant-design/icons"
 import { TreeSelect } from "antd"
-import { CircularLoader } from '@dhis2/ui'
 
 
 const generateTreeFromOrgUnits = (ouList = [], icon = null, parentId = null, level = 1, setLoading) => {
