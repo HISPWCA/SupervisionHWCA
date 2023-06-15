@@ -66,12 +66,12 @@ const Supervision = ({ me }) => {
     const [programStages, setProgramStages] = useState([])
     const [isNewMappingMode, setIsNewMappingMode] = useState(false)
     const [mappingConfigs, setMappingConfigs] = useState([])
-    const [indicatorGroups, setIndicatorGroups] = useState([])
     const [notification, setNotification] = useState({ show: false, message: null, type: null })
     const [visibleAnalyticComponentModal, setVisibleAnalyticComponentModal] = useState(false)
     const [analyticIndicatorResults, setAnalyticIndicatorResults] = useState([])
     const [analyticErrorMessage, setAnalyticErrorMessage] = useState(null)
     const [teisList, setTeisList] = useState([])
+    const [isEmpty, setEmpty] = useState(false)
 
     const [selectedStep, setSelectedStep] = useState(0)
     const [selectedSupervisionType, setSelectedSupervisionType] = useState(null)
@@ -85,9 +85,6 @@ const Supervision = ({ me }) => {
     const [selectedPeriodType, setSelectedPeriodType] = useState(null)
     const [selectedProgramStage, setSelectedProgramStage] = useState(null)
     const [selectedDataElement, setSelectedDataElement] = useState(null)
-    const [selectedIndicatorGroup, setSelectedIndicatorGroup] = useState(null)
-    const [selectedIndicatorType, setSelectedIndicatorType] = useState(PROGRAM_INDICATOR)
-    const [selectedIndicator, setSelectedIndicator] = useState(null)
     const [selectedMetaDatas, setSelectedMetaDatas] = useState([])
     const [selectedOrganisationUnitInd, setSelectedOrganisationUnitInd] = useState(null)
     const [selectedAgents, setSelectedAgents] = useState([])
@@ -107,7 +104,6 @@ const Supervision = ({ me }) => {
     const [loadingUsers, setLoadingUsers] = useState(false)
     const [loadingProgramStages, setLoadingProgramStages] = useState(false)
     const [loadingSaveDateElementMappingConfig, setLoadingSaveDateElementMappingConfig] = useState(false)
-    const [loadingIndicatorGroups, setLoadingIndicatorGroups] = useState(false)
     const [loadingSupervisionPlanification, setLoadingSupervisionPlanification] = useState(false)
     const [loadingAnalyticIndicatorResults, setLoadingAnalyticIndicatorResults] = useState(false)
     const [loadingTeiList, setLoadingTeiList] = useState(false)
@@ -227,7 +223,6 @@ const Supervision = ({ me }) => {
             }
         }
         catch (err) {
-            console.log(err)
             setLoadingOrganisationUnits(false)
         }
     }
@@ -249,33 +244,6 @@ const Supervision = ({ me }) => {
         }
     }
 
-    const loadIndicatorGroups = async () => {
-        try {
-            setLoadingIndicatorGroups(true)
-
-            const response = await axios.get(`${INDICATORS_GROUP_ROUTE}`)
-
-            setIndicatorGroups(response.data.indicatorGroups)
-            setLoadingIndicatorGroups(false)
-        } catch (err) {
-            setLoadingIndicatorGroups(false)
-        }
-    }
-
-    const loadProgramIndicatorGroups = async () => {
-        try {
-            setLoadingIndicatorGroups(true)
-
-            const response = await axios.get(`${PROGRAM_INDICATOR_GROUPS}`)
-
-            setIndicatorGroups(response.data.programIndicatorGroups)
-            setLoadingIndicatorGroups(false)
-        } catch (err) {
-            console.log(err)
-            setLoadingIndicatorGroups(false)
-        }
-    }
-
     const loadUsers = async (userOrgUnitId) => {
         try {
             if (userOrgUnitId) {
@@ -289,7 +257,6 @@ const Supervision = ({ me }) => {
             }
         }
         catch (err) {
-            console.log(err)
             setLoadingUsers(false)
         }
     }
@@ -302,7 +269,6 @@ const Supervision = ({ me }) => {
             setLoadingOrganisationUnitGroupSets(false)
         }
         catch (err) {
-            console.log(err)
             setLoadingOrganisationUnitGroupSets(false)
         }
     }
@@ -324,7 +290,6 @@ const Supervision = ({ me }) => {
             setLoadingDataStoreSupervisionConfigs(false)
         }
         catch (err) {
-            console.log(err)
             setLoadingDataStoreSupervisionConfigs(false)
         }
     }
@@ -337,7 +302,6 @@ const Supervision = ({ me }) => {
             setLoadingDataStoreSupervisions(false)
         }
         catch (err) {
-            console.log(err)
             setLoadingDataStoreSupervisions(false)
         }
     }
@@ -350,43 +314,20 @@ const Supervision = ({ me }) => {
             setLoadingDataStoreIndicatorConfigs(false)
         }
         catch (err) {
-            console.log(err)
             setLoadingDataStoreIndicatorConfigs(false)
         }
-    }
-
-    const handleSelectIndicatorGroup = (value) => {
-        setSelectedIndicator(null)
-        setSelectedIndicatorGroup(indicatorGroups.find(indGroup => indGroup.id === value))
-    }
-
-    const handleChangeIndicatorType = ({ value }) => {
-        setSelectedIndicatorGroup(null)
-        setSelectedIndicator(null)
-        setSelectedDataElement(null)
-        setIndicatorGroups([])
-        setSelectedIndicatorType(value)
-
-        value === INDICATOR_GROUP && loadIndicatorGroups()
-        value === PROGRAM_INDICATOR && loadProgramIndicatorGroups()
     }
 
     const handleSelectDataElement = (value) => {
         setSelectedDataElement(selectedProgramStage.programStageDataElements?.map(p => p.dataElement).find(dataElement => dataElement.id === value))
     }
 
-    const handleSelectIndicator = (value) => {
-        setSelectedIndicator(null)
-        selectedIndicatorType === INDICATOR_GROUP && setSelectedIndicator(selectedIndicatorGroup.indicators?.find(ind => ind.id === value))
-        selectedIndicatorType === PROGRAM_INDICATOR && setSelectedIndicator(selectedIndicatorGroup.programIndicators?.find(progInd => progInd.id === value))
-    }
 
     const handleAddNewMappingConfig = () => {
         setIsNewMappingMode(!isNewMappingMode)
 
         if (!isNewMappingMode) {
             setSelectedDataElement(null)
-            setSelectedIndicator(null)
         }
     }
 
@@ -426,9 +367,7 @@ const Supervision = ({ me }) => {
                     setSelectedDataElement(null)
                     setInputDataSourceDisplayName('')
                     setInputDataSourceID(null)
-                    // setSelectedIndicator(null)
                     setSelectedProgramStage(null)
-                    // setSelectedIndicatorGroup(null)
                     setNotification({ show: true, type: NOTIFICATON_SUCCESS, message: 'Configuration ajoutée !' })
                     setLoadingSaveDateElementMappingConfig(false)
                 } else {
@@ -436,7 +375,6 @@ const Supervision = ({ me }) => {
                 }
             }
         } catch (err) {
-            console.log(err)
             setNotification({ show: true, type: NOTIFICATON_CRITICAL, message: err.response?.data?.message || err.message })
             setLoadingSaveDateElementMappingConfig(false)
         }
@@ -445,7 +383,6 @@ const Supervision = ({ me }) => {
     const handleDeleteConfigItem = async (value) => {
         try {
             if (value) {
-                setSelectedIndicator(null)
                 const newList = mappingConfigs.filter(mapConf => mapConf.id !== value.id)
                 setMappingConfigs(newList)
                 setNotification({ show: true, message: 'Suppression éffectuée !', type: NOTIFICATON_SUCCESS })
@@ -457,6 +394,9 @@ const Supervision = ({ me }) => {
 
     const handleChangeSupervisionType = ({ value }) => {
         setSelectedProgram(null)
+        setSelectedAgents([])
+        setSelectedOrganisationUnitInd(null)
+
         setSelectedSupervisionType(value)
     }
 
@@ -487,7 +427,9 @@ const Supervision = ({ me }) => {
     const handleClickSupervisionItem = (sup) => {
         setSelectedProgramStage(null)
         setSelectedDataElement(null)
-        setSelectedIndicator(null)
+        setSelectedAgents([])
+        setSelectedOrganisationUnitInd(null)
+
 
         loadProgramStages(sup.program?.id)
         setSelectedProgram(sup)
@@ -1111,13 +1053,7 @@ const Supervision = ({ me }) => {
                         fieldConfig: item.fieldConfig
                     }
 
-                    let createdTEIObject = null
-
-                    if (selectedSupervisionType === TYPE_SUPERVISION_AGENT) {
-                        createdTEIObject = await generateEventsForAgent(payload)
-                    } else {
-                        createdTEIObject = await generateTeiWithEnrollmentWithEvents(payload)
-                    }
+                    const createdTEIObject = await generateTeiWithEnrollmentWithEvents(payload)
 
                     if (createdTEIObject) {
                         supervisionsList.push({
@@ -1161,8 +1097,13 @@ const Supervision = ({ me }) => {
                         program: item.program?.id,
                         fieldConfig: item.fieldConfig
                     }
+                    let createdTEIObject = null
 
-                    const createdTEIObject = await generateEventsAsNewSupervision(payload)
+                    if (selectedSupervisionType === TYPE_SUPERVISION_AGENT) {
+                        createdTEIObject = await generateEventsForAgent(payload)
+                    } else {
+                        createdTEIObject = await generateEventsAsNewSupervision(payload)
+                    }
                     if (createdTEIObject) {
                         supervisionsList.push({
                             ...item,
@@ -1334,7 +1275,7 @@ const Supervision = ({ me }) => {
 
             await createEvents({ events: newEventsList })
 
-            const currentTEI = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}/${tei_id}?fields=*`)
+            const currentTEI = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}/${existing_tei.enrollments[0].trackedEntityInstance}?fields=*`)
             return currentTEI.data
 
         } catch (err) {
@@ -1392,6 +1333,8 @@ const Supervision = ({ me }) => {
         setMappingConfigs([])
         setProgramStages([])
         setSelectedAgents([])
+        setTeisList([])
+        setEmpty(false)
         setSelectedStep(0)
         setSelectedSupervisionType(null)
         setSelectedProgram(null)
@@ -1404,9 +1347,6 @@ const Supervision = ({ me }) => {
         setSelectedPeriodType(null)
         setSelectedProgramStage(null)
         setSelectedDataElement(null)
-        setSelectedIndicatorGroup(null)
-        setSelectedIndicatorType(PROGRAM_INDICATOR)
-        setSelectedIndicator(null)
         setSelectedMetaDatas([])
         setInputMeilleur(0)
         setInputMauvais(0)
@@ -1435,13 +1375,11 @@ const Supervision = ({ me }) => {
             if (selectedSupervisionType === TYPE_SUPERVISION_AGENT && selectedProgram.generationType === TYPE_GENERATION_AS_EVENT)
                 await saveSupervisionAsEventStrategy(inputFields)
 
-
             setLoadingSupervisionPlanification(false)
             setNotification({ show: true, message: 'Planification effectuée avec succès !', type: NOTIFICATON_SUCCESS })
             setEditionMode(false)
             cleanAllNewSupervisionState()
         } catch (err) {
-            console.log(err)
             setLoadingSupervisionPlanification(false)
             setNotification({ show: true, type: NOTIFICATON_CRITICAL, message: err.response?.data?.message || err.message })
         }
@@ -1489,7 +1427,7 @@ const Supervision = ({ me }) => {
                         {
                             isEditionMode && inputFields.length > 0 && (
                                 <div style={{ marginTop: '15px' }}>
-                                    <Button icon={<ImCancelCircle style={{ color: '#fff', fontSize: '18px' }} />} destructive >
+                                    <Button onClick={cleanAllNewSupervisionState} icon={<ImCancelCircle style={{ color: '#fff', fontSize: '18px' }} />} destructive >
                                         Annuler
                                     </Button>
                                 </div>
@@ -1574,9 +1512,7 @@ const Supervision = ({ me }) => {
                     <div style={{ fontWeight: 'bold', padding: '10px', borderBottom: '1px solid #ccc' }}>Fiches de supervisions</div>
                     <div style={{ padding: '10px' }}>
                         {
-                            selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
-                            dataStoreSupervisionConfigs
-                                .filter(sup => sup.generationType === TYPE_GENERATION_AS_EVENT)
+                            selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT
                                 .map((sup, index) => (
                                     <div key={index} className={`supervision-item ${selectedProgram?.id === sup.id ? 'active' : ''}`} onClick={() => handleClickSupervisionItem(sup)}>
                                         {sup.program?.displayName}
@@ -1602,7 +1538,8 @@ const Supervision = ({ me }) => {
 
                         {
                             selectedSupervisionType === TYPE_SUPERVISION_AGENT &&
-                            dataStoreSupervisionConfigs.length === 0 && (
+                            dataStoreSupervisionConfigs
+                                .filter(sup => sup.generationType === TYPE_GENERATION_AS_EVENT).length === 0 && (
                                 <div style={{ fontWeight: 'bold' }}> Aucune fiche de supervision disponible</div>
                             )
                         }
@@ -2147,7 +2084,6 @@ const Supervision = ({ me }) => {
                 throw new Error("Veuillez sélectionner la période !")
 
             const route = `${ANALYTICS_ROUTE}?dimension=dx:${selectedIndicators.map(ind => ind.indicator?.id).join(';')},ou:${selectedOrganisationUnitInd?.id};OU_GROUP-${selectedOrganisationUnitGroup?.id}&filter=pe:${formatPeriod(selectedPeriod, selectedPeriodType)}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=true&includeNumDen=true&skipRounding=false&completedOnly=false&outputIdScheme=UID`
-            // const route = `${ANALYTICS_ROUTE}/dataValueSet.json?dimension=dx:${selectedIndicators.map(ind => ind.indicator?.id).join(';')}&dimension=ou:${selectedOrganisationUnitInd?.id};OU_GROUP-${selectedOrganisationUnitGroup?.id}&dimension=pe:${formatPeriod(selectedPeriod, selectedPeriodType)}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=true&includeNumDen=true&skipRounding=false&completedOnly=false`
             const response = await axios.get(route)
 
             let availableIndicators = []
@@ -2186,14 +2122,6 @@ const Supervision = ({ me }) => {
             }
 
             setLoadingAnalyticIndicatorResults(false)
-            // setSelectedOrganisationUnitInd(null)
-            // setSelectedOrganisationUnitGroup(null)
-            // setSelectedOrganisationUnitGroupSet(null)
-            // setInputMeilleur('')
-            // setSelectedPeriodType(null)
-            // setSelectedPeriod(null)
-            // setInputMauvais('')
-
         } catch (err) {
             setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
             setLoadingAnalyticIndicatorResults(false)
@@ -2333,7 +2261,7 @@ const Supervision = ({ me }) => {
         <>
             {
                 mappingConfigs.length > 0 && (
-                    <div className='my-shadow' style={{ padding: '10px', background: '#FFF', marginBottom: '2px', borderRadius: '8px' }}>
+                    <div className='my-shadow' style={{ padding: '10px', background: '#FFF', marginBottom: '2px', borderRadius: '8px', marginTop: '10px' }}>
                         <div style={{ marginBottom: '10px', fontWeight: 'bold', fontSize: '16px' }}>Liste des configurations des éléments de données </div>
                         <Table
                             dataSource={
@@ -2677,14 +2605,19 @@ const Supervision = ({ me }) => {
         try {
             if (selectedProgram && orgUnitId) {
                 setLoadingTeiList(true)
-                const route = `${TRACKED_ENTITY_INSTANCES_ROUTE}.json?ou=${orgUnitId}&ouMode=SELECTED&program=${selectedProgram.program?.id}&fields=trackedEntityInstance,attributes,orgUnit,trackedEntityType,enrollments=[enrollment,orgUnit,orgUnitName,status,program,enrollmentDate]`
+                setEmpty(false)
+
+                const route = `${TRACKED_ENTITY_INSTANCES_ROUTE}.json?ou=${orgUnitId}&ouMode=SELECTED&program=${selectedProgram.program?.id}&fields=trackedEntityInstance,attributes,orgUnit,trackedEntityType,enrollments=[enrollment,orgUnit,orgUnitName,status,program,enrollmentDate,trackedEntityInstance]`
                 const response = await axios.get(route)
                 setTeisList(response.data.trackedEntityInstances)
+                if (response.data.trackedEntityInstances?.length === 0 || !response.data.trackedEntityInstance) {
+                    setEmpty(true)
+                }
                 setLoadingTeiList(false)
             }
         } catch (err) {
-            console.log(err)
             setLoadingTeiList(false)
+            setEmpty(true)
         }
     }
 
@@ -2711,66 +2644,85 @@ const Supervision = ({ me }) => {
                         <OrganisationUnitsTree
                             meOrgUnitId={me?.organisationUnits[0]?.id}
                             orgUnits={organisationUnits}
-                            currentOrgUnits={selectedOrganisationUnits}
-                            setCurrentOrgUnits={setSelectedOrganisationUnits}
+                            currentOrgUnits={selectedOrganisationUnitInd}
+                            setCurrentOrgUnits={setSelectedOrganisationUnitInd}
                             loadingOrganisationUnits={loadingOrganisationUnits}
                             onChange={onOrgUnitSelected}
                         />
                     </div>
                 </Card>
             </div>
-            {loadingTeiList && (
-                <div style={{ marginTop: '20px' }}>
-                    <Card size='small' className='my-shadow'>
-                        <div style={{ display: 'flex', alignItems: 'center', }}>
-                            <CircularLoader small />
-                            <span style={{ marginLeft: '20px' }}>Chargement...</span>
-                        </div>
-                    </Card>
-                </div>
-            )}
+
             {
-                teisList.length > 0 && (
+                selectedOrganisationUnitInd && (
                     <div style={{ marginTop: '10px' }}>
                         <Card size='small' className='my-shadow'>
                             <>
+                                <div style={{ fontWeight: 'bold' }}>Liste des Agents</div>
+
+
+
                                 {
-                                    teisList.length > 0 && (
+                                    loadingTeiList && (
                                         <div style={{ marginTop: '20px' }}>
-                                            <div style={{ fontWeight: 'bold' }}>Liste des Agents</div>
-                                            <div>
-                                                <Table
-                                                    size='small'
-                                                    dataSource={
-                                                        teisList.map(tei => {
-                                                            let payload = {
-                                                                tei
-                                                            }
-                                                            for (let att of selectedProgram.attributesToDisplay) {
-                                                                for (let teiAttr of tei.attributes) {
-                                                                    if (att.id === teiAttr.attribute) {
-                                                                        payload[`${att.displayName}`] = teiAttr.value
-                                                                    }
-                                                                }
-                                                            }
-                                                            return payload
-                                                        })
-                                                    }
-                                                    columns={[
-                                                        {
-                                                            title: 'Actions', width: '100px', dataIndex: 'tei', key: 'action', render: value => (
-                                                                <div>
-                                                                    <AntCheckbox onChange={() => handleSelectCheckboxAgent(value)} checked={selectedAgents.map(ag => ag.trackedEntityInstance).includes(value.trackedEntityInstance)} />
-                                                                </div>
-                                                            )
-                                                        },
-                                                        ...selectedProgram.attributesToDisplay.map(at => ({ title: at.displayName, dataIndex: at.displayName, key: at.displayName }))
-                                                    ]}
-                                                />
+                                            <div style={{ display: 'flex', alignItems: 'center', }}>
+                                                <CircularLoader small />
+                                                <span style={{ marginLeft: '20px' }}>Chargement...</span>
                                             </div>
                                         </div>
                                     )
                                 }
+
+                                {
+                                    teisList.length > 0 && (
+
+                                        <div style={{ marginTop: '20px' }}>
+                                            {
+                                                teisList.length > 0 && (
+                                                    <div>
+                                                        <Table
+                                                            size='small'
+                                                            dataSource={
+                                                                teisList.map(tei => {
+                                                                    let payload = {
+                                                                        tei
+                                                                    }
+                                                                    for (let att of selectedProgram.attributesToDisplay) {
+                                                                        for (let teiAttr of tei.attributes) {
+                                                                            if (att.id === teiAttr.attribute) {
+                                                                                payload[`${att.displayName}`] = teiAttr.value
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    return payload
+                                                                })
+                                                            }
+                                                            columns={[
+                                                                {
+                                                                    title: 'Actions', width: '100px', dataIndex: 'tei', key: 'action', render: value => (
+                                                                        <div>
+                                                                            <AntCheckbox onChange={() => handleSelectCheckboxAgent(value)} checked={selectedAgents.map(ag => ag.trackedEntityInstance).includes(value.trackedEntityInstance)} />
+                                                                        </div>
+                                                                    )
+                                                                },
+                                                                ...selectedProgram.attributesToDisplay.map(at => ({ title: at.displayName, dataIndex: at.displayName, key: at.displayName }))
+                                                            ]}
+                                                        />
+                                                    </div>
+                                                )
+                                            }
+                                        </div>
+                                    )
+                                }
+
+                                {
+                                    isEmpty && (
+                                        <div style={{ marginTop: '20px' }}>
+                                            <span style={{ fontWeight: 'bold', color: 'red' }}> Aucun Agent trouvé !</span>
+                                        </div>
+                                    )
+                                }
+
                             </>
                         </Card>
                     </div>

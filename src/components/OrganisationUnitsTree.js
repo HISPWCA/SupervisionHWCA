@@ -154,13 +154,18 @@ const OrganisationUnitsTree = ({
   orgUnits,
   meOrgUnitId,
   loadingOrganisationUnits,
+  setLoadingOrganisationUnits,
   multiple = false,
   onChange
 }) => {
   const [tree, setTree] = useState([])
   useEffect(() => {
     if (orgUnits.length > 0) {
-      setTree(generateTreeFromOrgUnits(orgUnits, <CarryOutOutlined />, meOrgUnitId))
+      setLoadingOrganisationUnits && setLoadingOrganisationUnits(true)
+      setTimeout(() => {
+        setTree(generateTreeFromOrgUnits(orgUnits, <CarryOutOutlined />, meOrgUnitId))
+        setLoadingOrganisationUnits && setLoadingOrganisationUnits(false)
+      }, 100)
     }
   }, [orgUnits])
   return (
