@@ -49,6 +49,7 @@ const Setting = () => {
     const [selectedAnalyseDataElement, setSelectedAnalyseDataElement] = useState(null)
     const [selectedProgramStage, setSelectedProgramStage] = useState(null)
     const [selectedDataElements, setSelectedDataElements] = useState([])
+    const [selectedAttributesToDisplay, setSelectedAttributesToDisplay] = useState([])
 
     const [loadingPrograms, setLoadingPrograms] = useState(false)
     const [loadingIndicatorGroups, setLoadingIndicatorGroups] = useState(false)
@@ -169,9 +170,8 @@ const Setting = () => {
         setIndicatorGroups([])
         setSelectedProgramStage(null)
         setSelectedDataElements([])
+        setSelectedAttributesToDisplay([])
         setSelectedTEIProgram(programs.find(p => p.id === value))
-        // selectedIndicatorType === INDICATOR_GROUP && loadIndicatorGroups()
-        // selectedIndicatorType === PROGRAM_INDICATOR && loadProgramIndicatorGroups()
         loadProgramStages(value)
     }
 
@@ -274,6 +274,7 @@ const Setting = () => {
             setMappingConfigs([])
             setDataElements([])
             setIndicators([])
+            setSelectedAttributesToDisplay([])
             setAnalyseConfigs([])
             setMappingConfigSupervisions([])
             setSelectedTEIProgram(null)
@@ -378,7 +379,8 @@ const Setting = () => {
                 const payload = {
                     generationType: selectedSupervisionGenerationType,
                     program: { id: selectedTEIProgram.id, displayName: selectedTEIProgram.displayName },
-                    fieldConfig: null
+                    fieldConfig: null,
+                    attributesToDisplay: selectedAttributesToDisplay
                 }
 
                 if (selectedProgramStage && selectedDataElements.length > 0) {
@@ -411,6 +413,7 @@ const Setting = () => {
                 setSelectedProgramStage(null)
                 setFieldEditingMode(false)
                 setSelectedDataElements([])
+                setSelectedAttributesToDisplay([])
                 setNotification({ show: true, type: NOTIFICATON_SUCCESS, message: isFieldEditingMode ? 'Mise à jour éffectuée' : 'Configuration ajoutée !' })
                 setLoadingSaveSupervionsConfig(false)
             }
@@ -678,7 +681,6 @@ const Setting = () => {
                     </div>
                     <div style={{ marginTop: '5px' }}>
                         <Radio
-
                             label="Générer les supervisions comme Evènements"
                             onChange={handleSupervisionGenerationType}
                             value={TYPE_GENERATION_AS_EVENT}
@@ -692,11 +694,12 @@ const Setting = () => {
 
     const handleEditProgramSup = async (prog) => {
         try {
-            setSelectedTEIProgram(prog.program)
+            setSelectedTEIProgram(programs.find(p => p.id === prog.program?.id))
             const programStageList = await loadProgramStages(prog?.program?.id)
             setSelectedProgramStage(programStageList.find(psg => psg.id === prog.fieldConfig?.supervisor?.programStage.id))
             setSelectedDataElements(prog.fieldConfig?.supervisor?.dataElements || [])
             setSelectedSupervisionGenerationType(prog.generationType)
+            setSelectedAttributesToDisplay(prog.attributesToDisplay || [])
             setFieldEditingMode(true)
         } catch (err) {
             console.log(err)
@@ -704,12 +707,43 @@ const Setting = () => {
         }
     }
 
+    const handleChangeProgramAttributeToDisplay = (values) => {
+        setSelectedAttributesToDisplay(values.map(v => selectedTEIProgram.programTrackedEntityAttributes.map(p => p.trackedEntityAttribute).find(att => att.id === v)))
+    }
+
+    const RenderAttributesToDisplay = () => (
+        <div style={{ marginTop: '20px' }}>
+            <Card className="my-shadow" size='small'>
+                <div>
+                    <div style={{ fontWeight: 'bold' }}>Configuration des attributs du programme à affichée</div>
+                    <div style={{ marginTop: '10px' }}>Attributs</div>
+                    <div style={{ marginTop: '2px' }}>
+                        <Select
+                            options={selectedTEIProgram.programTrackedEntityAttributes.map(p => p.trackedEntityAttribute).map(attribute => ({ label: attribute.displayName, value: attribute.id }))}
+                            placeholder="Choisir le program stage"
+                            style={{ width: '100%' }}
+                            optionFilterProp='label'
+                            value={selectedAttributesToDisplay.map(att => att.id)}
+                            onChange={handleChangeProgramAttributeToDisplay}
+                            showSearch
+                            allowClear
+                            mode='multiple'
+                            loading={loadingPrograms}
+                            disabled={loadingPrograms}
+                        />
+                    </div>
+                </div>
+            </Card>
+        </div>
+    )
+
     const RenderPageSupervisionConfig = () => (
         <>
-            <Row gutter={[8, 10]} >
+            <Row gutter={[8, 10]}>
                 <Col md={12} sm={24}>
                     <div >
                         {RenderSupervisionConfiguration()}
+                        {selectedTEIProgram && selectedTEIProgram.programTrackedEntityAttributes && RenderAttributesToDisplay()}
                         {selectedTEIProgram && RenderSupervisorFieldConfiguration()}
 
                         <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center' }}>
@@ -723,6 +757,7 @@ const Setting = () => {
                                             setSelectedTEIProgram(null)
                                             setSelectedProgramStage(null)
                                             setSelectedDataElements([])
+                                            setSelectedAttributesToDisplay([])
                                             setSelectedSupervisionGenerationType(TYPE_GENERATION_AS_TEI)
                                         }}
                                     >
@@ -910,7 +945,7 @@ const Setting = () => {
                                             },
 
                                             {
-                                                title: 'Type de génération',
+                                                title: 'Type de Stratégie',
                                                 dataIndex: 'generationType',
                                                 render: value => (
                                                     <>

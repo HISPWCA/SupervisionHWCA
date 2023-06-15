@@ -490,10 +490,10 @@ const Supervision = ({ me }) => {
         setSelectedIndicator(null)
 
         loadProgramStages(sup.program?.id)
-        // selectedIndicatorType === PROGRAM_INDICATOR && loadProgramIndicatorGroups()
-        // selectedIndicatorType === INDICATOR_GROUP && loadIndicatorGroups()
-
         setSelectedProgram(sup)
+        if (selectedSupervisionType === TYPE_SUPERVISION_AGENT && sup?.attributesToDisplay?.length === 0) {
+            return setNotification({ show: true, message: "Aucun attribut à afficher, n'est configuré pour ce programme !", type: NOTIFICATON_CRITICAL })
+        }
     }
 
     const handleDeleteOtherSupervisor = (item, index) => {
@@ -1302,9 +1302,6 @@ const Supervision = ({ me }) => {
         }
     }
 
-    const handleOnchangeOrgUnit = (values) => {
-        console.log(values)
-    }
 
     const RenderSupervisionList = () => (
         <>
@@ -2407,51 +2404,87 @@ const Supervision = ({ me }) => {
     }
 
     const RenderAgentConfigList = () => (
-        <div style={{ marginBottom: '20px' }}>
-            <Card size='small' className='my-shadow'>
-                <div style={{ maxWidth: '500px' }}>
-                    <div style={{ marginBottom: '5px' }}>Unités d'organisation</div>
-                    <OrganisationUnitsTree
-                        meOrgUnitId={me?.organisationUnits[0]?.id}
-                        orgUnits={organisationUnits}
-                        currentOrgUnits={selectedOrganisationUnits}
-                        setCurrentOrgUnits={setSelectedOrganisationUnits}
-                        loadingOrganisationUnits={loadingOrganisationUnits}
-                        onChange={onOrgUnitSelected}
-                    />
-                </div>
-                <>
-                    {loadingTeiList && (
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <>
+            <div>
+                <Card size='small' className='my-shadow'>
+                    <div style={{ maxWidth: '500px' }}>
+                        <div style={{ marginBottom: '5px' }}>Unités d'organisation</div>
+                        <OrganisationUnitsTree
+                            meOrgUnitId={me?.organisationUnits[0]?.id}
+                            orgUnits={organisationUnits}
+                            currentOrgUnits={selectedOrganisationUnits}
+                            setCurrentOrgUnits={setSelectedOrganisationUnits}
+                            loadingOrganisationUnits={loadingOrganisationUnits}
+                            onChange={onOrgUnitSelected}
+                        />
+                    </div>
+                </Card>
+            </div>
+            {loadingTeiList && (
+                <div style={{ marginTop: '20px' }}>
+                    <Card size='small' className='my-shadow'>
+                        <div style={{ display: 'flex', alignItems: 'center', }}>
                             <CircularLoader small />
                             <span style={{ marginLeft: '20px' }}>Chargement...</span>
                         </div>
-                    )}
-                    {
-                        teisList.length > 0 && (
-                            <div style={{ marginTop: '20px' }}>
-                                <div style={{ fontWeight: 'bold' }}>Liste des Agents</div>
-                                <div>
-                                    <Table
-                                        columns={[
-                                            { title: '' },
-                                            { title: 'Nom' },
-                                            { title: 'Téléphone' }
-                                        ]}
-                                    />
-                                </div>
-                            </div>
-                        )
-                    }
-                </>
-            </Card>
-        </div>
+                    </Card>
+                </div>
+            )}
+            {
+                teisList.length > 0 && (
+                    <div style={{ marginTop: '10px' }}>
+                        <Card size='small' className='my-shadow'>
+                            <>
+                                {
+                                    teisList.length > 0 && (
+                                        <div style={{ marginTop: '20px' }}>
+                                            <div style={{ fontWeight: 'bold' }}>Liste des Agents</div>
+                                            <div>
+                                                <Table
+                                                    dataSource={
+                                                        teisList.map(tei => {
+                                                            console.log("teee: , ", tei)
+                                                            let payload = { tei }
+                                                            for (let att of selectedProgram.attributesToDisplay) {
+                                                                for (let teiAttr of tei.attributes) {
+                                                                    if (att.id === teiAttr.attribute) {
+                                                                        payload[`${att.displayName}`] = teiAttr.value
+                                                                    }
+                                                                }
+                                                            }
+                                                            return payload
+                                                        })
+                                                    }
+                                                    columns={[
+                                                        {
+                                                            title: '', dataIndex: 'tei', render: value => () => (
+                                                                <Checkbox />
+                                                            )
+                                                        },
+                                                        ...selectedProgram.attributesToDisplay.map(at => ({ title: at.displayName, dataIndex: at.displayName }))
+                                                    ]}
+                                                />
+                                            </div>
+                                        </div>
+                                    )
+                                }
+                            </>
+                        </Card>
+                    </div>
+                )
+            }
+
+            {
+
+            }
+
+        </>
     )
 
     const RenderStepsContent = () => <>
         {
             selectedStep === 0 && (
-                <>
+                <> {console.log("selected program : ", selectedProgram)}
                     <Row gutter={[12, 12]}>
                         {selectedProgram && (
                             <Col md={24}>
@@ -2471,7 +2504,7 @@ const Supervision = ({ me }) => {
                             {selectedProgram && RenderDataElementConfigContent()}
                         </Col>
                         <Col sm={24} md={16}>
-                            {selectedProgram && selectedSupervisionType === TYPE_SUPERVISION_AGENT && RenderAgentConfigList()}
+                            {selectedProgram && selectedSupervisionType === TYPE_SUPERVISION_AGENT && selectedProgram.attributesToDisplay?.length > 0 && RenderAgentConfigList()}
                             {selectedProgram && RenderDataElementConfigList()}
                         </Col>
                     </Row>
