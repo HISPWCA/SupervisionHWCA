@@ -90,7 +90,7 @@ const Supervision = ({ me }) => {
     const [selectedIndicator, setSelectedIndicator] = useState(null)
     const [selectedMetaDatas, setSelectedMetaDatas] = useState([])
     const [selectedOrganisationUnitInd, setSelectedOrganisationUnitInd] = useState(null)
-    const [selectedTEIs, setSelectedTEIs] = useState([])
+    const [selectedAgents, setSelectedAgents] = useState([])
 
     const [inputMeilleur, setInputMeilleur] = useState(0)
     const [inputMauvais, setInputMauvais] = useState(0)
@@ -672,18 +672,10 @@ const Supervision = ({ me }) => {
                                     const currentSUP = newSupervisorsList[j]
                                     if (currentDE && currentSUP && !newDataValues.map(dv => dv.dataElement).includes(currentDE.id)) {
 
-                                        // if (i === payload.fieldConfig?.supervisor?.dataElements?.length - 1) {
-                                        //     newDataValues.push({
-                                        //         dataElement: currentDE.id,
-                                        //         value: `${currentSUP},${newSupervisorsList?.join(',')}`
-                                        //     })
-                                        // } else {
                                         newDataValues.push({
                                             dataElement: currentDE.id,
                                             value: currentSUP
                                         })
-                                        // }
-
                                     }
                                 }
                             }
@@ -700,16 +692,6 @@ const Supervision = ({ me }) => {
                                     const currentDE = payload.fieldConfig?.supervisor?.dataElements[i]
                                     const currentSUP = newSupervisorsList[j]
                                     if (currentDE && currentSUP && !newDataValues.map(dv => dv.dataElement).includes(currentDE.id)) {
-
-                                        // if (i === newSupervisorsList?.length - 1) {
-                                        //     newDataValues.push({
-                                        //         dataElement: currentDE.id,
-                                        //         value: `${currentSUP},${newSupervisorsList?.join(',')}`
-                                        //     })
-                                        // } else {
-
-                                        // }
-
                                         newDataValues.push({
                                             dataElement: currentDE.id,
                                             value: currentSUP
@@ -733,7 +715,7 @@ const Supervision = ({ me }) => {
 
             await createEvents({ events: newEventsList })
 
-            const currentTEI = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}/${tei_id}?program=${payload.program}`)
+            const currentTEI = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}/${tei_id}?fields=*`)
             return currentTEI.data
 
         } catch (err) {
@@ -1128,7 +1110,15 @@ const Supervision = ({ me }) => {
                         program: item.program?.id,
                         fieldConfig: item.fieldConfig
                     }
-                    const createdTEIObject = await generateTeiWithEnrollmentWithEvents(payload)
+
+                    let createdTEIObject = null
+
+                    if (selectedSupervisionType === TYPE_SUPERVISION_AGENT) {
+                        createdTEIObject = await generateEventsForAgent(payload)
+                    } else {
+                        createdTEIObject = await generateTeiWithEnrollmentWithEvents(payload)
+                    }
+
                     if (createdTEIObject) {
                         supervisionsList.push({
                             ...item,
@@ -1202,6 +1192,156 @@ const Supervision = ({ me }) => {
         }
     }
 
+    const generateEventsForAgent = async (payload) => {
+        try {
+            const existing_tei_route = `${TRACKED_ENTITY_INSTANCES_ROUTE}/${payload.trackedEntityInstance}?fields=trackedEntityInstance,enrollments[*]`
+            const existing_tei_response = await axios.get(existing_tei_route)
+            const existing_tei = existing_tei_response.data
+
+            if (!existing_tei || !existing_tei.enrollments[0])
+                throw new Error("Impossible de trouver cet Agent !")
+
+            const availableProgramStages = []
+            const newEventsList = []
+
+            //  Récuperation dans une list les programmes stage
+            for (let mapping of mappingConfigs) {
+                if (!availableProgramStages.includes(mapping.programStage?.id)) {
+                    availableProgramStages.push(mapping.programStage.id)
+                }
+            }
+
+            if (payload.fieldConfig?.supervisor?.programStage?.id) {
+                if (!availableProgramStages.includes(payload.fieldConfig?.supervisor?.programStage?.id)) {
+                    availableProgramStages.push(payload.fieldConfig?.supervisor?.programStage?.id)
+                }
+            }
+
+            for (let stage of availableProgramStages) {
+                const eventPayload = {
+                    eventDate: payload.period ? dayjs(payload.period).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
+                    program: existing_tei.enrollments[0].program,
+                    orgUnit: existing_tei.enrollments[0].orgUnit,
+                    enrollment: existing_tei.enrollments[0].enrollment,
+                    programStage: stage,
+                    trackedEntityInstance: existing_tei.enrollments[0].trackedEntityInstance,
+                    dataValues: []
+                }
+
+                if (mappingConfigs?.length > 0) {
+                    eventPayload.status = 'ACTIVE'
+                    eventPayload.eventDate = payload.period ? dayjs(payload.period).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')
+                    eventPayload.dueDate = payload.period ? dayjs(payload.period).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')
+                    eventPayload.dataValues = mappingConfigs.filter(ev => ev.programStage?.id === stage)
+                        .map(ev => ({
+                            dataElement: ev.dataElement?.id,
+                            value: ev.indicator?.displayName
+                        }))
+                } else {
+                    eventPayload.status = 'SCHEDULE'
+                    eventPayload.dueDate = payload.period ? dayjs(payload.period).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')
+                }
+
+                // Ajoute des dataValues superviseurs
+                if (payload.fieldConfig?.supervisor?.programStage?.id === stage && payload.fieldConfig?.supervisor?.dataElements?.length > 0) {
+                    const newDataValues = []
+
+                    /*
+                    * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son INFÉRIEUR au nombres de superviseurs sélectionnés
+                    */
+
+                    const newSupervisorsList = [...payload.supervisors?.map(s => s.displayName), ...payload.otherSupervisors]
+
+                    if (payload.fieldConfig?.supervisor?.dataElements?.length < newSupervisorsList?.length) {
+                        const supervisorArrayCurrent = newSupervisorsList?.slice(0, payload.fieldConfig?.supervisor?.dataElements?.length)
+                        const supervisorArraylast = newSupervisorsList?.slice(payload.fieldConfig?.supervisor?.dataElements?.length)
+
+                        for (let i = 0; i < payload.fieldConfig?.supervisor?.dataElements?.length; i++) {
+                            for (let j = 0; j < supervisorArrayCurrent.length; j++) {
+                                if (i === j) {
+                                    const currentDE = payload.fieldConfig?.supervisor?.dataElements[i]
+                                    const currentSUP = supervisorArrayCurrent[j]
+                                    if (currentDE && currentSUP && !newDataValues.map(dv => dv.dataElement).includes(currentDE.id)) {
+
+                                        if (i === payload.fieldConfig?.supervisor?.dataElements?.length - 1) {
+                                            newDataValues.push({
+                                                dataElement: currentDE.id,
+                                                value: `${currentSUP},${supervisorArraylast?.join(',')}`
+                                            })
+                                        } else {
+                                            newDataValues.push({
+                                                dataElement: currentDE.id,
+                                                value: currentSUP
+                                            })
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    /*
+                   * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son EGALE au nombres de superviseurs sélectionnés
+                   */
+                    if (payload.fieldConfig?.supervisor?.dataElements?.length === newSupervisorsList?.length) {
+                        for (let i = 0; i < payload.fieldConfig?.supervisor?.dataElements?.length; i++) {
+                            for (let j = 0; j < newSupervisorsList.length; j++) {
+                                if (i === j) {
+                                    const currentDE = payload.fieldConfig?.supervisor?.dataElements[i]
+                                    const currentSUP = newSupervisorsList[j]
+                                    if (currentDE && currentSUP && !newDataValues.map(dv => dv.dataElement).includes(currentDE.id)) {
+                                        newDataValues.push({
+                                            dataElement: currentDE.id,
+                                            value: currentSUP
+                                        })
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    /*
+                  * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son SUPERIEUR au nombres de superviseurs sélectionnés
+                  */
+                    if (payload.fieldConfig?.supervisor?.dataElements?.length > newSupervisorsList?.length) {
+                        for (let i = 0; i < payload.fieldConfig?.supervisor?.dataElements?.length; i++) {
+                            for (let j = 0; j < newSupervisorsList?.length; j++) {
+                                if (i === j) {
+                                    const currentDE = payload.fieldConfig?.supervisor?.dataElements[i]
+                                    const currentSUP = newSupervisorsList[j]
+                                    if (currentDE && currentSUP && !newDataValues.map(dv => dv.dataElement).includes(currentDE.id)) {
+                                        newDataValues.push({
+                                            dataElement: currentDE.id,
+                                            value: currentSUP
+                                        })
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (newDataValues.length > 0) {
+                        eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValues]
+                    }
+                }
+
+                if (!newEventsList.map(ev => ev.programStage).includes(stage)) {
+                    newEventsList.push(eventPayload)
+                }
+            }
+
+            await createEvents({ events: newEventsList })
+
+            const currentTEI = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}/${tei_id}?fields=*`)
+            return currentTEI.data
+
+        } catch (err) {
+            throw err
+        }
+    }
+
     const saveSupervisionAsEnrollmentStrategy = async (inputFieldsList) => {
         try {
             if (inputFieldsList.length > 0) {
@@ -1251,6 +1391,7 @@ const Supervision = ({ me }) => {
         setIsNewMappingMode(false)
         setMappingConfigs([])
         setProgramStages([])
+        setSelectedAgents([])
         setSelectedStep(0)
         setSelectedSupervisionType(null)
         setSelectedProgram(null)
@@ -1282,14 +1423,18 @@ const Supervision = ({ me }) => {
         try {
             setLoadingSupervisionPlanification(true)
 
-            if (selectedProgram.generationType === TYPE_GENERATION_AS_TEI)
+            if (selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT && selectedProgram.generationType === TYPE_GENERATION_AS_TEI)
                 await saveSupervisionAsTEIStrategy(inputFields)
 
-            if (selectedProgram.generationType === TYPE_GENERATION_AS_ENROLMENT)
+            if (selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT && selectedProgram.generationType === TYPE_GENERATION_AS_ENROLMENT)
                 await saveSupervisionAsEnrollmentStrategy(inputFields)
 
-            if (selectedProgram.generationType === TYPE_GENERATION_AS_EVENT)
+            if (selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT && selectedProgram.generationType === TYPE_GENERATION_AS_EVENT)
                 await saveSupervisionAsEventStrategy(inputFields)
+
+            if (selectedSupervisionType === TYPE_SUPERVISION_AGENT && selectedProgram.generationType === TYPE_GENERATION_AS_EVENT)
+                await saveSupervisionAsEventStrategy(inputFields)
+
 
             setLoadingSupervisionPlanification(false)
             setNotification({ show: true, message: 'Planification effectuée avec succès !', type: NOTIFICATON_SUCCESS })
@@ -1778,11 +1923,156 @@ const Supervision = ({ me }) => {
                                                 </Col>
                                             )
                                         }
+                                    </Row>
+                                </div>
+                            </Card>
+                        </Col>
+                    ))
+                }
+            </Row>
+        </div>
+    )
 
-                                        {/* <Col md={24}>
-                                            <Divider style={{ margin: '10px' }} />
-                                            <Button icon={<FiSave style={{ fontSize: '18px', color: '#fff' }} />} primary>Enrégistrer la supervision</Button>
-                                        </Col> */}
+
+    const handleCloseAgentForm = (ag) => {
+        setSelectedAgents(selectedAgents.filter(agent => agent.trackedEntityInstance !== ag.trackedEntityInstance))
+        setInputFields(inputFields.filter(agent => agent.trackedEntityInstance !== ag.id))
+    }
+    const RenderAgentsForm = (colMd = 6) => (
+        <div>
+            <Row gutter={[10, 10]}>
+                {
+                    selectedAgents.map((agent, index) => (
+                        <Col md={colMd} sm={24} key={index}>
+                            <Card bodyStyle={{ padding: '0px' }} className="my-shadow" size='small'>
+                                <div style={{ background: GREEN, color: '#FFF', fontWeight: 'bold', padding: '10px', position: 'relative' }}>
+                                    <span>
+                                        Formulaire de planification sur
+                                    </span>
+
+                                    <span
+                                        style={{
+                                            marginLeft: '20px',
+                                            background: '#fff',
+                                            color: GREEN,
+                                            fontWeight: 'bold',
+                                            padding: '5px',
+                                            borderRadius: '10px',
+                                        }}
+                                    >
+                                        {
+                                            agent.attributes?.find(att => att.attribute === selectedProgram.attributesToDisplay?.[0]?.id)?.value
+                                        }
+                                    </span>
+
+                                    <span className="delete-sup"  >
+                                        <Popconfirm
+                                            title="Suppression"
+                                            description="Voulez-vous vraiment ce formularie ? "
+                                            icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+                                            onConfirm={() => handleCloseAgentForm(agent)}
+                                        >
+                                            <span style={{ padding: '5px' }}>X</span>
+                                        </Popconfirm>
+                                    </span>
+                                </div>
+                                <div style={{ padding: '10px' }}>
+                                    <Row gutter={[10, 10]}>
+                                        <Col sm={24} md={24}>
+                                            <div>
+                                                <div style={{ marginBottom: '5px' }}>Période</div>
+                                                <DatePicker
+                                                    style={{ width: '100%' }}
+                                                    placeholder='Période'
+                                                    value={inputFields[index]?.period}
+                                                    onChange={period => handleInputPeriod(period, index)}
+                                                />
+                                            </div>
+                                        </Col>
+                                        {
+                                            0 > 1 && <Col sm={24} md={12}>
+                                                <div>
+                                                    <div style={{ marginBottom: '5px' }}>Libellé</div>
+                                                    <Input
+                                                        placeholder="Libellé"
+                                                        style={{ width: '100%' }}
+                                                        value={inputFields[index]?.libelle}
+                                                        onChange={event => handleInputLibelle(event, index)}
+                                                    />
+                                                </div>
+                                            </Col>
+                                        }
+                                        <Col sm={24} md={24}>
+                                            <div>
+                                                <div style={{ marginBottom: '5px' }}>Superviseurs</div>
+                                                <Select
+                                                    placeholder="Superviseurs"
+                                                    style={{ width: '100%' }}
+                                                    loading={loadingUsers}
+                                                    disabled={loadingUsers}
+                                                    value={inputFields[index]?.supervisors?.map(sup => sup.id)}
+                                                    onChange={(values) => handleInputSupervisors(values, index)}
+                                                    mode='multiple'
+                                                    optionFilterProp='label'
+                                                    showSearch
+                                                    options={users.map(user => ({ label: user.displayName, value: user.id }))}
+                                                />
+                                            </div>
+                                        </Col>
+                                        <Col md={24}>
+                                            <div>
+                                                <div style={{ marginBottom: '5px' }}>Autre superviseurs</div>
+                                                <Row gutter={[10, 10]}>
+                                                    <Col md={18} sm={24}>
+                                                        <Input
+                                                            placeholder='Autre superviseur'
+                                                            value={inputFields[index]?.inputOtherSupervisor}
+                                                            onChange={event => handleInputOtherSupervisor(event, index)}
+                                                        />
+                                                    </Col>
+                                                    <Col flex='auto' style={{ textAlign: 'right' }}>
+                                                        <Button
+                                                            primary
+                                                            onClick={() => handleInputAddOtherSupervisors(index)}
+                                                            disabled={
+                                                                inputFields[index]?.inputOtherSupervisor?.trim() && !inputFields[index]?.otherSupervisorList?.includes(inputFields[index]?.inputOtherSupervisor?.trim()) ? false : true
+                                                            }
+                                                        >+ Ajouter </Button>
+                                                    </Col>
+                                                </Row>
+                                            </div>
+                                        </Col>
+
+                                        {
+                                            inputFields[index]?.otherSupervisors?.length > 0 && (
+                                                <Col md={24}>
+                                                    <div style={{ marginTop: '10px' }}>
+                                                        <List
+                                                            size='small'
+                                                            bordered
+                                                            dataSource={inputFields[index]?.otherSupervisors}
+                                                            renderItem={(item) => (
+                                                                <List.Item style={{ padding: '2px 10px' }}>
+                                                                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                                                                        <div>{item}</div>
+                                                                        <div>
+                                                                            <Popconfirm
+                                                                                title="Suppression"
+                                                                                description="Voulez-vous vraiment ce superviseur ? "
+                                                                                icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+                                                                                onConfirm={() => handleDeleteOtherSupervisor(item, index)}
+                                                                            >
+                                                                                <RiDeleteBinLine style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }} />
+                                                                            </Popconfirm>
+                                                                        </div>
+                                                                    </div>
+                                                                </List.Item>
+                                                            )}
+                                                        />
+                                                    </div>
+                                                </Col>
+                                            )
+                                        }
                                     </Row>
                                 </div>
                             </Card>
@@ -2385,10 +2675,9 @@ const Supervision = ({ me }) => {
 
     const loadTEIs = async (orgUnitId) => {
         try {
-            console.log("selected program : ", selectedProgram)
             if (selectedProgram && orgUnitId) {
                 setLoadingTeiList(true)
-                const route = `${TRACKED_ENTITY_INSTANCES_ROUTE}.json?ou=${orgUnitId}&ouMode=SELECTED&program=${selectedProgram.program?.id}`
+                const route = `${TRACKED_ENTITY_INSTANCES_ROUTE}.json?ou=${orgUnitId}&ouMode=SELECTED&program=${selectedProgram.program?.id}&fields=trackedEntityInstance,attributes,orgUnit,trackedEntityType,enrollments=[enrollment,orgUnit,orgUnitName,status,program,enrollmentDate]`
                 const response = await axios.get(route)
                 setTeisList(response.data.trackedEntityInstances)
                 setLoadingTeiList(false)
@@ -2401,6 +2690,16 @@ const Supervision = ({ me }) => {
 
     const onOrgUnitSelected = (value) => {
         return loadTEIs(value.id)
+    }
+
+
+    const handleSelectCheckboxAgent = (value) => {
+        if (selectedAgents.map(ag => ag.trackedEntityInstance).includes(value.trackedEntityInstance)) {
+            setSelectedAgents(selectedAgents.filter(ag => ag.trackedEntityInstance !== value.trackedEntityInstance))
+            setInputFields(inputFields.filter(o => o.trackedEntityInstance !== value.trackedEntityInstance))
+        } else {
+            setSelectedAgents([...selectedAgents, teisList.find(tei => tei.trackedEntityInstance === value.trackedEntityInstance)])
+        }
     }
 
     const RenderAgentConfigList = () => (
@@ -2441,10 +2740,12 @@ const Supervision = ({ me }) => {
                                             <div style={{ fontWeight: 'bold' }}>Liste des Agents</div>
                                             <div>
                                                 <Table
+                                                    size='small'
                                                     dataSource={
                                                         teisList.map(tei => {
-                                                            console.log("teee: , ", tei)
-                                                            let payload = { tei }
+                                                            let payload = {
+                                                                tei
+                                                            }
                                                             for (let att of selectedProgram.attributesToDisplay) {
                                                                 for (let teiAttr of tei.attributes) {
                                                                     if (att.id === teiAttr.attribute) {
@@ -2457,11 +2758,13 @@ const Supervision = ({ me }) => {
                                                     }
                                                     columns={[
                                                         {
-                                                            title: '', dataIndex: 'tei', render: value => () => (
-                                                                <Checkbox />
+                                                            title: 'Actions', width: '100px', dataIndex: 'tei', key: 'action', render: value => (
+                                                                <div>
+                                                                    <AntCheckbox onChange={() => handleSelectCheckboxAgent(value)} checked={selectedAgents.map(ag => ag.trackedEntityInstance).includes(value.trackedEntityInstance)} />
+                                                                </div>
                                                             )
                                                         },
-                                                        ...selectedProgram.attributesToDisplay.map(at => ({ title: at.displayName, dataIndex: at.displayName }))
+                                                        ...selectedProgram.attributesToDisplay.map(at => ({ title: at.displayName, dataIndex: at.displayName, key: at.displayName }))
                                                     ]}
                                                 />
                                             </div>
@@ -2484,7 +2787,7 @@ const Supervision = ({ me }) => {
     const RenderStepsContent = () => <>
         {
             selectedStep === 0 && (
-                <> {console.log("selected program : ", selectedProgram)}
+                <>
                     <Row gutter={[12, 12]}>
                         {selectedProgram && (
                             <Col md={24}>
@@ -2493,7 +2796,9 @@ const Supervision = ({ me }) => {
                                         <Button primary small disabled={selectedStep === 0 ? true : false} icon={<BsArrowLeft style={{ color: '#fff', fontSize: '18px' }} />} onClick={() => setSelectedStep(selectedStep - 1)}>Précédent</Button>
                                     </div>
                                     <div style={{ marginLeft: '10px' }}>
-                                        <Button icon={<BsArrowRight style={{ color: '#fff', fontSize: '18px' }} />} primary small onClick={() => setSelectedStep(selectedStep + 1)}>Suivant</Button>
+                                        <Button
+                                            disabled={selectedSupervisionType === TYPE_SUPERVISION_AGENT ? selectedAgents.length > 0 ? false : true : false}
+                                            icon={<BsArrowRight style={{ color: '#fff', fontSize: '18px' }} />} primary small onClick={() => setSelectedStep(selectedStep + 1)}>Suivant</Button>
                                     </div>
                                 </div>
                             </Col>
@@ -2528,19 +2833,32 @@ const Supervision = ({ me }) => {
                                 </div>
                             </Col>
                         )}
-                        <Col sm={24} md={8}>
-                            {selectedProgram && RenderSupervisionPlanificationType()}
-                            {selectedPlanificationType === INDICATOR && RenderSupervisionPlanificationIndicatorContent()}
-                            {selectedPlanificationType === ORGANISATION_UNIT && RenderSupervisionPlanificationOrganisationUnitContent()}
-                        </Col>
-                        <Col sm={24} md={16}>
-                            {RenderPlanificationForm()}
-                        </Col>
 
                         {
-                            selectedPlanificationType === INDICATOR && selectedIndicators.length > 0 &&
+                            selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT && (
+                                <Col sm={24} md={8}>
+                                    {selectedProgram && RenderSupervisionPlanificationType()}
+                                    {selectedPlanificationType === INDICATOR && RenderSupervisionPlanificationIndicatorContent()}
+                                    {selectedPlanificationType === ORGANISATION_UNIT && RenderSupervisionPlanificationOrganisationUnitContent()}
+                                </Col>
+                            )
+                        }
+
+                        {
+                            selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT && (
+                                <Col sm={24} md={16}>
+                                    {RenderPlanificationForm()}
+                                </Col>
+                            )
+                        }
+
+                        {
+                            selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
+                            selectedPlanificationType === INDICATOR &&
+                            selectedIndicators.length > 0 &&
                             selectedOrganisationUnitInd &&
-                            selectedOrganisationUnitGroup && selectedPeriod && (
+                            selectedOrganisationUnitGroup &&
+                            selectedPeriod && (
                                 <Col md={24}>
                                     <Card size='small' className='my-shadow'>
                                         <div style={{ textAlign: 'center' }}>
@@ -2561,9 +2879,12 @@ const Supervision = ({ me }) => {
                         }
 
                         {
-                            selectedPlanificationType === INDICATOR && selectedIndicators.length > 0 &&
+                            selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
+                            selectedPlanificationType === INDICATOR &&
+                            selectedIndicators.length > 0 &&
                             selectedOrganisationUnitInd &&
-                            selectedOrganisationUnitGroup && selectedPeriod &&
+                            selectedOrganisationUnitGroup &&
+                            selectedPeriod &&
                             analyticIndicatorResults.length > 0 &&
                             [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].length >= parseInt(inputMeilleur || 0) + parseInt(inputMauvais || 0) &&
                             (
@@ -2572,13 +2893,21 @@ const Supervision = ({ me }) => {
                         }
 
                         {
-                            selectedPlanificationType === INDICATOR && selectedIndicators.length > 0 && selectedOrganisationUnits.length > 0 && (
+                            selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT && selectedPlanificationType === INDICATOR && selectedIndicators.length > 0 && selectedOrganisationUnits.length > 0 && (
                                 <Col md={24}>
                                     {RenderOrganisationUnitForm(8)}
                                 </Col>
                             )
                         }
 
+                        {
+                            selectedSupervisionType === TYPE_SUPERVISION_AGENT &&
+                            selectedAgents.length > 0 && (
+                                <Col sm={24} md={24}>
+                                    {RenderAgentsForm(6)}
+                                </Col>
+                            )
+                        }
 
                     </Row>
                 </>
@@ -2586,7 +2915,6 @@ const Supervision = ({ me }) => {
         }
 
     </>
-
 
     const RenderSupervisionForm = () => (
         <>
@@ -2598,27 +2926,58 @@ const Supervision = ({ me }) => {
 
     const initInputFields = () => {
         const newList = []
-        for (let org of selectedOrganisationUnits) {
-            if (inputFields.map(inp => inp.organisationUnit.id).includes(org.id)) {
-                newList.push(
-                    inputFields.find(inp => inp.organisationUnit.id === org.id)
-                )
-            } else {
-                newList.push(
-                    {
-                        organisationUnit: { id: org.id, displayName: org.displayName },
-                        program: { id: selectedProgram.program?.id, displayName: selectedProgram.program?.displayName },
-                        fieldConfig: selectedProgram.fieldConfig,
-                        generationType: selectedProgram.generationType,
-                        libelle: '',
-                        period: null,
-                        supervisors: [],
-                        otherSupervisors: [],
-                        inputOtherSupervisor: ''
-                    }
-                )
+
+        if (selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT && selectedOrganisationUnits && selectedOrganisationUnits?.length > 0) {
+            for (let org of selectedOrganisationUnits) {
+                if (inputFields.map(inp => inp.organisationUnit.id).includes(org.id)) {
+                    newList.push(
+                        inputFields.find(inp => inp.organisationUnit.id === org.id)
+                    )
+                } else {
+                    newList.push(
+                        {
+                            organisationUnit: { id: org.id, displayName: org.displayName },
+                            program: { id: selectedProgram.program?.id, displayName: selectedProgram.program?.displayName },
+                            fieldConfig: selectedProgram.fieldConfig,
+                            generationType: selectedProgram.generationType,
+                            libelle: '',
+                            period: null,
+                            supervisors: [],
+                            otherSupervisors: [],
+                            inputOtherSupervisor: ''
+                        }
+                    )
+                }
             }
         }
+
+        if (selectedSupervisionType === TYPE_SUPERVISION_AGENT && selectedAgents && selectedAgents?.length > 0) {
+            for (let ag of selectedAgents) {
+                if (inputFields.map(inp => inp.trackedEntityInstance).includes(ag.trackedEntityInstance)) {
+                    newList.push(
+                        inputFields.find(inp => inp.trackedEntityInstance === ag.trackedEntityInstance)
+                    )
+                } else {
+                    if (ag.enrollments?.length > 0) {
+                        newList.push(
+                            {
+                                organisationUnit: { id: ag.enrollments[0]?.orgUnit, displayName: ag.enrollments[0]?.orgUnitName },
+                                trackedEntityInstance: ag.enrollments[0]?.trackedEntityInstance,
+                                program: { id: selectedProgram.program?.id, displayName: selectedProgram.program?.displayName },
+                                fieldConfig: selectedProgram.fieldConfig,
+                                generationType: selectedProgram.generationType,
+                                libelle: '',
+                                period: null,
+                                supervisors: [],
+                                otherSupervisors: [],
+                                inputOtherSupervisor: ''
+                            }
+                        )
+                    }
+                }
+            }
+        }
+
         setInputFields(newList)
     }
 
@@ -2633,8 +2992,8 @@ const Supervision = ({ me }) => {
     }, [me])
 
     useEffect(() => {
-        selectedOrganisationUnits && selectedOrganisationUnits?.length > 0 && initInputFields()
-    }, [selectedOrganisationUnits])
+        initInputFields()
+    }, [selectedOrganisationUnits, selectedAgents])
 
     return (
         <>
