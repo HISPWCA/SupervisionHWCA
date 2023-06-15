@@ -1512,7 +1512,8 @@ const Supervision = ({ me }) => {
                     <div style={{ fontWeight: 'bold', padding: '10px', borderBottom: '1px solid #ccc' }}>Fiches de supervisions</div>
                     <div style={{ padding: '10px' }}>
                         {
-                            selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT
+                            selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
+                            dataStoreSupervisionConfigs
                                 .map((sup, index) => (
                                     <div key={index} className={`supervision-item ${selectedProgram?.id === sup.id ? 'active' : ''}`} onClick={() => handleClickSupervisionItem(sup)}>
                                         {sup.program?.displayName}
