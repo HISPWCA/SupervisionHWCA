@@ -2611,7 +2611,7 @@ const Supervision = ({ me }) => {
                 const route = `${TRACKED_ENTITY_INSTANCES_ROUTE}.json?ou=${orgUnitId}&ouMode=SELECTED&program=${selectedProgram.program?.id}&fields=trackedEntityInstance,attributes,orgUnit,trackedEntityType,enrollments=[enrollment,orgUnit,orgUnitName,status,program,enrollmentDate,trackedEntityInstance]`
                 const response = await axios.get(route)
                 setTeisList(response.data.trackedEntityInstances)
-                if (response.data.trackedEntityInstances?.length === 0 || !response.data.trackedEntityInstance) {
+                if (!response.data.trackedEntityInstances || response.data.trackedEntityInstances?.length === 0) {
                     setEmpty(true)
                 }
                 setLoadingTeiList(false)
@@ -2625,7 +2625,6 @@ const Supervision = ({ me }) => {
     const onOrgUnitSelected = (value) => {
         return loadTEIs(value.id)
     }
-
 
     const handleSelectCheckboxAgent = (value) => {
         if (selectedAgents.map(ag => ag.trackedEntityInstance).includes(value.trackedEntityInstance)) {
@@ -2719,7 +2718,7 @@ const Supervision = ({ me }) => {
                                 {
                                     isEmpty && (
                                         <div style={{ marginTop: '20px' }}>
-                                            <span style={{ fontWeight: 'bold', color: 'red' }}> Aucun Agent trouvé !</span>
+                                            <span style={{ fontWeight: 'bold', color: '#00000090' }}> Aucun Agent trouvé !</span>
                                         </div>
                                     )
                                 }
