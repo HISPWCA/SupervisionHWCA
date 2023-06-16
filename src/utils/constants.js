@@ -21,6 +21,7 @@ export const INDICATOR_GROUP = 'INDICATOR_GROUP'
 export const AGGREGATE_INDICATOR = 'AGGREGATE_INDICATOR'
 export const ORGANISATION_UNIT = 'ORGANISATION_UNIT'
 export const INDICATOR = 'INDICATOR'
+export const DESCENDANTS = 'DESCENDANTS'
 
 export const NOTIFICATON_CRITICAL = 'NOTIFICATON_CRITICAL'
 export const NOTIFICATON_SUCCESS = 'NOTIFICATON_SUCCESS'
@@ -39,6 +40,7 @@ export const NOTICE_BOX_WARNING = 'warning'
 export const NOTICE_BOX_VALID = 'valid'
 export const NOTICE_BOX_ERROR = 'error'
 export const NOTICE_BOX_DEFAULT = 'default'
+
 
 export const DAY = 'Day'
 export const WEEK = 'Week'

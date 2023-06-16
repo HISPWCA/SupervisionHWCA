@@ -4,17 +4,29 @@ import { Calendar, momentLocalizer } from 'react-big-calendar'
 import ReactEchart from 'echarts-for-react'
 import moment from 'moment'
 import axios from 'axios';
-import { ME_ROUTE, ORGANISATION_UNITS_ROUTE, USERS_ROUTE } from '../utils/api.routes'
+import { ORGANISATION_UNITS_ROUTE, TRACKED_ENTITY_INSTANCES_ROUTE, USERS_ROUTE } from '../utils/api.routes'
 import OrganisationUnitsTree from './OrganisationUnitsTree'
-import meStore from '../stores/meStore'
-import { PLANIFICATION_PAR_MOI, PLANIFICATION_PAR_TOUS, PLANIFICATION_PAR_UN_USER } from '../utils/constants'
-import usersStore from '../stores/usersStore'
-import dayjs from 'dayjs'
+import { DESCENDANTS, NOTICE_BOX_DEFAULT, NOTIFICATON_CRITICAL, PLANIFICATION_PAR_MOI, PLANIFICATION_PAR_TOUS, PLANIFICATION_PAR_UN_USER, TYPE_GENERATION_AS_ENROLMENT, TYPE_GENERATION_AS_EVENT, TYPE_GENERATION_AS_TEI } from '../utils/constants'
 import { Chart } from "react-google-charts"
 import MapView from './MapView'
 import { loadDataStore } from '../utils/functions'
 import { IoMdOpen } from 'react-icons/io'
 import { BLUE } from '../utils/couleurs'
+import { AiOutlineSearch } from 'react-icons/ai'
+
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import { MyNoticeBox } from './MyNoticeBox'
+import MyNotification from './MyNotification'
+import { Button } from '@dhis2/ui'
+const quarterOfYear = require('dayjs/plugin/quarterOfYear')
+const weekOfYear = require('dayjs/plugin/weekOfYear')
+
+dayjs.extend(weekOfYear)
+dayjs.extend(quarterOfYear)
+dayjs.extend(customParseFormat)
+
+
 
 
 const localizer = momentLocalizer(moment)
@@ -236,28 +248,33 @@ const events = [
     }
 ]
 
-export const Dashboard = () => {
+export const Dashboard = ({ me }) => {
 
     const [organisationUnits, setOrganisationUnits] = useState([])
-    const me = meStore(state => state.me)
-    const setMe = meStore(state => state.setMe)
-    const users = usersStore(state => state.users)
-    const setUsers = usersStore(state => state.setUsers)
+    const [users, setUsers] = useState([])
     const [dataStoreAnalyses, setDataStoreAnalyses] = useState([])
+    const [dataStoreSupervisionsConfigs, setDataStoreSupervisionsConfigs] = useState([])
     const [dataStoreSupervisionPlanifications, setDataStoreSupervisionPlanifications] = useState([])
     const [calendarEvents, setCalendarEvents] = useState([])
+    const [teiList, setTeiList] = useState([])
+    const [noticeBox, setNoticeBox] = useState({ show: false, message: null, title: null, type: NOTICE_BOX_DEFAULT })
+    const [notification, setNotification] = useState({ show: false, message: null, type: null })
 
     const [selectedOrganisationUnit, setSelectedOrganisationUnit] = useState(null)
     const [selectedPlanification, setSelectedPlanification] = useState(PLANIFICATION_PAR_MOI)
     const [selectedPeriod, setSelectedPeriod] = useState(dayjs(new Date()))
     const [selectedPlanificationUser, setSelectedPlanificationUser] = useState(null)
     const [selectedSupervisors, setSelectedSupervisors] = useState([])
+    const [selectedProgram, setSelectedProgram] = useState(null)
 
     const [loadingOrganisationUnits, setLoadingOrganisationUnits] = useState(false)
     const [loadingUsers, setLoadingUsers] = useState(false)
     const [loadingDataStoreAnalyses, setLoadingDataStoreAnalyses] = useState(false)
     const [loadingAnalyticsAnalysisConfigData, setLoadingAnalyticsAnalysisConfigData] = useState(false)
     const [loadingDataStoreSupervisionPlanifications, setLoadingDataStoreSupervisionPlanifications] = useState(false)
+    const [loadingDataStoreSupervisionsConfigs, setLoadingDataStoreSupervisionsConfigs] = useState(false)
+    const [loadingTeiList, setLoadingTeiList] = useState(false)
+
 
     const colors = ['#5470C6', '#EE6666']
 
@@ -382,50 +399,63 @@ export const Dashboard = () => {
     const loadOrganisationUnits = async () => {
         try {
             setLoadingOrganisationUnits(true)
-            const meResponse = await axios.get(`${ME_ROUTE},organisationUnits`)
-            const meData = meResponse.data
+            const response = await axios.get(ORGANISATION_UNITS_ROUTE)
+            const orgUnits = response.data.organisationUnits
+            const progs = await loadDataStoreSupervisionsConfigs()
 
-            const userOrganisationUnitId = meData.organisationUnits.length !== 0 && meData.organisationUnits[0].id
-            if (userOrganisationUnitId) {
-                const organisationUnitRequest = await axios.get(ORGANISATION_UNITS_ROUTE)
-                const organisationUnitResponse = organisationUnitRequest.data
+            setOrganisationUnits(orgUnits)
+            setSelectedPeriod(dayjs())
+            if (progs.length > 0) {
 
-                setOrganisationUnits(organisationUnitResponse.organisationUnits)
-                setLoadingOrganisationUnits(false)
-                setMe(meData)
-                loadUsers(userOrganisationUnitId)
+                const currentProgram = progs[0]
+                const currentOrgUnit = orgUnits.find(ou => ou.id === me?.organisationUnits?.[0]?.id)
+                const currentPeriod = dayjs()
+                const currentPlanification = PLANIFICATION_PAR_MOI
+
+                if (currentProgram) {
+                    setSelectedProgram(currentProgram)
+                    setSelectedOrganisationUnit(currentOrgUnit)
+                    setSelectedPeriod(currentPeriod)
+                    setSelectedPlanification(currentPlanification)
+                    loadTeisPlanifications(currentProgram.program.id, currentOrgUnit?.id, DESCENDANTS)
+                }
             }
+            loadUsers(me?.organisationUnits?.[0]?.id)
+            setLoadingOrganisationUnits(false)
         }
         catch (err) {
             console.log(err)
             setLoadingOrganisationUnits(false)
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
         }
     }
 
-    const loadAnalyticsAnalysisConfigData = (dx) => {
+
+    const loadTeisPlanifications = async (program_id, orgUnit_id, ouMode = DESCENDANTS) => {
         try {
-            setLoadingAnalyticsAnalysisConfigData(true)
-            const route = ``
-            const response =
-                setLoadingAnalyticsAnalysisConfigData(false)
+            setLoadingTeiList(true)
+            const response = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}.json?program=${program_id}&ou=${orgUnit_id}&ouMode=${ouMode}&order=created:DESC&fields=trackedEntityInstance,created,program,orgUnit,enrollments[*]`)
+            const trackedEntityInstances = response.data.trackedEntityInstances
+            setTeiList(trackedEntityInstances)
+            setLoadingTeiList(false)
+        } catch (err) {
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
+            setLoadingTeiList(false)
+        }
+    }
+
+    const loadDataStoreSupervisionsConfigs = async () => {
+        try {
+            setLoadingDataStoreSupervisionsConfigs(true)
+            const response = await loadDataStore(process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY, null, null, null)
+
+            setDataStoreSupervisionsConfigs(response)
+            setLoadingDataStoreSupervisionsConfigs(false)
+            return response
         } catch (err) {
             console.log(err)
-            setLoadingAnalyticsAnalysisConfigData(false)
-        }
-    }
-
-    const loadDataStoreAnalyses = async () => {
-        try {
-            setLoadingDataStoreAnalyses(true)
-            const response = await loadDataStore(process.env.REACT_APP_ANALYSES_CONFIG_KEY, null, null, null)
-            if (response.length > 0) {
-                // await loadAnalyticsAnalysisConfigData()
-            }
-            setLoadingDataStoreAnalyses(false)
-        }
-        catch (err) {
-            console.log(err)
-            setLoadingDataStoreAnalyses(false)
+            setLoadingDataStoreSupervisionsConfigs(false)
+            throw err
         }
     }
 
@@ -490,7 +520,6 @@ export const Dashboard = () => {
 
 
     const handleSelectPlanification = (value) => {
-        console.log("Value:  ", value)
         setSelectedPlanification(value)
     }
 
@@ -502,16 +531,111 @@ export const Dashboard = () => {
 
     const handleSelectPlanificationUser = value => setSelectedPlanificationUser(users.find(u => u.id === value))
 
+    const filterAndGetPlanfications = () => teiList.reduce((prev, current) => {
+        if (selectedProgram.generationType === TYPE_GENERATION_AS_TEI) {
+            if (
+                selectedPeriod &&
+                dayjs(current.created).format('YYYYMM') === dayjs(selectedPeriod).format('YYYYMM') &&
+                current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)
+            ) {
+                return [
+                    ...prev,
+                    {
+                        trackedEntityInstance: current.trackedEntityInstance,
+                        period: current.created,
+                        enrollment: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.enrollment,
+                        program: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.program,
+                        orgUnit: current.orgUnit,
+                        storedBy: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.storedBy
+                    }
+                ]
+            }
+        }
+
+        if (selectedProgram.generationType === TYPE_GENERATION_AS_ENROLMENT) {
+            if (selectedPeriod) {
+                const enrollmentsList = []
+                for (let en of current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)) {
+                    if (dayjs(en.enrollmentDate).format('YYYYMM') === dayjs(selectedPeriod).format('YYYYMM')) {
+                        enrollmentsList.push(en)
+                    }
+                }
+                return [
+                    ...prev,
+                    ...enrollmentsList.map(en => ({
+                        trackedEntityInstance: en.trackedEntityInstance,
+                        period: en.enrollmentDate,
+                        enrollment: en.enrollment,
+                        program: en.program,
+                        orgUnit: current.orgUnit,
+                        storedBy: en.storedBy
+                    }))
+                ]
+            }
+        }
+
+        if (selectedProgram.generationType === TYPE_GENERATION_AS_EVENT) {
+            if (selectedPeriod) {
+                const eventList = []
+                const currentEnrollment = current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]
+                for (let event of currentEnrollment?.events || []) {
+                    if (dayjs(event.eventDate).format('YYYYMM') === dayjs(selectedPeriod).format('YYYYMM')) {
+                        eventList.push(event)
+                    }
+                }
+                return [
+                    ...prev,
+                    ...eventList.map(ev => ({
+                        trackedEntityInstance: currentEnrollment?.trackedEntityInstance,
+                        period: ev.eventDate,
+                        enrollment: currentEnrollment?.enrollment,
+                        program: currentEnrollment?.enrollments,
+                        orgUnit: currentEnrollment?.orgUnit,
+                        storedBy: ev.storedBy
+                    }))
+                ]
+            }
+        }
+
+        return prev
+    }, [])
+        .filter(planification => {
+            if (selectedPlanification === PLANIFICATION_PAR_MOI)
+                return me?.username?.toLowerCase() === planification.storedBy?.toLowerCase()
+
+            if (selectedPlanification === PLANIFICATION_PAR_TOUS)
+                return true
+
+            if (selectedPlanification === PLANIFICATION_PAR_UN_USER)
+                return false
+
+            return true
+        })
+
+
+    const getFiveLastPlanifications = () => filterAndGetPlanfications().slice(0, 5).map((planification, index) => ({
+        key: index,
+        nom: dayjs(planification.period).format('YYYY-MM-DD HH:mm:ss'),
+        tei: planification
+    }))
+
+    const getCalendarEvents = () => filterAndGetPlanfications().map((planification, index) => ({
+        id: index,
+        title: dayjs(planification.period).format('YYYY-MM-DD HH:mm:ss'),
+        allDay: true,
+        start: dayjs(planification.period).format('YYYY-MM-DD HH:mm:ss'),
+        end: dayjs(planification.period).format('YYYY-MM-DD HH:mm:ss'),
+    }))
+
     const RenderCalendar = () => (
-        <Col md={12} sm={24}>
+        <Col md={12} sm={24}> {console.log("tei: ", filterAndGetPlanfications())}
             <div style={{ backgroundColor: '#fff', padding: '10px', borderRadius: '8px', marginBottom: '2px' }} className="my-shadow">
                 <div>
                     <Calendar
                         localizer={localizer}
-                        events={events}
+                        events={getCalendarEvents()}
                         startAccessor="start"
                         endAccessor="end"
-                        // style={{ height: '820px' }}
                         style={{ height: '445px' }}
                         selectable
                         onSelectEvent={event => alert(JSON.stringify(event, null, 4))}
@@ -550,21 +674,16 @@ export const Dashboard = () => {
                             size='small'
                             columns={
                                 [
-                                    { title: 'Nom', key: 'displayName', dataIndex: 'displayName' },
-                                    // { title: 'Description', key: 'description', dataIndex: 'description' },
-                                    { title: 'Status', key: 'status', dataIndex: 'status', width: '100px' },
-                                    { title: 'Actions', key: 'action', width: '50px', dataIndex: 'action', render: value => <div style={{ textAlign: 'center' }}><IoMdOpen title='Ouvrir' style={{ fontSize: '18px', color: BLUE, cursor: 'pointer' }} /></div> }
+                                    { title: 'Nom', key: 'nom', dataIndex: 'nom' },
+                                    // { title: 'Status', key: 'status', dataIndex: 'status', width: '100px' },
+                                    {
+                                        title: 'Actions', key: 'action', width: '50px', dataIndex: 'tei', render: tei => <div style={{ textAlign: 'center' }}>
+                                            <IoMdOpen title='Ouvrir' onClick={() => alert(JSON.stringify(tei, null, 5))} style={{ fontSize: '18px', color: BLUE, cursor: 'pointer' }} />
+                                        </div>
+                                    }
                                 ]
                             }
-                            dataSource={
-                                [
-                                    { id: 1, displayName: 'Supervision 1 ', description: 'Test, nouvelle description de la supervision 1', action: 1, status: 'En attente' },
-                                    { id: 2, displayName: 'Supervision 2 ', description: 'Test, nouvelle description de la supervision 2', action: 2, status: 'Validée' },
-                                    { id: 3, displayName: 'Supervision 3 ', description: 'Test, nouvelle description de la supervision 3', action: 3, status: 'Non Validée' },
-                                    { id: 4, displayName: 'Supervision 4 ', description: 'Test, nouvelle description de la supervision 4', action: 4, status: 'Validée' },
-                                    { id: 5, displayName: 'Supervision 5 ', description: 'Test, nouvelle description de la supervision 5', action: 5, status: 'En attente' }
-                                ]
-                            }
+                            dataSource={getFiveLastPlanifications()}
                             pagination={false}
                             style={{ height: '100%' }}
                         />
@@ -582,33 +701,57 @@ export const Dashboard = () => {
         </Col>
     )
 
+    const handleSearch = () => {
+        if (selectedPeriod && selectedOrganisationUnit && selectedProgram) {
+            loadTeisPlanifications(selectedProgram.program?.id, selectedOrganisationUnit.id)
+        }
+    }
+
+    const handleSelectProgram = (value) => {
+        setTeiList([])
+        setSelectedProgram(dataStoreSupervisionsConfigs.find(d => d.program?.id === value))
+    }
+
     const RenderFilters = () => (
         <>
             <div className='my-shadow' style={{ backgroundColor: '#fff', padding: '10px', marginTop: '5px', marginBottom: '20px', borderRadius: '8px' }}>
                 <Row gutter={[8, 8]} align='middle'>
+                    <Col sm={24} md={4}>
+                        <div style={{ marginBottom: '2px' }}>Programme</div>
+                        <Select
+                            placeholder="Programme"
+                            onChange={handleSelectProgram}
+                            value={selectedProgram?.program?.id}
+                            style={{ width: '100%' }}
+                            options={dataStoreSupervisionsConfigs.map(d => ({ value: d.program?.id, label: d.program?.displayName }))}
+                            loading={loadingDataStoreSupervisionsConfigs}
+                        />
+                    </Col>
                     <Col sm={24} md={3}>
-                        <div>Période</div>
+                        <div style={{ marginBottom: '2px' }}>Période</div>
                         <DatePicker
                             onChange={handleSelectedPeriod}
                             picker="month"
                             value={selectedPeriod}
                             style={{ width: '100%' }}
                             placeholder="Période"
+                            allowClear={false}
                         />
                     </Col>
                     <Col sm={24} md={5}>
-                        <div>Unités d'organisation</div>
+                        <div style={{ marginBottom: '2px' }}>Unités d'organisation</div>
                         <OrganisationUnitsTree
                             meOrgUnitId={me?.organisationUnits[0]?.id}
                             orgUnits={organisationUnits}
                             currentOrgUnits={selectedOrganisationUnit}
                             setCurrentOrgUnits={setSelectedOrganisationUnit}
                             loadingOrganisationUnits={loadingOrganisationUnits}
+                            setLoadingOrganisationUnits={setLoadingOrganisationUnits}
                         />
                     </Col>
 
                     <Col sm={24} md={4}>
-                        <div>Planification</div>
+                        <div style={{ marginBottom: '2px' }}>Planifier par </div>
                         <Select
                             placeholder="Planification"
                             onChange={handleSelectPlanification}
@@ -633,7 +776,7 @@ export const Dashboard = () => {
                     {
                         selectedPlanification === PLANIFICATION_PAR_UN_USER && users.length > 0 && (
                             <Col sm={24} md={4}>
-                                <div>Utilisateurs</div>
+                                <div style={{ marginBottom: '2px' }}>Utilisateurs</div>
                                 <Select
                                     placeholder="Utilisateurs"
                                     style={{ width: '100%' }}
@@ -646,8 +789,8 @@ export const Dashboard = () => {
                     }
 
                     {
-                        <Col sm={24} md={4}>
-                            <div>Superviseurs</div>
+                        <Col sm={24} md={3}>
+                            <div style={{ marginBottom: '2px' }}>Superviseurs</div>
                             <Select
                                 placeholder="Superviseurs"
                                 style={{ width: '100%' }}
@@ -660,16 +803,31 @@ export const Dashboard = () => {
                         </Col>
                     }
 
+                    <Col sm={24} md={1}>
+                        <div style={{ marginTop: '20px' }}>
+                            <Button onClick={handleSearch} loading={loadingTeiList} primary icon={<AiOutlineSearch style={{ fontSize: '20px' }} />} />
+                        </div>
+                    </Col>
+
                 </Row>
             </div>
         </>
     )
 
+    const RenderNoticeBox = () => (
+        <div style={{ padding: '10px' }}>
+            <MyNoticeBox
+                show={noticeBox.show}
+                message={noticeBox.message}
+                title={noticeBox.title}
+                type={noticeBox.type}
+            />
+        </div>
+    )
+
     useEffect(() => {
-        loadOrganisationUnits()
-        loadDataStoreAnalyses()
-        loadDataStoreSupervisionPlanifications()
-    }, [])
+        me?.organisationUnits?.length > 0 && loadOrganisationUnits()
+    }, [me])
 
     return (
         <>
@@ -679,6 +837,9 @@ export const Dashboard = () => {
                     {RenderCalendar()}
                     {RenderCharts()}
                 </Row>
+
+                {RenderNoticeBox()}
+                <MyNotification notification={notification} setNotification={setNotification} />
             </div>
         </>
     )

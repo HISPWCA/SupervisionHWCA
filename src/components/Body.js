@@ -42,7 +42,7 @@ export const Body = () => {
     const loadMe = async () => {
         try {
             setLoadingMe(true)
-            const meResponse = await axios.get(`${ME_ROUTE},organisationUnits`)
+            const meResponse = await axios.get(`${ME_ROUTE},username,organisationUnits[id,displayName]`)
             setMe(meResponse.data)
             setLoadingMe(false)
         }
@@ -82,7 +82,7 @@ export const Body = () => {
             case PAGE_DASHBOARD:
                 return (
                     <div className='my-scrollable' style={{ height: '100%', width: '100%', overflowY: 'scroll' }}>
-                        <Dashboard />
+                        <Dashboard me={me} />
                     </div>
                 )
 
@@ -103,7 +103,7 @@ export const Body = () => {
             default:
                 return (
                     <div className='my-scrollable' style={{ height: '100%', width: '100%', overflowY: 'scroll' }}>
-                        <Dashboard />
+                        <Dashboard me={me} />
                     </div>
                 )
         }

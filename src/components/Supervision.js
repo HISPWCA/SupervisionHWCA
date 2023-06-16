@@ -7,14 +7,12 @@ import { Button, ButtonStrip, Checkbox, CircularLoader, Modal, ModalActions, Mod
 import {
     DAY,
     INDICATOR,
-    INDICATOR_GROUP,
     MONTH,
     NOTICE_BOX_DEFAULT,
     NOTICE_BOX_WARNING,
     NOTIFICATON_CRITICAL,
     NOTIFICATON_SUCCESS,
     ORGANISATION_UNIT,
-    PROGRAM_INDICATOR,
     QUARTER,
     TYPE_GENERATION_AS_ENROLMENT,
     TYPE_GENERATION_AS_EVENT,
@@ -60,13 +58,13 @@ const Supervision = ({ me }) => {
     const [dataStoreIndicatorConfigs, setDataStoreIndicatorConfigs] = useState([])
     const [isEditionMode, setEditionMode] = useState(true)
     const [noticeBox, setNoticeBox] = useState({ show: false, message: null, title: null, type: NOTICE_BOX_DEFAULT })
+    const [notification, setNotification] = useState({ show: false, message: null, type: null })
     const [organisationUnits, setOrganisationUnits] = useState([])
     const [users, setUsers] = useState([])
     const [organisationUnitGroupSets, setOrganisationUnitGroupSets] = useState([])
     const [programStages, setProgramStages] = useState([])
     const [isNewMappingMode, setIsNewMappingMode] = useState(false)
     const [mappingConfigs, setMappingConfigs] = useState([])
-    const [notification, setNotification] = useState({ show: false, message: null, type: null })
     const [visibleAnalyticComponentModal, setVisibleAnalyticComponentModal] = useState(false)
     const [analyticIndicatorResults, setAnalyticIndicatorResults] = useState([])
     const [analyticErrorMessage, setAnalyticErrorMessage] = useState(null)
