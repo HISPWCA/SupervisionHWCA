@@ -48,6 +48,8 @@ const Setting = () => {
     const [selectedAnalyseIndicator, setSelectedAnalyseIndicator] = useState(null)
     const [selectedAnalyseDataElement, setSelectedAnalyseDataElement] = useState(null)
     const [selectedProgramStage, setSelectedProgramStage] = useState(null)
+    const [selectedStatutProgramStage, setSelectedStatutProgramStage] = useState(null)
+    const [selectedStatutDataElement, setSelectedStatutDataElement] = useState(null)
     const [selectedDataElements, setSelectedDataElements] = useState([])
     const [selectedAttributesToDisplay, setSelectedAttributesToDisplay] = useState([])
 
@@ -169,7 +171,9 @@ const Setting = () => {
         setSelectedIndicatorGroup(null)
         setIndicatorGroups([])
         setSelectedProgramStage(null)
+        setSelectedStatutProgramStage(null)
         setSelectedDataElements([])
+        setSelectedStatutDataElement(null)
         setSelectedAttributesToDisplay([])
         setSelectedTEIProgram(programs.find(p => p.id === value))
         loadProgramStages(value)
@@ -307,7 +311,9 @@ const Setting = () => {
                 setFieldEditingMode(false)
                 setSelectedTEIProgram(null)
                 setSelectedProgramStage(null)
+                setSelectedStatutProgramStage(null)
                 setSelectedDataElements([])
+                setSelectedStatutDataElement(null)
                 setSelectedSupervisionGenerationType(TYPE_GENERATION_AS_TEI)
             }
         } catch (err) {
@@ -379,8 +385,9 @@ const Setting = () => {
                 const payload = {
                     generationType: selectedSupervisionGenerationType,
                     program: { id: selectedTEIProgram.id, displayName: selectedTEIProgram.displayName },
+                    attributesToDisplay: selectedAttributesToDisplay,
                     fieldConfig: null,
-                    attributesToDisplay: selectedAttributesToDisplay
+                    statut: null
                 }
 
                 if (selectedProgramStage && selectedDataElements.length > 0) {
@@ -389,6 +396,13 @@ const Setting = () => {
                             programStage: { id: selectedProgramStage.id, displayName: selectedProgramStage.displayName },
                             dataElements: selectedDataElements
                         }
+                    }
+                }
+
+                if (selectedStatutProgramStage && selectedStatutDataElement) {
+                    payload.statut = {
+                        programStage: { id: selectedStatutProgramStage.id, displayName: selectedStatutProgramStage.displayName },
+                        dataElement: selectedStatutDataElement
                     }
                 }
 
@@ -410,9 +424,11 @@ const Setting = () => {
 
                 setMappingConfigSupervisions(newList)
                 setSelectedTEIProgram(null)
+                setSelectedStatutProgramStage(null)
                 setSelectedProgramStage(null)
                 setFieldEditingMode(false)
                 setSelectedDataElements([])
+                setSelectedStatutDataElement(null)
                 setSelectedAttributesToDisplay([])
                 setNotification({ show: true, type: NOTIFICATON_SUCCESS, message: isFieldEditingMode ? 'Mise à jour éffectuée' : 'Configuration ajoutée !' })
                 setLoadingSaveSupervionsConfig(false)
@@ -583,9 +599,19 @@ const Setting = () => {
     const handleSelectDataElements = (values) => {
         setSelectedDataElements(values.map(value => selectedProgramStage.programStageDataElements?.map(p => p.dataElement).find(dataElement => dataElement.id === value)))
     }
+
     const handleSelectProgramStage = (value) => {
         setSelectedProgramStage(programStages.find(pstage => pstage.id === value))
         setSelectedDataElements([])
+    }
+
+    const handleSelectStatutDataElement = (value) => {
+        setSelectedStatutDataElement(selectedProgramStage.programStageDataElements?.map(p => p.dataElement).find(dataElement => dataElement.id === value))
+    }
+
+    const handleSelectStatutProgramStage = (value) => {
+        setSelectedStatutProgramStage(programStages.find(pstage => pstage.id === value))
+        setSelectedStatutDataElement(null)
     }
 
     const RenderSupervisorFieldConfiguration = () => (
@@ -697,7 +723,9 @@ const Setting = () => {
             setSelectedTEIProgram(programs.find(p => p.id === prog.program?.id))
             const programStageList = await loadProgramStages(prog?.program?.id)
             setSelectedProgramStage(programStageList.find(psg => psg.id === prog.fieldConfig?.supervisor?.programStage.id))
+            setSelectedStatutProgramStage(programStageList.find(psg => psg.id === prog.statut?.programStage?.id))
             setSelectedDataElements(prog.fieldConfig?.supervisor?.dataElements || [])
+            setSelectedStatutDataElement(prog?.statut?.dataElement)
             setSelectedSupervisionGenerationType(prog.generationType)
             setSelectedAttributesToDisplay(prog.attributesToDisplay || [])
             setFieldEditingMode(true)
@@ -715,7 +743,7 @@ const Setting = () => {
         <div style={{ marginTop: '20px' }}>
             <Card className="my-shadow" size='small'>
                 <div>
-                    <div style={{ fontWeight: 'bold' }}>Configuration des attributs du programme à affichée</div>
+                    <div style={{ fontWeight: 'bold' }}>Configuration des attributs du programme a affichées</div>
                     <div style={{ marginTop: '10px' }}>Attributs</div>
                     <div style={{ marginTop: '2px' }}>
                         <Select
@@ -737,6 +765,59 @@ const Setting = () => {
         </div>
     )
 
+    const RenderStatusDataElementToUse = () => (
+        <div style={{ marginTop: '20px' }}>
+            <Card className="my-shadow" size='small'>
+                <div>
+                    <div style={{ fontWeight: 'bold' }}>Configuration de l'élement de donné à utiliser pour le statut de la planification</div>
+                    <div style={{ marginTop: '10px', color: '#00000080', fontSize: '13px' }}>
+                        La configuration de cet élément de données, permettra de suivre le statut des planifications.
+                    </div>
+                    <div style={{ margin: '10px 0px' }}>
+                        <Row gutter={[10, 10]}>
+                            <Col md={12}>
+                                <div>
+                                    <div style={{ marginBottom: '5px' }}>Programmes Stage</div>
+                                    <Select
+                                        options={programStages.map(programStage => ({ label: programStage.displayName, value: programStage.id }))}
+                                        placeholder="Choisir le program stage"
+                                        style={{ width: '100%' }}
+                                        optionFilterProp='label'
+                                        value={selectedStatutProgramStage?.id}
+                                        onChange={handleSelectStatutProgramStage}
+                                        showSearch
+                                        allowClear
+                                        loading={loadingProgramStages}
+                                        disabled={loadingProgramStages}
+                                    />
+                                </div>
+                            </Col>
+                            {
+                                selectedStatutProgramStage && (
+                                    <Col md={12} xs={24}>
+                                        <div>
+                                            <div style={{ marginBottom: '5px' }}>Eléments de données</div>
+                                            <Select
+                                                options={selectedStatutProgramStage?.programStageDataElements?.map(progStageDE => ({ label: progStageDE.dataElement?.displayName, value: progStageDE.dataElement?.id }))}
+                                                placeholder="Element de donnée"
+                                                style={{ width: '100%' }}
+                                                onChange={handleSelectStatutDataElement}
+                                                value={selectedStatutDataElement?.id}
+                                                optionFilterProp='label'
+                                                showSearch
+                                                allowClear
+                                            />
+                                        </div>
+                                    </Col>
+                                )
+                            }
+                        </Row>
+                    </div>
+                </div>
+            </Card>
+        </div>
+    )
+
     const RenderPageSupervisionConfig = () => (
         <>
             <Row gutter={[8, 10]}>
@@ -744,6 +825,7 @@ const Setting = () => {
                     <div >
                         {RenderSupervisionConfiguration()}
                         {selectedTEIProgram && selectedTEIProgram.programTrackedEntityAttributes && RenderAttributesToDisplay()}
+                        {selectedTEIProgram && RenderStatusDataElementToUse()}
                         {selectedTEIProgram && RenderSupervisorFieldConfiguration()}
 
                         <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center' }}>
@@ -756,6 +838,8 @@ const Setting = () => {
                                             setFieldEditingMode(false)
                                             setSelectedTEIProgram(null)
                                             setSelectedProgramStage(null)
+                                            setSelectedStatutProgramStage(null)
+                                            setSelectedStatutDataElement(null)
                                             setSelectedDataElements([])
                                             setSelectedAttributesToDisplay([])
                                             setSelectedSupervisionGenerationType(TYPE_GENERATION_AS_TEI)
