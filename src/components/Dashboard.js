@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Col, DatePicker, Row, Select, Table } from 'antd'
-import { Calendar, momentLocalizer } from 'react-big-calendar'
+import { Calendar, dayjsLocalizer } from 'react-big-calendar'
 import ReactEchart from 'echarts-for-react'
 import moment from 'moment'
 import axios from 'axios';
@@ -21,15 +21,17 @@ import MyNotification from './MyNotification'
 import { Button } from '@dhis2/ui'
 const quarterOfYear = require('dayjs/plugin/quarterOfYear')
 const weekOfYear = require('dayjs/plugin/weekOfYear')
+import timezone from 'dayjs/plugin/timezone'
 
 dayjs.extend(weekOfYear)
 dayjs.extend(quarterOfYear)
 dayjs.extend(customParseFormat)
+dayjs.extend(timezone)
+dayjs.locale('fr-FR')
+
+const localizer = dayjsLocalizer(dayjs)
 
 
-
-
-const localizer = momentLocalizer(moment)
 const now = new Date()
 
 const events = [
@@ -259,6 +261,7 @@ export const Dashboard = ({ me }) => {
     const [teiList, setTeiList] = useState([])
     const [noticeBox, setNoticeBox] = useState({ show: false, message: null, title: null, type: NOTICE_BOX_DEFAULT })
     const [notification, setNotification] = useState({ show: false, message: null, type: null })
+    const [calendarDate, setCalendarDate] = useState(dayjs().format('YYYY-MM-DD'))
 
     const [selectedOrganisationUnit, setSelectedOrganisationUnit] = useState(null)
     const [selectedPlanification, setSelectedPlanification] = useState(PLANIFICATION_PAR_MOI)
@@ -438,6 +441,7 @@ export const Dashboard = ({ me }) => {
             const trackedEntityInstances = response.data.trackedEntityInstances
             setTeiList(trackedEntityInstances)
             setLoadingTeiList(false)
+            setCalendarDate(selectedPeriod)
         } catch (err) {
             setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
             setLoadingTeiList(false)
@@ -637,6 +641,7 @@ export const Dashboard = ({ me }) => {
                         startAccessor="start"
                         endAccessor="end"
                         style={{ height: '445px' }}
+                        date={dayjs(calendarDate).format('YYYY-MM-DD')}
                         selectable
                         onSelectEvent={event => alert(JSON.stringify(event, null, 4))}
                         onSelectSlot={event => alert(JSON.stringify(event, null, 4))}
