@@ -432,7 +432,7 @@ const Supervision = ({ me }) => {
         loadProgramStages(sup.program?.id)
         setSelectedProgram(sup)
         if (selectedSupervisionType === TYPE_SUPERVISION_AGENT && sup?.attributesToDisplay?.length === 0) {
-            return setNotification({ show: true, message: "Aucun attribut à afficher, n'est configuré pour ce programme !", type: NOTIFICATON_CRITICAL })
+            return setNotification({ show: true, message: "Aucun attribut à afficher, n'est encore configuré pour ce programme, Veuillez vous rendre dans partie configuration pour les configurer !", type: NOTIFICATON_CRITICAL })
         }
     }
 
