@@ -1575,7 +1575,7 @@ const Setting = () => {
     }, [currentItem, indicatorGroups, programs])
 
     return (
-        <>
+        <> 
             {RenderTopContent()}
             {RenderContent()}
             <MyNotification notification={notification} setNotification={setNotification} />

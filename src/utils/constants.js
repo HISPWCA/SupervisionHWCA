@@ -47,3 +47,13 @@ export const WEEK = 'Week'
 export const MONTH = 'Month'
 export const QUARTER = 'Quarter'
 export const YEAR = 'Year'
+
+export const CANCELED = { name: 'Annulée', value: 'CANCELED' }
+export const ABANDONED = { name: 'Abandonnée', value: 'ABANDONED' }
+export const POSTPONED = { name: 'Reportée', value: 'POSTPONED' }
+export const PENDING_VALIDATION = { name: 'En Attente de Validation', value: 'PENDING_VALIDATION' }
+export const PENDING_PAYMENT = { name: 'En Attente de Paiement', value: 'PENDING_PAYMENT' }
+export const PAYMENT_EFFECTUATED = { name: 'Paiement Effectué', value: 'PAYMENT_EFFECTUATED' }
+export const SUPERVISION_COMPLETED = { name: 'Supervision Terminée', value: 'SUPERVISION_COMPLETED' }
+
+

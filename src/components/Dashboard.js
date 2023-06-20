@@ -2,26 +2,25 @@ import { useState, useEffect } from 'react'
 import { Col, DatePicker, Row, Select, Table } from 'antd'
 import { Calendar, dayjsLocalizer } from 'react-big-calendar'
 import ReactEchart from 'echarts-for-react'
-import moment from 'moment'
 import axios from 'axios';
-import { ORGANISATION_UNITS_ROUTE, TRACKED_ENTITY_INSTANCES_ROUTE, USERS_ROUTE } from '../utils/api.routes'
+import { ORGANISATION_UNITS_ROUTE, SERVER_URL, TRACKED_ENTITY_INSTANCES_ROUTE, USERS_ROUTE } from '../utils/api.routes'
 import OrganisationUnitsTree from './OrganisationUnitsTree'
-import { DESCENDANTS, NOTICE_BOX_DEFAULT, NOTIFICATON_CRITICAL, PLANIFICATION_PAR_MOI, PLANIFICATION_PAR_TOUS, PLANIFICATION_PAR_UN_USER, TYPE_GENERATION_AS_ENROLMENT, TYPE_GENERATION_AS_EVENT, TYPE_GENERATION_AS_TEI } from '../utils/constants'
+import { CANCELED, DESCENDANTS, NOTICE_BOX_DEFAULT, NOTIFICATON_CRITICAL, PENDING_VALIDATION, PLANIFICATION_PAR_MOI, PLANIFICATION_PAR_TOUS, PLANIFICATION_PAR_UN_USER, POSTPONED, SUPERVISION_COMPLETED, TYPE_GENERATION_AS_ENROLMENT, TYPE_GENERATION_AS_EVENT, TYPE_GENERATION_AS_TEI } from '../utils/constants'
 import { Chart } from "react-google-charts"
 import MapView from './MapView'
 import { loadDataStore } from '../utils/functions'
 import { IoMdOpen } from 'react-icons/io'
-import { BLUE } from '../utils/couleurs'
+import { BLACK, BLUE, GREEN, JAUNE, ORANGE, RED, WHITE } from '../utils/couleurs'
 import { AiOutlineSearch } from 'react-icons/ai'
-
-import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { MyNoticeBox } from './MyNoticeBox'
 import MyNotification from './MyNotification'
 import { Button } from '@dhis2/ui'
+
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import timezone from 'dayjs/plugin/timezone'
 const quarterOfYear = require('dayjs/plugin/quarterOfYear')
 const weekOfYear = require('dayjs/plugin/weekOfYear')
-import timezone from 'dayjs/plugin/timezone'
 
 dayjs.extend(weekOfYear)
 dayjs.extend(quarterOfYear)
@@ -32,229 +31,10 @@ dayjs.locale('fr-FR')
 const localizer = dayjsLocalizer(dayjs)
 
 
-const now = new Date()
-
-const events = [
-    {
-        id: 0,
-        title: 'All Day Event very long title',
-        allDay: true,
-        start: new Date(2015, 3, 0),
-        end: new Date(2015, 3, 1),
-    },
-    {
-        id: 1,
-        title: 'Long Event',
-        start: new Date(2015, 3, 7),
-        end: new Date(2015, 3, 10),
-    },
-
-    {
-        id: 2,
-        title: 'DTS STARTS',
-        start: new Date(2016, 2, 13, 0, 0, 0),
-        end: new Date(2016, 2, 20, 0, 0, 0),
-    },
-
-    {
-        id: 3,
-        title: 'DTS ENDS',
-        start: new Date(2016, 10, 6, 0, 0, 0),
-        end: new Date(2016, 10, 13, 0, 0, 0),
-    },
-
-    {
-        id: 4,
-        title: 'Some Event',
-        start: new Date(2015, 3, 9, 0, 0, 0),
-        end: new Date(2015, 3, 10, 0, 0, 0),
-    },
-    {
-        id: 5,
-        title: 'Conference',
-        start: new Date(2015, 3, 11),
-        end: new Date(2015, 3, 13),
-        desc: 'Big conference for important people',
-    },
-    {
-        id: 6,
-        title: 'Meeting',
-        start: new Date(2015, 3, 12, 10, 30, 0, 0),
-        end: new Date(2015, 3, 12, 12, 30, 0, 0),
-        desc: 'Pre-meeting meeting, to prepare for the meeting',
-    },
-    {
-        id: 7,
-        title: 'Lunch',
-        start: new Date(2015, 3, 12, 12, 0, 0, 0),
-        end: new Date(2015, 3, 12, 13, 0, 0, 0),
-        desc: 'Power lunch',
-    },
-    {
-        id: 8,
-        title: 'Meeting',
-        start: new Date(2015, 3, 12, 14, 0, 0, 0),
-        end: new Date(2015, 3, 12, 15, 0, 0, 0),
-    },
-    {
-        id: 9,
-        title: 'Happy Hour',
-        start: new Date(2015, 3, 12, 17, 0, 0, 0),
-        end: new Date(2015, 3, 12, 17, 30, 0, 0),
-        desc: 'Most important meal of the day',
-    },
-    {
-        id: 10,
-        title: 'Dinner',
-        start: new Date(2015, 3, 12, 20, 0, 0, 0),
-        end: new Date(2015, 3, 12, 21, 0, 0, 0),
-    },
-    {
-        id: 11,
-        title: 'Planning Meeting with Paige',
-        start: new Date(2015, 3, 13, 8, 0, 0),
-        end: new Date(2015, 3, 13, 10, 30, 0),
-    },
-    {
-        id: 11.1,
-        title: 'Inconvenient Conference Call',
-        start: new Date(2015, 3, 13, 9, 30, 0),
-        end: new Date(2015, 3, 13, 12, 0, 0),
-    },
-    {
-        id: 11.2,
-        title: "Project Kickoff - Lou's Shoes",
-        start: new Date(2015, 3, 13, 11, 30, 0),
-        end: new Date(2015, 3, 13, 14, 0, 0),
-    },
-    {
-        id: 11.3,
-        title: 'Quote Follow-up - Tea by Tina',
-        start: new Date(2015, 3, 13, 15, 30, 0),
-        end: new Date(2015, 3, 13, 16, 0, 0),
-    },
-    {
-        id: 12,
-        title: 'Late Night Event',
-        start: new Date(2015, 3, 17, 19, 30, 0),
-        end: new Date(2015, 3, 18, 2, 0, 0),
-    },
-    {
-        id: 12.5,
-        title: 'Late Same Night Event',
-        start: new Date(2015, 3, 17, 19, 30, 0),
-        end: new Date(2015, 3, 17, 23, 30, 0),
-    },
-    {
-        id: 13,
-        title: 'Multi-day Event',
-        start: new Date(2015, 3, 20, 19, 30, 0),
-        end: new Date(2015, 3, 22, 2, 0, 0),
-    },
-    {
-        id: 14,
-        title: 'Today',
-        start: new Date(new Date().setHours(new Date().getHours() - 3)),
-        end: new Date(new Date().setHours(new Date().getHours() + 3)),
-    },
-    {
-        id: 15,
-        title: 'Point in Time Event',
-        start: now,
-        end: now,
-    },
-    {
-        id: 16,
-        title: 'Video Record',
-        start: new Date(2015, 3, 14, 15, 30, 0),
-        end: new Date(2015, 3, 14, 19, 0, 0),
-    },
-    {
-        id: 17,
-        title: 'Dutch Song Producing',
-        start: new Date(2015, 3, 14, 16, 30, 0),
-        end: new Date(2015, 3, 14, 20, 0, 0),
-    },
-    {
-        id: 18,
-        title: 'Itaewon Halloween Meeting',
-        start: new Date(2015, 3, 14, 16, 30, 0),
-        end: new Date(2015, 3, 14, 17, 30, 0),
-    },
-    {
-        id: 19,
-        title: 'Online Coding Test',
-        start: new Date(2015, 3, 14, 17, 30, 0),
-        end: new Date(2015, 3, 14, 20, 30, 0),
-    },
-    {
-        id: 20,
-        title: 'An overlapped Event',
-        start: new Date(2015, 3, 14, 17, 0, 0),
-        end: new Date(2015, 3, 14, 18, 30, 0),
-    },
-    {
-        id: 21,
-        title: 'Phone Interview',
-        start: new Date(2015, 3, 14, 17, 0, 0),
-        end: new Date(2015, 3, 14, 18, 30, 0),
-    },
-    {
-        id: 22,
-        title: 'Cooking Class',
-        start: new Date(2015, 3, 14, 17, 30, 0),
-        end: new Date(2015, 3, 14, 19, 0, 0),
-    },
-    {
-        id: 23,
-        title: 'Go to the gym',
-        start: new Date(2015, 3, 14, 18, 30, 0),
-        end: new Date(2015, 3, 14, 20, 0, 0),
-    },
-    {
-        id: 24,
-        title: 'DST ends on this day (Europe)',
-        start: new Date(2022, 9, 30, 0, 0, 0),
-        end: new Date(2022, 9, 30, 4, 30, 0),
-    },
-    {
-        id: 25,
-        title: 'DST ends on this day (America)',
-        start: new Date(2022, 10, 6, 0, 0, 0),
-        end: new Date(2022, 10, 6, 4, 30, 0),
-    },
-    {
-        id: 26,
-        title: 'DST starts on this day (America)',
-        start: new Date(2023, 2, 12, 0, 0, 0),
-        end: new Date(2023, 2, 12, 4, 30, 0),
-    },
-    {
-        id: 27,
-        title: 'DST starts on this day (Europe)',
-        start: new Date(2023, 2, 26, 0, 0, 0),
-        end: new Date(2023, 2, 26, 4, 30, 0),
-    },
-    {
-        id: 28,
-        title: <div style={{ fontWeight: 'bold', backgroundColor: 'yellow', color: '#000', margin: '0px', padding: '5px' }}>Je suis un simple text customizer</div>,
-        start: new Date(2023, 4, 1, 0, 0, 0),
-        end: new Date(2023, 4, 3, 4, 30, 0),
-        allDay: true
-    },
-    {
-        id: 29,
-        title: <div style={{ fontWeight: 'bold', backgroundColor: 'green', color: '#fff', margin: '0px', padding: '5px' }}>Je suis une couleur verte</div>,
-        start: new Date(2023, 4, 10, 0, 0, 0),
-        end: new Date(2023, 4, 10, 4, 30, 0),
-    }
-]
-
 export const Dashboard = ({ me }) => {
 
     const [organisationUnits, setOrganisationUnits] = useState([])
     const [users, setUsers] = useState([])
-    const [dataStoreAnalyses, setDataStoreAnalyses] = useState([])
     const [dataStoreSupervisionsConfigs, setDataStoreSupervisionsConfigs] = useState([])
     const [dataStoreSupervisionPlanifications, setDataStoreSupervisionPlanifications] = useState([])
     const [calendarEvents, setCalendarEvents] = useState([])
@@ -272,8 +52,6 @@ export const Dashboard = ({ me }) => {
 
     const [loadingOrganisationUnits, setLoadingOrganisationUnits] = useState(false)
     const [loadingUsers, setLoadingUsers] = useState(false)
-    const [loadingDataStoreAnalyses, setLoadingDataStoreAnalyses] = useState(false)
-    const [loadingAnalyticsAnalysisConfigData, setLoadingAnalyticsAnalysisConfigData] = useState(false)
     const [loadingDataStoreSupervisionPlanifications, setLoadingDataStoreSupervisionPlanifications] = useState(false)
     const [loadingDataStoreSupervisionsConfigs, setLoadingDataStoreSupervisionsConfigs] = useState(false)
     const [loadingTeiList, setLoadingTeiList] = useState(false)
@@ -376,21 +154,6 @@ export const Dashboard = ({ me }) => {
                 ]
             }
         ]
-    }
-
-    const mapData = [
-        ["Task", "Hours per Day"],
-        ["Work", 11],
-        ["Eat", 2],
-        ["Commute", 2],
-        ["Watch TV", 2],
-        ["Sleep", 7],
-    ]
-
-    const mapOptions = {
-        title: "",
-        is3D: true,
-        legend: 'bottom'
     }
 
     const coordinates = [
@@ -535,6 +298,10 @@ export const Dashboard = ({ me }) => {
 
     const handleSelectPlanificationUser = value => setSelectedPlanificationUser(users.find(u => u.id === value))
 
+    const getDefaultStatusIfStatusIsNull = (p) => {
+        return PENDING_VALIDATION.value
+    }
+
     const filterAndGetPlanfications = () => teiList.reduce((prev, current) => {
         if (selectedProgram.generationType === TYPE_GENERATION_AS_TEI) {
             if (
@@ -550,7 +317,9 @@ export const Dashboard = ({ me }) => {
                         enrollment: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.enrollment,
                         program: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.program,
                         orgUnit: current.orgUnit,
-                        storedBy: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.storedBy
+                        storedBy: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.storedBy,
+                        libelle: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.orgUnitName,
+                        status: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statut?.dataElement?.id)?.value || getDefaultStatusIfStatusIsNull(current.created)
                     }
                 ]
             }
@@ -572,7 +341,9 @@ export const Dashboard = ({ me }) => {
                         enrollment: en.enrollment,
                         program: en.program,
                         orgUnit: current.orgUnit,
-                        storedBy: en.storedBy
+                        storedBy: en.storedBy,
+                        libelle: en.orgUnitName,
+                        status: en?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statut?.dataElement?.id)?.value || getDefaultStatusIfStatusIsNull(en.enrollmentDate)
                     }))
                 ]
             }
@@ -595,7 +366,9 @@ export const Dashboard = ({ me }) => {
                         enrollment: currentEnrollment?.enrollment,
                         program: currentEnrollment?.enrollments,
                         orgUnit: currentEnrollment?.orgUnit,
-                        storedBy: ev.storedBy
+                        storedBy: currentEnrollment?.storedBy,
+                        libelle: currentEnrollment?.orgUnitName,
+                        status: currentEnrollment?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statut?.dataElement?.id)?.value || getDefaultStatusIfStatusIsNull(ev.eventDate)
                     }))
                 ]
             }
@@ -616,17 +389,56 @@ export const Dashboard = ({ me }) => {
             return true
         })
 
+    const getPieChartDatas = () => ({
+        itle: {
+            text: 'Rapport sur les planifications',
+            left: 'center'
+        },
 
-    const getFiveLastPlanifications = () => filterAndGetPlanfications().slice(0, 5).map((planification, index) => ({
-        key: index,
-        nom: dayjs(planification.period).format('YYYY-MM-DD HH:mm:ss'),
+        tooltip: {
+            trigger: 'item'
+        },
+
+        legend: {
+            orient: 'vertical',
+            left: 'left'
+        },
+        series: [
+            {
+                type: 'pie',
+                radius: '50%',
+                data: Object.values(
+                    filterAndGetPlanfications().reduce((prev, curr) => {
+                        if (curr.status && prev[`${curr.status}`]) {
+                            prev[`${curr.status}`] = { name: getStatusNameAndColor(curr.status)?.name, value: prev[`${curr.status}`].value + 1 }
+                        } else {
+                            prev[`${curr.status}`] = { name: getStatusNameAndColor(curr.status)?.name, value: 1 }
+                        }
+
+                        return prev
+                    }, {})
+                ),
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 30,
+                        shadowOffsetX: 0,
+                        shadowColor: `${BLACK}50`
+                    }
+                }
+            }
+        ]
+    })
+
+    const getFiveLastPlanifications = () => filterAndGetPlanfications().slice(0, 5).map((planification) => ({
+        ...planification,
+        key: planification.trackedEntityInstance,
+        nom: planification.libelle,
         tei: planification
     }))
 
-    const getCalendarEvents = () => filterAndGetPlanfications().map((planification, index) => ({
-        id: index,
-        title: dayjs(planification.period).format('YYYY-MM-DD HH:mm:ss'),
-        allDay: true,
+    const getCalendarEvents = () => filterAndGetPlanfications().map((planification) => ({
+        id: planification.trackedEntityInstance,
+        title: <div style={{ fontWeight: 'bold', borderRadius: '5px', backgroundColor: getStatusNameAndColor(planification.status)?.color?.background, color: getStatusNameAndColor(planification.status)?.color?.text, margin: '0px', padding: '5px' }}> {planification.libelle}</div>,
         start: dayjs(planification.period).format('YYYY-MM-DD HH:mm:ss'),
         end: dayjs(planification.period).format('YYYY-MM-DD HH:mm:ss'),
     }))
@@ -659,17 +471,35 @@ export const Dashboard = ({ me }) => {
         </Col>
     )
 
+    const getStatusNameAndColor = status => {
+
+        if (status === CANCELED.value) {
+            return { name: CANCELED.name, color: { background: RED, text: WHITE } }
+        }
+
+        if (status === POSTPONED.value) {
+            return { name: POSTPONED.name, color: { background: JAUNE, text: BLACK } }
+        }
+
+        if (status === PENDING_VALIDATION.value) {
+            return { name: PENDING_VALIDATION.name, color: { background: ORANGE, text: WHITE } }
+        }
+
+        if (status === SUPERVISION_COMPLETED.value) {
+            return { name: SUPERVISION_COMPLETED.name, color: { background: GREEN, text: WHITE } }
+        }
+
+    }
+
+
     const RenderCharts = () => (
         <Col md={12} sm={24}>
             <Row gutter={[8, 8]}>
                 <Col md={10}>
                     <div className='my-shadow' style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '10px', marginBottom: '2px', height: '100%' }}>
-                        <Chart
-                            chartType="PieChart"
-                            data={mapData}
-                            options={mapOptions}
-                            width="100%"
-                            height="100%"
+                        <ReactEchart
+                            style={{ height: '100%', width: '100%' }}
+                            option={getPieChartDatas()}
                         />
                     </div>
                 </Col>
@@ -680,11 +510,26 @@ export const Dashboard = ({ me }) => {
                             columns={
                                 [
                                     { title: 'Nom', key: 'nom', dataIndex: 'nom' },
-                                    // { title: 'Status', key: 'status', dataIndex: 'status', width: '100px' },
                                     {
-                                        title: 'Actions', key: 'action', width: '50px', dataIndex: 'tei', render: tei => <div style={{ textAlign: 'center' }}>
-                                            <IoMdOpen title='Ouvrir' onClick={() => alert(JSON.stringify(tei, null, 5))} style={{ fontSize: '18px', color: BLUE, cursor: 'pointer' }} />
-                                        </div>
+                                        title: 'Status', key: 'status', dataIndex: 'status', width: '150px',
+                                        render: value => (
+                                            <>
+                                                <span className='text-truncate-one' title={getStatusNameAndColor(value)?.name} style={{ textAlign: 'center', background: getStatusNameAndColor(value)?.color?.background, color: getStatusNameAndColor(value)?.color?.text, padding: '2px', fontSize: '12px', borderRadius: '5px' }}>
+                                                    {getStatusNameAndColor(value)?.name}
+                                                </span>
+                                            </>
+                                        )
+                                    },
+                                    {
+                                        title: 'Actions', key: 'action', width: '50px', dataIndex: 'tei', render: tei => (
+                                            <a
+                                                target='_blank'
+                                                href={`${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${tei.trackedEntityInstance}&program=${tei.program}&ou=${tei.orgUnit}`}
+                                                style={{ textAlign: 'center', cursor: 'pointer' }}
+                                            > {console.log("Serveur url : ", SERVER_URL)}
+                                                <IoMdOpen title='Ouvrir dans le tracker' style={{ fontSize: '18px', color: BLUE, cursor: 'pointer' }} />
+                                            </a>
+                                        )
                                     }
                                 ]
                             }
@@ -713,7 +558,6 @@ export const Dashboard = ({ me }) => {
     }
 
     const handleSelectProgram = (value) => {
-        setTeiList([])
         setSelectedProgram(dataStoreSupervisionsConfigs.find(d => d.program?.id === value))
     }
 
@@ -835,14 +679,13 @@ export const Dashboard = ({ me }) => {
     }, [me])
 
     return (
-        <>
+        <>{console.log("dataStoreSupervisionsConfigs : ", dataStoreSupervisionsConfigs)}
             <div style={{ padding: '10px', width: '100%' }}>
                 {RenderFilters()}
                 <Row gutter={[8, 8]}>
                     {RenderCalendar()}
                     {RenderCharts()}
                 </Row>
-
                 {RenderNoticeBox()}
                 <MyNotification notification={notification} setNotification={setNotification} />
             </div>
