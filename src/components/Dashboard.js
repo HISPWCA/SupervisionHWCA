@@ -3,13 +3,13 @@ import { Card, Col, DatePicker, Row, Select, Table } from 'antd'
 import { Calendar, dayjsLocalizer } from 'react-big-calendar'
 import ReactEchart from 'echarts-for-react'
 import axios from 'axios';
-import { ORGANISATION_UNITS_ROUTE, SERVER_URL, TRACKED_ENTITY_INSTANCES_ROUTE, USERS_ROUTE } from '../utils/api.routes'
+import { DATA_ELEMENT_OPTION_SETS, OPTION_SETS_ROUTE, ORGANISATION_UNITS_ROUTE, SERVER_URL, TRACKED_ENTITY_INSTANCES_ROUTE, USERS_ROUTE } from '../utils/api.routes'
 import OrganisationUnitsTree from './OrganisationUnitsTree'
-import { CANCELED, DESCENDANTS, NOTICE_BOX_DEFAULT, NOTIFICATON_CRITICAL, PENDING_VALIDATION, PLANIFICATION_PAR_MOI, PLANIFICATION_PAR_TOUS, PLANIFICATION_PAR_UN_USER, POSTPONED, SUPERVISION_COMPLETED, SUPERVISION_PLANNED, TYPE_GENERATION_AS_ENROLMENT, TYPE_GENERATION_AS_EVENT, TYPE_GENERATION_AS_TEI } from '../utils/constants'
+import { CANCELED, DESCENDANTS, NOTICE_BOX_DEFAULT, NOTIFICATON_CRITICAL, PENDING_VALIDATION, PLANIFICATION_PAR_MOI, PLANIFICATION_PAR_TOUS, PLANIFICATION_PAR_UN_USER, COMPLETED, SCHEDULED, TYPE_GENERATION_AS_ENROLMENT, TYPE_GENERATION_AS_EVENT, TYPE_GENERATION_AS_TEI, NA, PAYMENT_DONE, PENDING_PAYMENT } from '../utils/constants'
 import MapView from './MapView'
 import { loadDataStore } from '../utils/functions'
 import { IoMdOpen } from 'react-icons/io'
-import { BLACK, BLUE, GREEN, JAUNE, ORANGE, RED, WHITE } from '../utils/couleurs'
+import { BLACK, BLUE, GRAY_DARK, GREEN, JAUNE, ORANGE, RED, WHITE } from '../utils/couleurs'
 import { AiOutlineSearch } from 'react-icons/ai'
 import { MyNoticeBox } from './MyNoticeBox'
 import MyNotification from './MyNotification'
@@ -40,6 +40,8 @@ export const Dashboard = ({ me }) => {
     const [noticeBox, setNoticeBox] = useState({ show: false, message: null, title: null, type: NOTICE_BOX_DEFAULT })
     const [notification, setNotification] = useState({ show: false, message: null, type: null })
     const [calendarDate, setCalendarDate] = useState(dayjs().format('YYYY-MM-DD'))
+    const [statusSupervisionOptions, setStatusSupervisionOptions] = useState([])
+    const [statusPaymentOptions, setStatusPaymentOptions] = useState([])
 
     const [selectedOrganisationUnit, setSelectedOrganisationUnit] = useState(null)
     const [selectedPlanification, setSelectedPlanification] = useState(PLANIFICATION_PAR_MOI)
@@ -294,9 +296,9 @@ export const Dashboard = ({ me }) => {
 
     const handleSelectPlanificationUser = value => setSelectedPlanificationUser(users.find(u => u.id === value))
 
-    const getDefaultStatusIfStatusIsNull = (p) => {
-        return SUPERVISION_PLANNED.value
-    }
+    const getDefaultStatusSupervisionIfStatusIsNull = _ => SCHEDULED.value
+
+    const getDefaultStatusPaymentIfStatusIsNull = _ => NA.value
 
     const filterAndGetPlanfications = () => teiList.reduce((prev, current) => {
         if (selectedProgram.generationType === TYPE_GENERATION_AS_TEI) {
@@ -305,18 +307,20 @@ export const Dashboard = ({ me }) => {
                 dayjs(current.created).format('YYYYMM') === dayjs(selectedPeriod).format('YYYYMM') &&
                 current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)
             ) {
+                const eventDate = current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.events[0]?.eventDate
+
                 return [
                     ...prev,
                     {
                         trackedEntityInstance: current.trackedEntityInstance,
-                        period: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.events[0]?.eventDate,
+                        period: eventDate,
                         enrollment: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.enrollment,
                         program: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.program,
                         orgUnit: current.orgUnit,
                         storedBy: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.storedBy,
                         libelle: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.orgUnitName,
-                        statusSupervision: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusIfStatusIsNull(current.created),
-                        statusPayment: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statusPayment?.dataElement?.id)?.value || getDefaultStatusIfStatusIsNull(current.created)
+                        statusSupervision: dayjs(eventDate).isAfter(dayjs()) ? getDefaultStatusSupervisionIfStatusIsNull() : current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
+                        statusPayment: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statusPayment?.dataElement?.id)?.value || getDefaultStatusPaymentIfStatusIsNull()
                     }
                 ]
             }
@@ -340,8 +344,8 @@ export const Dashboard = ({ me }) => {
                         orgUnit: current.orgUnit,
                         storedBy: en.storedBy,
                         libelle: en.orgUnitName,
-                        statusSupervision: en?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusIfStatusIsNull(en.enrollmentDate),
-                        statusPayment: en?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statusPayment?.dataElement?.id)?.value || getDefaultStatusIfStatusIsNull(en.enrollmentDate)
+                        statusSupervision: dayjs(en?.events[0]?.eventDate).isAfter(dayjs()) ? getDefaultStatusSupervisionIfStatusIsNull() : en?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
+                        statusPayment: en?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statusPayment?.dataElement?.id)?.value || getDefaultStatusPaymentIfStatusIsNull()
                     }))
                 ]
             }
@@ -366,8 +370,8 @@ export const Dashboard = ({ me }) => {
                         orgUnit: currentEnrollment?.orgUnit,
                         storedBy: currentEnrollment?.storedBy,
                         libelle: currentEnrollment?.orgUnitName,
-                        statusSupervision: currentEnrollment?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusIfStatusIsNull(ev.eventDate),
-                        statusPayment: currentEnrollment?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statusPayment?.dataElement?.id)?.value || getDefaultStatusIfStatusIsNull(ev.eventDate)
+                        statusSupervision: dayjs(ev.eventDate).isAfter(dayjs()) ? getDefaultStatusSupervisionIfStatusIsNull() : currentEnrollment?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
+                        statusPayment: currentEnrollment?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statusPayment?.dataElement?.id)?.value || getDefaultStatusPaymentIfStatusIsNull()
                     }))
                 ]
             }
@@ -389,11 +393,11 @@ export const Dashboard = ({ me }) => {
         })
 
 
-    const getPieChartDatas = () => ({
-        // title: {
-        //     text: 'Rapport sur les planifications',
-        //     left: 'center'
-        // },
+    const getPieChartDatasForSupervisions = () => ({
+        title: {
+            text: 'Supervisions',
+            left: 'center'
+        },
 
         tooltip: {
             trigger: 'item'
@@ -401,25 +405,33 @@ export const Dashboard = ({ me }) => {
 
         legend: {
             orient: 'vertical',
+            bottom: '10',
             left: 'left',
         },
-        color: Object.values(
-            filterAndGetPlanfications().reduce((prev, curr) => {
-                if (curr.statusSupervision && prev[`${curr.statusSupervision}`]) {
-                    prev[`${curr.statusSupervision}`] = getStatusNameAndColor(curr.statusSupervision).color.background
-                } else {
-                    prev[`${curr.statusSupervision}`] = getStatusNameAndColor(curr.statusSupervision).color.background
-                }
 
-                return prev
-            }, {})
-        ),
+        // color: Object.values(
+        //     filterAndGetPlanfications().reduce((prev, curr) => {
+        //         if (curr.statusSupervision && prev[`${curr.statusSupervision}`]) {
+        //             prev[`${curr.statusSupervision}`] = getStatusNameAndColor(curr.statusSupervision).color.background
+        //         } else {
+        //             prev[`${curr.statusSupervision}`] = getStatusNameAndColor(curr.statusSupervision).color.background
+        //         }
+
+        //         return prev
+        //     }, {})
+        // ),
+
+        color: statusSupervisionOptions.map(option => getStatusNameAndColor(option.code).color.background),
+
         series: [
             {
                 type: 'pie',
-                radius: '50%',
-                data: Object.values(
-                    filterAndGetPlanfications().reduce((prev, curr) => {
+                radius: '65%',
+                center: ['50%', '50%'],
+                selectedMode: 'single',
+                label: { show: false },
+                data: statusPaymentOptions.map(option => {
+                    const statusPayload = filterAndGetPlanfications().reduce((prev, curr) => {
                         if (curr.statusSupervision && prev[`${curr.statusSupervision}`]) {
                             prev[`${curr.statusSupervision}`] = { name: getStatusNameAndColor(curr.statusSupervision)?.name, value: prev[`${curr.statusSupervision}`].value + 1 }
                         } else {
@@ -428,7 +440,69 @@ export const Dashboard = ({ me }) => {
 
                         return prev
                     }, {})
-                ),
+                    return statusPayload[option.code] || { name: option.displayName, value: 0 }
+                }),
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 30,
+                        shadowOffsetX: 0,
+                        shadowColor: `${BLACK}50`
+                    }
+                }
+            }
+        ]
+
+    })
+
+    const getPieChartDatasForPayment = () => ({
+        title: {
+            text: 'Paiement',
+            left: 'center'
+        },
+
+        tooltip: {
+            trigger: 'item'
+        },
+
+        legend: {
+            orient: 'vertical',
+            bottom: '10',
+            left: 'left',
+        },
+
+        // color: Object.values(
+        //     filterAndGetPlanfications().reduce((prev, curr) => {
+        //         if (curr.statusPayment && prev[`${curr.statusPayment}`]) {
+        //             prev[`${curr.statusPayment}`] = getStatusNameAndColor(curr.statusSupervision).color.background
+        //         } else {
+        //             prev[`${curr.statusPayment}`] = getStatusNameAndColor(curr.statusPayment).color.background
+        //         }
+
+        //         return prev
+        //     }, {})
+        // ),
+
+        color: statusPaymentOptions.map(option => getStatusNameAndColor(option.code).color.background),
+
+        series: [
+            {
+                type: 'pie',
+                radius: '65%',
+                center: ['50%', '50%'],
+                selectedMode: 'single',
+                label: { show: false },
+                data: statusPaymentOptions.map(option => {
+                    const statusPayload = filterAndGetPlanfications().reduce((prev, curr) => {
+                        if (curr.statusPayment && prev[`${curr.statusPayment}`]) {
+                            prev[`${curr.statusPayment}`] = { name: getStatusNameAndColor(curr.statusPayment)?.name, value: prev[`${curr.statusPayment}`].value + 1 }
+                        } else {
+                            prev[`${curr.statusPayment}`] = { name: getStatusNameAndColor(curr.statusPayment)?.name, value: 1 }
+                        }
+
+                        return prev
+                    }, {})
+                    return statusPayload[option.code] || { name: option.displayName, value: 0 }
+                }),
                 emphasis: {
                     itemStyle: {
                         shadowBlur: 30,
@@ -447,13 +521,15 @@ export const Dashboard = ({ me }) => {
         tei: planification
     }))
 
-    const getCalendarEvents = () => filterAndGetPlanfications().map((planification) => ({
-        id: planification.trackedEntityInstance,
-        allDay: true,
-        title: <div style={{ fontWeight: 'bold', fontSize: '12px', borderRadius: '5px', backgroundColor: getStatusNameAndColor(planification.statusSupervision)?.color?.background, color: getStatusNameAndColor(planification.statusSupervision)?.color?.text, margin: '0px', padding: '3px' }}> {planification.libelle}</div>,
-        start: dayjs(planification.period).format('YYYY-MM-DD HH:mm:ss'),
-        end: dayjs(planification.period).format('YYYY-MM-DD HH:mm:ss'),
-    }))
+    const getCalendarEvents = () =>
+        filterAndGetPlanfications()
+            .map((planification) => ({
+                id: planification.trackedEntityInstance,
+                allDay: true,
+                title: <div style={{ fontWeight: 'bold', fontSize: '12px', borderRadius: '5px', backgroundColor: getStatusNameAndColor(planification.statusSupervision)?.color?.background, color: getStatusNameAndColor(planification.statusSupervision)?.color?.text, margin: '0px', padding: '3px' }}> {planification.libelle}</div>,
+                start: dayjs(planification.period).format('YYYY-MM-DD HH:mm:ss'),
+                end: dayjs(planification.period).format('YYYY-MM-DD HH:mm:ss'),
+            }))
 
     const RenderCalendar = () => (
         <Col md={12} sm={24}> {console.log("tei: ", filterAndGetPlanfications())}
@@ -473,24 +549,85 @@ export const Dashboard = ({ me }) => {
                 </div>
             </div>
 
-            {0 > 1 && <div style={{ backgroundColor: '#fff', padding: '10px', borderRadius: '8px', marginBottom: '2px', marginTop: '10px' }} className="my-shadow">
-                <ReactEchart
-                    option={analyleLineOptions}
-                    style={{ height: '300px', width: '100%' }}
-                />
-
-                Single value
-            </div>}
+            {
+                0 > 1 && <div style={{ backgroundColor: '#fff', padding: '10px', borderRadius: '8px', marginBottom: '2px', marginTop: '10px' }} className="my-shadow">
+                    <ReactEchart
+                        option={analyleLineOptions}
+                        style={{ height: '300px', width: '100%' }}
+                    />
+                    Single value
+                </div>
+            }
 
             <div style={{ marginTop: '10px' }}>
                 <Row gutter={[10, 10]}>
                     <Col md={8}>
                         <Card size='small' className='my-shadow'>
                             <div>
-                                <div style={{ fontWeight: 'bold', color: `${BLACK}90` }}> Nombres de Supervisions planifiées</div>
-                                <div style={{ marginTop: '20px' }}>
-                                    <span style={{ fontWeight: 'bold', fontSize: '20px', borderRight: '1px solid #ccc' }}>7</span>
-                                    <span style={{ marginLeft: '30px', color: `${BLACK}90`, fontSize: '13px' }}> 2023-06</span>
+                                <div style={{ fontWeight: 'bold', color: `${BLACK}90`, textAlign: 'center' }}> Nombres de Supervisions en Attente</div>
+                                <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                                    <span style={{ fontWeight: 'bold', fontSize: '20px', borderRight: '1px solid #ccc', paddingRight: '20px' }}>7</span>
+                                    <span style={{ paddingLeft: '20px', color: `${BLACK}90`, fontSize: '13px' }}> 2023-06</span>
+                                </div>
+                            </div>
+                        </Card>
+                    </Col>
+                    <Col md={8}>
+                        <Card size='small' className='my-shadow'>
+                            <div>
+                                <div style={{ fontWeight: 'bold', color: `${BLACK}90`, textAlign: 'center' }}> Nombres de Supervisions Planifiées</div>
+                                <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                                    <span style={{ fontWeight: 'bold', fontSize: '20px', borderRight: '1px solid #ccc', paddingRight: '20px' }}>3</span>
+                                    <span style={{ paddingLeft: '20px', color: `${BLACK}90`, fontSize: '13px' }}> 2023-06</span>
+                                </div>
+                            </div>
+                        </Card>
+                    </Col>
+                    <Col md={8}>
+                        <Card size='small' className='my-shadow'>
+                            <div>
+                                <div style={{ fontWeight: 'bold', color: `${BLACK}90`, textAlign: 'center' }}> Nombres de Supervisions Terminée</div>
+                                <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                                    <span style={{ fontWeight: 'bold', fontSize: '20px', borderRight: '1px solid #ccc', paddingRight: '20px' }}>2</span>
+                                    <span style={{ paddingLeft: '20px', color: `${BLACK}90`, fontSize: '13px' }}> 2023-06</span>
+                                </div>
+                            </div>
+                        </Card>
+                    </Col>
+                </Row>
+            </div>
+
+            <div style={{ marginTop: '10px' }}>
+                <Row gutter={[10, 10]}>
+                    <Col md={8}>
+                        <Card size='small' className='my-shadow'>
+                            <div>
+                                <div style={{ fontWeight: 'bold', color: `${BLACK}90`, textAlign: 'center' }}> Non  Applicable ( NA ) </div>
+                                <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                                    <span style={{ fontWeight: 'bold', fontSize: '20px', borderRight: '1px solid #ccc', paddingRight: '20px' }}>23</span>
+                                    <span style={{ paddingLeft: '20px', color: `${BLACK}90`, fontSize: '13px' }}> 2023-06</span>
+                                </div>
+                            </div>
+                        </Card>
+                    </Col>
+                    <Col md={8}>
+                        <Card size='small' className='my-shadow'>
+                            <div>
+                                <div style={{ fontWeight: 'bold', color: `${BLACK}90`, textAlign: 'center' }}> En Attente de Paiement</div>
+                                <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                                    <span style={{ fontWeight: 'bold', fontSize: '20px', borderRight: '1px solid #ccc', paddingRight: '20px' }}>8</span>
+                                    <span style={{ paddingLeft: '20px', color: `${BLACK}90`, fontSize: '13px' }}> 2023-06</span>
+                                </div>
+                            </div>
+                        </Card>
+                    </Col>
+                    <Col md={8}>
+                        <Card size='small' className='my-shadow'>
+                            <div>
+                                <div style={{ fontWeight: 'bold', color: `${BLACK}90`, textAlign: 'center' }}> Paiement Effectué </div>
+                                <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                                    <span style={{ fontWeight: 'bold', fontSize: '20px', borderRight: '1px solid #ccc', paddingRight: '20px' }}>3</span>
+                                    <span style={{ paddingLeft: '20px', color: `${BLACK}90`, fontSize: '13px' }}> 2023-06</span>
                                 </div>
                             </div>
                         </Card>
@@ -503,25 +640,44 @@ export const Dashboard = ({ me }) => {
 
     const getStatusNameAndColor = status => {
 
-        if (status === CANCELED.value) {
-            return { name: CANCELED.name, color: { background: RED, text: WHITE } }
+        if (status === NA.value) {
+            return { name: NA.name, color: { background: GRAY_DARK, text: WHITE } }
         }
 
-        if (status === POSTPONED.value) {
-            return { name: POSTPONED.name, color: { background: JAUNE, text: BLACK } }
+        if (status === CANCELED.value) {
+            return { name: CANCELED.name, color: { background: RED, text: WHITE } }
         }
 
         if (status === PENDING_VALIDATION.value) {
             return { name: PENDING_VALIDATION.name, color: { background: ORANGE, text: WHITE } }
         }
 
-        if (status === SUPERVISION_COMPLETED.value) {
-            return { name: SUPERVISION_COMPLETED.name, color: { background: GREEN, text: BLACK } }
+        if (status === COMPLETED.value) {
+            return { name: COMPLETED.name, color: { background: GREEN, text: WHITE } }
         }
 
-        if (status === SUPERVISION_PLANNED.value) {
-            return { name: SUPERVISION_PLANNED.name, color: { background: BLUE, text: WHITE } }
+        if (status === SCHEDULED.value) {
+            return { name: SCHEDULED.name, color: { background: BLUE, text: WHITE } }
         }
+
+        return { name: NA.name, color: { background: GRAY_DARK, text: WHITE } }
+
+    }
+
+    const getStatusNameAndColorForPayment = status => {
+        if (status === PAYMENT_DONE.value) {
+            return { name: PAYMENT_DONE.name, color: { background: GREEN, text: WHITE } }
+        }
+
+        if (status === PENDING_PAYMENT.value) {
+            return { name: PENDING_PAYMENT.name, color: { background: ORANGE, text: WHITE } }
+        }
+
+        if (status === NA.value) {
+            return { name: NA.name, color: { background: GRAY_DARK, text: WHITE } }
+        }
+
+        return { name: NA.name, color: { background: GRAY_DARK, text: WHITE } }
 
     }
 
@@ -549,8 +705,8 @@ export const Dashboard = ({ me }) => {
                                         title: 'Status Paiement', key: 'statusPayment', dataIndex: 'statusPayment', width: '150px',
                                         render: value => (
                                             <>
-                                                <span className='text-truncate-one' title={getStatusNameAndColor(value)?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColor(value)?.color?.background, color: getStatusNameAndColor(value)?.color?.text, padding: '3px', fontSize: '12px', borderRadius: '5px' }}>
-                                                    {getStatusNameAndColor(value)?.name}
+                                                <span className='text-truncate-one' title={getStatusNameAndColorForPayment(value)?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColorForPayment(value)?.color?.background, color: getStatusNameAndColorForPayment(value)?.color?.text, padding: '3px', fontSize: '12px', borderRadius: '5px' }}>
+                                                    {getStatusNameAndColorForPayment(value)?.name}
                                                 </span>
                                             </>
                                         )
@@ -591,7 +747,7 @@ export const Dashboard = ({ me }) => {
                             teiList.length > 0 && (
                                 <ReactEchart
                                     style={{ height: '400px', width: '100%' }}
-                                    option={getPieChartDatas()}
+                                    option={getPieChartDatasForSupervisions()}
                                 />
                             )
                         }
@@ -607,7 +763,7 @@ export const Dashboard = ({ me }) => {
                             teiList.length > 0 && (
                                 <ReactEchart
                                     style={{ height: '400px', width: '100%' }}
-                                    option={getPieChartDatas()}
+                                    option={getPieChartDatasForPayment()}
                                 />
                             )
                         }
@@ -623,9 +779,27 @@ export const Dashboard = ({ me }) => {
         }
     }
 
+    const loadOptions = async (dataElementId, setState) => {
+        try {
+            if (!dataElementId)
+                throw new Error("Elément de donnée introuvable !")
+
+            const response = await axios.get(`${DATA_ELEMENT_OPTION_SETS}/${dataElementId}.json?fields=optionSet[options[id,code,displayName]]`)
+            setState && setState(response.data.optionSet?.options || [])
+        } catch (err) {
+            console.log(err)
+            setState && setState([])
+        }
+    }
+
     const handleSelectProgram = (value) => {
-        setTeiList([])
-        setSelectedProgram(dataStoreSupervisionsConfigs.find(d => d.program?.id === value))
+        if (value) {
+            const supFound = dataStoreSupervisionsConfigs.find(d => d.program?.id === value)
+            setTeiList([])
+            setSelectedProgram(supFound)
+            loadOptions(supFound.statusPayment?.dataElement, setStatusPaymentOptions)
+            loadOptions(supFound.statusSupervision?.dataElement, setStatusSupervisionOptions)
+        }
     }
 
     const RenderFilters = () => (
@@ -748,6 +922,8 @@ export const Dashboard = ({ me }) => {
     return (
         <>
             <div style={{ padding: '10px', width: '100%' }}>
+                {console.log(statusPaymentOptions)}
+                {console.log(statusSupervisionOptions)}
                 {RenderFilters()}
                 <Row gutter={[8, 8]}>
                     {RenderCalendar()}
