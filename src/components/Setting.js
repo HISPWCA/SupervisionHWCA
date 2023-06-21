@@ -48,8 +48,10 @@ const Setting = () => {
     const [selectedAnalyseIndicator, setSelectedAnalyseIndicator] = useState(null)
     const [selectedAnalyseDataElement, setSelectedAnalyseDataElement] = useState(null)
     const [selectedProgramStage, setSelectedProgramStage] = useState(null)
-    const [selectedStatutProgramStage, setSelectedStatutProgramStage] = useState(null)
-    const [selectedStatutDataElement, setSelectedStatutDataElement] = useState(null)
+    const [selectedStatutSupervisionProgramStage, setSelectedStatutSupervisionProgramStage] = useState(null)
+    const [selectedStatutPaymentProgramStage, setSelectedStatutPaymentProgramStage] = useState(null)
+    const [selectedStatutSupervisionDataElement, setSelectedStatutSupervisionDataElement] = useState(null)
+    const [selectedStatutPaymentDataElement, setSelectedStatutPaymentDataElement] = useState(null)
     const [selectedDataElements, setSelectedDataElements] = useState([])
     const [selectedAttributesToDisplay, setSelectedAttributesToDisplay] = useState([])
 
@@ -171,9 +173,11 @@ const Setting = () => {
         setSelectedIndicatorGroup(null)
         setIndicatorGroups([])
         setSelectedProgramStage(null)
-        setSelectedStatutProgramStage(null)
         setSelectedDataElements([])
-        setSelectedStatutDataElement(null)
+        setSelectedStatutSupervisionProgramStage(null)
+        setSelectedStatutSupervisionDataElement(null)
+        setSelectedStatutPaymentProgramStage(null)
+        setSelectedStatutPaymentDataElement(null)
         setSelectedAttributesToDisplay([])
         setSelectedTEIProgram(programs.find(p => p.id === value))
         loadProgramStages(value)
@@ -311,9 +315,11 @@ const Setting = () => {
                 setFieldEditingMode(false)
                 setSelectedTEIProgram(null)
                 setSelectedProgramStage(null)
-                setSelectedStatutProgramStage(null)
                 setSelectedDataElements([])
-                setSelectedStatutDataElement(null)
+                setSelectedStatutSupervisionProgramStage(null)
+                setSelectedStatutSupervisionDataElement(null)
+                setSelectedStatutPaymentProgramStage(null)
+                setSelectedStatutPaymentDataElement(null)
                 setSelectedSupervisionGenerationType(TYPE_GENERATION_AS_TEI)
             }
         } catch (err) {
@@ -387,7 +393,8 @@ const Setting = () => {
                     program: { id: selectedTEIProgram.id, displayName: selectedTEIProgram.displayName },
                     attributesToDisplay: selectedAttributesToDisplay,
                     fieldConfig: null,
-                    statut: null
+                    statusSupervision: null,
+                    statusPayment: null
                 }
 
                 if (selectedProgramStage && selectedDataElements.length > 0) {
@@ -399,10 +406,17 @@ const Setting = () => {
                     }
                 }
 
-                if (selectedStatutProgramStage && selectedStatutDataElement) {
-                    payload.statut = {
-                        programStage: { id: selectedStatutProgramStage.id, displayName: selectedStatutProgramStage.displayName },
-                        dataElement: selectedStatutDataElement
+                if (selectedStatutSupervisionProgramStage && selectedStatutSupervisionDataElement) {
+                    payload.statusSupervision = {
+                        programStage: { id: selectedStatutSupervisionProgramStage.id, displayName: selectedStatutSupervisionProgramStage.displayName },
+                        dataElement: selectedStatutSupervisionDataElement
+                    }
+                }
+
+                if (selectedStatutPaymentProgramStage && selectedStatutPaymentDataElement) {
+                    payload.statusPayment = {
+                        programStage: { id: selectedStatutPaymentProgramStage.id, displayName: selectedStatutPaymentProgramStage.displayName },
+                        dataElement: selectedStatutPaymentDataElement
                     }
                 }
 
@@ -424,11 +438,13 @@ const Setting = () => {
 
                 setMappingConfigSupervisions(newList)
                 setSelectedTEIProgram(null)
-                setSelectedStatutProgramStage(null)
+                setSelectedStatutSupervisionProgramStage(null)
+                setSelectedStatutSupervisionDataElement(null)
+                setSelectedStatutPaymentProgramStage(null)
+                setSelectedStatutPaymentDataElement(null)
                 setSelectedProgramStage(null)
                 setFieldEditingMode(false)
                 setSelectedDataElements([])
-                setSelectedStatutDataElement(null)
                 setSelectedAttributesToDisplay([])
                 setNotification({ show: true, type: NOTIFICATON_SUCCESS, message: isFieldEditingMode ? 'Mise à jour éffectuée' : 'Configuration ajoutée !' })
                 setLoadingSaveSupervionsConfig(false)
@@ -605,13 +621,22 @@ const Setting = () => {
         setSelectedDataElements([])
     }
 
-    const handleSelectStatutDataElement = (value) => {
-        setSelectedStatutDataElement(selectedProgramStage.programStageDataElements?.map(p => p.dataElement).find(dataElement => dataElement.id === value))
+    const handleSelectStatutSupervisionDataElement = (value) => {
+        setSelectedStatutSupervisionDataElement(selectedStatutSupervisionProgramStage.programStageDataElements?.map(p => p.dataElement).find(dataElement => dataElement.id === value))
     }
 
-    const handleSelectStatutProgramStage = (value) => {
-        setSelectedStatutProgramStage(programStages.find(pstage => pstage.id === value))
-        setSelectedStatutDataElement(null)
+    const handleSelectStatutSupervisionProgramStage = (value) => {
+        setSelectedStatutSupervisionProgramStage(programStages.find(pstage => pstage.id === value))
+        setSelectedStatutSupervisionDataElement(null)
+    }
+
+    const handleSelectStatutPaymentDataElement = (value) => {
+        setSelectedStatutPaymentDataElement(selectedStatutPaymentProgramStage.programStageDataElements?.map(p => p.dataElement).find(dataElement => dataElement.id === value))
+    }
+
+    const handleSelectStatutPaymentProgramStage = (value) => {
+        setSelectedStatutPaymentProgramStage(programStages.find(pstage => pstage.id === value))
+        setSelectedStatutPaymentDataElement(null)
     }
 
     const RenderSupervisorFieldConfiguration = () => (
@@ -723,9 +748,11 @@ const Setting = () => {
             setSelectedTEIProgram(programs.find(p => p.id === prog.program?.id))
             const programStageList = await loadProgramStages(prog?.program?.id)
             setSelectedProgramStage(programStageList.find(psg => psg.id === prog.fieldConfig?.supervisor?.programStage.id))
-            setSelectedStatutProgramStage(programStageList.find(psg => psg.id === prog.statut?.programStage?.id))
             setSelectedDataElements(prog.fieldConfig?.supervisor?.dataElements || [])
-            setSelectedStatutDataElement(prog?.statut?.dataElement)
+            setSelectedStatutSupervisionProgramStage(programStageList.find(psg => psg.id === prog.statusSupervision?.programStage?.id))
+            setSelectedStatutSupervisionDataElement(prog?.statusSupervision?.dataElement)
+            setSelectedStatutPaymentProgramStage(programStageList.find(psg => psg.id === prog.statusPayment?.programStage?.id))
+            setSelectedStatutPaymentDataElement(prog?.statusPayment?.dataElement)
             setSelectedSupervisionGenerationType(prog.generationType)
             setSelectedAttributesToDisplay(prog.attributesToDisplay || [])
             setFieldEditingMode(true)
@@ -765,13 +792,13 @@ const Setting = () => {
         </div>
     )
 
-    const RenderStatusDataElementToUse = () => (
+    const RenderStatusSupervisionDataElementToUse = () => (
         <div style={{ marginTop: '20px' }}>
             <Card className="my-shadow" size='small'>
                 <div>
-                    <div style={{ fontWeight: 'bold' }}>Configuration de l'élement de donné à utiliser pour le statut de la planification</div>
+                    <div style={{ fontWeight: 'bold' }}>Configuration de l'élement de donné à utiliser pour le statut de la supervision</div>
                     <div style={{ marginTop: '10px', color: '#00000080', fontSize: '13px' }}>
-                        La configuration de cet élément de données, permettra de suivre le statut des planifications.
+                        La configuration de cet élément de données, permettra de suivre le statut des supervisions.
                     </div>
                     <div style={{ margin: '10px 0px' }}>
                         <Row gutter={[10, 10]}>
@@ -783,8 +810,8 @@ const Setting = () => {
                                         placeholder="Choisir le program stage"
                                         style={{ width: '100%' }}
                                         optionFilterProp='label'
-                                        value={selectedStatutProgramStage?.id}
-                                        onChange={handleSelectStatutProgramStage}
+                                        value={selectedStatutSupervisionProgramStage?.id}
+                                        onChange={handleSelectStatutSupervisionProgramStage}
                                         showSearch
                                         allowClear
                                         loading={loadingProgramStages}
@@ -793,16 +820,69 @@ const Setting = () => {
                                 </div>
                             </Col>
                             {
-                                selectedStatutProgramStage && (
+                                selectedStatutSupervisionProgramStage && (
                                     <Col md={12} xs={24}>
                                         <div>
                                             <div style={{ marginBottom: '5px' }}>Eléments de données</div>
                                             <Select
-                                                options={selectedStatutProgramStage?.programStageDataElements?.map(progStageDE => ({ label: progStageDE.dataElement?.displayName, value: progStageDE.dataElement?.id }))}
+                                                options={selectedStatutSupervisionProgramStage?.programStageDataElements?.map(progStageDE => ({ label: progStageDE.dataElement?.displayName, value: progStageDE.dataElement?.id }))}
                                                 placeholder="Element de donnée"
                                                 style={{ width: '100%' }}
-                                                onChange={handleSelectStatutDataElement}
-                                                value={selectedStatutDataElement?.id}
+                                                onChange={handleSelectStatutSupervisionDataElement}
+                                                value={selectedStatutSupervisionDataElement?.id}
+                                                optionFilterProp='label'
+                                                showSearch
+                                                allowClear
+                                            />
+                                        </div>
+                                    </Col>
+                                )
+                            }
+                        </Row>
+                    </div>
+                </div>
+            </Card>
+        </div>
+    )
+
+    const RenderStatusPaymentDataElementToUse = () => (
+        <div style={{ marginTop: '20px' }}>
+            <Card className="my-shadow" size='small'>
+                <div>
+                    <div style={{ fontWeight: 'bold' }}>Configuration de l'élement de donné à utiliser pour le statut du paiement</div>
+                    <div style={{ marginTop: '10px', color: '#00000080', fontSize: '13px' }}>
+                        La configuration de cet élément de données, permettra de suivre le statut des paiements.
+                    </div>
+                    <div style={{ margin: '10px 0px' }}>
+                        <Row gutter={[10, 10]}>
+                            <Col md={12}>
+                                <div>
+                                    <div style={{ marginBottom: '5px' }}>Programmes Stage</div>
+                                    <Select
+                                        options={programStages.map(programStage => ({ label: programStage.displayName, value: programStage.id }))}
+                                        placeholder="Choisir le program stage"
+                                        style={{ width: '100%' }}
+                                        optionFilterProp='label'
+                                        value={selectedStatutPaymentProgramStage?.id}
+                                        onChange={handleSelectStatutPaymentProgramStage}
+                                        showSearch
+                                        allowClear
+                                        loading={loadingProgramStages}
+                                        disabled={loadingProgramStages}
+                                    />
+                                </div>
+                            </Col>
+                            {
+                                selectedStatutPaymentProgramStage && (
+                                    <Col md={12} xs={24}>
+                                        <div>
+                                            <div style={{ marginBottom: '5px' }}>Eléments de données</div>
+                                            <Select
+                                                options={selectedStatutPaymentProgramStage?.programStageDataElements?.map(progStageDE => ({ label: progStageDE.dataElement?.displayName, value: progStageDE.dataElement?.id }))}
+                                                placeholder="Element de donnée"
+                                                style={{ width: '100%' }}
+                                                onChange={handleSelectStatutPaymentDataElement}
+                                                value={selectedStatutPaymentDataElement?.id}
                                                 optionFilterProp='label'
                                                 showSearch
                                                 allowClear
@@ -825,7 +905,8 @@ const Setting = () => {
                     <div >
                         {RenderSupervisionConfiguration()}
                         {selectedTEIProgram && selectedTEIProgram.programTrackedEntityAttributes && RenderAttributesToDisplay()}
-                        {selectedTEIProgram && RenderStatusDataElementToUse()}
+                        {selectedTEIProgram && RenderStatusSupervisionDataElementToUse()}
+                        {selectedTEIProgram && RenderStatusPaymentDataElementToUse()}
                         {selectedTEIProgram && RenderSupervisorFieldConfiguration()}
 
                         <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center' }}>
@@ -838,8 +919,10 @@ const Setting = () => {
                                             setFieldEditingMode(false)
                                             setSelectedTEIProgram(null)
                                             setSelectedProgramStage(null)
-                                            setSelectedStatutProgramStage(null)
-                                            setSelectedStatutDataElement(null)
+                                            setSelectedStatutSupervisionProgramStage(null)
+                                            setSelectedStatutSupervisionDataElement(null)
+                                            setSelectedStatutPaymentProgramStage(null)
+                                            setSelectedStatutPaymentDataElement(null)
                                             setSelectedDataElements([])
                                             setSelectedAttributesToDisplay([])
                                             setSelectedSupervisionGenerationType(TYPE_GENERATION_AS_TEI)
@@ -1575,7 +1658,7 @@ const Setting = () => {
     }, [currentItem, indicatorGroups, programs])
 
     return (
-        <> 
+        <>
             {RenderTopContent()}
             {RenderContent()}
             <MyNotification notification={notification} setNotification={setNotification} />

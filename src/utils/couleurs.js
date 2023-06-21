@@ -1,9 +1,9 @@
 export const GRAY = "#d5dde5"
 export const BORDER_COLOR = GRAY
 export const APP_BACKGROUND_COLOR = "#f3f5f7"
-export const BLUE = '#2c6693'
+export const BLUE = '#00B4D8'
 export const BLUE_SECOND = '#118AB2'
-export const GREEN = '#00695c'
+export const GREEN = '#4ECDC4'
 export const RED = '#EF476F'
 export const ORANGE = '#FF7B00'
 export const WHITE = '#FFFFFF'

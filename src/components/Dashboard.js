@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Col, DatePicker, Row, Select, Table } from 'antd'
+import { Card, Col, DatePicker, Row, Select, Table } from 'antd'
 import { Calendar, dayjsLocalizer } from 'react-big-calendar'
 import ReactEchart from 'echarts-for-react'
 import axios from 'axios';
@@ -315,7 +315,8 @@ export const Dashboard = ({ me }) => {
                         orgUnit: current.orgUnit,
                         storedBy: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.storedBy,
                         libelle: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.orgUnitName,
-                        status: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statut?.dataElement?.id)?.value || getDefaultStatusIfStatusIsNull(current.created)
+                        statusSupervision: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusIfStatusIsNull(current.created),
+                        statusPayment: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statusPayment?.dataElement?.id)?.value || getDefaultStatusIfStatusIsNull(current.created)
                     }
                 ]
             }
@@ -339,7 +340,8 @@ export const Dashboard = ({ me }) => {
                         orgUnit: current.orgUnit,
                         storedBy: en.storedBy,
                         libelle: en.orgUnitName,
-                        status: en?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statut?.dataElement?.id)?.value || getDefaultStatusIfStatusIsNull(en.enrollmentDate)
+                        statusSupervision: en?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusIfStatusIsNull(en.enrollmentDate),
+                        statusPayment: en?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statusPayment?.dataElement?.id)?.value || getDefaultStatusIfStatusIsNull(en.enrollmentDate)
                     }))
                 ]
             }
@@ -364,7 +366,8 @@ export const Dashboard = ({ me }) => {
                         orgUnit: currentEnrollment?.orgUnit,
                         storedBy: currentEnrollment?.storedBy,
                         libelle: currentEnrollment?.orgUnitName,
-                        status: currentEnrollment?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statut?.dataElement?.id)?.value || getDefaultStatusIfStatusIsNull(ev.eventDate)
+                        statusSupervision: currentEnrollment?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusIfStatusIsNull(ev.eventDate),
+                        statusPayment: currentEnrollment?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statusPayment?.dataElement?.id)?.value || getDefaultStatusIfStatusIsNull(ev.eventDate)
                     }))
                 ]
             }
@@ -402,10 +405,10 @@ export const Dashboard = ({ me }) => {
         },
         color: Object.values(
             filterAndGetPlanfications().reduce((prev, curr) => {
-                if (curr.status && prev[`${curr.status}`]) {
-                    prev[`${curr.status}`] = getStatusNameAndColor(curr.status).color.background
+                if (curr.statusSupervision && prev[`${curr.statusSupervision}`]) {
+                    prev[`${curr.statusSupervision}`] = getStatusNameAndColor(curr.statusSupervision).color.background
                 } else {
-                    prev[`${curr.status}`] = getStatusNameAndColor(curr.status).color.background
+                    prev[`${curr.statusSupervision}`] = getStatusNameAndColor(curr.statusSupervision).color.background
                 }
 
                 return prev
@@ -417,10 +420,10 @@ export const Dashboard = ({ me }) => {
                 radius: '50%',
                 data: Object.values(
                     filterAndGetPlanfications().reduce((prev, curr) => {
-                        if (curr.status && prev[`${curr.status}`]) {
-                            prev[`${curr.status}`] = { name: getStatusNameAndColor(curr.status)?.name, value: prev[`${curr.status}`].value + 1 }
+                        if (curr.statusSupervision && prev[`${curr.statusSupervision}`]) {
+                            prev[`${curr.statusSupervision}`] = { name: getStatusNameAndColor(curr.statusSupervision)?.name, value: prev[`${curr.statusSupervision}`].value + 1 }
                         } else {
-                            prev[`${curr.status}`] = { name: getStatusNameAndColor(curr.status)?.name, value: 1 }
+                            prev[`${curr.statusSupervision}`] = { name: getStatusNameAndColor(curr.statusSupervision)?.name, value: 1 }
                         }
 
                         return prev
@@ -447,7 +450,7 @@ export const Dashboard = ({ me }) => {
     const getCalendarEvents = () => filterAndGetPlanfications().map((planification) => ({
         id: planification.trackedEntityInstance,
         allDay: true,
-        title: <div style={{ fontWeight: 'bold', fontSize: '12px', borderRadius: '5px', backgroundColor: getStatusNameAndColor(planification.status)?.color?.background, color: getStatusNameAndColor(planification.status)?.color?.text, margin: '0px', padding: '3px' }}> {planification.libelle}</div>,
+        title: <div style={{ fontWeight: 'bold', fontSize: '12px', borderRadius: '5px', backgroundColor: getStatusNameAndColor(planification.statusSupervision)?.color?.background, color: getStatusNameAndColor(planification.statusSupervision)?.color?.text, margin: '0px', padding: '3px' }}> {planification.libelle}</div>,
         start: dayjs(planification.period).format('YYYY-MM-DD HH:mm:ss'),
         end: dayjs(planification.period).format('YYYY-MM-DD HH:mm:ss'),
     }))
@@ -470,11 +473,29 @@ export const Dashboard = ({ me }) => {
                 </div>
             </div>
 
-            <div style={{ backgroundColor: '#fff', padding: '10px', borderRadius: '8px', marginBottom: '2px', marginTop: '10px' }} className="my-shadow">
+            {0 > 1 && <div style={{ backgroundColor: '#fff', padding: '10px', borderRadius: '8px', marginBottom: '2px', marginTop: '10px' }} className="my-shadow">
                 <ReactEchart
                     option={analyleLineOptions}
                     style={{ height: '300px', width: '100%' }}
                 />
+
+                Single value
+            </div>}
+
+            <div style={{ marginTop: '10px' }}>
+                <Row gutter={[10, 10]}>
+                    <Col md={8}>
+                        <Card size='small' className='my-shadow'>
+                            <div>
+                                <div style={{ fontWeight: 'bold', color: `${BLACK}90` }}> Nombres de Supervisions planifiées</div>
+                                <div style={{ marginTop: '20px' }}>
+                                    <span style={{ fontWeight: 'bold', fontSize: '20px', borderRight: '1px solid #ccc' }}>7</span>
+                                    <span style={{ marginLeft: '30px', color: `${BLACK}90`, fontSize: '13px' }}> 2023-06</span>
+                                </div>
+                            </div>
+                        </Card>
+                    </Col>
+                </Row>
             </div>
 
         </Col>
@@ -495,7 +516,7 @@ export const Dashboard = ({ me }) => {
         }
 
         if (status === SUPERVISION_COMPLETED.value) {
-            return { name: SUPERVISION_COMPLETED.name, color: { background: GREEN, text: WHITE } }
+            return { name: SUPERVISION_COMPLETED.name, color: { background: GREEN, text: BLACK } }
         }
 
         if (status === SUPERVISION_PLANNED.value) {
@@ -507,22 +528,7 @@ export const Dashboard = ({ me }) => {
     const RenderCharts = () => (
         <Col md={12} sm={24}>
             <Row gutter={[8, 8]}>
-                <Col md={10}>
-                    <div className='my-shadow' style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '10px', marginBottom: '2px', height: '100%', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        {
-                            teiList.length === 0 && (<div style={{ fontWeight: 'bold', color: `${BLACK}90` }}> Aucune données disponibles !</div>)
-                        }
-                        {
-                            teiList.length > 0 && (
-                                <ReactEchart
-                                    style={{ height: '100%', width: '100%' }}
-                                    option={getPieChartDatas()}
-                                />
-                            )
-                        }
-                    </div>
-                </Col>
-                <Col md={14}>
+                <Col md={24}>
                     <div className='my-shadow' style={{ backgroundColor: '#fff', borderRadius: '8px', marginBottom: '2px', padding: '10px', height: '100%' }}>
                         <Table
                             size='small'
@@ -530,7 +536,17 @@ export const Dashboard = ({ me }) => {
                                 [
                                     { title: "Unité d'organisation", key: 'nom', dataIndex: 'nom' },
                                     {
-                                        title: 'Status', key: 'status', dataIndex: 'status', width: '150px',
+                                        title: 'Status Supervision', key: 'statusSupervision', dataIndex: 'statusSupervision', width: '150px',
+                                        render: value => (
+                                            <>
+                                                <span className='text-truncate-one' title={getStatusNameAndColor(value)?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColor(value)?.color?.background, color: getStatusNameAndColor(value)?.color?.text, padding: '3px', fontSize: '12px', borderRadius: '5px' }}>
+                                                    {getStatusNameAndColor(value)?.name}
+                                                </span>
+                                            </>
+                                        )
+                                    },
+                                    {
+                                        title: 'Status Paiement', key: 'statusPayment', dataIndex: 'statusPayment', width: '150px',
                                         render: value => (
                                             <>
                                                 <span className='text-truncate-one' title={getStatusNameAndColor(value)?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColor(value)?.color?.background, color: getStatusNameAndColor(value)?.color?.text, padding: '3px', fontSize: '12px', borderRadius: '5px' }}>
@@ -557,12 +573,44 @@ export const Dashboard = ({ me }) => {
                         />
                     </div>
                 </Col>
-                <Col md={24}>
-                    <div className='my-shadow' style={{ backgroundColor: '#fff', borderRadius: '8px', marginBottom: '2px', padding: '5px' }}>
+                <Col md={12}>
+                    {0 > 1 && <div className='my-shadow' style={{ backgroundColor: '#fff', borderRadius: '8px', marginBottom: '2px', padding: '5px' }}>
                         <MapView
                             coordinates={coordinates}
                             style={{ height: '500px' }}
                         />
+
+                    </div>
+                    }
+
+                    <div className='my-shadow' style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '10px', marginBottom: '2px', height: '100%', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {
+                            teiList.length === 0 && (<div style={{ fontWeight: 'bold', color: `${BLACK}90` }}> Aucune données disponibles !</div>)
+                        }
+                        {
+                            teiList.length > 0 && (
+                                <ReactEchart
+                                    style={{ height: '400px', width: '100%' }}
+                                    option={getPieChartDatas()}
+                                />
+                            )
+                        }
+                    </div>
+
+                </Col>
+                <Col md={12}>
+                    <div className='my-shadow' style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '10px', marginBottom: '2px', height: '100%', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {
+                            teiList.length === 0 && (<div style={{ fontWeight: 'bold', color: `${BLACK}90` }}> Aucune données disponibles !</div>)
+                        }
+                        {
+                            teiList.length > 0 && (
+                                <ReactEchart
+                                    style={{ height: '400px', width: '100%' }}
+                                    option={getPieChartDatas()}
+                                />
+                            )
+                        }
                     </div>
                 </Col>
             </Row>
