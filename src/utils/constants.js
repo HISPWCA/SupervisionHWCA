@@ -55,5 +55,6 @@ export const PENDING_VALIDATION = { name: 'En Attente de Validation', value: 'PE
 export const PENDING_PAYMENT = { name: 'En Attente de Paiement', value: 'PENDING_PAYMENT' }
 export const PAYMENT_EFFECTUATED = { name: 'Paiement Effectué', value: 'PAYMENT_EFFECTUATED' }
 export const SUPERVISION_COMPLETED = { name: 'Supervision Terminée', value: 'SUPERVISION_COMPLETED' }
+export const SUPERVISION_PLANNED = { name: 'Supervision Planifiée', value: 'SUPERVISION_PLANNED' }
 
 

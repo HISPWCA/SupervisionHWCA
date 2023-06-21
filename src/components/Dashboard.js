@@ -5,8 +5,7 @@ import ReactEchart from 'echarts-for-react'
 import axios from 'axios';
 import { ORGANISATION_UNITS_ROUTE, SERVER_URL, TRACKED_ENTITY_INSTANCES_ROUTE, USERS_ROUTE } from '../utils/api.routes'
 import OrganisationUnitsTree from './OrganisationUnitsTree'
-import { CANCELED, DESCENDANTS, NOTICE_BOX_DEFAULT, NOTIFICATON_CRITICAL, PENDING_VALIDATION, PLANIFICATION_PAR_MOI, PLANIFICATION_PAR_TOUS, PLANIFICATION_PAR_UN_USER, POSTPONED, SUPERVISION_COMPLETED, TYPE_GENERATION_AS_ENROLMENT, TYPE_GENERATION_AS_EVENT, TYPE_GENERATION_AS_TEI } from '../utils/constants'
-import { Chart } from "react-google-charts"
+import { CANCELED, DESCENDANTS, NOTICE_BOX_DEFAULT, NOTIFICATON_CRITICAL, PENDING_VALIDATION, PLANIFICATION_PAR_MOI, PLANIFICATION_PAR_TOUS, PLANIFICATION_PAR_UN_USER, POSTPONED, SUPERVISION_COMPLETED, SUPERVISION_PLANNED, TYPE_GENERATION_AS_ENROLMENT, TYPE_GENERATION_AS_EVENT, TYPE_GENERATION_AS_TEI } from '../utils/constants'
 import MapView from './MapView'
 import { loadDataStore } from '../utils/functions'
 import { IoMdOpen } from 'react-icons/io'
@@ -37,7 +36,6 @@ export const Dashboard = ({ me }) => {
     const [users, setUsers] = useState([])
     const [dataStoreSupervisionsConfigs, setDataStoreSupervisionsConfigs] = useState([])
     const [dataStoreSupervisionPlanifications, setDataStoreSupervisionPlanifications] = useState([])
-    const [calendarEvents, setCalendarEvents] = useState([])
     const [teiList, setTeiList] = useState([])
     const [noticeBox, setNoticeBox] = useState({ show: false, message: null, title: null, type: NOTICE_BOX_DEFAULT })
     const [notification, setNotification] = useState({ show: false, message: null, type: null })
@@ -256,7 +254,6 @@ export const Dashboard = ({ me }) => {
 
                 eventList.push(payload)
             }
-            setCalendarEvents(eventList)
 
             setDataStoreSupervisionPlanifications(response)
             setLoadingDataStoreSupervisionPlanifications(false)
@@ -285,7 +282,6 @@ export const Dashboard = ({ me }) => {
         }
     }
 
-
     const handleSelectPlanification = (value) => {
         setSelectedPlanification(value)
     }
@@ -299,7 +295,7 @@ export const Dashboard = ({ me }) => {
     const handleSelectPlanificationUser = value => setSelectedPlanificationUser(users.find(u => u.id === value))
 
     const getDefaultStatusIfStatusIsNull = (p) => {
-        return PENDING_VALIDATION.value
+        return SUPERVISION_PLANNED.value
     }
 
     const filterAndGetPlanfications = () => teiList.reduce((prev, current) => {
@@ -313,7 +309,7 @@ export const Dashboard = ({ me }) => {
                     ...prev,
                     {
                         trackedEntityInstance: current.trackedEntityInstance,
-                        period: current.created,
+                        period: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.events[0]?.eventDate,
                         enrollment: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.enrollment,
                         program: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.program,
                         orgUnit: current.orgUnit,
@@ -337,7 +333,7 @@ export const Dashboard = ({ me }) => {
                     ...prev,
                     ...enrollmentsList.map(en => ({
                         trackedEntityInstance: en.trackedEntityInstance,
-                        period: en.enrollmentDate,
+                        period: en?.events[0]?.eventDate,
                         enrollment: en.enrollment,
                         program: en.program,
                         orgUnit: current.orgUnit,
@@ -364,7 +360,7 @@ export const Dashboard = ({ me }) => {
                         trackedEntityInstance: currentEnrollment?.trackedEntityInstance,
                         period: ev.eventDate,
                         enrollment: currentEnrollment?.enrollment,
-                        program: currentEnrollment?.enrollments,
+                        program: currentEnrollment?.program,
                         orgUnit: currentEnrollment?.orgUnit,
                         storedBy: currentEnrollment?.storedBy,
                         libelle: currentEnrollment?.orgUnitName,
@@ -389,11 +385,12 @@ export const Dashboard = ({ me }) => {
             return true
         })
 
+
     const getPieChartDatas = () => ({
-        itle: {
-            text: 'Rapport sur les planifications',
-            left: 'center'
-        },
+        // title: {
+        //     text: 'Rapport sur les planifications',
+        //     left: 'center'
+        // },
 
         tooltip: {
             trigger: 'item'
@@ -401,8 +398,19 @@ export const Dashboard = ({ me }) => {
 
         legend: {
             orient: 'vertical',
-            left: 'left'
+            left: 'left',
         },
+        color: Object.values(
+            filterAndGetPlanfications().reduce((prev, curr) => {
+                if (curr.status && prev[`${curr.status}`]) {
+                    prev[`${curr.status}`] = getStatusNameAndColor(curr.status).color.background
+                } else {
+                    prev[`${curr.status}`] = getStatusNameAndColor(curr.status).color.background
+                }
+
+                return prev
+            }, {})
+        ),
         series: [
             {
                 type: 'pie',
@@ -438,7 +446,8 @@ export const Dashboard = ({ me }) => {
 
     const getCalendarEvents = () => filterAndGetPlanfications().map((planification) => ({
         id: planification.trackedEntityInstance,
-        title: <div style={{ fontWeight: 'bold', borderRadius: '5px', backgroundColor: getStatusNameAndColor(planification.status)?.color?.background, color: getStatusNameAndColor(planification.status)?.color?.text, margin: '0px', padding: '5px' }}> {planification.libelle}</div>,
+        allDay: true,
+        title: <div style={{ fontWeight: 'bold', fontSize: '12px', borderRadius: '5px', backgroundColor: getStatusNameAndColor(planification.status)?.color?.background, color: getStatusNameAndColor(planification.status)?.color?.text, margin: '0px', padding: '3px' }}> {planification.libelle}</div>,
         start: dayjs(planification.period).format('YYYY-MM-DD HH:mm:ss'),
         end: dayjs(planification.period).format('YYYY-MM-DD HH:mm:ss'),
     }))
@@ -489,18 +498,28 @@ export const Dashboard = ({ me }) => {
             return { name: SUPERVISION_COMPLETED.name, color: { background: GREEN, text: WHITE } }
         }
 
-    }
+        if (status === SUPERVISION_PLANNED.value) {
+            return { name: SUPERVISION_PLANNED.name, color: { background: BLUE, text: WHITE } }
+        }
 
+    }
 
     const RenderCharts = () => (
         <Col md={12} sm={24}>
             <Row gutter={[8, 8]}>
                 <Col md={10}>
-                    <div className='my-shadow' style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '10px', marginBottom: '2px', height: '100%' }}>
-                        <ReactEchart
-                            style={{ height: '100%', width: '100%' }}
-                            option={getPieChartDatas()}
-                        />
+                    <div className='my-shadow' style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '10px', marginBottom: '2px', height: '100%', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {
+                            teiList.length === 0 && (<div style={{ fontWeight: 'bold', color: `${BLACK}90` }}> Aucune données disponibles !</div>)
+                        }
+                        {
+                            teiList.length > 0 && (
+                                <ReactEchart
+                                    style={{ height: '100%', width: '100%' }}
+                                    option={getPieChartDatas()}
+                                />
+                            )
+                        }
                     </div>
                 </Col>
                 <Col md={14}>
@@ -509,12 +528,12 @@ export const Dashboard = ({ me }) => {
                             size='small'
                             columns={
                                 [
-                                    { title: 'Nom', key: 'nom', dataIndex: 'nom' },
+                                    { title: "Unité d'organisation", key: 'nom', dataIndex: 'nom' },
                                     {
                                         title: 'Status', key: 'status', dataIndex: 'status', width: '150px',
                                         render: value => (
                                             <>
-                                                <span className='text-truncate-one' title={getStatusNameAndColor(value)?.name} style={{ textAlign: 'center', background: getStatusNameAndColor(value)?.color?.background, color: getStatusNameAndColor(value)?.color?.text, padding: '2px', fontSize: '12px', borderRadius: '5px' }}>
+                                                <span className='text-truncate-one' title={getStatusNameAndColor(value)?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColor(value)?.color?.background, color: getStatusNameAndColor(value)?.color?.text, padding: '3px', fontSize: '12px', borderRadius: '5px' }}>
                                                     {getStatusNameAndColor(value)?.name}
                                                 </span>
                                             </>
@@ -526,13 +545,12 @@ export const Dashboard = ({ me }) => {
                                                 target='_blank'
                                                 href={`${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${tei.trackedEntityInstance}&program=${tei.program}&ou=${tei.orgUnit}`}
                                                 style={{ textAlign: 'center', cursor: 'pointer' }}
-                                            > {console.log("Serveur url : ", SERVER_URL)}
+                                            >
                                                 <IoMdOpen title='Ouvrir dans le tracker' style={{ fontSize: '18px', color: BLUE, cursor: 'pointer' }} />
                                             </a>
                                         )
                                     }
-                                ]
-                            }
+                                ]}
                             dataSource={getFiveLastPlanifications()}
                             pagination={false}
                             style={{ height: '100%' }}
@@ -558,6 +576,7 @@ export const Dashboard = ({ me }) => {
     }
 
     const handleSelectProgram = (value) => {
+        setTeiList([])
         setSelectedProgram(dataStoreSupervisionsConfigs.find(d => d.program?.id === value))
     }
 
@@ -679,7 +698,7 @@ export const Dashboard = ({ me }) => {
     }, [me])
 
     return (
-        <>{console.log("dataStoreSupervisionsConfigs : ", dataStoreSupervisionsConfigs)}
+        <>
             <div style={{ padding: '10px', width: '100%' }}>
                 {RenderFilters()}
                 <Row gutter={[8, 8]}>
