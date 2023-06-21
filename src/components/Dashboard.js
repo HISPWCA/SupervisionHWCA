@@ -184,6 +184,8 @@ export const Dashboard = ({ me }) => {
                     setSelectedPeriod(currentPeriod)
                     setSelectedPlanification(currentPlanification)
                     loadTeisPlanifications(currentProgram.program.id, currentOrgUnit?.id, DESCENDANTS)
+                    loadOptions(currentProgram.statusSupervision?.dataElement?.id, setStatusSupervisionOptions)
+                    loadOptions(currentProgram.statusPayment?.dataElement?.id, setStatusPaymentOptions)
                 }
             }
             loadUsers(me?.organisationUnits?.[0]?.id)
@@ -409,19 +411,7 @@ export const Dashboard = ({ me }) => {
             left: 'left',
         },
 
-        // color: Object.values(
-        //     filterAndGetPlanfications().reduce((prev, curr) => {
-        //         if (curr.statusSupervision && prev[`${curr.statusSupervision}`]) {
-        //             prev[`${curr.statusSupervision}`] = getStatusNameAndColor(curr.statusSupervision).color.background
-        //         } else {
-        //             prev[`${curr.statusSupervision}`] = getStatusNameAndColor(curr.statusSupervision).color.background
-        //         }
-
-        //         return prev
-        //     }, {})
-        // ),
-
-        color: statusSupervisionOptions.map(option => getStatusNameAndColor(option.code).color.background),
+        color: [{ code: SCHEDULED.value, id: null, displayName: SCHEDULED.name }, ...statusSupervisionOptions].map(option => getStatusNameAndColor(option.code).color.background),
 
         series: [
             {
@@ -430,7 +420,7 @@ export const Dashboard = ({ me }) => {
                 center: ['50%', '50%'],
                 selectedMode: 'single',
                 label: { show: false },
-                data: statusPaymentOptions.map(option => {
+                data: [{ code: SCHEDULED.value, id: null, displayName: SCHEDULED.name }, ...statusSupervisionOptions].map(option => {
                     const statusPayload = filterAndGetPlanfications().reduce((prev, curr) => {
                         if (curr.statusSupervision && prev[`${curr.statusSupervision}`]) {
                             prev[`${curr.statusSupervision}`] = { name: getStatusNameAndColor(curr.statusSupervision)?.name, value: prev[`${curr.statusSupervision}`].value + 1 }
@@ -470,19 +460,7 @@ export const Dashboard = ({ me }) => {
             left: 'left',
         },
 
-        // color: Object.values(
-        //     filterAndGetPlanfications().reduce((prev, curr) => {
-        //         if (curr.statusPayment && prev[`${curr.statusPayment}`]) {
-        //             prev[`${curr.statusPayment}`] = getStatusNameAndColor(curr.statusSupervision).color.background
-        //         } else {
-        //             prev[`${curr.statusPayment}`] = getStatusNameAndColor(curr.statusPayment).color.background
-        //         }
-
-        //         return prev
-        //     }, {})
-        // ),
-
-        color: statusPaymentOptions.map(option => getStatusNameAndColor(option.code).color.background),
+        color: statusPaymentOptions.map(option => getStatusNameAndColorForPayment(option.code).color.background),
 
         series: [
             {
@@ -494,9 +472,9 @@ export const Dashboard = ({ me }) => {
                 data: statusPaymentOptions.map(option => {
                     const statusPayload = filterAndGetPlanfications().reduce((prev, curr) => {
                         if (curr.statusPayment && prev[`${curr.statusPayment}`]) {
-                            prev[`${curr.statusPayment}`] = { name: getStatusNameAndColor(curr.statusPayment)?.name, value: prev[`${curr.statusPayment}`].value + 1 }
+                            prev[`${curr.statusPayment}`] = { name: getStatusNameAndColorForPayment(curr.statusPayment)?.name, value: prev[`${curr.statusPayment}`].value + 1 }
                         } else {
-                            prev[`${curr.statusPayment}`] = { name: getStatusNameAndColor(curr.statusPayment)?.name, value: 1 }
+                            prev[`${curr.statusPayment}`] = { name: getStatusNameAndColorForPayment(curr.statusPayment)?.name, value: 1 }
                         }
 
                         return prev
@@ -560,79 +538,70 @@ export const Dashboard = ({ me }) => {
             }
 
             <div style={{ marginTop: '10px' }}>
-                <Row gutter={[10, 10]}>
-                    <Col md={8}>
-                        <Card size='small' className='my-shadow'>
-                            <div>
-                                <div style={{ fontWeight: 'bold', color: `${BLACK}90`, textAlign: 'center' }}> Nombres de Supervisions en Attente</div>
-                                <div style={{ marginTop: '20px', textAlign: 'center' }}>
-                                    <span style={{ fontWeight: 'bold', fontSize: '20px', borderRight: '1px solid #ccc', paddingRight: '20px' }}>7</span>
-                                    <span style={{ paddingLeft: '20px', color: `${BLACK}90`, fontSize: '13px' }}> 2023-06</span>
-                                </div>
-                            </div>
-                        </Card>
-                    </Col>
-                    <Col md={8}>
-                        <Card size='small' className='my-shadow'>
-                            <div>
-                                <div style={{ fontWeight: 'bold', color: `${BLACK}90`, textAlign: 'center' }}> Nombres de Supervisions Planifiées</div>
-                                <div style={{ marginTop: '20px', textAlign: 'center' }}>
-                                    <span style={{ fontWeight: 'bold', fontSize: '20px', borderRight: '1px solid #ccc', paddingRight: '20px' }}>3</span>
-                                    <span style={{ paddingLeft: '20px', color: `${BLACK}90`, fontSize: '13px' }}> 2023-06</span>
-                                </div>
-                            </div>
-                        </Card>
-                    </Col>
-                    <Col md={8}>
-                        <Card size='small' className='my-shadow'>
-                            <div>
-                                <div style={{ fontWeight: 'bold', color: `${BLACK}90`, textAlign: 'center' }}> Nombres de Supervisions Terminée</div>
-                                <div style={{ marginTop: '20px', textAlign: 'center' }}>
-                                    <span style={{ fontWeight: 'bold', fontSize: '20px', borderRight: '1px solid #ccc', paddingRight: '20px' }}>2</span>
-                                    <span style={{ paddingLeft: '20px', color: `${BLACK}90`, fontSize: '13px' }}> 2023-06</span>
-                                </div>
-                            </div>
-                        </Card>
-                    </Col>
-                </Row>
+                <Card size='small' className='my-shadow'>
+                    <Row gutter={[10, 10]}>
+                        {
+                            [{ id: null, displayName: SCHEDULED.name, code: SCHEDULED.value }, ...statusSupervisionOptions].map(option => {
+                                const statusPayload = filterAndGetPlanfications().reduce((prev, curr) => {
+                                    if (curr.statusSupervision && prev[`${curr.statusSupervision}`]) {
+                                        prev[`${curr.statusSupervision}`] = { name: getStatusNameAndColor(curr.statusSupervision)?.name, value: prev[`${curr.statusSupervision}`].value + 1 }
+                                    } else {
+                                        prev[`${curr.statusSupervision}`] = { name: getStatusNameAndColor(curr.statusSupervision)?.name, value: 1 }
+                                    }
+
+                                    return prev
+                                }, {})
+
+                                return (
+                                    <Col flex='auto'>
+                                        <div className='my-shadow' style={{ backgroundColor: `${getStatusNameAndColor(option.code)?.color?.background}40`, borderRadius: '8px', marginBottom: '2px', padding: '10px', height: '100%', borderLeft: `3px solid ${getStatusNameAndColor(option.code)?.color?.background}` }}>
+                                            <div>
+                                                <div style={{ fontWeight: 'bold', color: `${getStatusNameAndColor(option.code)?.color?.background}`, textAlign: 'center' }}> {option.displayName} </div>
+                                                <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                                                    <span style={{ fontWeight: 'bold', fontSize: '20px', borderRight: '1px solid #ccc', paddingRight: '20px' }}>{statusPayload[option.code]?.value || 0}</span>
+                                                    <span style={{ paddingLeft: '20px', color: `${BLACK}90`, fontSize: '13px' }}> 67% </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Col>
+                                )
+                            })
+                        }
+                    </Row>
+                </Card>
             </div>
 
             <div style={{ marginTop: '10px' }}>
-                <Row gutter={[10, 10]}>
-                    <Col md={8}>
-                        <Card size='small' className='my-shadow'>
-                            <div>
-                                <div style={{ fontWeight: 'bold', color: `${BLACK}90`, textAlign: 'center' }}> Non  Applicable ( NA ) </div>
-                                <div style={{ marginTop: '20px', textAlign: 'center' }}>
-                                    <span style={{ fontWeight: 'bold', fontSize: '20px', borderRight: '1px solid #ccc', paddingRight: '20px' }}>23</span>
-                                    <span style={{ paddingLeft: '20px', color: `${BLACK}90`, fontSize: '13px' }}> 2023-06</span>
-                                </div>
-                            </div>
-                        </Card>
-                    </Col>
-                    <Col md={8}>
-                        <Card size='small' className='my-shadow'>
-                            <div>
-                                <div style={{ fontWeight: 'bold', color: `${BLACK}90`, textAlign: 'center' }}> En Attente de Paiement</div>
-                                <div style={{ marginTop: '20px', textAlign: 'center' }}>
-                                    <span style={{ fontWeight: 'bold', fontSize: '20px', borderRight: '1px solid #ccc', paddingRight: '20px' }}>8</span>
-                                    <span style={{ paddingLeft: '20px', color: `${BLACK}90`, fontSize: '13px' }}> 2023-06</span>
-                                </div>
-                            </div>
-                        </Card>
-                    </Col>
-                    <Col md={8}>
-                        <Card size='small' className='my-shadow'>
-                            <div>
-                                <div style={{ fontWeight: 'bold', color: `${BLACK}90`, textAlign: 'center' }}> Paiement Effectué </div>
-                                <div style={{ marginTop: '20px', textAlign: 'center' }}>
-                                    <span style={{ fontWeight: 'bold', fontSize: '20px', borderRight: '1px solid #ccc', paddingRight: '20px' }}>3</span>
-                                    <span style={{ paddingLeft: '20px', color: `${BLACK}90`, fontSize: '13px' }}> 2023-06</span>
-                                </div>
-                            </div>
-                        </Card>
-                    </Col>
-                </Row>
+                <Card size='small' className='my-shadow'>
+                    <Row gutter={[10, 10]}>
+                        {
+                            statusPaymentOptions.map(option => {
+                                const statusPayload = filterAndGetPlanfications().reduce((prev, curr) => {
+                                    if (curr.statusPayment && prev[`${curr.statusPayment}`]) {
+                                        prev[`${curr.statusPayment}`] = { name: getStatusNameAndColorForPayment(curr.statusPayment)?.name, value: prev[`${curr.statusPayment}`].value + 1 }
+                                    } else {
+                                        prev[`${curr.statusPayment}`] = { name: getStatusNameAndColorForPayment(curr.statusPayment)?.name, value: 1 }
+                                    }
+
+                                    return prev
+                                }, {})
+
+                                return (
+                                    <Col flex='auto'>
+                                        <div className='my-shadow' style={{  backgroundColor: `${getStatusNameAndColorForPayment(option.code)?.color?.background}40`, borderRadius: '8px', marginBottom: '2px', padding: '10px', height: '100%', borderLeft: `3px solid ${getStatusNameAndColorForPayment(option.code)?.color?.background}` }}>
+                                            <div>
+                                                <div style={{ fontWeight: 'bold', color: `${getStatusNameAndColorForPayment(option.code)?.color?.background}`, textAlign: 'center' }}> {option.displayName} </div>
+                                                <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                                                    <span style={{ fontWeight: 'bold', fontSize: '20px' }}>{statusPayload[option.code]?.value || 0}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Col>
+                                )
+                            })
+                        }
+                    </Row>
+                </Card>
             </div>
 
         </Col>
@@ -660,7 +629,7 @@ export const Dashboard = ({ me }) => {
             return { name: SCHEDULED.name, color: { background: BLUE, text: WHITE } }
         }
 
-        return { name: NA.name, color: { background: GRAY_DARK, text: WHITE } }
+        return { name: SCHEDULED.name, color: { background: BLUE, text: WHITE } }
 
     }
 
@@ -691,6 +660,7 @@ export const Dashboard = ({ me }) => {
                             columns={
                                 [
                                     { title: "Unité d'organisation", key: 'nom', dataIndex: 'nom' },
+                                    { title: "Période", key: 'period', dataIndex: 'period', render: value => <div>{dayjs(value).format('YYYY-MM-DD')} </div> },
                                     {
                                         title: 'Status Supervision', key: 'statusSupervision', dataIndex: 'statusSupervision', width: '150px',
                                         render: value => (
@@ -797,8 +767,8 @@ export const Dashboard = ({ me }) => {
             const supFound = dataStoreSupervisionsConfigs.find(d => d.program?.id === value)
             setTeiList([])
             setSelectedProgram(supFound)
-            loadOptions(supFound.statusPayment?.dataElement, setStatusPaymentOptions)
-            loadOptions(supFound.statusSupervision?.dataElement, setStatusSupervisionOptions)
+            loadOptions(supFound.statusPayment?.dataElement?.id, setStatusPaymentOptions)
+            loadOptions(supFound.statusSupervision?.dataElement?.id, setStatusSupervisionOptions)
         }
     }
 
@@ -922,8 +892,6 @@ export const Dashboard = ({ me }) => {
     return (
         <>
             <div style={{ padding: '10px', width: '100%' }}>
-                {console.log(statusPaymentOptions)}
-                {console.log(statusSupervisionOptions)}
                 {RenderFilters()}
                 <Row gutter={[8, 8]}>
                     {RenderCalendar()}
