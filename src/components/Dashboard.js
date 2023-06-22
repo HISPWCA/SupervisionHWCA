@@ -492,6 +492,41 @@ export const Dashboard = ({ me }) => {
         ]
     })
 
+    const calculatePourcentageOfSupervision = (value) => {
+
+        const list = [{ id: null, displayName: SCHEDULED.name, code: SCHEDULED.value }, ...statusSupervisionOptions].map(option => {
+            const statusPayload = filterAndGetPlanfications().reduce((prev, curr) => {
+                if (curr.statusSupervision && prev[`${curr.statusSupervision}`]) {
+                    prev[`${curr.statusSupervision}`] = { name: getStatusNameAndColor(curr.statusSupervision)?.name, value: prev[`${curr.statusSupervision}`].value + 1 }
+                } else {
+                    prev[`${curr.statusSupervision}`] = { name: getStatusNameAndColor(curr.statusSupervision)?.name, value: 1 }
+                }
+
+                return prev
+            }, {})
+
+
+            return statusPayload[`${option.code}`]?.value || 0
+        })
+
+        let total = 0
+
+
+        for (let i = 0; i <= list.length; i++) {
+            console.log("total: ", total)
+            total = total + list[i]
+        }
+
+
+        console.log("List : ", list)
+        console.log("(parseInt(value) * 100) / total : ", parseInt(value) * 100 / total)
+
+        if (total > 0)
+            return `${parseInt(value) * 100 / total}%`
+
+        return '0%'
+    }
+
     const getFiveLastPlanifications = () => filterAndGetPlanfications().slice(0, 5).map((planification) => ({
         ...planification,
         key: planification.trackedEntityInstance,
@@ -510,7 +545,7 @@ export const Dashboard = ({ me }) => {
             }))
 
     const RenderCalendar = () => (
-        <Col md={12} sm={24}> {console.log("tei: ", filterAndGetPlanfications())}
+        <Col md={12} sm={24}>
             <div style={{ backgroundColor: '#fff', padding: '10px', borderRadius: '8px', marginBottom: '2px' }} className="my-shadow">
                 <div>
                     <Calendar
@@ -554,12 +589,16 @@ export const Dashboard = ({ me }) => {
 
                                 return (
                                     <Col flex='auto'>
-                                        <div className='my-shadow' style={{ backgroundColor: `${getStatusNameAndColor(option.code)?.color?.background}40`, borderRadius: '8px', marginBottom: '2px', padding: '10px', height: '100%', borderLeft: `3px solid ${getStatusNameAndColor(option.code)?.color?.background}` }}>
+                                        <div className='my-shadow' style={{ backgroundColor: '#fff', borderRadius: '8px', marginBottom: '2px', padding: '10px', height: '100%', borderLeft: `3px solid ${getStatusNameAndColor(option.code)?.color?.background}` }}>
                                             <div>
-                                                <div style={{ fontWeight: 'bold', color: `${getStatusNameAndColor(option.code)?.color?.background}`, textAlign: 'center' }}> {option.displayName} </div>
+                                                <div style={{ fontWeight: 'bold', color: `${getStatusNameAndColor(option.code)?.color?.background}`, textAlign: 'center', fontSize: '13px' }}>
+                                                    <div style={{ backgroundColor: `${getStatusNameAndColor(option.code)?.color?.background}`, padding: '5px', color: `${getStatusNameAndColor(option.code)?.color?.text}` }}>
+                                                        {option.displayName}
+                                                    </div>
+                                                </div>
                                                 <div style={{ marginTop: '20px', textAlign: 'center' }}>
                                                     <span style={{ fontWeight: 'bold', fontSize: '20px', borderRight: '1px solid #ccc', paddingRight: '20px' }}>{statusPayload[option.code]?.value || 0}</span>
-                                                    <span style={{ paddingLeft: '20px', color: `${BLACK}90`, fontSize: '13px' }}> 67% </span>
+                                                    <span style={{ paddingLeft: '20px', color: `${BLACK}90`, fontSize: '13px' }}> {calculatePourcentageOfSupervision(statusPayload[option.code]?.value || 0)} </span>
                                                 </div>
                                             </div>
                                         </div>
@@ -588,9 +627,13 @@ export const Dashboard = ({ me }) => {
 
                                 return (
                                     <Col flex='auto'>
-                                        <div className='my-shadow' style={{  backgroundColor: `${getStatusNameAndColorForPayment(option.code)?.color?.background}40`, borderRadius: '8px', marginBottom: '2px', padding: '10px', height: '100%', borderLeft: `3px solid ${getStatusNameAndColorForPayment(option.code)?.color?.background}` }}>
+                                        <div className='my-shadow' style={{ backgroundColor: '#fff', borderRadius: '8px', marginBottom: '2px', padding: '10px', height: '100%', borderLeft: `3px solid ${getStatusNameAndColorForPayment(option.code)?.color?.background}` }}>
                                             <div>
-                                                <div style={{ fontWeight: 'bold', color: `${getStatusNameAndColorForPayment(option.code)?.color?.background}`, textAlign: 'center' }}> {option.displayName} </div>
+                                                <div style={{ fontWeight: 'bold', color: `${getStatusNameAndColorForPayment(option.code)?.color?.background}`, textAlign: 'center' }}>
+                                                    <span style={{ backgroundColor: `${getStatusNameAndColorForPayment(option.code)?.color?.background}`, fontSize: '13px', padding: '5px', color: `${getStatusNameAndColorForPayment(option.code)?.color?.text}` }}>
+                                                        {option.displayName}
+                                                    </span>
+                                                </div>
                                                 <div style={{ marginTop: '20px', textAlign: 'center' }}>
                                                     <span style={{ fontWeight: 'bold', fontSize: '20px' }}>{statusPayload[option.code]?.value || 0}</span>
                                                 </div>
@@ -603,7 +646,6 @@ export const Dashboard = ({ me }) => {
                     </Row>
                 </Card>
             </div>
-
         </Col>
     )
 
@@ -716,7 +758,7 @@ export const Dashboard = ({ me }) => {
                         {
                             teiList.length > 0 && (
                                 <ReactEchart
-                                    style={{ height: '400px', width: '100%' }}
+                                    style={{ height: '430px', width: '100%' }}
                                     option={getPieChartDatasForSupervisions()}
                                 />
                             )
@@ -726,13 +768,14 @@ export const Dashboard = ({ me }) => {
                 </Col>
                 <Col md={12}>
                     <div className='my-shadow' style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '10px', marginBottom: '2px', height: '100%', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+
                         {
                             teiList.length === 0 && (<div style={{ fontWeight: 'bold', color: `${BLACK}90` }}> Aucune données disponibles !</div>)
                         }
                         {
                             teiList.length > 0 && (
                                 <ReactEchart
-                                    style={{ height: '400px', width: '100%' }}
+                                    style={{ height: '430px', width: '100%' }}
                                     option={getPieChartDatasForPayment()}
                                 />
                             )
