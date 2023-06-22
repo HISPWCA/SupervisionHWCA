@@ -511,18 +511,12 @@ export const Dashboard = ({ me }) => {
 
         let total = 0
 
-
-        for (let i = 0; i <= list.length; i++) {
-            console.log("total: ", total)
+        for (let i = 0; i < list.length; i++) {
             total = total + list[i]
         }
 
-
-        console.log("List : ", list)
-        console.log("(parseInt(value) * 100) / total : ", parseInt(value) * 100 / total)
-
         if (total > 0)
-            return `${parseInt(value) * 100 / total}%`
+            return `${Math.round(parseInt(value) * 100 / total)}%`
 
         return '0%'
     }
