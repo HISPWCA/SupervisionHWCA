@@ -1,11 +1,12 @@
 import React, { useMemo, useEffect, useState } from 'react'
 import { MantineReactTable } from 'mantine-react-table'
-import { Card, Col, DatePicker, Divider, FloatButton, Input, InputNumber, List, Popconfirm, Row, Select, Checkbox as AntCheckbox, Table } from 'antd'
+import { Card, Col, DatePicker, Divider, FloatButton, Input, InputNumber, List, Popconfirm, Row, Select, Checkbox as AntCheckbox, Table, Grid } from 'antd'
 import { IoMdAdd } from 'react-icons/io'
 import { IoListCircleOutline } from 'react-icons/io5'
 import { Button, ButtonStrip, Checkbox, CircularLoader, Modal, ModalActions, ModalContent, ModalTitle, NoticeBox, Radio } from '@dhis2/ui'
 import {
     DAY,
+    DESCENDANTS,
     INDICATOR,
     MONTH,
     NOTICE_BOX_DEFAULT,
@@ -24,10 +25,9 @@ import {
 } from '../utils/constants'
 import { loadDataStore, saveDataToDataStore } from '../utils/functions'
 import { MyNoticeBox } from './MyNoticeBox'
-import { ANALYTICS_ROUTE, ENROLLMENTS_ROUTE, EVENTS_ROUTE, INDICATORS_GROUP_ROUTE, ORGANISATION_UNITS_ROUTE, ORGANISATION_UNIT_GROUP_SETS_ROUTE, PROGRAMS_STAGE_ROUTE, PROGRAM_INDICATOR_GROUPS, PROGS_ROUTE, TRACKED_ENTITY_ATTRIBUTES_ROUTE, TRACKED_ENTITY_INSTANCES_ROUTE, USERS_ROUTE } from '../utils/api.routes'
+import { ANALYTICS_ROUTE, ENROLLMENTS_ROUTE, EVENTS_ROUTE, ORGANISATION_UNITS_ROUTE, ORGANISATION_UNIT_GROUP_SETS_ROUTE, PROGRAMS_STAGE_ROUTE, PROGRAM_INDICATOR_GROUPS, PROGS_ROUTE, TRACKED_ENTITY_ATTRIBUTES_ROUTE, TRACKED_ENTITY_INSTANCES_ROUTE, USERS_ROUTE } from '../utils/api.routes'
 import axios from 'axios'
 import OrganisationUnitsTree from './OrganisationUnitsTree'
-import { GREEN } from '../utils/couleurs'
 import { QuestionCircleOutlined } from '@ant-design/icons'
 import { RiDeleteBinLine } from 'react-icons/ri'
 import MyNotification from './MyNotification'
@@ -56,7 +56,7 @@ const Supervision = ({ me }) => {
     const [dataStoreSupervisionConfigs, setDataStoreSupervisionConfigs] = useState([])
     const [dataStoreSupervisions, setDataStoreSupervisions] = useState([])
     const [dataStoreIndicatorConfigs, setDataStoreIndicatorConfigs] = useState([])
-    const [isEditionMode, setEditionMode] = useState(true)
+    const [isEditionMode, setEditionMode] = useState(false)
     const [noticeBox, setNoticeBox] = useState({ show: false, message: null, title: null, type: NOTICE_BOX_DEFAULT })
     const [notification, setNotification] = useState({ show: false, message: null, type: null })
     const [organisationUnits, setOrganisationUnits] = useState([])
@@ -70,6 +70,7 @@ const Supervision = ({ me }) => {
     const [analyticErrorMessage, setAnalyticErrorMessage] = useState(null)
     const [teisList, setTeisList] = useState([])
     const [isEmpty, setEmpty] = useState(false)
+    const [allSupervisionsFromTracker, setAllSupervisionsFromTracker] = useState([])
 
     const [selectedStep, setSelectedStep] = useState(0)
     const [selectedSupervisionType, setSelectedSupervisionType] = useState(null)
@@ -86,6 +87,9 @@ const Supervision = ({ me }) => {
     const [selectedMetaDatas, setSelectedMetaDatas] = useState([])
     const [selectedOrganisationUnitInd, setSelectedOrganisationUnitInd] = useState(null)
     const [selectedAgents, setSelectedAgents] = useState([])
+    const [selectedSupervisionsConfigProgram, setSelectedSupervisionConfigProgram] = useState(null)
+    const [selectedOrgUnitSupervisionFromTracker, setSelectedOrgUnitSupervisionFromTracker] = useState(null)
+
 
     const [inputMeilleur, setInputMeilleur] = useState(0)
     const [inputMauvais, setInputMauvais] = useState(0)
@@ -105,6 +109,8 @@ const Supervision = ({ me }) => {
     const [loadingSupervisionPlanification, setLoadingSupervisionPlanification] = useState(false)
     const [loadingAnalyticIndicatorResults, setLoadingAnalyticIndicatorResults] = useState(false)
     const [loadingTeiList, setLoadingTeiList] = useState(false)
+    const [loadingAllSupervisionsFromTracker, setLoadingAllSupervisionsFromTracker] = useState(false)
+    const [loadingOrgUnitsSupervisionsFromTracker, setLoadingOrgUnitsSupervisionsFromTracker] = useState(false)
 
     const data = [
         {
@@ -225,6 +231,39 @@ const Supervision = ({ me }) => {
         }
     }
 
+    const loadTeisPlanifications = async (program_id, orgUnit_id, ouMode = DESCENDANTS) => {
+        try {
+            const response = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}.json?program=${program_id}&ou=${orgUnit_id}&ouMode=${ouMode}&order=created:DESC&fields=trackedEntityInstance,created,program,orgUnit,enrollments[*]`)
+            setAllSupervisionsFromTracker(response.data.trackedEntityInstances)
+        } catch (err) {
+            throw err
+        }
+    }
+
+    const loadAllSupervisionsFromTracker = async (dataStoreprogramList) => {
+        try {
+            setLoadingAllSupervisionsFromTracker(true)
+            if (dataStoreprogramList.length > 0) {
+                const currentProgram = dataStoreprogramList[0]
+                const currentOrgUnit = organisationUnits.find(ou => ou.id === me?.organisationUnits?.[0]?.id)
+                console.log("Current org unit : ", currentOrgUnit)
+                console.log("org units : ", organisationUnits)
+                console.log("me: ", me.organisationUnits?.[0]?.id)
+
+                if (currentProgram) {
+                    setSelectedSupervisionConfigProgram(currentProgram)
+                    setSelectedOrgUnitSupervisionFromTracker(currentOrgUnit)
+                    await loadTeisPlanifications(currentProgram.program.id, currentOrgUnit?.id, DESCENDANTS)
+                }
+            }
+
+            setLoadingAllSupervisionsFromTracker(false)
+        } catch (err) {
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
+            setLoadingAllSupervisionsFromTracker(false)
+        }
+    }
+
     const loadProgramStages = async (programID) => {
         try {
             setLoadingProgramStages(true)
@@ -284,6 +323,9 @@ const Supervision = ({ me }) => {
                     type: NOTICE_BOX_WARNING
                 })
             }
+
+
+            await loadAllSupervisionsFromTracker(response)
             setDataStoreSupervisionConfigs(response)
             setLoadingDataStoreSupervisionConfigs(false)
         }
@@ -953,19 +995,10 @@ const Supervision = ({ me }) => {
                                         const currentDE = payload.fieldConfig?.supervisor?.dataElements[i]
                                         const currentSUP = newSupervisorsList[j]
                                         if (currentDE && currentSUP && !newDataValues.map(dv => dv.dataElement).includes(currentDE.id)) {
-
-                                            // if (i === payload.fieldConfig?.supervisor?.dataElements?.length - 1) {
-                                            //     newDataValues.push({
-                                            //         dataElement: currentDE.id,
-                                            //         value: `${currentSUP},${newSupervisorsList?.join(',')}`
-                                            //     })
-                                            // } else {
                                             newDataValues.push({
                                                 dataElement: currentDE.id,
                                                 value: currentSUP
                                             })
-                                            // }
-
                                         }
                                     }
                                 }
@@ -982,16 +1015,6 @@ const Supervision = ({ me }) => {
                                         const currentDE = payload.fieldConfig?.supervisor?.dataElements[i]
                                         const currentSUP = newSupervisorsList[j]
                                         if (currentDE && currentSUP && !newDataValues.map(dv => dv.dataElement).includes(currentDE.id)) {
-
-                                            // if (i === newSupervisorsList?.length - 1) {
-                                            //     newDataValues.push({
-                                            //         dataElement: currentDE.id,
-                                            //         value: `${currentSUP},${newSupervisorsList?.join(',')}`
-                                            //     })
-                                            // } else {
-
-                                            // }
-
                                             newDataValues.push({
                                                 dataElement: currentDE.id,
                                                 value: currentSUP
@@ -1382,32 +1405,72 @@ const Supervision = ({ me }) => {
             setNotification({ show: true, type: NOTIFICATON_CRITICAL, message: err.response?.data?.message || err.message })
         }
     }
+    const handleSelectSupervisionProgramConfigForTracker = (value) => {
+        if (value) {
+            const supFound = dataStoreSupervisionConfigs.find(d => d.program?.id === value)
+            setAllSupervisionsFromTracker([])
+            setSelectedSupervisionConfigProgram(supFound)
+            setSelectedOrgUnitSupervisionFromTracker(null)
+        }
+    }
 
 
     const RenderSupervisionList = () => (
         <>
-
-            <Card size='small' className='my-shadow'>
-                <MantineReactTable
-                    enableStickyHeader
-                    columns={columns}
-                    data={data}
-                    mantinePaperProps={{
-                        shadow: 'none',
-                        radius: '8px',
-                        withBorder: false,
-                    }}
-                    initialState={
-                        {
-                            density: 'xs',
+            <div style={{ marginTop: '10px' }}>
+                <Card size='small' className='my-shadow'>
+                    <Row gutter={[10, 10]}>
+                        <Col md={6}>
+                            {/* <div style={{ marginBottom: '2px' }}>Programme</div> */}
+                            <Select
+                                placeholder="Programme"
+                                onChange={handleSelectSupervisionProgramConfigForTracker}
+                                value={selectedSupervisionsConfigProgram?.program?.id}
+                                style={{ width: '100%' }}
+                                options={dataStoreSupervisionConfigs.map(d => ({ value: d.program?.id, label: d.program?.displayName }))}
+                                loading={loadingDataStoreSupervisionConfigs}
+                            />
+                        </Col>
+                        <Col md={6}>
+                            {/* <div style={{ marginBottom: '2px' }}>Unités d'organisation</div> */}
+                            <OrganisationUnitsTree
+                                meOrgUnitId={me?.organisationUnits[0]?.id}
+                                orgUnits={organisationUnits}
+                                currentOrgUnits={selectedOrgUnitSupervisionFromTracker}
+                                setCurrentOrgUnits={setSelectedOrgUnitSupervisionFromTracker}
+                                loadingOrganisationUnits={loadingOrgUnitsSupervisionsFromTracker}
+                                setLoadingOrganisationUnits={setLoadingOrgUnitsSupervisionsFromTracker}
+                            />
+                        </Col>
+                        <Col md={6}>
+                            <Button primary onClick={() => alert('Recherché')}>Rechercher</Button>
+                        </Col>
+                    </Row>
+                </Card>
+            </div>
+            <div style={{ marginTop: '20px' }}>
+                <Card size='small' className='my-shadow'>
+                    <MantineReactTable
+                        enableStickyHeader
+                        columns={columns}
+                        data={data}
+                        mantinePaperProps={{
+                            shadow: 'none',
+                            radius: '8px',
+                            withBorder: false,
+                        }}
+                        initialState={
+                            {
+                                density: 'xs',
+                            }
                         }
-                    }
-                    mantineTableProps={{
-                        striped: true,
-                        highlightOnHover: true,
-                    }}
-                />
-            </Card>
+                        mantineTableProps={{
+                            striped: true,
+                            highlightOnHover: true,
+                        }}
+                    />
+                </Card>
+            </div>
         </>
     )
 
@@ -1419,7 +1482,7 @@ const Supervision = ({ me }) => {
                         <div style={{ fontWeight: 'bold', fontSize: '18px', marginTop: '15px' }}>Supervisions</div>
                     </Col>
                     <Col sm={24} md={16}>
-                        {RenderSteps()}
+                        {isEditionMode && RenderSteps()}
                     </Col>
                     <Col sm={24} md={2} style={{ textAlign: 'right' }}>
                         {
@@ -1652,6 +1715,20 @@ const Supervision = ({ me }) => {
         )
     }
 
+    const handleInputPayment = (value, index) => {
+        setInputFields(
+            inputFields.map((field, fieldIndex) => {
+                if (index === fieldIndex) {
+                    return {
+                        ...field,
+                        payment: value
+                    }
+                }
+                return field
+            })
+        )
+    }
+
     const handleInputOtherSupervisor = (event, index) => {
         setInputFields(
             inputFields.map((field, fieldIndex) => {
@@ -1730,7 +1807,7 @@ const Supervision = ({ me }) => {
                     selectedOrganisationUnits.map((org, index) => (
                         <Col md={colMd} sm={24} key={index}>
                             <Card bodyStyle={{ padding: '0px' }} className="my-shadow" size='small'>
-                                <div style={{ background: GREEN, color: '#FFF', fontWeight: 'bold', padding: '10px', position: 'relative' }}>
+                                <div style={{ background: '#0A9396', color: '#FFF', fontWeight: 'bold', padding: '10px', position: 'relative' }}>
                                     <span>
                                         Formulaire de planification sur
                                     </span>
@@ -1740,7 +1817,7 @@ const Supervision = ({ me }) => {
                                                 style={{
                                                     marginLeft: '20px',
                                                     background: '#fff',
-                                                    color: GREEN,
+                                                    color: '#0A9396',
                                                     fontWeight: 'bold',
                                                     padding: '5px',
                                                     borderRadius: '10px',
@@ -1754,7 +1831,7 @@ const Supervision = ({ me }) => {
                                     <span className="delete-sup"  >
                                         <Popconfirm
                                             title="Suppression"
-                                            description="Voulez-vous vraiment ce formularie ? "
+                                            description="Voulez-vous vraiment supprimer ce formulaire ? "
                                             icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
                                             onConfirm={() => handleCloseOrgUnitForm(org, index)}
                                         >
@@ -1844,7 +1921,7 @@ const Supervision = ({ me }) => {
                                                                         <div>
                                                                             <Popconfirm
                                                                                 title="Suppression"
-                                                                                description="Voulez-vous vraiment ce superviseur ? "
+                                                                                description="Voulez-vous vraiment supprimer ce superviseur ? "
                                                                                 icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
                                                                                 onConfirm={() => handleDeleteOtherSupervisor(item, index)}
                                                                             >
@@ -1881,7 +1958,7 @@ const Supervision = ({ me }) => {
                     selectedAgents.map((agent, index) => (
                         <Col md={colMd} sm={24} key={index}>
                             <Card bodyStyle={{ padding: '0px' }} className="my-shadow" size='small'>
-                                <div style={{ background: GREEN, color: '#FFF', fontWeight: 'bold', padding: '10px', position: 'relative' }}>
+                                <div style={{ background: '#0A9396', color: '#FFF', fontWeight: 'bold', padding: '10px', position: 'relative' }}>
                                     <span>
                                         Formulaire de planification sur
                                     </span>
@@ -1890,7 +1967,7 @@ const Supervision = ({ me }) => {
                                         style={{
                                             marginLeft: '20px',
                                             background: '#fff',
-                                            color: GREEN,
+                                            color: '#0A9396',
                                             fontWeight: 'bold',
                                             padding: '5px',
                                             borderRadius: '10px',
@@ -1904,7 +1981,7 @@ const Supervision = ({ me }) => {
                                     <span className="delete-sup"  >
                                         <Popconfirm
                                             title="Suppression"
-                                            description="Voulez-vous vraiment ce formularie ? "
+                                            description="Voulez-vous vraiment supprimer ce formulaire ? "
                                             icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
                                             onConfirm={() => handleCloseAgentForm(agent)}
                                         >
@@ -1938,6 +2015,29 @@ const Supervision = ({ me }) => {
                                                 </div>
                                             </Col>
                                         }
+
+                                        {
+                                            selectedProgram?.paymentConfigs?.length > 0 && (
+                                                <Col sm={24} md={24}>
+                                                    <div>
+                                                        <div style={{ marginBottom: '5px' }}>Critères de paiement</div>
+                                                        <Select
+                                                            placeholder="Critères de paiement"
+                                                            style={{ width: '100%' }}
+                                                            loading={loadingDataStoreSupervisionConfigs}
+                                                            disabled={loadingDataStoreSupervisionConfigs}
+                                                            value={inputFields[index]?.payment}
+                                                            onChange={(value) => handleInputPayment(value, index)}
+                                                            optionFilterProp='label'
+                                                            showSearch
+                                                            allowClear
+                                                            options={selectedProgram?.paymentConfigs?.map(p => ({ label: p.libelle, value: p.id }))}
+                                                        />
+                                                    </div>
+                                                </Col>
+                                            )
+                                        }
+
                                         <Col sm={24} md={24}>
                                             <div>
                                                 <div style={{ marginBottom: '5px' }}>Superviseurs</div>
@@ -1994,7 +2094,7 @@ const Supervision = ({ me }) => {
                                                                         <div>
                                                                             <Popconfirm
                                                                                 title="Suppression"
-                                                                                description="Voulez-vous vraiment ce superviseur ? "
+                                                                                description="Voulez-vous vraiment supprimer ce superviseur ? "
                                                                                 icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
                                                                                 onConfirm={() => handleDeleteOtherSupervisor(item, index)}
                                                                             >
@@ -2131,7 +2231,7 @@ const Supervision = ({ me }) => {
     const RenderIndicatorForm = () => (
         <div>
             <Card bodyStyle={{ padding: '0px' }} className="my-shadow" size='small'>
-                <div style={{ background: GREEN, color: '#FFF', fontWeight: 'bold', padding: '10px' }}>
+                <div style={{ background: '#0A9396', color: '#FFF', fontWeight: 'bold', padding: '10px' }}>
                     <span>
                         Critères de recherches
                     </span>
@@ -2606,7 +2706,7 @@ const Supervision = ({ me }) => {
                 setLoadingTeiList(true)
                 setEmpty(false)
 
-                const route = `${TRACKED_ENTITY_INSTANCES_ROUTE}.json?ou=${orgUnitId}&ouMode=SELECTED&program=${selectedProgram.program?.id}&fields=trackedEntityInstance,attributes,orgUnit,trackedEntityType,enrollments=[enrollment,orgUnit,orgUnitName,status,program,enrollmentDate,trackedEntityInstance]`
+                const route = `${TRACKED_ENTITY_INSTANCES_ROUTE}.json?ou=${orgUnitId}&ouMode=SELECTED&program=${selectedProgram.program?.id}&fields=trackedEntityInstance,attributes,orgUnit,trackedEntityType,enrollments=[enrollment,orgUnit,orgUnitName,status,program,enrollmentDate,trackedEntityInstance]&order=created:DESC`
                 const response = await axios.get(route)
                 setTeisList(response.data.trackedEntityInstances)
                 if (!response.data.trackedEntityInstances || response.data.trackedEntityInstances?.length === 0) {
@@ -2891,6 +2991,7 @@ const Supervision = ({ me }) => {
                             fieldConfig: selectedProgram.fieldConfig,
                             generationType: selectedProgram.generationType,
                             libelle: '',
+                            payment: null,
                             period: null,
                             supervisors: [],
                             otherSupervisors: [],
@@ -2917,10 +3018,12 @@ const Supervision = ({ me }) => {
                                 fieldConfig: selectedProgram.fieldConfig,
                                 generationType: selectedProgram.generationType,
                                 libelle: '',
+                                payment: null,
                                 period: null,
                                 supervisors: [],
                                 otherSupervisors: [],
-                                inputOtherSupervisor: ''
+                                inputOtherSupervisor: '',
+
                             }
                         )
                     }

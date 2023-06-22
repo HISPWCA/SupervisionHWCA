@@ -56,7 +56,6 @@ export const Dashboard = ({ me }) => {
     const [loadingDataStoreSupervisionsConfigs, setLoadingDataStoreSupervisionsConfigs] = useState(false)
     const [loadingTeiList, setLoadingTeiList] = useState(false)
 
-
     const colors = ['#5470C6', '#EE6666']
 
     const analyleLineOptions = {
@@ -192,12 +191,10 @@ export const Dashboard = ({ me }) => {
             setLoadingOrganisationUnits(false)
         }
         catch (err) {
-            console.log(err)
             setLoadingOrganisationUnits(false)
             setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
         }
     }
-
 
     const loadTeisPlanifications = async (program_id, orgUnit_id, ouMode = DESCENDANTS) => {
         try {
@@ -222,7 +219,6 @@ export const Dashboard = ({ me }) => {
             setLoadingDataStoreSupervisionsConfigs(false)
             return response
         } catch (err) {
-            console.log(err)
             setLoadingDataStoreSupervisionsConfigs(false)
             throw err
         }
@@ -232,7 +228,6 @@ export const Dashboard = ({ me }) => {
         try {
             setLoadingDataStoreSupervisionPlanifications(true)
             const response = await loadDataStore(process.env.REACT_APP_SUPERVISIONS_KEY, null, null, null)
-            console.log(response)
 
             let supervisionList = []
             const eventList = []
@@ -263,7 +258,6 @@ export const Dashboard = ({ me }) => {
             setLoadingDataStoreSupervisionPlanifications(false)
         }
         catch (err) {
-            console.log(err)
             setLoadingDataStoreSupervisionPlanifications(false)
         }
     }
@@ -281,7 +275,6 @@ export const Dashboard = ({ me }) => {
             }
         }
         catch (err) {
-            console.log(err)
             setLoadingUsers(false)
         }
     }
@@ -493,7 +486,6 @@ export const Dashboard = ({ me }) => {
     })
 
     const calculatePourcentageOfSupervision = (value) => {
-
         const list = [{ id: null, displayName: SCHEDULED.name, code: SCHEDULED.value }, ...statusSupervisionOptions].map(option => {
             const statusPayload = filterAndGetPlanfications().reduce((prev, curr) => {
                 if (curr.statusSupervision && prev[`${curr.statusSupervision}`]) {
@@ -516,7 +508,35 @@ export const Dashboard = ({ me }) => {
         }
 
         if (total > 0)
-            return `${Math.round(parseInt(value) * 100 / total)}%`
+            return `${parseFloat((parseInt(value) * 100 / total)).toFixed(2)}%`
+
+        return '0%'
+    }
+
+    const calculatePourcentageOfPayment = (value) => {
+        const list = statusPaymentOptions.map(option => {
+            const statusPayload = filterAndGetPlanfications().reduce((prev, curr) => {
+                if (curr.statusPayment && prev[`${curr.statusPayment}`]) {
+                    prev[`${curr.statusPayment}`] = { name: getStatusNameAndColorForPayment(curr.statusPayment)?.name, value: prev[`${curr.statusPayment}`].value + 1 }
+                } else {
+                    prev[`${curr.statusPayment}`] = { name: getStatusNameAndColorForPayment(curr.statusPayment)?.name, value: 1 }
+                }
+
+                return prev
+            }, {})
+
+
+            return statusPayload[`${option.code}`]?.value || 0
+        })
+
+        let total = 0
+
+        for (let i = 0; i < list.length; i++) {
+            total = total + list[i]
+        }
+
+        if (total > 0)
+            return `${parseFloat((parseInt(value) * 100 / total)).toFixed(2)}%`
 
         return '0%'
     }
@@ -550,8 +570,8 @@ export const Dashboard = ({ me }) => {
                         style={{ height: '445px' }}
                         date={dayjs(calendarDate).format('YYYY-MM-DD')}
                         selectable
-                        onSelectEvent={event => alert(JSON.stringify(event, null, 4))}
-                        onSelectSlot={event => alert(JSON.stringify(event, null, 4))}
+                    // onSelectEvent={event => alert(JSON.stringify(event, null, 4))}
+                    // onSelectSlot={event => alert(JSON.stringify(event, null, 4))}
                     />
                 </div>
             </div>
@@ -586,7 +606,7 @@ export const Dashboard = ({ me }) => {
                                         <div className='my-shadow' style={{ backgroundColor: '#fff', borderRadius: '8px', marginBottom: '2px', padding: '10px', height: '100%', borderLeft: `3px solid ${getStatusNameAndColor(option.code)?.color?.background}` }}>
                                             <div>
                                                 <div style={{ fontWeight: 'bold', color: `${getStatusNameAndColor(option.code)?.color?.background}`, textAlign: 'center', fontSize: '13px' }}>
-                                                    <div style={{ backgroundColor: `${getStatusNameAndColor(option.code)?.color?.background}`, padding: '5px', color: `${getStatusNameAndColor(option.code)?.color?.text}` }}>
+                                                    <div style={{ backgroundColor: `${getStatusNameAndColor(option.code)?.color?.background}`, padding: '4px', color: `${getStatusNameAndColor(option.code)?.color?.text}` }}>
                                                         {option.displayName}
                                                     </div>
                                                 </div>
@@ -624,12 +644,13 @@ export const Dashboard = ({ me }) => {
                                         <div className='my-shadow' style={{ backgroundColor: '#fff', borderRadius: '8px', marginBottom: '2px', padding: '10px', height: '100%', borderLeft: `3px solid ${getStatusNameAndColorForPayment(option.code)?.color?.background}` }}>
                                             <div>
                                                 <div style={{ fontWeight: 'bold', color: `${getStatusNameAndColorForPayment(option.code)?.color?.background}`, textAlign: 'center' }}>
-                                                    <span style={{ backgroundColor: `${getStatusNameAndColorForPayment(option.code)?.color?.background}`, fontSize: '13px', padding: '5px', color: `${getStatusNameAndColorForPayment(option.code)?.color?.text}` }}>
+                                                    <div style={{ backgroundColor: `${getStatusNameAndColorForPayment(option.code)?.color?.background}`, fontSize: '13px', padding: '4px', color: `${getStatusNameAndColorForPayment(option.code)?.color?.text}` }}>
                                                         {option.displayName}
-                                                    </span>
+                                                    </div>
                                                 </div>
                                                 <div style={{ marginTop: '20px', textAlign: 'center' }}>
-                                                    <span style={{ fontWeight: 'bold', fontSize: '20px' }}>{statusPayload[option.code]?.value || 0}</span>
+                                                    <span style={{ fontWeight: 'bold', fontSize: '20px', borderRight: '1px solid #ccc', paddingRight: '20px' }}>{statusPayload[option.code]?.value || 0}</span>
+                                                    <span style={{ paddingLeft: '20px', color: `${BLACK}90`, fontSize: '13px' }}> {calculatePourcentageOfPayment(statusPayload[option.code]?.value || 0)} </span>
                                                 </div>
                                             </div>
                                         </div>
@@ -719,13 +740,15 @@ export const Dashboard = ({ me }) => {
                                     },
                                     {
                                         title: 'Actions', key: 'action', width: '50px', dataIndex: 'tei', render: tei => (
-                                            <a
-                                                target='_blank'
-                                                href={`${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${tei.trackedEntityInstance}&program=${tei.program}&ou=${tei.orgUnit}`}
-                                                style={{ textAlign: 'center', cursor: 'pointer' }}
-                                            >
-                                                <IoMdOpen title='Ouvrir dans le tracker' style={{ fontSize: '18px', color: BLUE, cursor: 'pointer' }} />
-                                            </a>
+                                            <div style={{ textAlign: 'center', }}>
+                                                <a
+                                                    target='_blank'
+                                                    href={`${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${tei.trackedEntityInstance}&program=${tei.program}&ou=${tei.orgUnit}`}
+                                                    style={{ cursor: 'pointer' }}
+                                                >
+                                                    <IoMdOpen title='Ouvrir dans le tracker' style={{ fontSize: '18px', color: BLUE, cursor: 'pointer' }} />
+                                                </a>
+                                            </div>
                                         )
                                     }
                                 ]}
@@ -794,7 +817,6 @@ export const Dashboard = ({ me }) => {
             const response = await axios.get(`${DATA_ELEMENT_OPTION_SETS}/${dataElementId}.json?fields=optionSet[options[id,code,displayName]]`)
             setState && setState(response.data.optionSet?.options || [])
         } catch (err) {
-            console.log(err)
             setState && setState([])
         }
     }
@@ -863,15 +885,15 @@ export const Dashboard = ({ me }) => {
                                     value: PLANIFICATION_PAR_TOUS,
                                     label: 'Tous',
                                 },
-                                {
-                                    value: PLANIFICATION_PAR_UN_USER,
-                                    label: 'Un utilisateur',
-                                },
+                                // {
+                                //     value: PLANIFICATION_PAR_UN_USER,
+                                //     label: 'Un utilisateur',
+                                // },
                             ]}
                         />
                     </Col>
                     {
-                        selectedPlanification === PLANIFICATION_PAR_UN_USER && users.length > 0 && (
+                        0 > 1 && selectedPlanification === PLANIFICATION_PAR_UN_USER && users.length > 0 && (
                             <Col sm={24} md={4}>
                                 <div style={{ marginBottom: '2px' }}>Utilisateurs</div>
                                 <Select
@@ -886,18 +908,20 @@ export const Dashboard = ({ me }) => {
                     }
 
                     {
-                        <Col sm={24} md={3}>
-                            <div style={{ marginBottom: '2px' }}>Superviseurs</div>
-                            <Select
-                                placeholder="Superviseurs"
-                                style={{ width: '100%' }}
-                                loading={loadingUsers}
-                                mode='multiple'
-                                onChange={handleSelectSupervisor}
-                                value={selectedSupervisors.map(sup => sup.id)}
-                                options={users.map(user => ({ label: user.displayName, value: user.id }))}
-                            />
-                        </Col>
+                        0 > 1 && (
+                            <Col sm={24} md={3}>
+                                <div style={{ marginBottom: '2px' }}>Superviseurs</div>
+                                <Select
+                                    placeholder="Superviseurs"
+                                    style={{ width: '100%' }}
+                                    loading={loadingUsers}
+                                    mode='multiple'
+                                    onChange={handleSelectSupervisor}
+                                    value={selectedSupervisors.map(sup => sup.id)}
+                                    options={users.map(user => ({ label: user.displayName, value: user.id }))}
+                                />
+                            </Col>
+                        )
                     }
 
                     <Col sm={24} md={1}>

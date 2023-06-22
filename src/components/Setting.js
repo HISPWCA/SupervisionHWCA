@@ -9,7 +9,6 @@ import { FiSave } from 'react-icons/fi'
 import { RiDeleteBinLine } from 'react-icons/ri'
 import { QuestionCircleOutlined } from '@ant-design/icons'
 import { FiEdit } from 'react-icons/fi'
-import { RxInfoCircled } from 'react-icons/rx'
 import { MdOutlineCancel } from 'react-icons/md'
 import { loadDataStore, saveDataToDataStore } from '../utils/functions'
 import { BLUE } from '../utils/couleurs'
@@ -31,6 +30,9 @@ const Setting = () => {
     const [analyseConfigs, setAnalyseConfigs] = useState([])
     const [programStages, setProgramStages] = useState([])
     const [isFieldEditingMode, setFieldEditingMode] = useState(false)
+    const [paymentConfigList, setPaymentConfigList] = useState([])
+    const [isEditModePayment, setEditModePayment] = useState(false)
+    const [currentPaymentConfig, setCurrentPaymentConfig] = useState(null)
 
     const [indicatorName, setIndicatorName] = useState('')
     const [indicatorEtiquette, setIndicatorEtiquette] = useState('')
@@ -55,6 +57,10 @@ const Setting = () => {
     const [selectedDataElements, setSelectedDataElements] = useState([])
     const [selectedAttributesToDisplay, setSelectedAttributesToDisplay] = useState([])
 
+    const [inputLibellePayment, setInputLibellePayment] = useState('')
+    const [inputMontantConstantPayment, setInputMontantConstantPayment] = useState(0)
+    const [inputFraisMobileMoneyPayment, setInputFraisMobileMoneyPayment] = useState(0)
+
     const [loadingPrograms, setLoadingPrograms] = useState(false)
     const [loadingIndicatorGroups, setLoadingIndicatorGroups] = useState(false)
     const [loadingSaveSupervionsConfig, setLoadingSaveSupervionsConfig] = useState(false)
@@ -74,7 +80,6 @@ const Setting = () => {
             setPrograms(response.data.programs)
             setLoadingPrograms(false)
         } catch (err) {
-            console.log(err)
             setLoadingPrograms(false)
         }
     }
@@ -86,7 +91,6 @@ const Setting = () => {
             setIndicators(response.data.indicators)
             setLoadingIndicators(false)
         } catch (err) {
-            console.log(err)
             setLoadingIndicators(false)
         }
     }
@@ -98,7 +102,6 @@ const Setting = () => {
             setDataElements(response.data.dataElements)
             setLoadingDataElements(false)
         } catch (err) {
-            console.log(err)
             setLoadingDataElements(false)
         }
     }
@@ -125,7 +128,6 @@ const Setting = () => {
             setIndicatorGroups(response.data.programIndicatorGroups)
             setLoadingIndicatorGroups(false)
         } catch (err) {
-            console.log(err)
             setLoadingIndicatorGroups(false)
         }
     }
@@ -251,7 +253,6 @@ const Setting = () => {
             const response = await loadDataStore(process.env.REACT_APP_INDICATORS_CONFIG_KEY, null, null, null)
             setMappingConfigs(response)
         } catch (err) {
-            console.log(err)
             setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
         }
     }
@@ -270,7 +271,6 @@ const Setting = () => {
             const response = await loadDataStore(process.env.REACT_APP_ANALYSES_CONFIG_KEY, null, null, null)
             setAnalyseConfigs(response)
         } catch (err) {
-            console.log(err)
             setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
 
         }
@@ -294,9 +294,17 @@ const Setting = () => {
             const responseSupervisionTracker = await loadDataStore(process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY, null, null, null)
             setMappingConfigSupervisions(responseSupervisionTracker)
         } catch (err) {
-            console.log(err)
             setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
         }
+    }
+
+    const cleanPaymentConfigState = () => {
+        setEditModePayment(false)
+        setInputFraisMobileMoneyPayment(0)
+        setInputMontantConstantPayment(0)
+        setInputLibellePayment('')
+        setPaymentConfigList([])
+        setCurrentPaymentConfig(null)
     }
 
     const handleDeleteSupervisionConfig = async (item) => {
@@ -321,6 +329,7 @@ const Setting = () => {
                 setSelectedStatutPaymentProgramStage(null)
                 setSelectedStatutPaymentDataElement(null)
                 setSelectedSupervisionGenerationType(TYPE_GENERATION_AS_TEI)
+                cleanPaymentConfigState()
             }
         } catch (err) {
             setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
@@ -367,7 +376,6 @@ const Setting = () => {
                 }
             }
         } catch (err) {
-            console.log(err)
             setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
         }
     }
@@ -394,7 +402,8 @@ const Setting = () => {
                     attributesToDisplay: selectedAttributesToDisplay,
                     fieldConfig: null,
                     statusSupervision: null,
-                    statusPayment: null
+                    statusPayment: null,
+                    paymentConfigs: paymentConfigList
                 }
 
                 if (selectedProgramStage && selectedDataElements.length > 0) {
@@ -446,8 +455,9 @@ const Setting = () => {
                 setFieldEditingMode(false)
                 setSelectedDataElements([])
                 setSelectedAttributesToDisplay([])
-                setNotification({ show: true, type: NOTIFICATON_SUCCESS, message: isFieldEditingMode ? 'Mise à jour éffectuée' : 'Configuration ajoutée !' })
                 setLoadingSaveSupervionsConfig(false)
+                cleanPaymentConfigState()
+                setNotification({ show: true, type: NOTIFICATON_SUCCESS, message: isFieldEditingMode ? 'Mise à jour éffectuée' : 'Configuration ajoutée !' })
             }
 
         } catch (err) {
@@ -745,19 +755,22 @@ const Setting = () => {
 
     const handleEditProgramSup = async (prog) => {
         try {
+            cleanPaymentConfigState()
+
             setSelectedTEIProgram(programs.find(p => p.id === prog.program?.id))
             const programStageList = await loadProgramStages(prog?.program?.id)
+
             setSelectedProgramStage(programStageList.find(psg => psg.id === prog.fieldConfig?.supervisor?.programStage.id))
-            setSelectedDataElements(prog.fieldConfig?.supervisor?.dataElements || [])
+            setSelectedDataElements(prog?.fieldConfig?.supervisor?.dataElements || [])
             setSelectedStatutSupervisionProgramStage(programStageList.find(psg => psg.id === prog.statusSupervision?.programStage?.id))
             setSelectedStatutSupervisionDataElement(prog?.statusSupervision?.dataElement)
             setSelectedStatutPaymentProgramStage(programStageList.find(psg => psg.id === prog.statusPayment?.programStage?.id))
             setSelectedStatutPaymentDataElement(prog?.statusPayment?.dataElement)
-            setSelectedSupervisionGenerationType(prog.generationType)
+            setSelectedSupervisionGenerationType(prog?.generationType)
             setSelectedAttributesToDisplay(prog.attributesToDisplay || [])
+            setPaymentConfigList(prog?.paymentConfigs || [])
             setFieldEditingMode(true)
         } catch (err) {
-            console.log(err)
             setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
         }
     }
@@ -845,16 +858,58 @@ const Setting = () => {
         </div>
     )
 
+    const handleAddPaymentConfig = () => {
+        try {
+            if (!inputLibellePayment)
+                throw new Error('Le champ libellé est obligatoire !')
+
+            if (!isEditModePayment && paymentConfigList.map(conf => conf.libelle?.trim()?.toLowerCase()).includes(inputLibellePayment?.trim()?.toLowerCase()))
+                throw new Error("Cette configuration à déjà été ajoutée !")
+
+
+            let payload = {
+                libelle: inputLibellePayment,
+                fraisMobileMoney: inputFraisMobileMoneyPayment,
+                montantConstant: inputMontantConstantPayment,
+                program: { id: selectedTEIProgram?.id, displayName: selectedTEIProgram?.displayName }
+            }
+
+            if (isEditModePayment && currentPaymentConfig) {
+                setPaymentConfigList(paymentConfigList.map(paiement => paiement.id === currentPaymentConfig.id ? payload : paiement))
+            } else {
+                payload.id = uuid()
+                setPaymentConfigList([...paymentConfigList, payload])
+            }
+
+            setCurrentPaymentConfig(null)
+            setEditModePayment(false)
+            setInputFraisMobileMoneyPayment(0)
+            setInputMontantConstantPayment(0)
+            setInputLibellePayment('')
+            setNotification({ show: true, message: isEditModePayment ? 'Paiement Mise à jour !' : 'Paiement ajouté !', type: NOTIFICATON_SUCCESS })
+
+        } catch (err) {
+            setNotification({ show: true, message: err.message, type: NOTIFICATON_CRITICAL })
+        }
+
+    }
+
     const RenderStatusPaymentDataElementToUse = () => (
         <div style={{ marginTop: '20px' }}>
             <Card className="my-shadow" size='small'>
                 <div>
-                    <div style={{ fontWeight: 'bold' }}>Configuration de l'élement de donné à utiliser pour le statut du paiement</div>
-                    <div style={{ marginTop: '10px', color: '#00000080', fontSize: '13px' }}>
-                        La configuration de cet élément de données, permettra de suivre le statut des paiements.
-                    </div>
-                    <div style={{ margin: '10px 0px' }}>
+                    <div style={{ fontWeight: 'bold' }}>Configuration des paiements</div>
+                    <div>
                         <Row gutter={[10, 10]}>
+                            <Col md={24}>
+                                <Divider style={{ margin: '5px 0px' }} />
+                            </Col>
+                            <Col md={24}>
+                                <div style={{ fontWeight: 'bold' }}>Statut du paiement</div>
+                                <div style={{ marginTop: '5px', color: '#00000080', fontSize: '13px' }}>
+                                    La configuration de cet élément de données, permettra de suivre le statut des paiements.
+                                </div>
+                            </Col>
                             <Col md={12}>
                                 <div>
                                     <div style={{ marginBottom: '5px' }}>Programmes Stage</div>
@@ -891,12 +946,59 @@ const Setting = () => {
                                     </Col>
                                 )
                             }
+                            <Col md={24}>
+                                <Divider style={{ margin: '5px 0px' }} />
+                            </Col>
+                            <Col md={24}>
+                                <div style={{ fontWeight: 'bold' }}>Paiement</div>
+                            </Col>
+                            <Col sm={24} md={8}>
+                                <div>Libellé</div>
+                                <div style={{ marginTop: '2px' }}>
+                                    <Input value={inputLibellePayment} onChange={event => setInputLibellePayment(event.target.value)} placeholder='Libellé' style={{ width: '100%' }} />
+                                </div>
+                            </Col>
+
+                            <Col sm={24} md={6}>
+                                <div>Montant constant</div>
+                                <div style={{ marginTop: '2px' }}>
+                                    <InputNumber value={inputMontantConstantPayment} onChange={value => setInputMontantConstantPayment(value)} placeholder='Montant constant' style={{ width: '100%' }} />
+                                </div>
+                            </Col>
+                            <Col sm={24} md={6}>
+                                <div>Frais Mobile Money ( % )</div>
+                                <div style={{ marginTop: '2px' }}>
+                                    <InputNumber onChange={value => setInputFraisMobileMoneyPayment(value || 0)} value={inputFraisMobileMoneyPayment} placeholder='Frais Mobile Money' style={{ width: '100%' }} />
+                                </div>
+                            </Col>
+                            <Col sm={24} md={4}>
+                                <div style={{ marginTop: '25px' }}>
+                                    <Button small primary onClick={handleAddPaymentConfig}>
+                                        {!isEditModePayment ? '+ Ajouter' : 'Mise à jour'}
+                                    </Button>
+                                </div>
+                            </Col>
                         </Row>
                     </div>
                 </div>
             </Card>
         </div>
     )
+
+    const handleEditPaymentConfig = config => {
+        setInputFraisMobileMoneyPayment(config.fraisMobileMoney)
+        setInputMontantConstantPayment(config.montantConstant)
+        setInputLibellePayment(config.libelle)
+        setCurrentPaymentConfig(config)
+        setEditModePayment(true)
+    }
+
+    const handleDeletePaymentConfig = value => {
+        cleanPaymentConfigState()
+        setPaymentConfigList(paymentConfigList.filter(p => p.id !== value.id))
+
+        return setNotification({ show: true, message: 'Configuration supprimée !', type: NOTIFICATON_SUCCESS })
+    }
 
     const RenderPageSupervisionConfig = () => (
         <>
@@ -905,8 +1007,8 @@ const Setting = () => {
                     <div >
                         {RenderSupervisionConfiguration()}
                         {selectedTEIProgram && selectedTEIProgram.programTrackedEntityAttributes && RenderAttributesToDisplay()}
-                        {selectedTEIProgram && RenderStatusSupervisionDataElementToUse()}
                         {selectedTEIProgram && RenderStatusPaymentDataElementToUse()}
+                        {selectedTEIProgram && RenderStatusSupervisionDataElementToUse()}
                         {selectedTEIProgram && RenderSupervisorFieldConfiguration()}
 
                         <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center' }}>
@@ -945,153 +1047,9 @@ const Setting = () => {
                                 </Button>
                             </div>
                         </div>
-                        {/* {
-                            selectedTEIProgram && (
-                                <div className='my-shadow' style={{ padding: '20px', background: '#FFF', marginBottom: '2px', borderRadius: '8px', marginTop: '10px' }}>
-                                    <Row gutter={[14, 14]}>
-                                        <Col md={24}>
-                                            <div>
-                                                <div style={{ marginBottom: '5px' }}>Programmes Stage</div>
-                                                <Select
-                                                    options={programStages.map(program => ({ label: program.displayName, value: program.id }))}
-                                                    placeholder="Choisir le program stage"
-                                                    style={{ width: '100%' }}
-                                                    optionFilterProp='label'
-                                                    value={selectedProgramStage?.id}
-                                                    onChange={handleSelectProgramStage}
-                                                    showSearch
-                                                    loading={loadingProgramStages}
-                                                    disabled={loadingProgramStages}
-                                                />
-                                            </div>
-                                        </Col>
-                                        <Col md={12}>
-                                            <Row gutter={[8, 8]}>
-                                                <Col md={24}>
-                                                    <div style={{ marginBottom: '5px' }}>Type d'indicateurs</div>
-                                                </Col>
-                                                <Col>
-                                                    <div>
-                                                        <Radio
-                                                            label="Indicateurs de programmes"
-                                                            onChange={handleChangeIndicatorType}
-                                                            value={PROGRAM_INDICATOR}
-                                                            checked={selectedIndicatorType === PROGRAM_INDICATOR}
-                                                        />
-                                                    </div>
-                                                </Col>
-                                                <Col>
-                                                    <div>
-                                                        <Radio
-                                                            label="Groupe d'indicateurs"
-                                                            onChange={handleChangeIndicatorType}
-                                                            value={INDICATOR_GROUP}
-                                                            checked={selectedIndicatorType === INDICATOR_GROUP}
-                                                        />
-                                                    </div>
-                                                </Col>
-                                            </Row>
-                                        </Col>
-
-                                        <Col md={12}>
-                                            <div>
-                                                <div style={{ marginBottom: '5px' }}>Group d'indicateurs</div>
-                                                <Select
-                                                    options={indicatorGroups.map(indicateurGroup => ({ label: indicateurGroup.displayName, value: indicateurGroup.id }))}
-                                                    placeholder="Choisir le group d'indicateur"
-                                                    style={{ width: '100%' }}
-                                                    onChange={handleSelectIndicatorGroup}
-                                                    value={selectedIndicatorGroup?.id}
-                                                    optionFilterProp='label'
-                                                    showSearch
-                                                    loading={loadingIndicatorGroups}
-                                                    disabled={loadingIndicatorGroups}
-                                                />
-                                            </div>
-
-                                        </Col>
-                                        {
-                                            selectedIndicatorGroup && selectedProgramStage && (
-                                                <Col md={24} xs={24}>
-                                                    <Divider style={{ margin: '5px auto' }} />
-
-                                                    {
-                                                        selectedProgramStage && (
-                                                            <Button primary={!isNewMappingMode ? true : false} destructive={isNewMappingMode ? true : false} onClick={handleAddNewMappingConfig}>
-                                                                {!isNewMappingMode && <span>+ Ajouter nouveau mapping</span>}
-                                                                {isNewMappingMode && <span>Annuler le mapping</span>}
-                                                            </Button>
-                                                        )
-                                                    }
-
-                                                    {
-                                                        isNewMappingMode && (
-                                                            <div style={{ marginTop: '10px' }}>
-                                                                <Row gutter={[8, 8]}>
-                                                                    {
-                                                                        selectedProgramStage && (
-                                                                            <Col md={10} xs={24}>
-                                                                                <div>
-                                                                                    <div style={{ marginBottom: '5px' }}>Eléments de données</div>
-                                                                                    <Select
-                                                                                        options={selectedProgramStage?.programStageDataElements?.map(progStageDE => ({ label: progStageDE.dataElement?.displayName, value: progStageDE.dataElement?.id }))}
-                                                                                        placeholder="Element de donnée"
-                                                                                        style={{ width: '100%' }}
-                                                                                        onChange={handleSelectDataElement}
-                                                                                        value={selectedDataElement?.id}
-                                                                                        optionFilterProp='label'
-                                                                                        showSearch
-                                                                                    />
-                                                                                </div>
-                                                                            </Col>
-                                                                        )
-                                                                    }
-
-                                                                    {
-                                                                        selectedIndicatorGroup && (
-                                                                            <Col md={10} xs={24}>
-                                                                                <div>
-                                                                                    <div style={{ marginBottom: '5px' }}>Indicateurs</div>
-                                                                                    <Select
-                                                                                        options={
-                                                                                            selectedIndicatorType === INDICATOR_GROUP ?
-                                                                                                selectedIndicatorGroup.indicators?.map(progInd => ({ label: progInd.displayName, value: progInd.id }))
-                                                                                                : selectedIndicatorType === PROGRAM_INDICATOR &&
-                                                                                                selectedIndicatorGroup.programIndicators?.map(progInd => ({ label: progInd.displayName, value: progInd.id })) ||
-                                                                                                []
-                                                                                        }
-                                                                                        placeholder="Indicateurs"
-                                                                                        style={{ width: '100%' }}
-                                                                                        onChange={handleSelectIndicator}
-                                                                                        value={selectedIndicator?.id}
-                                                                                        optionFilterProp='label'
-                                                                                        showSearch
-                                                                                    />
-                                                                                </div>
-                                                                            </Col>
-                                                                        )
-                                                                    }
-                                                                    <Col md={4} xs={24}>
-                                                                        <div style={{ marginTop: '18px' }}>
-                                                                            <Button loading={loadingSaveDateElementMappingConfig} disabled={loadingSaveDateElementMappingConfig} primary onClick={handleSaveNewMappingConfig}>+ Ajouter </Button>
-                                                                        </div>
-                                                                    </Col>
-                                                                </Row>
-                                                            </div>
-                                                        )
-                                                    }
-
-                                                </Col>
-                                            )
-                                        }
-                                    </Row>
-                                </div>
-                            )
-                        } */}
                     </div>
                 </Col>
                 <Col md={12} sm={24}>
-
                     {
                         mappingConfigSupervisions.length > 0 && (
                             <div className='my-shadow' style={{ padding: '20px', background: '#FFF', marginBottom: '2px', borderRadius: '8px' }}>
@@ -1129,7 +1087,7 @@ const Setting = () => {
                                                 render: value => (
                                                     <div style={{ display: 'flex', alignItems: 'center' }}>
                                                         <div style={{ marginRight: '10px' }}>
-                                                            <FiEdit style={{ color: BLUE, fontSize: '20px', cursor: 'pointer' }} onClick={() => handleEditProgramSup(value)} />
+                                                            <FiEdit style={{ color: BLUE, fontSize: '18px', cursor: 'pointer' }} onClick={() => handleEditProgramSup(value)} />
                                                         </div>
                                                         <Popconfirm
                                                             title="Suppression de la configuration"
@@ -1138,7 +1096,7 @@ const Setting = () => {
                                                             onConfirm={() => handleDeleteSupervisionConfig(value)}
                                                         >
                                                             <div>
-                                                                <RiDeleteBinLine style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }} />
+                                                                <RiDeleteBinLine style={{ color: 'red', fontSize: '18px', cursor: 'pointer' }} />
                                                             </div>
                                                         </Popconfirm>
                                                     </div>
@@ -1151,6 +1109,57 @@ const Setting = () => {
                             </div>
                         )
                     }
+
+                    {
+                        selectedTEIProgram && paymentConfigList.length > 0 && (
+                            <div className='my-shadow' style={{ padding: '20px', marginTop: '10px', background: '#FFF', marginBottom: '2px', borderRadius: '8px' }}>
+                                <div style={{ marginBottom: '10px', fontWeight: 'bold', fontSize: '16px' }}>Liste des configurations du paiement </div>
+
+                                <Table
+                                    dataSource={
+                                        paymentConfigList.map(conf => ({
+                                            ...conf,
+                                            programName: conf.program?.displayName,
+                                            action: conf
+                                        }))
+                                    }
+                                    columns={
+                                        [
+                                            { title: 'Program', dataIndex: 'programName' },
+
+                                            { title: 'Libellé', dataIndex: 'libelle' },
+                                            { title: 'Montant Constant', dataIndex: 'montantConstant' },
+                                            { title: 'Frais Mobile Money', dataIndex: 'fraisMobileMoney' },
+                                            {
+                                                title: 'Actions',
+                                                dataIndex: 'action',
+                                                width: '80px',
+                                                render: value => (
+                                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                        <div style={{ marginRight: '10px' }}>
+                                                            <FiEdit style={{ color: BLUE, fontSize: '18px', cursor: 'pointer' }} onClick={() => handleEditPaymentConfig(value)} />
+                                                        </div>
+                                                        <Popconfirm
+                                                            title="Suppression de la configuration"
+                                                            description="Voulez-vous vraiment supprimer cette configuration "
+                                                            icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+                                                            onConfirm={() => handleDeletePaymentConfig(value)}
+                                                        >
+                                                            <div>
+                                                                <RiDeleteBinLine style={{ color: 'red', fontSize: '18px', cursor: 'pointer' }} />
+                                                            </div>
+                                                        </Popconfirm>
+                                                    </div>
+                                                )
+                                            },
+                                        ]
+                                    }
+                                    size="small"
+                                />
+                            </div>
+                        )
+                    }
+
                 </Col>
             </Row>
         </>
