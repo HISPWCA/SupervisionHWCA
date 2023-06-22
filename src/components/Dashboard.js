@@ -30,6 +30,10 @@ dayjs.locale('fr-FR')
 const localizer = dayjsLocalizer(dayjs)
 
 
+export const getDefaultStatusSupervisionIfStatusIsNull = _ => SCHEDULED.value
+
+export const getDefaultStatusPaymentIfStatusIsNull = _ => NA.value
+
 export const Dashboard = ({ me }) => {
 
     const [organisationUnits, setOrganisationUnits] = useState([])
@@ -291,9 +295,7 @@ export const Dashboard = ({ me }) => {
 
     const handleSelectPlanificationUser = value => setSelectedPlanificationUser(users.find(u => u.id === value))
 
-    const getDefaultStatusSupervisionIfStatusIsNull = _ => SCHEDULED.value
 
-    const getDefaultStatusPaymentIfStatusIsNull = _ => NA.value
 
     const filterAndGetPlanfications = () => teiList.reduce((prev, current) => {
         if (selectedProgram.generationType === TYPE_GENERATION_AS_TEI) {
@@ -846,17 +848,6 @@ export const Dashboard = ({ me }) => {
                             loading={loadingDataStoreSupervisionsConfigs}
                         />
                     </Col>
-                    <Col sm={24} md={3}>
-                        <div style={{ marginBottom: '2px' }}>Période</div>
-                        <DatePicker
-                            onChange={handleSelectedPeriod}
-                            picker="month"
-                            value={selectedPeriod}
-                            style={{ width: '100%' }}
-                            placeholder="Période"
-                            allowClear={false}
-                        />
-                    </Col>
                     <Col sm={24} md={5}>
                         <div style={{ marginBottom: '2px' }}>Unités d'organisation</div>
                         <OrganisationUnitsTree
@@ -868,6 +859,18 @@ export const Dashboard = ({ me }) => {
                             setLoadingOrganisationUnits={setLoadingOrganisationUnits}
                         />
                     </Col>
+                    <Col sm={24} md={3}>
+                        <div style={{ marginBottom: '2px' }}>Période</div>
+                        <DatePicker
+                            onChange={handleSelectedPeriod}
+                            picker="month"
+                            value={selectedPeriod}
+                            style={{ width: '100%' }}
+                            placeholder="Période"
+                            allowClear={false}
+                        />
+                    </Col>
+
 
                     <Col sm={24} md={4}>
                         <div style={{ marginBottom: '2px' }}>Planifier par </div>

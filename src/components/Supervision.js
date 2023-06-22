@@ -5,16 +5,23 @@ import { IoMdAdd } from 'react-icons/io'
 import { IoListCircleOutline } from 'react-icons/io5'
 import { Button, ButtonStrip, Checkbox, CircularLoader, Modal, ModalActions, ModalContent, ModalTitle, NoticeBox, Radio } from '@dhis2/ui'
 import {
+    CANCELED,
+    COMPLETED,
     DAY,
     DESCENDANTS,
     INDICATOR,
     MONTH,
+    NA,
     NOTICE_BOX_DEFAULT,
     NOTICE_BOX_WARNING,
     NOTIFICATON_CRITICAL,
     NOTIFICATON_SUCCESS,
     ORGANISATION_UNIT,
+    PAYMENT_DONE,
+    PENDING_PAYMENT,
+    PENDING_VALIDATION,
     QUARTER,
+    SCHEDULED,
     TYPE_GENERATION_AS_ENROLMENT,
     TYPE_GENERATION_AS_EVENT,
     TYPE_GENERATION_AS_TEI,
@@ -43,6 +50,8 @@ import { DataDimension } from '@dhis2/analytics'
 
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat'
+import { BLUE, GRAY_DARK, GREEN, ORANGE, RED, WHITE } from '../utils/couleurs'
+import { getDefaultStatusPaymentIfStatusIsNull, getDefaultStatusSupervisionIfStatusIsNull } from './Dashboard'
 const quarterOfYear = require('dayjs/plugin/quarterOfYear')
 const weekOfYear = require('dayjs/plugin/weekOfYear')
 
@@ -89,6 +98,7 @@ const Supervision = ({ me }) => {
     const [selectedAgents, setSelectedAgents] = useState([])
     const [selectedSupervisionsConfigProgram, setSelectedSupervisionConfigProgram] = useState(null)
     const [selectedOrgUnitSupervisionFromTracker, setSelectedOrgUnitSupervisionFromTracker] = useState(null)
+    const [selectedPeriodSupervisionConfig, setSelectedPeriodSupervisionConfig] = useState(null)
 
 
     const [inputMeilleur, setInputMeilleur] = useState(0)
@@ -188,24 +198,51 @@ const Supervision = ({ me }) => {
     const columns = useMemo(
         () => [
             {
-                accessorKey: 'name.firstName', //access nested data with dot notation
-                header: 'First Name',
+                accessorKey: 'nom', //access nested data with dot notation
+                header: "Unité d'organisation",
             },
             {
-                accessorKey: 'name.lastName',
-                header: 'Last Name',
+                accessorKey: 'period',
+                header: 'Période',
             },
             {
-                accessorKey: 'address', //normal accessorKey
-                header: 'Address',
+                accessorKey: 'statusSupervision', //normal accessorKey
+                header: 'Status Supervision',
+                Cell: ({ cell, row }) => {
+                    console.log("cell.getValue(): ", cell.getValue())
+                    console.log("row.original: ", row.original)
+                    return (
+                        <>
+                            <span className='text-truncate-one' title={getStatusNameAndColor(cell.getValue())?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColor(cell.getValue())?.color?.background, color: getStatusNameAndColor(cell.getValue())?.color?.text, padding: '3px', fontSize: '12px', borderRadius: '5px' }}>
+                                {getStatusNameAndColor(cell.getValue())?.name}
+                            </span>
+                        </>
+                    )
+                }
             },
             {
-                accessorKey: 'city',
-                header: 'City',
+                accessorKey: 'statusPayment',
+                header: 'Status Paiement',
+                Cell: ({ cell, row }) => {
+                    console.log("cell.getValue(): ", cell.getValue())
+                    console.log("row.original: ", row.original)
+                    return (
+                        <>
+                            <span className='text-truncate-one' title={getStatusNameAndColorForPayment(cell.getValue())?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColorForPayment(cell.getValue())?.color?.background, color: getStatusNameAndColorForPayment(cell.getValue())?.color?.text, padding: '3px', fontSize: '12px', borderRadius: '5px' }}>
+                                {getStatusNameAndColorForPayment(cell.getValue())?.name}
+                            </span>
+                        </>
+                    )
+                }
             },
             {
-                accessorKey: 'state',
-                header: 'State',
+                accessorKey: 'montant',
+                header: 'Montants',
+            },
+            {
+                accessorKey: 'action',
+                header: 'Actions',
+
             },
         ],
         [],
@@ -222,6 +259,7 @@ const Supervision = ({ me }) => {
 
             if (userOrganisationUnitId) {
                 const response = await axios.get(ORGANISATION_UNITS_ROUTE)
+                loadDataStoreSupervisionConfigs(response.data.organisationUnits)
                 setOrganisationUnits(response.data?.organisationUnits)
                 setLoadingOrganisationUnits(false)
             }
@@ -240,18 +278,16 @@ const Supervision = ({ me }) => {
         }
     }
 
-    const loadAllSupervisionsFromTracker = async (dataStoreprogramList) => {
+    const loadAllSupervisionsFromTracker = async (dataStoreprogramList, orgUnitList) => {
         try {
             setLoadingAllSupervisionsFromTracker(true)
             if (dataStoreprogramList.length > 0) {
                 const currentProgram = dataStoreprogramList[0]
-                const currentOrgUnit = organisationUnits.find(ou => ou.id === me?.organisationUnits?.[0]?.id)
-                console.log("Current org unit : ", currentOrgUnit)
-                console.log("org units : ", organisationUnits)
-                console.log("me: ", me.organisationUnits?.[0]?.id)
+                const currentOrgUnit = orgUnitList.find(ou => ou.id === me?.organisationUnits?.[0]?.id)
 
                 if (currentProgram) {
                     setSelectedSupervisionConfigProgram(currentProgram)
+                    setSelectedPeriodSupervisionConfig(dayjs())
                     setSelectedOrgUnitSupervisionFromTracker(currentOrgUnit)
                     await loadTeisPlanifications(currentProgram.program.id, currentOrgUnit?.id, DESCENDANTS)
                 }
@@ -310,7 +346,7 @@ const Supervision = ({ me }) => {
         }
     }
 
-    const loadDataStoreSupervisionConfigs = async () => {
+    const loadDataStoreSupervisionConfigs = async (organisationUnitList) => {
         try {
             setLoadingDataStoreSupervisionConfigs(true)
             const response = await loadDataStore(process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY, null, null, null)
@@ -324,8 +360,7 @@ const Supervision = ({ me }) => {
                 })
             }
 
-
-            await loadAllSupervisionsFromTracker(response)
+            await loadAllSupervisionsFromTracker(response, organisationUnitList)
             setDataStoreSupervisionConfigs(response)
             setLoadingDataStoreSupervisionConfigs(false)
         }
@@ -376,6 +411,129 @@ const Supervision = ({ me }) => {
         setSelectedDataElement(null)
     }
 
+
+    const getStatusNameAndColor = status => {
+
+        if (status === NA.value) {
+            return { name: NA.name, color: { background: GRAY_DARK, text: WHITE } }
+        }
+
+        if (status === CANCELED.value) {
+            return { name: CANCELED.name, color: { background: RED, text: WHITE } }
+        }
+
+        if (status === PENDING_VALIDATION.value) {
+            return { name: PENDING_VALIDATION.name, color: { background: ORANGE, text: WHITE } }
+        }
+
+        if (status === COMPLETED.value) {
+            return { name: COMPLETED.name, color: { background: GREEN, text: WHITE } }
+        }
+
+        if (status === SCHEDULED.value) {
+            return { name: SCHEDULED.name, color: { background: BLUE, text: WHITE } }
+        }
+
+        return { name: SCHEDULED.name, color: { background: BLUE, text: WHITE } }
+
+    }
+
+    const getStatusNameAndColorForPayment = status => {
+        if (status === PAYMENT_DONE.value) {
+            return { name: PAYMENT_DONE.name, color: { background: GREEN, text: WHITE } }
+        }
+
+        if (status === PENDING_PAYMENT.value) {
+            return { name: PENDING_PAYMENT.name, color: { background: ORANGE, text: WHITE } }
+        }
+
+        if (status === NA.value) {
+            return { name: NA.name, color: { background: GRAY_DARK, text: WHITE } }
+        }
+
+        return { name: NA.name, color: { background: GRAY_DARK, text: WHITE } }
+
+    }
+
+    const filterAndGetPlanfications = () => allSupervisionsFromTracker.reduce((prev, current) => {
+        if (selectedSupervisionsConfigProgram.generationType === TYPE_GENERATION_AS_TEI) {
+            if (
+                selectedPeriodSupervisionConfig && dayjs(current.created).format('YYYYMM') === dayjs(selectedPeriodSupervisionConfig).format('YYYYMM') &&
+                current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)
+            ) {
+                const eventDate = current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events[0]?.eventDate
+
+                return [
+                    ...prev,
+                    {
+                        trackedEntityInstance: current.trackedEntityInstance,
+                        period: eventDate,
+                        enrollment: current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.enrollment,
+                        program: current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.program,
+                        orgUnit: current.orgUnit,
+                        storedBy: current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.storedBy,
+                        libelle: current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.orgUnitName,
+                        statusSupervision: dayjs(eventDate).isAfter(dayjs()) ? getDefaultStatusSupervisionIfStatusIsNull() : current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
+                        statusPayment: current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusPayment?.dataElement?.id)?.value || getDefaultStatusPaymentIfStatusIsNull()
+                    }
+                ]
+            }
+        }
+
+        if (selectedSupervisionsConfigProgram.generationType === TYPE_GENERATION_AS_ENROLMENT) {
+            if (selectedPeriodSupervisionConfig) {
+                const enrollmentsList = []
+                for (let en of current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)) {
+                    if (dayjs(en.enrollmentDate).format('YYYYMM') === dayjs(selectedPeriodSupervisionConfig).format('YYYYMM')) {
+                        enrollmentsList.push(en)
+                    }
+                }
+                return [
+                    ...prev,
+                    ...enrollmentsList.map(en => ({
+                        trackedEntityInstance: en.trackedEntityInstance,
+                        period: en?.events[0]?.eventDate,
+                        enrollment: en.enrollment,
+                        program: en.program,
+                        orgUnit: current.orgUnit,
+                        storedBy: en.storedBy,
+                        libelle: en.orgUnitName,
+                        statusSupervision: dayjs(en?.events[0]?.eventDate).isAfter(dayjs()) ? getDefaultStatusSupervisionIfStatusIsNull() : en?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
+                        statusPayment: en?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusPayment?.dataElement?.id)?.value || getDefaultStatusPaymentIfStatusIsNull()
+                    }))
+                ]
+            }
+        }
+
+        if (selectedSupervisionsConfigProgram.generationType === TYPE_GENERATION_AS_EVENT) {
+            if (selectedPeriodSupervisionConfig) {
+                const eventList = []
+                const currentEnrollment = current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]
+                for (let event of currentEnrollment?.events || []) {
+                    if (dayjs(event.eventDate).format('YYYYMM') === dayjs(selectedPeriodSupervisionConfig).format('YYYYMM')) {
+                        eventList.push(event)
+                    }
+                }
+                return [
+                    ...prev,
+                    ...eventList.map(ev => ({
+                        trackedEntityInstance: currentEnrollment?.trackedEntityInstance,
+                        period: ev.eventDate,
+                        enrollment: currentEnrollment?.enrollment,
+                        program: currentEnrollment?.program,
+                        orgUnit: currentEnrollment?.orgUnit,
+                        storedBy: currentEnrollment?.storedBy,
+                        libelle: currentEnrollment?.orgUnitName,
+                        statusSupervision: dayjs(ev.eventDate).isAfter(dayjs()) ? getDefaultStatusSupervisionIfStatusIsNull() : currentEnrollment?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
+                        statusPayment: currentEnrollment?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusPayment?.dataElement?.id)?.value || getDefaultStatusPaymentIfStatusIsNull()
+                    }))
+                ]
+            }
+        }
+
+        return prev
+    }, [])
+
     const handleSaveNewMappingConfig = async () => {
         try {
             setLoadingSaveDateElementMappingConfig(true)
@@ -390,7 +548,6 @@ const Supervision = ({ me }) => {
 
             if (selectedDataElement && selectedProgramStage) {
                 const existingConfig = mappingConfigs.find(mapping => mapping.dataElement?.id === selectedDataElement.id &&
-                    // mapping.indicator?.displayName === inputDataSourceDisplayName &&
                     mapping.programStage?.id === selectedProgramStage.id
                 )
 
@@ -1414,6 +1571,10 @@ const Supervision = ({ me }) => {
         }
     }
 
+    const handleSelectPeriodSupervisionConfig = (date) => {
+        setSelectedPeriodSupervisionConfig(dayjs((date)))
+    }
+
 
     const RenderSupervisionList = () => (
         <>
@@ -1432,6 +1593,16 @@ const Supervision = ({ me }) => {
                             />
                         </Col>
                         <Col md={6}>
+                            <DatePicker
+                                onChange={handleSelectPeriodSupervisionConfig}
+                                picker="month"
+                                value={selectedPeriodSupervisionConfig}
+                                style={{ width: '100%' }}
+                                placeholder="Période"
+                                allowClear={false}
+                            />
+                        </Col>
+                        <Col md={6}>
                             {/* <div style={{ marginBottom: '2px' }}>Unités d'organisation</div> */}
                             <OrganisationUnitsTree
                                 meOrgUnitId={me?.organisationUnits[0]?.id}
@@ -1443,7 +1614,7 @@ const Supervision = ({ me }) => {
                             />
                         </Col>
                         <Col md={6}>
-                            <Button primary onClick={() => alert('Recherché')}>Rechercher</Button>
+                            <Button primary onClick={() => null}>Rechercher</Button>
                         </Col>
                     </Row>
                 </Card>
@@ -1453,7 +1624,7 @@ const Supervision = ({ me }) => {
                     <MantineReactTable
                         enableStickyHeader
                         columns={columns}
-                        data={data}
+                        data={filterAndGetPlanfications()}
                         mantinePaperProps={{
                             shadow: 'none',
                             radius: '8px',
@@ -3036,7 +3207,6 @@ const Supervision = ({ me }) => {
 
     useEffect(() => {
         if (me) {
-            loadDataStoreSupervisionConfigs()
             loadDataStoreSupervisions()
             loadDataStoreIndicators()
             loadOrganisationUnits()
@@ -3050,6 +3220,7 @@ const Supervision = ({ me }) => {
 
     return (
         <>
+            {console.log("filterAndGetPlanfications : ", filterAndGetPlanfications())}
             {RenderTopContent()}
             {
                 loadingDataStoreSupervisionConfigs && (
