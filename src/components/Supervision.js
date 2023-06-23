@@ -5,6 +5,7 @@ import { IoMdAdd } from 'react-icons/io'
 import { IoListCircleOutline } from 'react-icons/io5'
 import { Button, ButtonStrip, Checkbox, CircularLoader, Modal, ModalActions, ModalContent, ModalTitle, NoticeBox, Radio } from '@dhis2/ui'
 import {
+    AGENT,
     CANCELED,
     COMPLETED,
     DAY,
@@ -102,7 +103,6 @@ const Supervision = ({ me }) => {
     const [selectedOrgUnitSupervisionFromTracker, setSelectedOrgUnitSupervisionFromTracker] = useState(null)
     const [selectedPeriodSupervisionConfig, setSelectedPeriodSupervisionConfig] = useState(null)
 
-
     const [inputMeilleur, setInputMeilleur] = useState(0)
     const [inputMauvais, setInputMauvais] = useState(0)
     const [inputMeilleurPositif, setInputMeilleurPositif] = useState(true)
@@ -149,11 +149,9 @@ const Supervision = ({ me }) => {
         ]
     }
 
-
-
     const columns = () => {
 
-        return selectedSupervisionsConfigProgram?.paymentConfigs?.length === 0 ? [
+        return selectedSupervisionsConfigProgram?.planificationType === ORGANISATION_UNIT ? [
             {
                 accessorKey: 'libelle', //access nested data with dot notation
                 header: "Unité d'organisation",
@@ -177,7 +175,7 @@ const Supervision = ({ me }) => {
                 Cell: ({ cell, row }) => {
                     return (
                         <>
-                            <span className='text-truncate-one' title={getStatusNameAndColor(cell.getValue())?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColor(cell.getValue())?.color?.background, color: getStatusNameAndColor(cell.getValue())?.color?.text, padding: '3px', fontSize: '12px', borderRadius: '5px' }}>
+                            <span title={getStatusNameAndColor(cell.getValue())?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColor(cell.getValue())?.color?.background, color: getStatusNameAndColor(cell.getValue())?.color?.text, padding: '4px', fontSize: '12px', borderRadius: '5px' }}>
                                 {getStatusNameAndColor(cell.getValue())?.name}
                             </span>
                         </>
@@ -230,7 +228,7 @@ const Supervision = ({ me }) => {
                     Cell: ({ cell, row }) => {
                         return (
                             <>
-                                <span className='text-truncate-one' title={getStatusNameAndColor(cell.getValue())?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColor(cell.getValue())?.color?.background, color: getStatusNameAndColor(cell.getValue())?.color?.text, padding: '3px', fontSize: '12px', borderRadius: '5px' }}>
+                                <span title={getStatusNameAndColor(cell.getValue())?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColor(cell.getValue())?.color?.background, color: getStatusNameAndColor(cell.getValue())?.color?.text, padding: '4px', fontSize: '12px', borderRadius: '5px' }}>
                                     {getStatusNameAndColor(cell.getValue())?.name}
                                 </span>
                             </>
@@ -243,7 +241,7 @@ const Supervision = ({ me }) => {
                     Cell: ({ cell, row }) => {
                         return (
                             <>
-                                <span className='text-truncate-one' title={getStatusNameAndColorForPayment(cell.getValue())?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColorForPayment(cell.getValue())?.color?.background, color: getStatusNameAndColorForPayment(cell.getValue())?.color?.text, padding: '3px', fontSize: '12px', borderRadius: '5px' }}>
+                                <span title={getStatusNameAndColorForPayment(cell.getValue())?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColorForPayment(cell.getValue())?.color?.background, color: getStatusNameAndColorForPayment(cell.getValue())?.color?.text, padding: '4px', fontSize: '12px', borderRadius: '5px' }}>
                                     {getStatusNameAndColorForPayment(cell.getValue())?.name}
                                 </span>
                             </>
@@ -499,7 +497,7 @@ const Supervision = ({ me }) => {
                     ...prev,
                     {
                         trackedEntityInstance,
-                        agent: `${current.attributes?.find(att => att.attribute === 'ruMvQBoqi3Y')?.value || ''} ${current.attributes?.find(att => att.attribute === 'rjIQHfDGnm5')?.value || ''}`,
+                        agent: `${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeFirstName?.id)?.value || ''}`,
                         period: eventDate,
                         montant: calculateMontant(trackedEntityInstance, eventDate, current.orgUnit, program),
                         enrollment: current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.enrollment,
@@ -526,7 +524,7 @@ const Supervision = ({ me }) => {
                     ...prev,
                     ...enrollmentsList.map(en => ({
                         trackedEntityInstance: en.trackedEntityInstance,
-                        agent: `${current.attributes?.find(att => att.attribute === 'ruMvQBoqi3Y')?.value || ''} ${current.attributes?.find(att => att.attribute === 'rjIQHfDGnm5')?.value || ''}`,
+                        agent: `${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeFirstName?.id)?.value || ''}`,
                         period: en?.events[0]?.eventDate,
                         montant: calculateMontant(en.trackedEntityInstance, en?.events[0]?.eventDate, current.orgUnit, en.program),
                         enrollment: en.enrollment,
@@ -550,11 +548,12 @@ const Supervision = ({ me }) => {
                         eventList.push(event)
                     }
                 }
+
                 return [
                     ...prev,
                     ...eventList.map(ev => ({
                         trackedEntityInstance: currentEnrollment?.trackedEntityInstance,
-                        agent: `${current.attributes?.find(att => att.attribute === 'ruMvQBoqi3Y')?.value || ''} ${current.attributes?.find(att => att.attribute === 'rjIQHfDGnm5')?.value || ''}`,
+                        agent: `${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeFirstName?.id)?.value || ''}`,
                         period: ev.eventDate,
                         montant: calculateMontant(currentEnrollment?.trackedEntityInstance, ev.eventDate, currentEnrollment?.orgUnit, currentEnrollment?.program),
                         enrollment: currentEnrollment?.enrollment,
@@ -631,7 +630,6 @@ const Supervision = ({ me }) => {
         setSelectedProgram(null)
         setSelectedAgents([])
         setSelectedOrganisationUnitInd(null)
-
         setSelectedSupervisionType(value)
     }
 
@@ -1631,8 +1629,6 @@ const Supervision = ({ me }) => {
         if (correctTEIs.length === 0)
             return `${montant} FCFA`
 
-        console.log("correctTEIs: ", correctTEIs)
-
         const correctPaymentObject = dataStoreSupervisionConfigs.find(d => d.program?.id === programId)?.paymentConfigs?.find(p => p.id === correctTEIs[0]?.payment)
 
         if (!correctPaymentObject)
@@ -1835,6 +1831,7 @@ const Supervision = ({ me }) => {
                         {
                             selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
                             dataStoreSupervisionConfigs
+                                .filter(sup => sup.planificationType === ORGANISATION_UNIT)
                                 .map((sup, index) => (
                                     <div key={index} className={`supervision-item ${selectedProgram?.id === sup.id ? 'active' : ''}`} onClick={() => handleClickSupervisionItem(sup)}>
                                         {sup.program?.displayName}
@@ -1844,7 +1841,7 @@ const Supervision = ({ me }) => {
                         {
                             selectedSupervisionType === TYPE_SUPERVISION_AGENT &&
                             dataStoreSupervisionConfigs
-                                .filter(sup => sup.generationType === TYPE_GENERATION_AS_EVENT)
+                                .filter(sup => sup.generationType === TYPE_GENERATION_AS_EVENT && sup.planificationType === AGENT)
                                 .map((sup, index) => (
                                     <div key={index} className={`supervision-item ${selectedProgram?.id === sup.id ? 'active' : ''}`} onClick={() => handleClickSupervisionItem(sup)}>
                                         {sup.program?.displayName}
@@ -1853,7 +1850,9 @@ const Supervision = ({ me }) => {
                         }
                         {
                             selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
-                            dataStoreSupervisionConfigs.length === 0 && (
+                            dataStoreSupervisionConfigs
+                                .filter(sup => sup.planificationType === ORGANISATION_UNIT)
+                                .length === 0 && (
                                 <div style={{ fontWeight: 'bold' }}> Aucune fiche de supervision disponible</div>
                             )
                         }
@@ -1861,7 +1860,8 @@ const Supervision = ({ me }) => {
                         {
                             selectedSupervisionType === TYPE_SUPERVISION_AGENT &&
                             dataStoreSupervisionConfigs
-                                .filter(sup => sup.generationType === TYPE_GENERATION_AS_EVENT).length === 0 && (
+                                .filter(sup => sup.generationType === TYPE_GENERATION_AS_EVENT && sup.planificationType === AGENT)
+                                .length === 0 && (
                                 <div style={{ fontWeight: 'bold' }}> Aucune fiche de supervision disponible</div>
                             )
                         }
@@ -2772,53 +2772,6 @@ const Supervision = ({ me }) => {
                         />
                     </div>
                 </Col>
-
-                {/* <Col md={12}>
-                    <Row gutter={[8, 8]}>
-                        <Col md={24}>
-                            <div style={{ marginBottom: '5px' }}>Type d'indicateurs</div>
-                        </Col>
-                        <Col>
-                            <div>
-                                <Radio
-                                    label="Indicateurs de programmes"
-                                    onChange={handleChangeIndicatorType}
-                                    value={PROGRAM_INDICATOR}
-                                    checked={selectedIndicatorType === PROGRAM_INDICATOR}
-                                />
-                            </div>
-                        </Col>
-                        <Col>
-                            <div>
-                                <Radio
-                                    label="Groupe d'indicateurs"
-                                    onChange={handleChangeIndicatorType}
-                                    value={INDICATOR_GROUP}
-                                    checked={selectedIndicatorType === INDICATOR_GROUP}
-                                />
-                            </div>
-                        </Col>
-                    </Row>
-                </Col> */}
-
-                {/* <Col md={12}>
-                    <div>
-                        <div style={{ marginBottom: '5px' }}>Group d'indicateurs</div>
-                        <Select
-                            options={indicatorGroups.map(indicateurGroup => ({ label: indicateurGroup.displayName, value: indicateurGroup.id }))}
-                            placeholder="Choisir le group d'indicateur"
-                            style={{ width: '100%' }}
-                            onChange={handleSelectIndicatorGroup}
-                            value={selectedIndicatorGroup?.id}
-                            optionFilterProp='label'
-                            showSearch
-                            loading={loadingIndicatorGroups}
-                            disabled={loadingIndicatorGroups}
-                        />
-                    </div>
-                </Col> */}
-
-                {/* selectedIndicatorGroup && selectedProgramStage && ( */}
                 {
                     selectedProgramStage && (
                         <Col md={24} xs={24}>
@@ -2856,30 +2809,6 @@ const Supervision = ({ me }) => {
                                                 )
                                             }
 
-                                            {/* {
-                                                selectedIndicatorGroup && (
-                                                    <Col md={12} xs={24}>
-                                                        <div>
-                                                            <div style={{ marginBottom: '5px' }}>Indicateurs</div>
-                                                            <Select
-                                                                options={
-                                                                    selectedIndicatorType === INDICATOR_GROUP ?
-                                                                        selectedIndicatorGroup.indicators?.map(progInd => ({ label: progInd.displayName, value: progInd.id }))
-                                                                        : selectedIndicatorType === PROGRAM_INDICATOR &&
-                                                                        selectedIndicatorGroup.programIndicators?.map(progInd => ({ label: progInd.displayName, value: progInd.id })) ||
-                                                                        []
-                                                                }
-                                                                placeholder="Indicateurs"
-                                                                style={{ width: '100%' }}
-                                                                onChange={handleSelectIndicator}
-                                                                value={selectedIndicator?.id}
-                                                                optionFilterProp='label'
-                                                                showSearch
-                                                            />
-                                                        </div>
-                                                    </Col>
-                                                )
-                                            }  */}
                                             <Col md={10} xs={24}>
                                                 <div>
                                                     <div style={{ marginBottom: '5px' }}>Source de donnée</div>
@@ -2907,7 +2836,6 @@ const Supervision = ({ me }) => {
                                     </div>
                                 )
                             }
-
                         </Col>
                     )
                 }
@@ -3296,9 +3224,9 @@ const Supervision = ({ me }) => {
 
     useEffect(() => {
         if (me) {
+            loadOrganisationUnits()
             loadDataStoreSupervisions()
             loadDataStoreIndicators()
-            loadOrganisationUnits()
             loadUsers(me?.organisationUnits?.[0]?.id)
         }
     }, [me])

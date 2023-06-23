@@ -343,6 +343,10 @@ const Setting = () => {
                 setSelectedStatutPaymentProgramStage(null)
                 setSelectedStatutPaymentDataElement(null)
                 setSelectedSupervisionGenerationType(TYPE_GENERATION_AS_TEI)
+                setSelectedPlanificationType(ORGANISATION_UNIT)
+                setSelectedAttributesToDisplay([])
+                setSelectedAttributeNameForAgent(null)
+                setSelectedAttributeFirstNameForAgent(null)
                 cleanPaymentConfigState()
             }
         } catch (err) {
@@ -401,14 +405,14 @@ const Setting = () => {
             if (!selectedTEIProgram)
                 throw new Error("Veuillez sélectionner le programme tracker !")
 
-            if (selectedSupervisionGenerationType === AGENT) {
+            if (selectedPlanificationType === AGENT) {
                 if (selectedAttributesToDisplay.length === 0)
                     throw new Error("Veuillez configurer les attributs à utiliser lors de l'affichage des agents !")
 
-                if (!selectedAttributeNameForAgent.length === 0)
+                if (!selectedAttributeNameForAgent)
                     throw new Error("Veuillez configurer l'attribut qui représente le nom de l'agent !")
 
-                if (!selectedAttributeFirstNameForAgent.length === 0)
+                if (!selectedAttributeFirstNameForAgent)
                     throw new Error("Veuillez configurer l'attribut qui représente le prénom de l'agent !")
             }
 
@@ -822,7 +826,7 @@ const Setting = () => {
             setSelectedStatutPaymentDataElement(prog?.statusPayment?.dataElement)
             setSelectedAttributesToDisplay(prog.attributesToDisplay || [])
             setSelectedAttributeNameForAgent(prog.attributeName)
-            setSelectedAttributeNameForAgent(prog.attributeFirstName)
+            setSelectedAttributeFirstNameForAgent(prog.attributeFirstName)
             setSelectedSupervisionGenerationType(prog?.generationType)
             setSelectedPlanificationType(prog.planificationType)
             setPaymentConfigList(prog?.paymentConfigs || [])
@@ -884,7 +888,7 @@ const Setting = () => {
                                         placeholder="Nom de l'Agent"
                                         style={{ width: '100%' }}
                                         optionFilterProp='label'
-                                        value={selectedAttributeNameForAgent}
+                                        value={selectedAttributeNameForAgent?.id}
                                         onChange={handleSelectProgramAttributeNameForAgent}
                                         showSearch
                                         allowClear
@@ -901,7 +905,7 @@ const Setting = () => {
                                         placeholder="Prénom de l'Agent"
                                         style={{ width: '100%' }}
                                         optionFilterProp='label'
-                                        value={selectedAttributeFirstNameForAgent}
+                                        value={selectedAttributeFirstNameForAgent?.id}
                                         onChange={handleSelectProgramAttributeFirstNameForAgent}
                                         showSearch
                                         allowClear
