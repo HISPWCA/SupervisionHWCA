@@ -5,7 +5,7 @@ import ReactEchart from 'echarts-for-react'
 import axios from 'axios';
 import { DATA_ELEMENT_OPTION_SETS, ORGANISATION_UNITS_ROUTE, SERVER_URL, TRACKED_ENTITY_INSTANCES_ROUTE, USERS_ROUTE } from '../utils/api.routes'
 import OrganisationUnitsTree from './OrganisationUnitsTree'
-import { CANCELED, DESCENDANTS, NOTICE_BOX_DEFAULT, NOTIFICATON_CRITICAL, PENDING_VALIDATION, PLANIFICATION_PAR_MOI, PLANIFICATION_PAR_TOUS, PLANIFICATION_PAR_UN_USER, COMPLETED, SCHEDULED, TYPE_GENERATION_AS_ENROLMENT, TYPE_GENERATION_AS_EVENT, TYPE_GENERATION_AS_TEI, NA, PAYMENT_DONE, PENDING_PAYMENT } from '../utils/constants'
+import { CANCELED, DESCENDANTS, NOTICE_BOX_DEFAULT, NOTIFICATON_CRITICAL, PENDING_VALIDATION, PLANIFICATION_PAR_MOI, PLANIFICATION_PAR_TOUS, PLANIFICATION_PAR_UN_USER, COMPLETED, SCHEDULED, TYPE_GENERATION_AS_ENROLMENT, TYPE_GENERATION_AS_EVENT, TYPE_GENERATION_AS_TEI, NA, PAYMENT_DONE, PENDING_PAYMENT, AGENT } from '../utils/constants'
 import MapView from './MapView'
 import { loadDataStore } from '../utils/functions'
 import { IoMdOpen } from 'react-icons/io'
@@ -312,6 +312,7 @@ export const Dashboard = ({ me }) => {
                     {
                         trackedEntityInstance: current.trackedEntityInstance,
                         period: eventDate,
+                        agent: `${current.attributes?.find(att => att.attribute === selectedProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedProgram?.attributeFirstName?.id)?.value || ''}`,
                         enrollment: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.enrollment,
                         program: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.program,
                         orgUnit: current.orgUnit,
@@ -336,6 +337,7 @@ export const Dashboard = ({ me }) => {
                     ...prev,
                     ...enrollmentsList.map(en => ({
                         trackedEntityInstance: en.trackedEntityInstance,
+                        agent: `${current.attributes?.find(att => att.attribute === selectedProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedProgram?.attributeFirstName?.id)?.value || ''}`,
                         period: en?.events[0]?.eventDate,
                         enrollment: en.enrollment,
                         program: en.program,
@@ -363,6 +365,7 @@ export const Dashboard = ({ me }) => {
                     ...eventList.map(ev => ({
                         trackedEntityInstance: currentEnrollment?.trackedEntityInstance,
                         period: ev.eventDate,
+                        agent: `${current.attributes?.find(att => att.attribute === selectedProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedProgram?.attributeFirstName?.id)?.value || ''}`,
                         enrollment: currentEnrollment?.enrollment,
                         program: currentEnrollment?.program,
                         orgUnit: currentEnrollment?.orgUnit,
@@ -389,6 +392,7 @@ export const Dashboard = ({ me }) => {
 
             return true
         })
+        .sort((a, b) => parseInt(dayjs(b.period).valueOf()) - parseInt(dayjs(a.period).valueOf()))
 
 
     const getPieChartDatasForSupervisions = () => ({
@@ -627,43 +631,47 @@ export const Dashboard = ({ me }) => {
                 </Card>
             </div>
 
-            <div style={{ marginTop: '10px' }}>
-                <Card size='small' className='my-shadow'>
-                    <Row gutter={[10, 10]}>
-                        {
-                            statusPaymentOptions.map(option => {
-                                const statusPayload = filterAndGetPlanfications().reduce((prev, curr) => {
-                                    if (curr.statusPayment && prev[`${curr.statusPayment}`]) {
-                                        prev[`${curr.statusPayment}`] = { name: getStatusNameAndColorForPayment(curr.statusPayment)?.name, value: prev[`${curr.statusPayment}`].value + 1 }
-                                    } else {
-                                        prev[`${curr.statusPayment}`] = { name: getStatusNameAndColorForPayment(curr.statusPayment)?.name, value: 1 }
-                                    }
+            {
+                selectedProgram?.planificationType === AGENT && (
+                    <div style={{ marginTop: '10px' }}>
+                        <Card size='small' className='my-shadow'>
+                            <Row gutter={[10, 10]}>
+                                {
+                                    statusPaymentOptions.map(option => {
+                                        const statusPayload = filterAndGetPlanfications().reduce((prev, curr) => {
+                                            if (curr.statusPayment && prev[`${curr.statusPayment}`]) {
+                                                prev[`${curr.statusPayment}`] = { name: getStatusNameAndColorForPayment(curr.statusPayment)?.name, value: prev[`${curr.statusPayment}`].value + 1 }
+                                            } else {
+                                                prev[`${curr.statusPayment}`] = { name: getStatusNameAndColorForPayment(curr.statusPayment)?.name, value: 1 }
+                                            }
 
-                                    return prev
-                                }, {})
+                                            return prev
+                                        }, {})
 
-                                return (
-                                    <Col flex='auto'>
-                                        <div className='my-shadow' style={{ backgroundColor: '#fff', borderRadius: '8px', marginBottom: '2px', padding: '10px', height: '100%', borderLeft: `3px solid ${getStatusNameAndColorForPayment(option.code)?.color?.background}` }}>
-                                            <div>
-                                                <div style={{ fontWeight: 'bold', color: `${getStatusNameAndColorForPayment(option.code)?.color?.background}`, textAlign: 'center' }}>
-                                                    <div style={{ backgroundColor: `${getStatusNameAndColorForPayment(option.code)?.color?.background}`, fontSize: '13px', padding: '4px', color: `${getStatusNameAndColorForPayment(option.code)?.color?.text}` }}>
-                                                        {option.displayName}
+                                        return (
+                                            <Col flex='auto'>
+                                                <div className='my-shadow' style={{ backgroundColor: '#fff', borderRadius: '8px', marginBottom: '2px', padding: '10px', height: '100%', borderLeft: `3px solid ${getStatusNameAndColorForPayment(option.code)?.color?.background}` }}>
+                                                    <div>
+                                                        <div style={{ fontWeight: 'bold', color: `${getStatusNameAndColorForPayment(option.code)?.color?.background}`, textAlign: 'center' }}>
+                                                            <div style={{ backgroundColor: `${getStatusNameAndColorForPayment(option.code)?.color?.background}`, fontSize: '13px', padding: '4px', color: `${getStatusNameAndColorForPayment(option.code)?.color?.text}` }}>
+                                                                {option.displayName}
+                                                            </div>
+                                                        </div>
+                                                        <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                                                            <span style={{ fontWeight: 'bold', fontSize: '20px', borderRight: '1px solid #ccc', paddingRight: '20px' }}>{statusPayload[option.code]?.value || 0}</span>
+                                                            <span style={{ paddingLeft: '20px', color: `${BLACK}90`, fontSize: '13px' }}> {calculatePourcentageOfPayment(statusPayload[option.code]?.value || 0)} </span>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div style={{ marginTop: '20px', textAlign: 'center' }}>
-                                                    <span style={{ fontWeight: 'bold', fontSize: '20px', borderRight: '1px solid #ccc', paddingRight: '20px' }}>{statusPayload[option.code]?.value || 0}</span>
-                                                    <span style={{ paddingLeft: '20px', color: `${BLACK}90`, fontSize: '13px' }}> {calculatePourcentageOfPayment(statusPayload[option.code]?.value || 0)} </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </Col>
-                                )
-                            })
-                        }
-                    </Row>
-                </Card>
-            </div>
+                                            </Col>
+                                        )
+                                    })
+                                }
+                            </Row>
+                        </Card>
+                    </div>
+                )
+            }
         </Col>
     )
 
@@ -710,6 +718,83 @@ export const Dashboard = ({ me }) => {
 
     }
 
+    const columns = () => selectedProgram?.planificationType === AGENT ? [
+        {
+            title: "Agent",
+            key: 'agent',
+            dataIndex: 'tei',
+            render: value => (
+                <div>
+                    <span style={{ fontSize: '13px' }}>{value?.agent} </span>
+                    <span style={{ fontSize: '10px', color: '#00000090', marginLeft: '5px' }}>( {value.nom}) </span>
+                </div>
+            )
+        },
+        // { title: "Unité d'organisation", key: 'nom', dataIndex: 'nom' },
+        { title: "Période", key: 'period', dataIndex: 'period', render: value => <div style={{ fontSize: '13px' }}>{dayjs(value).format('YYYY-MM-DD')} </div> },
+        {
+            title: 'Status Supervision', key: 'statusSupervision', dataIndex: 'statusSupervision', width: '150px',
+            render: value => (
+                <>
+                    <span className='text-truncate-one' title={getStatusNameAndColor(value)?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColor(value)?.color?.background, color: getStatusNameAndColor(value)?.color?.text, padding: '3px', fontSize: '12px', borderRadius: '5px' }}>
+                        {getStatusNameAndColor(value)?.name}
+                    </span>
+                </>
+            )
+        },
+        {
+            title: 'Status Paiement', key: 'statusPayment', dataIndex: 'statusPayment', width: '150px',
+            render: value => (
+                <>
+                    <span className='text-truncate-one' title={getStatusNameAndColorForPayment(value)?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColorForPayment(value)?.color?.background, color: getStatusNameAndColorForPayment(value)?.color?.text, padding: '3px', fontSize: '12px', borderRadius: '5px' }}>
+                        {getStatusNameAndColorForPayment(value)?.name}
+                    </span>
+                </>
+            )
+        },
+        {
+            title: 'Actions', key: 'action', width: '50px', dataIndex: 'tei', render: tei => (
+                <div style={{ textAlign: 'center', }}>
+                    <a
+                        target='_blank'
+                        href={`${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${tei.trackedEntityInstance}&program=${tei.program}&ou=${tei.orgUnit}`}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        <IoMdOpen title='Ouvrir dans le tracker' style={{ fontSize: '18px', color: BLUE, cursor: 'pointer' }} />
+                    </a>
+                </div>
+            )
+        }
+    ] :
+        [
+            { title: "Unité d'organisation", key: 'nom', dataIndex: 'nom' },
+            { title: "Période", key: 'period', dataIndex: 'period', render: value => <div>{dayjs(value).format('YYYY-MM-DD')} </div> },
+            {
+                title: 'Status Supervision', key: 'statusSupervision', dataIndex: 'statusSupervision', width: '150px',
+                render: value => (
+                    <>
+                        <span className='text-truncate-one' title={getStatusNameAndColor(value)?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColor(value)?.color?.background, color: getStatusNameAndColor(value)?.color?.text, padding: '3px', fontSize: '12px', borderRadius: '5px' }}>
+                            {getStatusNameAndColor(value)?.name}
+                        </span>
+                    </>
+                )
+            },
+            {
+                title: 'Actions', key: 'action', width: '50px', dataIndex: 'tei', render: tei => (
+                    <div style={{ textAlign: 'center', }}>
+                        <a
+                            target='_blank'
+                            href={`${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${tei.trackedEntityInstance}&program=${tei.program}&ou=${tei.orgUnit}`}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            <IoMdOpen title='Ouvrir dans le tracker' style={{ fontSize: '18px', color: BLUE, cursor: 'pointer' }} />
+                        </a>
+                    </div>
+                )
+            }
+        ]
+
+
     const RenderCharts = () => (
         <Col md={12} sm={24}>
             <Row gutter={[8, 8]}>
@@ -717,51 +802,14 @@ export const Dashboard = ({ me }) => {
                     <div className='my-shadow' style={{ backgroundColor: '#fff', borderRadius: '8px', marginBottom: '2px', padding: '10px', height: '100%' }}>
                         <Table
                             size='small'
-                            columns={
-                                [
-                                    { title: "Unité d'organisation", key: 'nom', dataIndex: 'nom' },
-                                    { title: "Période", key: 'period', dataIndex: 'period', render: value => <div>{dayjs(value).format('YYYY-MM-DD')} </div> },
-                                    {
-                                        title: 'Status Supervision', key: 'statusSupervision', dataIndex: 'statusSupervision', width: '150px',
-                                        render: value => (
-                                            <>
-                                                <span className='text-truncate-one' title={getStatusNameAndColor(value)?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColor(value)?.color?.background, color: getStatusNameAndColor(value)?.color?.text, padding: '3px', fontSize: '12px', borderRadius: '5px' }}>
-                                                    {getStatusNameAndColor(value)?.name}
-                                                </span>
-                                            </>
-                                        )
-                                    },
-                                    {
-                                        title: 'Status Paiement', key: 'statusPayment', dataIndex: 'statusPayment', width: '150px',
-                                        render: value => (
-                                            <>
-                                                <span className='text-truncate-one' title={getStatusNameAndColorForPayment(value)?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColorForPayment(value)?.color?.background, color: getStatusNameAndColorForPayment(value)?.color?.text, padding: '3px', fontSize: '12px', borderRadius: '5px' }}>
-                                                    {getStatusNameAndColorForPayment(value)?.name}
-                                                </span>
-                                            </>
-                                        )
-                                    },
-                                    {
-                                        title: 'Actions', key: 'action', width: '50px', dataIndex: 'tei', render: tei => (
-                                            <div style={{ textAlign: 'center', }}>
-                                                <a
-                                                    target='_blank'
-                                                    href={`${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${tei.trackedEntityInstance}&program=${tei.program}&ou=${tei.orgUnit}`}
-                                                    style={{ cursor: 'pointer' }}
-                                                >
-                                                    <IoMdOpen title='Ouvrir dans le tracker' style={{ fontSize: '18px', color: BLUE, cursor: 'pointer' }} />
-                                                </a>
-                                            </div>
-                                        )
-                                    }
-                                ]}
+                            columns={columns()}
                             dataSource={getFiveLastPlanifications()}
                             pagination={false}
                             style={{ height: '100%' }}
                         />
                     </div>
                 </Col>
-                <Col md={12}>
+                <Col sm={24} md={selectedProgram?.planificationType === AGENT ? 12 : 24}>
                     {0 > 1 && <div className='my-shadow' style={{ backgroundColor: '#fff', borderRadius: '8px', marginBottom: '2px', padding: '5px' }}>
                         <MapView
                             coordinates={coordinates}
@@ -778,7 +826,7 @@ export const Dashboard = ({ me }) => {
                         {
                             teiList.length > 0 && (
                                 <ReactEchart
-                                    style={{ height: '430px', width: '100%' }}
+                                    style={{ height: selectedProgram?.planificationType === AGENT ? '448px' : '302px', width: '100%' }}
                                     option={getPieChartDatasForSupervisions()}
                                 />
                             )
@@ -786,22 +834,26 @@ export const Dashboard = ({ me }) => {
                     </div>
 
                 </Col>
-                <Col md={12}>
-                    <div className='my-shadow' style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '10px', marginBottom: '2px', height: '100%', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {
+                    selectedProgram?.planificationType === AGENT && (
+                        <Col md={12} sm={24}>
+                            <div className='my-shadow' style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '10px', marginBottom: '2px', height: '100%', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
 
-                        {
-                            teiList.length === 0 && (<div style={{ fontWeight: 'bold', color: `${BLACK}90` }}> Aucune données disponibles !</div>)
-                        }
-                        {
-                            teiList.length > 0 && (
-                                <ReactEchart
-                                    style={{ height: '430px', width: '100%' }}
-                                    option={getPieChartDatasForPayment()}
-                                />
-                            )
-                        }
-                    </div>
-                </Col>
+                                {
+                                    teiList.length === 0 && (<div style={{ fontWeight: 'bold', color: `${BLACK}90` }}> Aucune données disponibles !</div>)
+                                }
+                                {
+                                    teiList.length > 0 && (
+                                        <ReactEchart
+                                            style={{ height: '302px', width: '100%' }}
+                                            option={getPieChartDatasForPayment()}
+                                        />
+                                    )
+                                }
+                            </div>
+                        </Col>
+                    )
+                }
             </Row>
         </Col>
     )

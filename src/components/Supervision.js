@@ -498,8 +498,8 @@ const Supervision = ({ me }) => {
                     {
                         trackedEntityInstance,
                         agent: `${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeFirstName?.id)?.value || ''}`,
-                        period: eventDate,
                         montant: calculateMontant(trackedEntityInstance, eventDate, current.orgUnit, program),
+                        period: eventDate,
                         enrollment: current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.enrollment,
                         program: program,
                         orgUnit: current.orgUnit,
