@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Button, Radio, Tab, TabBar } from "@dhis2/ui"
-import { AGGREGATE_INDICATOR, NOTIFICATON_CRITICAL, NOTIFICATON_SUCCESS, INDICATOR_GROUP, PAGE_CONFIGURATION_TYPE_SUPERVISIONS, PAGE_CONFIGURATION_USER_AUTHORIZATIONS, PAGE_CONFIG_INDICATORS, PAGE_CONFIG_SUPERVISION, PAGPE_CONFIGURATION_INDICATEURS, PROGRAM_INDICATOR, TYPE_GENERATION_AS_ENROLMENT, TYPE_GENERATION_AS_EVENT, TYPE_GENERATION_AS_TEI, PAGE_SUPERVISIONS, TYPE_ANALYSE_DATA_ELEMENT, PAGE_CONFIG_ANALYSE, TYPE_ANALYSE_INDICATOR } from "../utils/constants"
+import { AGGREGATE_INDICATOR, NOTIFICATON_CRITICAL, NOTIFICATON_SUCCESS, INDICATOR_GROUP, PAGE_CONFIGURATION_TYPE_SUPERVISIONS, PAGE_CONFIGURATION_USER_AUTHORIZATIONS, PAGE_CONFIG_INDICATORS, PAGE_CONFIG_SUPERVISION, PAGPE_CONFIGURATION_INDICATEURS, PROGRAM_INDICATOR, TYPE_GENERATION_AS_ENROLMENT, TYPE_GENERATION_AS_EVENT, TYPE_GENERATION_AS_TEI, PAGE_SUPERVISIONS, TYPE_ANALYSE_DATA_ELEMENT, PAGE_CONFIG_ANALYSE, TYPE_ANALYSE_INDICATOR, ORGANISATION_UNIT, AGENT } from "../utils/constants"
 import { Card, Checkbox, Col, Divider, Input, InputNumber, Popconfirm, Row, Select, Table } from 'antd'
 import { DATA_ELEMENTS_ROUTE, INDICATORS_GROUP_ROUTE, INDICATORS_ROUTE, PROGRAMS_ROUTE, PROGRAMS_STAGE_ROUTE, PROGRAM_INDICATOR_GROUPS } from '../utils/api.routes'
 import axios from 'axios'
@@ -56,6 +56,10 @@ const Setting = () => {
     const [selectedStatutPaymentDataElement, setSelectedStatutPaymentDataElement] = useState(null)
     const [selectedDataElements, setSelectedDataElements] = useState([])
     const [selectedAttributesToDisplay, setSelectedAttributesToDisplay] = useState([])
+
+    const [selectedPlanificationType, setSelectedPlanificationType] = useState(ORGANISATION_UNIT)
+    const [selectedAttributeNameForAgent, setSelectedAttributeNameForAgent] = useState(null)
+    const [selectedAttributeFirstNameForAgent, setSelectedAttributeFirstNameForAgent] = useState(null)
 
     const [inputLibellePayment, setInputLibellePayment] = useState('')
     const [inputMontantConstantPayment, setInputMontantConstantPayment] = useState(0)
@@ -181,6 +185,12 @@ const Setting = () => {
         setSelectedStatutPaymentProgramStage(null)
         setSelectedStatutPaymentDataElement(null)
         setSelectedAttributesToDisplay([])
+        setPaymentConfigList([])
+        setCurrentPaymentConfig(null)
+        setSelectedPlanificationType(ORGANISATION_UNIT)
+        setSelectedAttributesToDisplay([])
+        setSelectedAttributeNameForAgent(null)
+        setSelectedAttributeFirstNameForAgent(null)
         setSelectedTEIProgram(programs.find(p => p.id === value))
         loadProgramStages(value)
     }
@@ -206,6 +216,10 @@ const Setting = () => {
 
     const handleSupervisionGenerationType = ({ value }) => {
         setSelectedSupervisionGenerationType(value)
+    }
+
+    const handleSupervisionPlanificationType = ({ value }) => {
+        setSelectedPlanificationType(value)
     }
 
     const handleDeleteConfigItem = async (value) => {
@@ -385,7 +399,18 @@ const Setting = () => {
             setLoadingSaveSupervionsConfig(true)
 
             if (!selectedTEIProgram)
-                throw new Error("Veuillez selectionner le programme tracker !")
+                throw new Error("Veuillez sélectionner le programme tracker !")
+
+            if (selectedSupervisionGenerationType === AGENT) {
+                if (selectedAttributesToDisplay.length === 0)
+                    throw new Error("Veuillez configurer les attributs à utiliser lors de l'affichage des agents !")
+
+                if (!selectedAttributeNameForAgent.length === 0)
+                    throw new Error("Veuillez configurer l'attribut qui représente le nom de l'agent !")
+
+                if (!selectedAttributeFirstNameForAgent.length === 0)
+                    throw new Error("Veuillez configurer l'attribut qui représente le prénom de l'agent !")
+            }
 
             if (selectedTEIProgram && selectedSupervisionGenerationType) {
                 const existingConfig = mappingConfigSupervisions.find(mapping => mapping.program?.id === selectedTEIProgram.id)
@@ -398,8 +423,11 @@ const Setting = () => {
 
                 const payload = {
                     generationType: selectedSupervisionGenerationType,
+                    planificationType: selectedPlanificationType,
                     program: { id: selectedTEIProgram.id, displayName: selectedTEIProgram.displayName },
-                    attributesToDisplay: selectedAttributesToDisplay,
+                    attributesToDisplay: selectedPlanificationType === AGENT && selectedAttributesToDisplay || [],
+                    attributeName: selectedPlanificationType === AGENT && selectedAttributeNameForAgent,
+                    attributeFirstName: selectedPlanificationType === AGENT && selectedAttributeFirstNameForAgent,
                     fieldConfig: null,
                     statusSupervision: null,
                     statusPayment: null,
@@ -422,7 +450,7 @@ const Setting = () => {
                     }
                 }
 
-                if (selectedStatutPaymentProgramStage && selectedStatutPaymentDataElement) {
+                if (selectedStatutPaymentProgramStage && selectedStatutPaymentDataElement && selectedPlanificationType === AGENT) {
                     payload.statusPayment = {
                         programStage: { id: selectedStatutPaymentProgramStage.id, displayName: selectedStatutPaymentProgramStage.displayName },
                         dataElement: selectedStatutPaymentDataElement
@@ -749,6 +777,32 @@ const Setting = () => {
                         />
                     </div>
                 </div>
+
+                {
+                    selectedTEIProgram && (
+                        <div style={{ marginTop: '20px' }}>
+                            <div style={{ fontWeight: 'bold' }}>Voulez-vous planifier la supervision sur les Unités d'organisations ou sur les Agents ? </div>
+                            <div style={{ marginTop: '10px' }}>
+                                <div >
+                                    <Radio
+                                        label="Unité d'organisation"
+                                        onChange={handleSupervisionPlanificationType}
+                                        value={ORGANISATION_UNIT}
+                                        checked={selectedPlanificationType === ORGANISATION_UNIT}
+                                    />
+                                </div>
+                                <div >
+                                    <Radio
+                                        label="Agent"
+                                        onChange={handleSupervisionPlanificationType}
+                                        value={AGENT}
+                                        checked={selectedPlanificationType === AGENT}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )
+                }
             </div>
         </>
     )
@@ -766,8 +820,11 @@ const Setting = () => {
             setSelectedStatutSupervisionDataElement(prog?.statusSupervision?.dataElement)
             setSelectedStatutPaymentProgramStage(programStageList.find(psg => psg.id === prog.statusPayment?.programStage?.id))
             setSelectedStatutPaymentDataElement(prog?.statusPayment?.dataElement)
-            setSelectedSupervisionGenerationType(prog?.generationType)
             setSelectedAttributesToDisplay(prog.attributesToDisplay || [])
+            setSelectedAttributeNameForAgent(prog.attributeName)
+            setSelectedAttributeNameForAgent(prog.attributeFirstName)
+            setSelectedSupervisionGenerationType(prog?.generationType)
+            setSelectedPlanificationType(prog.planificationType)
             setPaymentConfigList(prog?.paymentConfigs || [])
             setFieldEditingMode(true)
         } catch (err) {
@@ -779,12 +836,24 @@ const Setting = () => {
         setSelectedAttributesToDisplay(values.map(v => selectedTEIProgram.programTrackedEntityAttributes.map(p => p.trackedEntityAttribute).find(att => att.id === v)))
     }
 
+    const handleSelectProgramAttributeNameForAgent = (value) => {
+        setSelectedAttributeNameForAgent(selectedTEIProgram.programTrackedEntityAttributes.map(p => p.trackedEntityAttribute).find(att => att.id === value))
+    }
+
+    const handleSelectProgramAttributeFirstNameForAgent = (value) => {
+        setSelectedAttributeFirstNameForAgent(selectedTEIProgram.programTrackedEntityAttributes.map(p => p.trackedEntityAttribute).find(att => att.id === value))
+    }
+
     const RenderAttributesToDisplay = () => (
         <div style={{ marginTop: '20px' }}>
             <Card className="my-shadow" size='small'>
                 <div>
                     <div style={{ fontWeight: 'bold' }}>Configuration des attributs du programme a affichées</div>
-                    <div style={{ marginTop: '10px' }}>Attributs</div>
+                    <Divider style={{ margin: '5px 0px' }} />
+                    <div style={{ fontWeight: 'bold' }}>Attributs</div>
+                    <div style={{ color: '#00000080', fontSize: '13px' }}>
+                        Les attributs configurés ici seront utilisés comme les entêtes des tableaux lors de l'affichage de la liste des Agents.
+                    </div>
                     <div style={{ marginTop: '2px' }}>
                         <Select
                             options={selectedTEIProgram.programTrackedEntityAttributes.map(p => p.trackedEntityAttribute).map(attribute => ({ label: attribute.displayName, value: attribute.id }))}
@@ -800,6 +869,50 @@ const Setting = () => {
                             disabled={loadingPrograms}
                         />
                     </div>
+                    <Divider style={{ margin: '10px 0px' }} />
+                    <div style={{ color: '#00000080', fontSize: '13px' }}>
+                        Veuillez configurer également les attributs représentant le nom et le prénom de l'Agent.
+                        Ces informations seront utilisées un meilleur affichage des informations de l'Agent.
+                    </div>
+                    <div style={{ marginTop: '5px' }}>
+                        <Row gutter={[10, 10]}>
+                            <Col md={12}>
+                                <div style={{ marginBottom: '2px', fontWeight: 'bold' }}>Nom de l'Agent</div>
+                                <div>
+                                    <Select
+                                        options={selectedTEIProgram.programTrackedEntityAttributes.map(p => p.trackedEntityAttribute).map(attribute => ({ label: attribute.displayName, value: attribute.id }))}
+                                        placeholder="Nom de l'Agent"
+                                        style={{ width: '100%' }}
+                                        optionFilterProp='label'
+                                        value={selectedAttributeNameForAgent}
+                                        onChange={handleSelectProgramAttributeNameForAgent}
+                                        showSearch
+                                        allowClear
+                                        loading={loadingPrograms}
+                                        disabled={loadingPrograms}
+                                    />
+                                </div>
+                            </Col>
+                            <Col md={12}>
+                                <div style={{ marginBottom: '2px', fontWeight: 'bold' }}>Prénom de l'Agent</div>
+                                <div>
+                                    <Select
+                                        options={selectedTEIProgram.programTrackedEntityAttributes.map(p => p.trackedEntityAttribute).map(attribute => ({ label: attribute.displayName, value: attribute.id }))}
+                                        placeholder="Prénom de l'Agent"
+                                        style={{ width: '100%' }}
+                                        optionFilterProp='label'
+                                        value={selectedAttributeFirstNameForAgent}
+                                        onChange={handleSelectProgramAttributeFirstNameForAgent}
+                                        showSearch
+                                        allowClear
+                                        loading={loadingPrograms}
+                                        disabled={loadingPrograms}
+                                    />
+                                </div>
+                            </Col>
+                        </Row>
+                    </div>
+
                 </div>
             </Card>
         </div>
@@ -1006,8 +1119,8 @@ const Setting = () => {
                 <Col md={12} sm={24}>
                     <div >
                         {RenderSupervisionConfiguration()}
-                        {selectedTEIProgram && selectedTEIProgram.programTrackedEntityAttributes && RenderAttributesToDisplay()}
-                        {selectedTEIProgram && RenderStatusPaymentDataElementToUse()}
+                        {selectedTEIProgram && selectedTEIProgram.programTrackedEntityAttributes && selectedPlanificationType === AGENT && RenderAttributesToDisplay()}
+                        {selectedTEIProgram && selectedPlanificationType === AGENT && RenderStatusPaymentDataElementToUse()}
                         {selectedTEIProgram && RenderStatusSupervisionDataElementToUse()}
                         {selectedTEIProgram && RenderSupervisorFieldConfiguration()}
 
@@ -1047,6 +1160,7 @@ const Setting = () => {
                                 </Button>
                             </div>
                         </div>
+
                     </div>
                 </Col>
                 <Col md={12} sm={24}>
@@ -1111,10 +1225,9 @@ const Setting = () => {
                     }
 
                     {
-                        selectedTEIProgram && paymentConfigList.length > 0 && (
+                        selectedPlanificationType === AGENT && selectedTEIProgram && paymentConfigList.length > 0 && (
                             <div className='my-shadow' style={{ padding: '20px', marginTop: '10px', background: '#FFF', marginBottom: '2px', borderRadius: '8px' }}>
                                 <div style={{ marginBottom: '10px', fontWeight: 'bold', fontSize: '16px' }}>Liste des configurations du paiement </div>
-
                                 <Table
                                     dataSource={
                                         paymentConfigList.map(conf => ({
@@ -1306,7 +1419,6 @@ const Setting = () => {
                             )
                         }
                     </div>
-
                     {
                         selectedIndicator && (
                             <div className='my-shadow' style={{ padding: '20px', background: '#FFF', marginBottom: '2px', borderRadius: '8px', marginTop: '10px' }}>
