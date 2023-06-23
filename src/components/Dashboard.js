@@ -725,7 +725,7 @@ export const Dashboard = ({ me }) => {
             render: tei => tei.agent?.trim()?.length > 0 ? (
                 <div>
                     <span style={{ fontSize: '13px' }}>{tei?.agent} </span>
-                    <span style={{ fontSize: '10px', color: '#00000090', marginLeft: '5px' }}>( {tei.nom}) </span>
+                    <span style={{ fontSize: '10px', color: '#00000090', marginLeft: '5px' }}>( {tei?.libelle}) </span>
                 </div>
             ) : <></>
         },
