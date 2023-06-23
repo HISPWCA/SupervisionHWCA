@@ -3,7 +3,7 @@ import { Card, Col, DatePicker, Row, Select, Table } from 'antd'
 import { Calendar, dayjsLocalizer } from 'react-big-calendar'
 import ReactEchart from 'echarts-for-react'
 import axios from 'axios';
-import { DATA_ELEMENT_OPTION_SETS, OPTION_SETS_ROUTE, ORGANISATION_UNITS_ROUTE, SERVER_URL, TRACKED_ENTITY_INSTANCES_ROUTE, USERS_ROUTE } from '../utils/api.routes'
+import { DATA_ELEMENT_OPTION_SETS, ORGANISATION_UNITS_ROUTE, SERVER_URL, TRACKED_ENTITY_INSTANCES_ROUTE, USERS_ROUTE } from '../utils/api.routes'
 import OrganisationUnitsTree from './OrganisationUnitsTree'
 import { CANCELED, DESCENDANTS, NOTICE_BOX_DEFAULT, NOTIFICATON_CRITICAL, PENDING_VALIDATION, PLANIFICATION_PAR_MOI, PLANIFICATION_PAR_TOUS, PLANIFICATION_PAR_UN_USER, COMPLETED, SCHEDULED, TYPE_GENERATION_AS_ENROLMENT, TYPE_GENERATION_AS_EVENT, TYPE_GENERATION_AS_TEI, NA, PAYMENT_DONE, PENDING_PAYMENT } from '../utils/constants'
 import MapView from './MapView'
@@ -18,6 +18,7 @@ import { Button } from '@dhis2/ui'
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import timezone from 'dayjs/plugin/timezone'
+
 const quarterOfYear = require('dayjs/plugin/quarterOfYear')
 const weekOfYear = require('dayjs/plugin/weekOfYear')
 
