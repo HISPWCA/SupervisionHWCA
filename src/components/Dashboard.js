@@ -204,7 +204,7 @@ export const Dashboard = ({ me }) => {
     const loadTeisPlanifications = async (program_id, orgUnit_id, ouMode = DESCENDANTS) => {
         try {
             setLoadingTeiList(true)
-            const response = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}.json?program=${program_id}&ou=${orgUnit_id}&ouMode=${ouMode}&order=created:DESC&fields=trackedEntityInstance,created,program,orgUnit,enrollments[*]`)
+            const response = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}.json?program=${program_id}&ou=${orgUnit_id}&ouMode=${ouMode}&order=created:DESC&fields=trackedEntityInstance,created,program,orgUnit,enrollments[*],attributes`)
             const trackedEntityInstances = response.data.trackedEntityInstances
             setTeiList(trackedEntityInstances)
             setLoadingTeiList(false)
@@ -360,6 +360,7 @@ export const Dashboard = ({ me }) => {
                         eventList.push(event)
                     }
                 }
+
                 return [
                     ...prev,
                     ...eventList.map(ev => ({
@@ -577,8 +578,6 @@ export const Dashboard = ({ me }) => {
                         style={{ height: '445px' }}
                         date={dayjs(calendarDate).format('YYYY-MM-DD')}
                         selectable
-                    // onSelectEvent={event => alert(JSON.stringify(event, null, 4))}
-                    // onSelectSlot={event => alert(JSON.stringify(event, null, 4))}
                     />
                 </div>
             </div>
@@ -723,12 +722,12 @@ export const Dashboard = ({ me }) => {
             title: "Agent",
             key: 'agent',
             dataIndex: 'tei',
-            render: value => (
+            render: tei => tei.agent?.trim()?.length > 0 ? (
                 <div>
-                    <span style={{ fontSize: '13px' }}>{value?.agent} </span>
-                    <span style={{ fontSize: '10px', color: '#00000090', marginLeft: '5px' }}>( {value.nom}) </span>
+                    <span style={{ fontSize: '13px' }}>{tei?.agent} </span>
+                    <span style={{ fontSize: '10px', color: '#00000090', marginLeft: '5px' }}>( {tei.nom}) </span>
                 </div>
-            )
+            ) : <></>
         },
         // { title: "Unité d'organisation", key: 'nom', dataIndex: 'nom' },
         { title: "Période", key: 'period', dataIndex: 'period', render: value => <div style={{ fontSize: '13px' }}>{dayjs(value).format('YYYY-MM-DD')} </div> },
@@ -768,7 +767,7 @@ export const Dashboard = ({ me }) => {
     ] :
         [
             { title: "Unité d'organisation", key: 'nom', dataIndex: 'nom' },
-            { title: "Période", key: 'period', dataIndex: 'period', render: value => <div>{dayjs(value).format('YYYY-MM-DD')} </div> },
+            { title: "Période", key: 'period', dataIndex: 'period', render: value => <div style={{ fontSize: '13px' }}>{dayjs(value).format('YYYY-MM-DD')} </div> },
             {
                 title: 'Status Supervision', key: 'statusSupervision', dataIndex: 'statusSupervision', width: '150px',
                 render: value => (
