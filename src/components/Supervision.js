@@ -198,7 +198,7 @@ const Supervision = ({ me }) => {
     const columns = useMemo(
         () => [
             {
-                accessorKey: 'nom', //access nested data with dot notation
+                accessorKey: 'libelle', //access nested data with dot notation
                 header: "Unité d'organisation",
             },
             {
@@ -209,8 +209,6 @@ const Supervision = ({ me }) => {
                 accessorKey: 'statusSupervision', //normal accessorKey
                 header: 'Status Supervision',
                 Cell: ({ cell, row }) => {
-                    console.log("cell.getValue(): ", cell.getValue())
-                    console.log("row.original: ", row.original)
                     return (
                         <>
                             <span className='text-truncate-one' title={getStatusNameAndColor(cell.getValue())?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColor(cell.getValue())?.color?.background, color: getStatusNameAndColor(cell.getValue())?.color?.text, padding: '3px', fontSize: '12px', borderRadius: '5px' }}>
@@ -224,8 +222,6 @@ const Supervision = ({ me }) => {
                 accessorKey: 'statusPayment',
                 header: 'Status Paiement',
                 Cell: ({ cell, row }) => {
-                    console.log("cell.getValue(): ", cell.getValue())
-                    console.log("row.original: ", row.original)
                     return (
                         <>
                             <span className='text-truncate-one' title={getStatusNameAndColorForPayment(cell.getValue())?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColorForPayment(cell.getValue())?.color?.background, color: getStatusNameAndColorForPayment(cell.getValue())?.color?.text, padding: '3px', fontSize: '12px', borderRadius: '5px' }}>
