@@ -719,15 +719,24 @@ export const Dashboard = ({ me }) => {
 
     const columns = () => selectedProgram?.planificationType === AGENT ? [
         {
-            title: "Agent",
+            title: "Agent ( org unit )",
             key: 'agent',
             dataIndex: 'tei',
-            render: tei => tei.agent?.trim()?.length > 0 ? (
-                <div>
-                    <span style={{ fontSize: '13px' }}>{tei?.agent} </span>
-                    <span style={{ fontSize: '10px', color: '#00000090', marginLeft: '5px' }}>( {tei?.libelle}) </span>
-                </div>
-            ) : <></>
+            render: tei => (
+                <>
+                    {
+                        tei.agent ?
+                            <div>
+                                <span style={{ fontSize: '13px' }}>{tei?.agent}</span>
+                                <span style={{ fontSize: '10px', color: '#00000090', marginLeft: '5px' }}>( {tei?.libelle}) </span>
+                            </div> :
+                            <div>
+                                <span>{tei?.libelle} </span>
+                            </div>
+                    }
+
+                </>
+            )
         },
         // { title: "Unité d'organisation", key: 'nom', dataIndex: 'nom' },
         { title: "Période", key: 'period', dataIndex: 'period', render: value => <div style={{ fontSize: '13px' }}>{dayjs(value).format('YYYY-MM-DD')} </div> },
