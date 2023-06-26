@@ -1,7 +1,7 @@
 import { CircularLoader, NoticeBox } from '@dhis2/ui'
 import axios from 'axios'
 import { useState, useEffect } from 'react'
-import { ME_ROUTE } from '../utils/api.routes'
+import { ME_ROUTE, ME_SETTINGS_ROUTE } from '../utils/api.routes'
 import { PAGE_DASHBOARD, PAGE_SUPERVISIONS, PAGE_SETTINGS } from "../utils/constants"
 import { BORDER_COLOR } from '../utils/couleurs'
 import { loadDataStore } from '../utils/functions'
@@ -26,6 +26,7 @@ export const Body = () => {
     const initDataStore = async () => {
         try {
             setLoadingDataStoreInitialization(true)
+            loadUserSettings()
             await loadDataStore(process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY, null, null, [])
             await loadDataStore(process.env.REACT_APP_INDICATORS_CONFIG_KEY, null, null, [])
             await loadDataStore(process.env.REACT_APP_SUPERVISIONS_KEY, null, null, [])
@@ -39,6 +40,8 @@ export const Body = () => {
         }
     }
 
+
+
     const loadMe = async () => {
         try {
             setLoadingMe(true)
@@ -49,6 +52,17 @@ export const Body = () => {
         catch (err) {
             console.log(err)
             setLoadingMe(false)
+            throw err
+        }
+    }
+
+    const loadUserSettings = async () => {
+        try {
+            const response = await axios.get(`${ME_SETTINGS_ROUTE}`)
+            localStorage.setItem('userLang', response.data?.keyUiLocale ? response.data?.keyUiLocale : 'fr')
+        }
+        catch (err) {
+            console.log(err)
             throw err
         }
     }

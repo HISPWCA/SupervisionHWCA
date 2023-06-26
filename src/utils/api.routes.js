@@ -25,3 +25,5 @@ export const PROGS_ROUTE = API_BASE_ROUTE.concat('/programs')
 export const ANALYTICS_ROUTE = API_BASE_ROUTE.concat('/analytics')
 export const OPTION_SETS_ROUTE = API_BASE_ROUTE.concat('/optionSets')
 export const DATA_ELEMENT_OPTION_SETS = API_BASE_ROUTE.concat('/dataElements')
+export const ME_SETTINGS_ROUTE = API_BASE_ROUTE.concat('/userSettings.json')
+
