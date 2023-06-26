@@ -1889,7 +1889,7 @@ const Supervision = ({ me }) => {
                     </div>
                     <div style={{ marginLeft: '20px' }}>
                         <Radio
-                            label="Basée sur les indicateurs"
+                            label="Basée sur les perfomances"
                             className="cursor-pointer"
                             onChange={handleChangePlanificationType}
                             value={INDICATOR}
@@ -1926,7 +1926,7 @@ const Supervision = ({ me }) => {
         <>
             <div style={{ marginTop: '10px' }}>
                 <Card bodyStyle={{ padding: '0px' }} className='my-shadow' size='small'>
-                    <div style={{ fontWeight: 'bold', padding: '10px', borderBottom: '1px solid #ccc' }}> Planification basée sur les indicateurs configurés </div>
+                    <div style={{ fontWeight: 'bold', padding: '10px', borderBottom: '1px solid #ccc' }}> Planification Basée sur les perfomances configurées </div>
                     <div style={{ padding: '10px' }}>
                         <div>Indicateurs</div>
                         <Select
