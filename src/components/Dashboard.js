@@ -731,14 +731,13 @@ export const Dashboard = ({ me }) => {
                                 <span style={{ fontSize: '12px', color: '#00000090', marginLeft: '5px' }}>( {tei?.libelle}) </span>
                             </div> :
                             <div>
-                                <span>{tei?.libelle} </span>
+                                <span style={{ color: '#00000090', fontSize: '13px' }}>{tei?.libelle} </span>
                             </div>
                     }
 
                 </>
             )
         },
-        // { title: "Unité d'organisation", key: 'nom', dataIndex: 'nom' },
         { title: "Période", key: 'period', dataIndex: 'period', render: value => <div style={{ fontSize: '13px' }}>{dayjs(value).format('YYYY-MM-DD')} </div> },
         {
             title: 'Status Supervision', key: 'statusSupervision', dataIndex: 'statusSupervision', width: '150px',
