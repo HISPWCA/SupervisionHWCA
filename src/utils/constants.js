@@ -55,5 +55,3 @@ export const PAYMENT_DONE = { name: 'Paiement Effectué', value: 'PAYMENT_DONE' 
 export const COMPLETED = { name: 'Terminée', value: 'COMPLETED' }
 export const SCHEDULED = { name: 'Planifiée', value: 'SCHEDULED' }
 export const NA = { name: 'Non Applicable', value: 'NA' }
-
-

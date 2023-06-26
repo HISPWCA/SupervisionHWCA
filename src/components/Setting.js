@@ -14,6 +14,7 @@ import { loadDataStore, saveDataToDataStore } from '../utils/functions'
 import { BLUE } from '../utils/couleurs'
 import { CgCloseO } from 'react-icons/cg'
 import MyNotification from './MyNotification'
+import translate from '../utils/translator'
 
 
 const Setting = () => {
@@ -239,7 +240,7 @@ const Setting = () => {
                 }
 
                 setMappingConfigs(newList)
-                setNotification({ show: true, message: 'Suppression éffectuée !', type: NOTIFICATON_SUCCESS })
+                setNotification({ show: true, message: translate('Suppression_Effectuee'), type: NOTIFICATON_SUCCESS })
             }
         } catch (err) {
             setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
@@ -327,12 +328,12 @@ const Setting = () => {
                 const existingDXMappingOfPrograms = mappingConfigs.filter(mConfig => mConfig?.program?.id === item?.program?.id) || []
 
                 if (existingDXMappingOfPrograms.length > 0)
-                    throw new Error("La configuration que vous essayez de supprimer est déjà mappée avec les éléments de données. Veuillez supprimer d'abors ses éléments de données.")
+                    throw new Error(translate('Configuration_Deja_Mapper'))
 
                 const newList = mappingConfigSupervisions.filter(mapConf => mapConf.id !== item.id)
                 await saveDataToDataStore(process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY, newList, null, null, null)
                 setMappingConfigSupervisions(newList)
-                setNotification({ show: true, message: 'Suppression éffectuée !', type: NOTIFICATON_SUCCESS })
+                setNotification({ show: true, message: translate('Suppression_Effectuee'), type: NOTIFICATON_SUCCESS })
 
                 setFieldEditingMode(false)
                 setSelectedTEIProgram(null)
@@ -403,27 +404,27 @@ const Setting = () => {
             setLoadingSaveSupervionsConfig(true)
 
             if (!selectedTEIProgram)
-                throw new Error("Veuillez sélectionner le programme tracker !")
+                throw new Error(translate('Veuillez_Selectionner_Un_Programme'))
 
             if (selectedPlanificationType === AGENT) {
                 if (selectedAttributesToDisplay.length === 0)
-                    throw new Error("Veuillez configurer les attributs à utiliser lors de l'affichage des agents !")
+                    throw new Error(translate('Veuillez_Configurer_Attribut_A_Utiliser'))
 
                 if (!selectedAttributeNameForAgent)
-                    throw new Error("Veuillez configurer l'attribut qui représente le nom de l'agent !")
+                    throw new Error(translate('Attribute_Nom'))
 
                 if (!selectedAttributeFirstNameForAgent)
-                    throw new Error("Veuillez configurer l'attribut qui représente le prénom de l'agent !")
+                    throw new Error(translate('Attribute_Prenom'))
             }
 
             if (selectedTEIProgram && selectedSupervisionGenerationType) {
                 const existingConfig = mappingConfigSupervisions.find(mapping => mapping.program?.id === selectedTEIProgram.id)
 
                 if (existingConfig && !isFieldEditingMode)
-                    throw new Error('Cette configuration à déjà été ajoutée !')
+                    throw new Error(translate('Configuration_Deja_Ajoutee'))
 
                 if (!existingConfig && isFieldEditingMode)
-                    throw new Error('Programme non trouvé !')
+                    throw new Error(translate('Programme_Introuvable'))
 
                 const payload = {
                     generationType: selectedSupervisionGenerationType,
@@ -489,7 +490,7 @@ const Setting = () => {
                 setSelectedAttributesToDisplay([])
                 setLoadingSaveSupervionsConfig(false)
                 cleanPaymentConfigState()
-                setNotification({ show: true, type: NOTIFICATON_SUCCESS, message: isFieldEditingMode ? 'Mise à jour éffectuée' : 'Configuration ajoutée !' })
+                setNotification({ show: true, type: NOTIFICATON_SUCCESS, message: isFieldEditingMode ? translate('Mise_A_Jour_Effectuer') : translate('Configuration_Ajoutee') })
             }
 
         } catch (err) {
@@ -502,19 +503,19 @@ const Setting = () => {
         try {
             setLoadingSaveIndicatorsConfig(true)
             if (!indicatorName?.trim())
-                throw new Error('Le Nom est obligatoire !')
+                throw new Error(translate('Nom_Obligatoire'))
 
             if (!indicatorEtiquette?.trim())
-                throw new Error("L' Etiquette est obligatoire !")
+                throw new Error(translate('Etiquette_Obligatoire'))
 
             if (indicatorWeight === undefined || indicatorWeight === null)
-                throw new Error('Le Poid est obligatoire !')
+                throw new Error(translate('Poid_Obligatoire'))
 
             if (indicatorName && indicatorEtiquette) {
                 const existingConfig = mappingConfigs.find(mapping => mapping.indicator?.id === selectedIndicator?.id)
 
                 if (!currentItem && existingConfig)
-                    throw new Error('Cet indicateur est déjà configuré !')
+                    throw new Error(translate('Indicateur_Deja_Configurer'))
 
                 const payload = {
                     indicator: selectedIndicator,
@@ -546,7 +547,7 @@ const Setting = () => {
 
                 await saveDataToDataStore(process.env.REACT_APP_INDICATORS_CONFIG_KEY, newList, setLoadingSaveIndicatorsConfig, null, null)
                 setMappingConfigs(newList)
-                setNotification({ show: true, message: !currentItem ? 'Configuration ajoutée !' : 'Mise à jour éffectuée avec success !', type: NOTIFICATON_SUCCESS })
+                setNotification({ show: true, message: !currentItem ? translate('Configuration_Ajoutee') : translate('Mise_A_Jour_Succes'), type: NOTIFICATON_SUCCESS })
                 setSelectedIndicator(null)
                 setIndicatorName(null)
                 setIndicatorBestPositive(true)
@@ -583,7 +584,7 @@ const Setting = () => {
                 const newList = analyseConfigs.filter(analyseConf => analyseConf.id !== value.id)
                 await saveDataToDataStore(process.env.REACT_APP_ANALYSES_CONFIG_KEY, newList, null, null, null)
                 setAnalyseConfigs(newList)
-                setNotification({ show: true, message: 'Suppression éffectuée !', type: NOTIFICATON_SUCCESS })
+                setNotification({ show: true, message: translate('Suppression_Effectuee'), type: NOTIFICATON_SUCCESS })
             }
         } catch (err) {
             setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
@@ -607,10 +608,10 @@ const Setting = () => {
             setLoadingAddAnalyseConfigs(true)
 
             if (selectedAnalyseType === TYPE_ANALYSE_DATA_ELEMENT && !selectedAnalyseDataElement)
-                throw new Error("L'élément de donnée est obligatoire !")
+                throw new Error(translate("Element_De_Donner_Obligatoire"))
 
             if (selectedAnalyseType === TYPE_ANALYSE_INDICATOR && !selectedAnalyseIndicator)
-                throw new Error("L'indicateur est obligatoire !")
+                throw new Error(translate('Indicateur_Obligatoire'))
 
             const existingConfig = analyseConfigs.find(config => {
                 if (selectedAnalyseType === TYPE_ANALYSE_DATA_ELEMENT) {
@@ -643,10 +644,10 @@ const Setting = () => {
                 setAnalyseConfigs(newList)
                 setSelectedAnalyseDataElement(null)
                 setSelectedAnalyseIndicator(null)
-                setNotification({ show: true, type: NOTIFICATON_SUCCESS, message: 'Configuration ajoutée !' })
+                setNotification({ show: true, type: NOTIFICATON_SUCCESS, message: translate('Configuration_Ajoutee') })
                 return setLoadingAddAnalyseConfigs(false)
             } else {
-                throw new Error('Cette configuration à déjà été ajoutée')
+                throw new Error(translate('Configuration_Deja_Ajoutee'))
             }
         } catch (err) {
             setNotification({ show: true, type: NOTIFICATON_CRITICAL, message: err.response?.data?.message || err.message })
@@ -686,21 +687,20 @@ const Setting = () => {
             <Card bodyStyle={{ padding: '0px' }} className="my-shadow" size='small'>
                 <div style={{ padding: '10px', borderBottom: '1px solid #ccc' }}>
                     <div style={{ fontWeight: 'bold' }}>
-                        Configuration des champs superviseurs
+                        {translate('Configuration_Champ_Supervision')}
                     </div>
                     <div style={{ marginTop: '10px', color: '#00000080', fontSize: '13px' }}>
-                        Cette configuration permettra de faire la correspondance entre les éléments de données sélectionnées,
-                        et les superviseurs qui seront sélectionnés lors de la planification en respectant l'ordre de sélection.
+                        {translate('Aide_Configuration_Supervision')}
                     </div>
                 </div>
                 <div style={{ padding: '10px' }}>
                     <Row gutter={[10, 10]}>
                         <Col md={12}>
                             <div>
-                                <div style={{ marginBottom: '5px' }}>Programmes Stage</div>
+                                <div style={{ marginBottom: '5px' }}>{translate('Programmes_Stage')}</div>
                                 <Select
                                     options={programStages.map(programStage => ({ label: programStage.displayName, value: programStage.id }))}
-                                    placeholder="Choisir le program stage"
+                                    placeholder={translate('Programmes_Stage')}
                                     style={{ width: '100%' }}
                                     optionFilterProp='label'
                                     value={selectedProgramStage?.id}
@@ -716,10 +716,10 @@ const Setting = () => {
                             selectedProgramStage && (
                                 <Col md={12} xs={24}>
                                     <div>
-                                        <div style={{ marginBottom: '5px' }}>Eléments de données</div>
+                                        <div style={{ marginBottom: '5px' }}>{translate('Element_Donne')}</div>
                                         <Select
                                             options={selectedProgramStage?.programStageDataElements?.map(progStageDE => ({ label: progStageDE.dataElement?.displayName, value: progStageDE.dataElement?.id }))}
-                                            placeholder="Element de donnée"
+                                            placeholder={translate('Element_Donne')}
                                             style={{ width: '100%' }}
                                             mode="multiple"
                                             onChange={handleSelectDataElements}
@@ -742,12 +742,12 @@ const Setting = () => {
         <>
             <div className='my-shadow' style={{ padding: '20px', background: '#FFF', marginBottom: '2px', borderRadius: '8px' }}>
                 <div>
-                    <div style={{ marginBottom: '5px' }}>Programmes Tracker</div>
+                    <div style={{ marginBottom: '5px' }}>{translate('Programmes_Tracker')}</div>
                     <Select
                         options={programs.map(program => ({ label: program.displayName, value: program.id }))}
                         loading={loadingPrograms}
                         showSearch
-                        placeholder="Choisir les programmes concerné"
+                        placeholder={translate('Programmes_Tracker')}
                         style={{ width: '100%' }}
                         optionFilterProp='label'
                         onChange={handleSelectedTEIProgram}
@@ -758,7 +758,7 @@ const Setting = () => {
                 <div style={{ marginTop: '10px' }}>
                     <div style={{ marginTop: '5px' }}>
                         <Radio
-                            label="Générer les supervisions comme Tracked Entity Instances"
+                            label={translate('Generer_Supervision_Comme_TEI')}
                             onChange={handleSupervisionGenerationType}
                             value={TYPE_GENERATION_AS_TEI}
                             checked={selectedSupervisionGenerationType === TYPE_GENERATION_AS_TEI}
@@ -766,7 +766,7 @@ const Setting = () => {
                     </div>
                     <div style={{ marginTop: '5px' }}>
                         <Radio
-                            label="Générer les supervisions comme Enrôlements"
+                            label={translate('Generer_Supervision_Comme_EN')}
                             onChange={handleSupervisionGenerationType}
                             value={TYPE_GENERATION_AS_ENROLMENT}
                             checked={selectedSupervisionGenerationType === TYPE_GENERATION_AS_ENROLMENT}
@@ -774,7 +774,7 @@ const Setting = () => {
                     </div>
                     <div style={{ marginTop: '5px' }}>
                         <Radio
-                            label="Générer les supervisions comme Evènements"
+                            label={translate('Generer_Supervision_Comme_EV')}
                             onChange={handleSupervisionGenerationType}
                             value={TYPE_GENERATION_AS_EVENT}
                             checked={selectedSupervisionGenerationType === TYPE_GENERATION_AS_EVENT}
@@ -785,11 +785,11 @@ const Setting = () => {
                 {
                     selectedTEIProgram && (
                         <div style={{ marginTop: '20px' }}>
-                            <div style={{ fontWeight: 'bold' }}>Voulez-vous planifier la supervision sur les Unités d'organisations ou sur les Agents ? </div>
+                            <div style={{ fontWeight: 'bold' }}>{translate('Planifier_Sur_OrgUnit_Ou_Agent')}</div>
                             <div style={{ marginTop: '10px' }}>
                                 <div >
                                     <Radio
-                                        label="Unité d'organisation"
+                                        label={translate('Unite_Organisation')}
                                         onChange={handleSupervisionPlanificationType}
                                         value={ORGANISATION_UNIT}
                                         checked={selectedPlanificationType === ORGANISATION_UNIT}
@@ -797,7 +797,7 @@ const Setting = () => {
                                 </div>
                                 <div >
                                     <Radio
-                                        label="Agent"
+                                        label={translate('Agent')}
                                         onChange={handleSupervisionPlanificationType}
                                         value={AGENT}
                                         checked={selectedPlanificationType === AGENT}
@@ -852,16 +852,16 @@ const Setting = () => {
         <div style={{ marginTop: '20px' }}>
             <Card className="my-shadow" size='small'>
                 <div>
-                    <div style={{ fontWeight: 'bold' }}>Configuration des attributs du programme a affichées</div>
+                    <div style={{ fontWeight: 'bold' }}>{translate('Configuration_Des_Attributes')}</div>
                     <Divider style={{ margin: '5px 0px' }} />
-                    <div style={{ fontWeight: 'bold' }}>Attributs</div>
+                    <div style={{ fontWeight: 'bold' }}>{translate('Attributs')}</div>
                     <div style={{ color: '#00000080', fontSize: '13px' }}>
-                        Les attributs configurés ici seront utilisés comme les entêtes des tableaux lors de l'affichage de la liste des Agents.
+                        {translate('Aide_Attribute_Configurer')}
                     </div>
                     <div style={{ marginTop: '2px' }}>
                         <Select
                             options={selectedTEIProgram.programTrackedEntityAttributes.map(p => p.trackedEntityAttribute).map(attribute => ({ label: attribute.displayName, value: attribute.id }))}
-                            placeholder="Choisir le program stage"
+                            placeholder={translate('Program_Stage')}
                             style={{ width: '100%' }}
                             optionFilterProp='label'
                             value={selectedAttributesToDisplay.map(att => att.id)}
@@ -875,17 +875,16 @@ const Setting = () => {
                     </div>
                     <Divider style={{ margin: '10px 0px' }} />
                     <div style={{ color: '#00000080', fontSize: '13px' }}>
-                        Veuillez configurer également les attributs représentant le nom et le prénom de l'Agent.
-                        Ces informations seront utilisées un meilleur affichage des informations de l'Agent.
+                        {translate('Attribute_Representant_Nom_Et_Prenom')}
                     </div>
                     <div style={{ marginTop: '5px' }}>
                         <Row gutter={[10, 10]}>
                             <Col md={12}>
-                                <div style={{ marginBottom: '2px', fontWeight: 'bold' }}>Nom de l'Agent</div>
+                                <div style={{ marginBottom: '2px', fontWeight: 'bold' }}>{translate('Nom_Agent')}</div>
                                 <div>
                                     <Select
                                         options={selectedTEIProgram.programTrackedEntityAttributes.map(p => p.trackedEntityAttribute).map(attribute => ({ label: attribute.displayName, value: attribute.id }))}
-                                        placeholder="Nom de l'Agent"
+                                        placeholder={translate('Nom_Agent')}
                                         style={{ width: '100%' }}
                                         optionFilterProp='label'
                                         value={selectedAttributeNameForAgent?.id}
@@ -898,11 +897,11 @@ const Setting = () => {
                                 </div>
                             </Col>
                             <Col md={12}>
-                                <div style={{ marginBottom: '2px', fontWeight: 'bold' }}>Prénom de l'Agent</div>
+                                <div style={{ marginBottom: '2px', fontWeight: 'bold' }}>{translate('Prenom_Agent')}</div>
                                 <div>
                                     <Select
                                         options={selectedTEIProgram.programTrackedEntityAttributes.map(p => p.trackedEntityAttribute).map(attribute => ({ label: attribute.displayName, value: attribute.id }))}
-                                        placeholder="Prénom de l'Agent"
+                                        placeholder={translate('Prenom_Agent')}
                                         style={{ width: '100%' }}
                                         optionFilterProp='label'
                                         value={selectedAttributeFirstNameForAgent?.id}
@@ -926,18 +925,18 @@ const Setting = () => {
         <div style={{ marginTop: '20px' }}>
             <Card className="my-shadow" size='small'>
                 <div>
-                    <div style={{ fontWeight: 'bold' }}>Configuration de l'élement de donné à utiliser pour le statut de la supervision</div>
+                    <div style={{ fontWeight: 'bold' }}>{translate('Configuration_Element')}</div>
                     <div style={{ marginTop: '10px', color: '#00000080', fontSize: '13px' }}>
-                        La configuration de cet élément de données, permettra de suivre le statut des supervisions.
+                        {translate('Aide_Config_Element')}
                     </div>
                     <div style={{ margin: '10px 0px' }}>
                         <Row gutter={[10, 10]}>
                             <Col md={12}>
                                 <div>
-                                    <div style={{ marginBottom: '5px' }}>Programmes Stage</div>
+                                    <div style={{ marginBottom: '5px' }}>{translate('Programmes_Stage')}</div>
                                     <Select
                                         options={programStages.map(programStage => ({ label: programStage.displayName, value: programStage.id }))}
-                                        placeholder="Choisir le program stage"
+                                        placeholder={translate('Programmes_Stage')}
                                         style={{ width: '100%' }}
                                         optionFilterProp='label'
                                         value={selectedStatutSupervisionProgramStage?.id}
@@ -953,10 +952,10 @@ const Setting = () => {
                                 selectedStatutSupervisionProgramStage && (
                                     <Col md={12} xs={24}>
                                         <div>
-                                            <div style={{ marginBottom: '5px' }}>Eléments de données</div>
+                                            <div style={{ marginBottom: '5px' }}>{translate('Elements_De_Donnees')}</div>
                                             <Select
                                                 options={selectedStatutSupervisionProgramStage?.programStageDataElements?.map(progStageDE => ({ label: progStageDE.dataElement?.displayName, value: progStageDE.dataElement?.id }))}
-                                                placeholder="Element de donnée"
+                                                placeholder={translate('Elements_De_Donnees')}
                                                 style={{ width: '100%' }}
                                                 onChange={handleSelectStatutSupervisionDataElement}
                                                 value={selectedStatutSupervisionDataElement?.id}
@@ -978,10 +977,10 @@ const Setting = () => {
     const handleAddPaymentConfig = () => {
         try {
             if (!inputLibellePayment)
-                throw new Error('Le champ libellé est obligatoire !')
+                throw new Error(translate('Libelle_Obligatoire'))
 
             if (!isEditModePayment && paymentConfigList.map(conf => conf.libelle?.trim()?.toLowerCase()).includes(inputLibellePayment?.trim()?.toLowerCase()))
-                throw new Error("Cette configuration à déjà été ajoutée !")
+                throw new Error(translate('Configuration_Deja_Ajoutee'))
 
 
             let payload = {
@@ -1003,7 +1002,7 @@ const Setting = () => {
             setInputFraisMobileMoneyPayment(0)
             setInputMontantConstantPayment(0)
             setInputLibellePayment('')
-            setNotification({ show: true, message: isEditModePayment ? 'Paiement Mise à jour !' : 'Paiement ajouté !', type: NOTIFICATON_SUCCESS })
+            setNotification({ show: true, message: isEditModePayment ? translate('Paiement_Mise_A_Jour') : translate('Paiement_Ajouter'), type: NOTIFICATON_SUCCESS })
 
         } catch (err) {
             setNotification({ show: true, message: err.message, type: NOTIFICATON_CRITICAL })
@@ -1015,24 +1014,24 @@ const Setting = () => {
         <div style={{ marginTop: '20px' }}>
             <Card className="my-shadow" size='small'>
                 <div>
-                    <div style={{ fontWeight: 'bold' }}>Configuration des paiements</div>
+                    <div style={{ fontWeight: 'bold' }}>{translate('Configuration_Des_Paiements')}</div>
                     <div>
                         <Row gutter={[10, 10]}>
                             <Col md={24}>
                                 <Divider style={{ margin: '5px 0px' }} />
                             </Col>
                             <Col md={24}>
-                                <div style={{ fontWeight: 'bold' }}>Statut du paiement</div>
+                                <div style={{ fontWeight: 'bold' }}>{translate('Status_Paiement')}</div>
                                 <div style={{ marginTop: '5px', color: '#00000080', fontSize: '13px' }}>
-                                    La configuration de cet élément de données, permettra de suivre le statut des paiements.
+                                    {translate('Aide_Configuration_Paiement')}
                                 </div>
                             </Col>
                             <Col md={12}>
                                 <div>
-                                    <div style={{ marginBottom: '5px' }}>Programmes Stage</div>
+                                    <div style={{ marginBottom: '5px' }}>{translate('Programmes_Stage')}</div>
                                     <Select
                                         options={programStages.map(programStage => ({ label: programStage.displayName, value: programStage.id }))}
-                                        placeholder="Choisir le program stage"
+                                        placeholder={translate('Programmes_Stage')}
                                         style={{ width: '100%' }}
                                         optionFilterProp='label'
                                         value={selectedStatutPaymentProgramStage?.id}
@@ -1048,10 +1047,10 @@ const Setting = () => {
                                 selectedStatutPaymentProgramStage && (
                                     <Col md={12} xs={24}>
                                         <div>
-                                            <div style={{ marginBottom: '5px' }}>Eléments de données</div>
+                                            <div style={{ marginBottom: '5px' }}>{translate('Elements_De_Donnees')}</div>
                                             <Select
                                                 options={selectedStatutPaymentProgramStage?.programStageDataElements?.map(progStageDE => ({ label: progStageDE.dataElement?.displayName, value: progStageDE.dataElement?.id }))}
-                                                placeholder="Element de donnée"
+                                                placeholder={translate('Element_De_Donnee')}
                                                 style={{ width: '100%' }}
                                                 onChange={handleSelectStatutPaymentDataElement}
                                                 value={selectedStatutPaymentDataElement?.id}
@@ -1067,23 +1066,23 @@ const Setting = () => {
                                 <Divider style={{ margin: '5px 0px' }} />
                             </Col>
                             <Col md={24}>
-                                <div style={{ fontWeight: 'bold' }}>Paiement</div>
+                                <div style={{ fontWeight: 'bold' }}>{translate('Paiement')}</div>
                             </Col>
                             <Col sm={24} md={8}>
-                                <div>Libellé</div>
+                                <div>{translate('Libelle')}</div>
                                 <div style={{ marginTop: '2px' }}>
-                                    <Input value={inputLibellePayment} onChange={event => setInputLibellePayment(event.target.value)} placeholder='Libellé' style={{ width: '100%' }} />
+                                    <Input value={inputLibellePayment} onChange={event => setInputLibellePayment(event.target.value)} placeholder={translate('Libelle')} style={{ width: '100%' }} />
                                 </div>
                             </Col>
 
                             <Col sm={24} md={6}>
-                                <div>Montant constant</div>
+                                <div>{translate('Montant_Constant')}</div>
                                 <div style={{ marginTop: '2px' }}>
-                                    <InputNumber value={inputMontantConstantPayment} onChange={value => setInputMontantConstantPayment(value)} placeholder='Montant constant' style={{ width: '100%' }} />
+                                    <InputNumber value={inputMontantConstantPayment} onChange={value => setInputMontantConstantPayment(value)} placeholder={translate('Montant_Constant')} style={{ width: '100%' }} />
                                 </div>
                             </Col>
                             <Col sm={24} md={6}>
-                                <div>Frais Mobile Money ( % )</div>
+                                <div>{translate('Frais_Mobile_Money')}</div>
                                 <div style={{ marginTop: '2px' }}>
                                     <InputNumber onChange={value => setInputFraisMobileMoneyPayment(value || 0)} value={inputFraisMobileMoneyPayment} placeholder='Frais Mobile Money' style={{ width: '100%' }} />
                                 </div>
@@ -1091,7 +1090,7 @@ const Setting = () => {
                             <Col sm={24} md={4}>
                                 <div style={{ marginTop: '25px' }}>
                                     <Button small primary onClick={handleAddPaymentConfig}>
-                                        {!isEditModePayment ? '+ Ajouter' : 'Mise à jour'}
+                                        {!isEditModePayment ? `+ ${translate('Ajouter')}` : translate('Mise_A_Jour')}
                                     </Button>
                                 </div>
                             </Col>
@@ -1114,7 +1113,7 @@ const Setting = () => {
         cleanPaymentConfigState()
         setPaymentConfigList(paymentConfigList.filter(p => p.id !== value.id))
 
-        return setNotification({ show: true, message: 'Configuration supprimée !', type: NOTIFICATON_SUCCESS })
+        return setNotification({ show: true, message: translate('Configuration_Supprimer'), type: NOTIFICATON_SUCCESS })
     }
 
     const RenderPageSupervisionConfig = () => (
@@ -1147,7 +1146,7 @@ const Setting = () => {
                                             setSelectedSupervisionGenerationType(TYPE_GENERATION_AS_TEI)
                                         }}
                                     >
-                                        Annuler
+                                        {translate('Annuler')}
                                     </Button>
                                 </div>
                             }
@@ -1159,8 +1158,8 @@ const Setting = () => {
                                     primary
                                     onClick={handleSaveSupConfig}
                                 >
-                                    {isFieldEditingMode && <span>Mise à jour</span>}
-                                    {!isFieldEditingMode && <span>Enrégistrer</span>}
+                                    {isFieldEditingMode && <span>{translate('Mise_A_Jour')}</span>}
+                                    {!isFieldEditingMode && <span>{translate('Enregistrer')}</span>}
                                 </Button>
                             </div>
                         </div>
@@ -1171,7 +1170,7 @@ const Setting = () => {
                     {
                         mappingConfigSupervisions.length > 0 && (
                             <div className='my-shadow' style={{ padding: '20px', background: '#FFF', marginBottom: '2px', borderRadius: '8px' }}>
-                                <div style={{ marginBottom: '10px', fontWeight: 'bold', fontSize: '16px' }}>Liste des configurations des programmes tracker </div>
+                                <div style={{ marginBottom: '10px', fontWeight: 'bold', fontSize: '16px' }}>{translate('Liste_Programme_Tracker')} </div>
                                 <Table
                                     dataSource={
                                         mappingConfigSupervisions.map(mapConf => ({
@@ -1183,23 +1182,23 @@ const Setting = () => {
                                     columns={
                                         [
                                             {
-                                                title: 'Program',
+                                                title: translate('Programme'),
                                                 dataIndex: 'programName'
                                             },
 
                                             {
-                                                title: 'Type de Stratégie',
+                                                title: translate('Type_Strategie'),
                                                 dataIndex: 'generationType',
                                                 render: value => (
                                                     <>
-                                                        {value === TYPE_GENERATION_AS_ENROLMENT && 'Enrôlements'}
-                                                        {value === TYPE_GENERATION_AS_EVENT && 'Evènements'}
-                                                        {value === TYPE_GENERATION_AS_TEI && 'Tracked Entity Instances'}
+                                                        {value === TYPE_GENERATION_AS_ENROLMENT && translate('Enrolements')}
+                                                        {value === TYPE_GENERATION_AS_EVENT && translate('Evenements')}
+                                                        {value === TYPE_GENERATION_AS_TEI && translate('Teis')}
                                                     </>
                                                 )
                                             },
                                             {
-                                                title: 'Actions',
+                                                title: translate('Actions'),
                                                 dataIndex: 'action',
                                                 width: '80px',
                                                 render: value => (
@@ -1208,8 +1207,8 @@ const Setting = () => {
                                                             <FiEdit style={{ color: BLUE, fontSize: '18px', cursor: 'pointer' }} onClick={() => handleEditProgramSup(value)} />
                                                         </div>
                                                         <Popconfirm
-                                                            title="Suppression de la configuration"
-                                                            description="Voulez-vous vraiment supprimer cette configuration "
+                                                            title={translate('Suppression_Configuration')}
+                                                            description={translate('Confirmation_Suppression_Configuration')}
                                                             icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
                                                             onConfirm={() => handleDeleteSupervisionConfig(value)}
                                                         >
@@ -1231,7 +1230,7 @@ const Setting = () => {
                     {
                         selectedPlanificationType === AGENT && selectedTEIProgram && paymentConfigList.length > 0 && (
                             <div className='my-shadow' style={{ padding: '20px', marginTop: '10px', background: '#FFF', marginBottom: '2px', borderRadius: '8px' }}>
-                                <div style={{ marginBottom: '10px', fontWeight: 'bold', fontSize: '16px' }}>Liste des configurations du paiement </div>
+                                <div style={{ marginBottom: '10px', fontWeight: 'bold', fontSize: '16px' }}>{translate('Liste_Config_Paiement')}</div>
                                 <Table
                                     dataSource={
                                         paymentConfigList.map(conf => ({
@@ -1242,13 +1241,13 @@ const Setting = () => {
                                     }
                                     columns={
                                         [
-                                            { title: 'Program', dataIndex: 'programName' },
+                                            { title: translate('Programme'), dataIndex: 'programName' },
 
-                                            { title: 'Libellé', dataIndex: 'libelle' },
-                                            { title: 'Montant Constant', dataIndex: 'montantConstant' },
-                                            { title: 'Frais Mobile Money', dataIndex: 'fraisMobileMoney' },
+                                            { title: translate('Libelle'), dataIndex: 'libelle' },
+                                            { title: translate('Montant_Constant'), dataIndex: 'montantConstant' },
+                                            { title: translate('Frais_Mobile_Money'), dataIndex: 'fraisMobileMoney' },
                                             {
-                                                title: 'Actions',
+                                                title: translate('Actions'),
                                                 dataIndex: 'action',
                                                 width: '80px',
                                                 render: value => (
@@ -1257,8 +1256,8 @@ const Setting = () => {
                                                             <FiEdit style={{ color: BLUE, fontSize: '18px', cursor: 'pointer' }} onClick={() => handleEditPaymentConfig(value)} />
                                                         </div>
                                                         <Popconfirm
-                                                            title="Suppression de la configuration"
-                                                            description="Voulez-vous vraiment supprimer cette configuration "
+                                                            title={translate('Suppression_Configuration')}
+                                                            description={translate('Confirmation_Suppression_Configuration')}
                                                             icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
                                                             onConfirm={() => handleDeletePaymentConfig(value)}
                                                         >
@@ -1285,7 +1284,7 @@ const Setting = () => {
     const RenderTopContent = () => (
         <>
             <div style={{ padding: '20px', borderBottom: '1px solid #ccc', background: '#FFF' }}>
-                <span style={{ fontWeight: 'bold', fontSize: '18px' }}>Paramètre de Configurations</span>
+                <span style={{ fontWeight: 'bold', fontSize: '18px' }}>{translate('Parametre_De_Configuration')}</span>
             </div>
         </>
     )
@@ -1304,12 +1303,12 @@ const Setting = () => {
                         <div>
                             <Row gutter={[8, 8]}>
                                 <Col md={24}>
-                                    <div style={{ marginBottom: '5px' }}>Type d'indicateurs</div>
+                                    <div style={{ marginBottom: '5px' }}>{translate('Type_Indicateur')}</div>
                                 </Col>
                                 <Col>
                                     <div>
                                         <Radio
-                                            label="Indicateurs Aggrégés"
+                                            label={translate('Indicateurs_Aggreges')}
                                             onChange={handleChangeIndicatorConfigType}
                                             value={AGGREGATE_INDICATOR}
                                             checked={selectedIndicatorType === AGGREGATE_INDICATOR}
@@ -1320,7 +1319,7 @@ const Setting = () => {
                                 <Col>
                                     <div>
                                         <Radio
-                                            label="Indicateurs de programmes"
+                                            label={translate('Indicateurs_Programmes')}
                                             onChange={handleChangeIndicatorConfigType}
                                             value={PROGRAM_INDICATOR}
                                             checked={selectedIndicatorType === PROGRAM_INDICATOR}
@@ -1337,10 +1336,10 @@ const Setting = () => {
                                     <Row gutter={[8, 8]}>
                                         <Col md={12} sm={24}>
                                             <div>
-                                                <div style={{ marginBottom: '5px' }}>Groupe d'indicateurs</div>
+                                                <div style={{ marginBottom: '5px' }}>{translate('Groupe_Indicateurs')}</div>
                                                 <Select
                                                     options={indicatorGroups.map(indicateurGroup => ({ label: indicateurGroup.displayName, value: indicateurGroup.id }))}
-                                                    placeholder="Choisir le group d'indicateur"
+                                                    placeholder={translate('Groupe_Indicateurs')}
                                                     style={{ width: '100%' }}
                                                     onChange={handleSelectIndicatorGroupIND}
                                                     value={selectedIndicatorGroup?.id}
@@ -1357,10 +1356,10 @@ const Setting = () => {
                                             selectedIndicatorGroup && (
                                                 <Col md={12} sm={24}>
                                                     <div>
-                                                        <div style={{ marginBottom: '5px' }}>Indicateurs</div>
+                                                        <div style={{ marginBottom: '5px' }}>{translate('Indicateurs')}</div>
                                                         <Select
                                                             options={selectedIndicatorGroup.indicators?.map(progInd => ({ label: progInd.displayName, value: progInd.id }))}
-                                                            placeholder="Indicateurs"
+                                                            placeholder={translate('Indicateurs')}
                                                             style={{ width: '100%' }}
                                                             onChange={handleSelectIndicatorIND}
                                                             value={selectedIndicator?.id}
@@ -1383,10 +1382,10 @@ const Setting = () => {
                                     <Row gutter={[8, 8]}>
                                         <Col md={12} sm={24}>
                                             <div>
-                                                <div style={{ marginBottom: '5px' }}>Programmes</div>
+                                                <div style={{ marginBottom: '5px' }}>{translate('Programmes')}</div>
                                                 <Select
                                                     options={programs.map(program => ({ label: program.displayName, value: program.id }))}
-                                                    placeholder="Choisir le programme"
+                                                    placeholder={translate('Programmes')}
                                                     style={{ width: '100%' }}
                                                     onChange={handleSelectProgramIND}
                                                     value={selectedProgram?.id}
@@ -1403,10 +1402,10 @@ const Setting = () => {
                                             selectedProgram && (
                                                 <Col md={12} sm={24}>
                                                     <div>
-                                                        <div style={{ marginBottom: '5px' }}>Indicateurs</div>
+                                                        <div style={{ marginBottom: '5px' }}>{translate('Indicateurs')}</div>
                                                         <Select
                                                             options={selectedProgram.programIndicators?.map(progInd => ({ label: progInd.displayName, value: progInd.id }))}
-                                                            placeholder="Indicateurs"
+                                                            placeholder={translate('Indicateurs')}
                                                             style={{ width: '100%' }}
                                                             onChange={handleSelectIndicatorIND}
                                                             value={selectedIndicator?.id}
@@ -1428,21 +1427,21 @@ const Setting = () => {
                             <div className='my-shadow' style={{ padding: '20px', background: '#FFF', marginBottom: '2px', borderRadius: '8px', marginTop: '10px' }}>
                                 <Row gutter={[15, 15]}>
                                     <Col md={12} sm={24}>
-                                        <div style={{ marginBottom: '5px' }}>Nom</div>
+                                        <div style={{ marginBottom: '5px' }}>{translate('Nom')}</div>
                                         <Input name='indicatorName' value={indicatorName} disabled />
                                     </Col>
                                     <Col md={12} sm={24}>
-                                        <div style={{ marginBottom: '5px' }}>Etiquette</div>
+                                        <div style={{ marginBottom: '5px' }}>{translate('Etiquette')}</div>
                                         <Input name='indicatorName' value={indicatorEtiquette} onChange={event => setIndicatorEtiquette(''.concat(event.target.value))} />
                                     </Col>
                                     <Col md={12} sm={24}>
-                                        <div style={{ marginBottom: '5px' }}>Poids</div>
+                                        <div style={{ marginBottom: '5px' }}>{translate('Poids')}</div>
                                         <InputNumber style={{ width: '100%' }} name='indicatorName' value={indicatorWeight} onChange={event => setIndicatorWeight(event)} />
                                     </Col>
                                     <Col md={12}>
                                         <div style={{ display: 'flex', alignItems: 'center', marginTop: '25px' }}>
                                             <Checkbox checked={indicatorBestPositive} onChange={() => setIndicatorBestPositive(!indicatorBestPositive)} />
-                                            <span style={{ marginLeft: '10px' }}> Meilleur Positif</span>
+                                            <span style={{ marginLeft: '10px' }}> {translate('Meilleur_Positif')}</span>
                                         </div>
                                     </Col>
 
@@ -1461,7 +1460,7 @@ const Setting = () => {
                                                             onClick={handleSaveIndicatorConfig}
                                                             loading={loadingSaveIndicatorsConfig}
                                                             disabled={loadingSaveIndicatorsConfig}
-                                                        >Enrégistrer</Button>
+                                                        >{translate('Enregistrer')}</Button>
                                                     </div>
                                                 )
                                             }
@@ -1473,7 +1472,7 @@ const Setting = () => {
                                                             icon={<MdOutlineCancel style={{ color: '#FFF', fontSize: '18px' }} />}
                                                             onClick={handleCancelUpdateIndicatorItem}
                                                             destructive
-                                                        >Annuler</Button>
+                                                        >{translate('Annuler')}</Button>
                                                     </div>
                                                 )
                                             }
@@ -1487,7 +1486,7 @@ const Setting = () => {
                                                             loading={loadingSaveIndicatorsConfig}
                                                             disabled={loadingSaveIndicatorsConfig}
                                                             primary
-                                                        >Mise à jour</Button>
+                                                        >{translate('Mise_A_Jour')}</Button>
                                                     </div>
                                                 )
                                             }
@@ -1504,7 +1503,7 @@ const Setting = () => {
                     {
                         mappingConfigs.length > 0 && (
                             <div className='my-shadow' style={{ padding: '20px', background: '#FFF', marginBottom: '2px', borderRadius: '8px' }}>
-                                <div style={{ marginBottom: '10px', fontWeight: 'bold', fontSize: '16px' }}>Liste des indicateurs configurés </div>
+                                <div style={{ marginBottom: '10px', fontWeight: 'bold', fontSize: '16px' }}>{translate('Liste_Indicateurs_Configurer')}</div>
                                 <Table
                                     dataSource={
                                         mappingConfigs.map(mapConf => ({
@@ -1515,25 +1514,25 @@ const Setting = () => {
                                     columns={
                                         [
                                             {
-                                                title: 'Indicateur',
+                                                title: translate('Indicateurs'),
                                                 dataIndex: 'nom'
                                             },
                                             {
-                                                title: 'Poid',
+                                                title: translate('Poids'),
                                                 dataIndex: 'weight'
                                             },
                                             {
-                                                title: "Type d'indicateur",
+                                                title: translate('Type_Indicateur'),
                                                 dataIndex: 'indicatorType',
                                                 render: value => (
                                                     <>
-                                                        {value === AGGREGATE_INDICATOR && 'Agrégee'}
-                                                        {value === PROGRAM_INDICATOR && 'Indicateur de programme'}
+                                                        {value === AGGREGATE_INDICATOR && translate('Agregee')}
+                                                        {value === PROGRAM_INDICATOR && translate('Indicateur_Programme')}
                                                     </>
                                                 )
                                             },
                                             {
-                                                title: 'Actions',
+                                                title: translate('Actions'),
                                                 dataIndex: 'action',
                                                 width: '80px',
                                                 render: value => (
@@ -1541,8 +1540,8 @@ const Setting = () => {
                                                         <div style={{ display: 'flex', justifyContent: 'center' }}>
                                                             <FiEdit style={{ color: BLUE, fontSize: '15px', cursor: 'pointer' }} onClick={() => handleUpdateBtnClicked(value)} />
                                                             <Popconfirm
-                                                                title="Suppression de la configuration"
-                                                                description="Voulez-vous vraiment supprimer cette configuration "
+                                                                title={translate('Suppression_Configuration')}
+                                                                description={translate('Confirmation_Suppression_Configuration')}
                                                                 icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
                                                                 onConfirm={() => handleDeleteConfigItem(value)}
                                                             >
@@ -1572,12 +1571,12 @@ const Setting = () => {
                         <div>
                             <Row gutter={[8, 8]}>
                                 <Col md={24}>
-                                    <div style={{ marginBottom: '5px' }}>Type d'élément</div>
+                                    <div style={{ marginBottom: '5px' }}>{translate('Type_Element')}</div>
                                 </Col>
                                 <Col>
                                     <div>
                                         <Radio
-                                            label="Élément de données"
+                                            label={translate('Element_De_Donnee')}
                                             onChange={handleChangeElementType}
                                             value={TYPE_ANALYSE_DATA_ELEMENT}
                                             checked={selectedAnalyseType === TYPE_ANALYSE_DATA_ELEMENT}
@@ -1587,7 +1586,7 @@ const Setting = () => {
                                 <Col>
                                     <div>
                                         <Radio
-                                            label="Indicateurs"
+                                            label={translate('Indicateurs')}
                                             onChange={handleChangeElementType}
                                             value={TYPE_ANALYSE_INDICATOR}
                                             checked={selectedAnalyseType === TYPE_ANALYSE_INDICATOR}
@@ -1603,10 +1602,10 @@ const Setting = () => {
                                     {
                                         selectedAnalyseType === TYPE_ANALYSE_DATA_ELEMENT && (
                                             <div>
-                                                <div style={{ marginBottom: '5px' }}>Eléments de données</div>
+                                                <div style={{ marginBottom: '5px' }}>{translate('Element_De_Donnee')}</div>
                                                 <Select
                                                     options={dataElements.map(dataElement => ({ label: dataElement.displayName, value: dataElement.id }))}
-                                                    placeholder="Element de donnée"
+                                                    placeholder={translate('Element_De_Donnee')}
                                                     style={{ width: '100%' }}
                                                     onChange={handleSelectAnalyseDataElement}
                                                     value={selectedAnalyseDataElement?.id}
@@ -1622,10 +1621,10 @@ const Setting = () => {
                                     {
                                         selectedAnalyseType === TYPE_ANALYSE_INDICATOR && (
                                             <div>
-                                                <div style={{ marginBottom: '5px' }}>Indicateurs</div>
+                                                <div style={{ marginBottom: '5px' }}>{translate('Indicateurs')}</div>
                                                 <Select
                                                     options={indicators.map(ind => ({ value: ind.id, label: ind.displayName }))}
-                                                    placeholder="Indicateurs"
+                                                    placeholder={translate('Indicateurs')}
                                                     style={{ width: '100%' }}
                                                     onChange={handleSelectAnalyseIndicator}
                                                     value={selectedAnalyseIndicator?.id}
@@ -1648,7 +1647,7 @@ const Setting = () => {
                                                     disabled={loadingAddAnalyseConfigs}
                                                     primary
                                                     onClick={handleSaveAnalyseConfigs}
-                                                > + Ajouter </Button>
+                                                > + {translate('Ajouter')} </Button>
                                             </div>
                                         ) : <></>
                                     }
@@ -1662,7 +1661,7 @@ const Setting = () => {
                     {
                         analyseConfigs.length > 0 && (
                             <div className='my-shadow' style={{ padding: '20px', background: '#FFF', marginBottom: '2px', borderRadius: '8px' }}>
-                                <div style={{ marginBottom: '10px', fontWeight: 'bold', fontSize: '16px' }}>Liste des éléments configurés </div>
+                                <div style={{ marginBottom: '10px', fontWeight: 'bold', fontSize: '16px' }}>{translate('Liste_Element_Configurer')} </div>
                                 <Table
                                     dataSource={
                                         analyseConfigs.map(config => ({
@@ -1675,29 +1674,29 @@ const Setting = () => {
                                     columns={
                                         [
                                             {
-                                                title: 'Nom',
+                                                title: translate('Nom'),
                                                 dataIndex: 'nom'
                                             },
                                             {
-                                                title: 'Type',
+                                                title: translate('Type'),
                                                 dataIndex: 'elementType',
                                                 render: value => (
                                                     <>
-                                                        {value === TYPE_ANALYSE_DATA_ELEMENT && 'Data Element'}
-                                                        {value === TYPE_ANALYSE_INDICATOR && 'Indicateur'}
+                                                        {value === TYPE_ANALYSE_DATA_ELEMENT && translate('Element_De_Donnee')}
+                                                        {value === TYPE_ANALYSE_INDICATOR && translate('Indicateur')}
                                                     </>
                                                 )
                                             },
                                             {
-                                                title: 'Actions',
+                                                title: translate('Actions'),
                                                 dataIndex: 'action',
                                                 width: '80px',
                                                 render: value => (
                                                     <>
                                                         <div style={{ display: 'flex', justifyContent: 'center' }}>
                                                             <Popconfirm
-                                                                title="Suppression de la configuration"
-                                                                description="Voulez-vous vraiment supprimer cette configuration "
+                                                                title={translate('Suppression_Configuration')}
+                                                                description={translate('Confirmation_Suppression_Configuration')}
                                                                 icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
                                                                 onConfirm={() => handleDeleteAnalyseConfig(value)}
                                                             >
@@ -1725,13 +1724,13 @@ const Setting = () => {
                 <Col md={4} sm={24}>
                     <div style={{ marginBottom: '2px', position: 'sticky', top: 30 }}>
                         <div className={`setting-menu-item ${selectedTypeSupervisionPage === PAGE_CONFIG_INDICATORS ? 'active' : ''}`} onClick={() => handleClickConfigMenu(PAGE_CONFIG_INDICATORS)} >
-                            Configuration des indicateurs
+                            {translate('Configuration_Des_Indicateurs')}
                         </div>
                         <div className={`setting-menu-item ${selectedTypeSupervisionPage === PAGE_CONFIG_SUPERVISION ? 'active' : ''}`} onClick={() => handleClickConfigMenu(PAGE_CONFIG_SUPERVISION)}>
-                            Paramètre des supervisions
+                            {translate('Parametre_Supervision')}
                         </div>
                         <div className={`setting-menu-item ${selectedTypeSupervisionPage === PAGE_CONFIG_ANALYSE ? 'active' : ''}`} onClick={() => handleClickConfigMenu(PAGE_CONFIG_ANALYSE)}>
-                            Analyses
+                            {translate('Analyses')}
                         </div>
                     </div>
                 </Col>
@@ -1755,7 +1754,7 @@ const Setting = () => {
             >
                 <TabBar>
                     <Tab selected={renderPage === PAGE_CONFIGURATION_TYPE_SUPERVISIONS} onClick={_ => setRenderPage(PAGE_CONFIGURATION_TYPE_SUPERVISIONS)}>
-                        Type de supervisions
+                        {translate('Type_De_Supervision')}
                     </Tab>
                     {0 > 1 &&
                         <Tab selected={renderPage === PAGE_CONFIGURATION_USER_AUTHORIZATIONS} onClick={_ => setRenderPage(PAGE_CONFIGURATION_USER_AUTHORIZATIONS)}>
