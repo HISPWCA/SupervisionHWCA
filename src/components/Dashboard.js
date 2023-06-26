@@ -18,6 +18,7 @@ import { Button } from '@dhis2/ui'
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import timezone from 'dayjs/plugin/timezone'
+import translate from '../utils/translator';
 
 const quarterOfYear = require('dayjs/plugin/quarterOfYear')
 const weekOfYear = require('dayjs/plugin/weekOfYear')
@@ -250,7 +251,7 @@ export const Dashboard = ({ me }) => {
             for (let sup of supervisionList) {
                 const payload = {
                     id: sup.id,
-                    title: 'All Day Event very long title',
+                    title: 'Supervision',
                     allDay: true,
                     start: new Date(2015, 3, 0),
                     end: new Date(2015, 3, 1),
@@ -398,7 +399,7 @@ export const Dashboard = ({ me }) => {
 
     const getPieChartDatasForSupervisions = () => ({
         title: {
-            text: 'Supervisions',
+            text: translate('Supervisions'),
             left: 'center'
         },
 
@@ -447,7 +448,7 @@ export const Dashboard = ({ me }) => {
 
     const getPieChartDatasForPayment = () => ({
         title: {
-            text: 'Paiement',
+            text: translate('Paiement'),
             left: 'center'
         },
 
@@ -719,7 +720,7 @@ export const Dashboard = ({ me }) => {
 
     const columns = () => selectedProgram?.planificationType === AGENT ? [
         {
-            title: "Agent ( org unit )",
+            title: translate('Agent_0rg_Unit'),
             key: 'agent',
             dataIndex: 'tei',
             render: tei => (
@@ -738,9 +739,9 @@ export const Dashboard = ({ me }) => {
                 </>
             )
         },
-        { title: "Période", key: 'period', dataIndex: 'period', render: value => <div style={{ fontSize: '13px' }}>{dayjs(value).format('YYYY-MM-DD')} </div> },
+        { title: translate('Periode'), key: 'period', dataIndex: 'period', render: value => <div style={{ fontSize: '13px' }}>{dayjs(value).format('YYYY-MM-DD')} </div> },
         {
-            title: 'Status Supervision', key: 'statusSupervision', dataIndex: 'statusSupervision', width: '150px',
+            title: translate('Status_Supervision'), key: 'statusSupervision', dataIndex: 'statusSupervision', width: '150px',
             render: value => (
                 <>
                     <span className='text-truncate-one' title={getStatusNameAndColor(value)?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColor(value)?.color?.background, color: getStatusNameAndColor(value)?.color?.text, padding: '3px', fontSize: '12px', borderRadius: '5px' }}>
@@ -750,7 +751,7 @@ export const Dashboard = ({ me }) => {
             )
         },
         {
-            title: 'Status Paiement', key: 'statusPayment', dataIndex: 'statusPayment', width: '150px',
+            title: translate('Status_Paiement'), key: 'statusPayment', dataIndex: 'statusPayment', width: '150px',
             render: value => (
                 <>
                     <span className='text-truncate-one' title={getStatusNameAndColorForPayment(value)?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColorForPayment(value)?.color?.background, color: getStatusNameAndColorForPayment(value)?.color?.text, padding: '3px', fontSize: '12px', borderRadius: '5px' }}>
@@ -760,24 +761,24 @@ export const Dashboard = ({ me }) => {
             )
         },
         {
-            title: 'Actions', key: 'action', width: '50px', dataIndex: 'tei', render: tei => (
+            title: translate('Actions'), key: 'action', width: '50px', dataIndex: 'tei', render: tei => (
                 <div style={{ textAlign: 'center', }}>
                     <a
                         target='_blank'
                         href={`${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${tei.trackedEntityInstance}&program=${tei.program}&ou=${tei.orgUnit}`}
                         style={{ cursor: 'pointer' }}
                     >
-                        <IoMdOpen title='Ouvrir dans le tracker' style={{ fontSize: '18px', color: BLUE, cursor: 'pointer' }} />
+                        <IoMdOpen title={translate('Ouvrir_Dans_Le_Tracker')} style={{ fontSize: '18px', color: BLUE, cursor: 'pointer' }} />
                     </a>
                 </div>
             )
         }
     ] :
         [
-            { title: "Unité d'organisation", key: 'nom', dataIndex: 'nom' },
+            { title: translate('Unite_Organisation'), key: 'nom', dataIndex: 'nom' },
             { title: "Période", key: 'period', dataIndex: 'period', render: value => <div style={{ fontSize: '13px' }}>{dayjs(value).format('YYYY-MM-DD')} </div> },
             {
-                title: 'Status Supervision', key: 'statusSupervision', dataIndex: 'statusSupervision', width: '150px',
+                title: translate('Status_Supervision'), key: 'statusSupervision', dataIndex: 'statusSupervision', width: '150px',
                 render: value => (
                     <>
                         <span className='text-truncate-one' title={getStatusNameAndColor(value)?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColor(value)?.color?.background, color: getStatusNameAndColor(value)?.color?.text, padding: '3px', fontSize: '12px', borderRadius: '5px' }}>
@@ -787,14 +788,14 @@ export const Dashboard = ({ me }) => {
                 )
             },
             {
-                title: 'Actions', key: 'action', width: '50px', dataIndex: 'tei', render: tei => (
+                title: translate('Actions'), key: 'action', width: '50px', dataIndex: 'tei', render: tei => (
                     <div style={{ textAlign: 'center', }}>
                         <a
                             target='_blank'
                             href={`${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${tei.trackedEntityInstance}&program=${tei.program}&ou=${tei.orgUnit}`}
                             style={{ cursor: 'pointer' }}
                         >
-                            <IoMdOpen title='Ouvrir dans le tracker' style={{ fontSize: '18px', color: BLUE, cursor: 'pointer' }} />
+                            <IoMdOpen title={translate('Ouvrir_Dans_Le_Tracker')} style={{ fontSize: '18px', color: BLUE, cursor: 'pointer' }} />
                         </a>
                     </div>
                 )
@@ -828,7 +829,7 @@ export const Dashboard = ({ me }) => {
 
                     <div className='my-shadow' style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '10px', marginBottom: '2px', height: '100%', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         {
-                            teiList.length === 0 && (<div style={{ fontWeight: 'bold', color: `${BLACK}90` }}> Aucune données disponibles !</div>)
+                            teiList.length === 0 && (<div style={{ fontWeight: 'bold', color: `${BLACK}90` }}> {translate('Aucune_donnees_Disponibles')} !</div>)
                         }
                         {
                             teiList.length > 0 && (
@@ -847,7 +848,7 @@ export const Dashboard = ({ me }) => {
                             <div className='my-shadow' style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '10px', marginBottom: '2px', height: '100%', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
 
                                 {
-                                    teiList.length === 0 && (<div style={{ fontWeight: 'bold', color: `${BLACK}90` }}> Aucune données disponibles !</div>)
+                                    teiList.length === 0 && (<div style={{ fontWeight: 'bold', color: `${BLACK}90` }}> {translate('Aucune_donnees_Disponibles')} !</div>)
                                 }
                                 {
                                     teiList.length > 0 && (
@@ -874,7 +875,7 @@ export const Dashboard = ({ me }) => {
     const loadOptions = async (dataElementId, setState) => {
         try {
             if (!dataElementId)
-                throw new Error("Elément de donnée introuvable !")
+                throw new Error(translate('Element_De_Donnee_Introuvable'))
 
             const response = await axios.get(`${DATA_ELEMENT_OPTION_SETS}/${dataElementId}.json?fields=optionSet[options[id,code,displayName]]`)
             setState && setState(response.data.optionSet?.options || [])
@@ -898,9 +899,9 @@ export const Dashboard = ({ me }) => {
             <div className='my-shadow' style={{ backgroundColor: '#fff', padding: '10px', marginTop: '5px', marginBottom: '20px', borderRadius: '8px' }}>
                 <Row gutter={[8, 8]} align='middle'>
                     <Col sm={24} md={4}>
-                        <div style={{ marginBottom: '2px' }}>Programme</div>
+                        <div style={{ marginBottom: '2px' }}>{translate('Programme')}</div>
                         <Select
-                            placeholder="Programme"
+                            placeholder={translate('Programme')}
                             onChange={handleSelectProgram}
                             value={selectedProgram?.program?.id}
                             style={{ width: '100%' }}
@@ -909,7 +910,7 @@ export const Dashboard = ({ me }) => {
                         />
                     </Col>
                     <Col sm={24} md={5}>
-                        <div style={{ marginBottom: '2px' }}>Unités d'organisation</div>
+                        <div style={{ marginBottom: '2px' }}>{translate('Unites_Organisation')}</div>
                         <OrganisationUnitsTree
                             meOrgUnitId={me?.organisationUnits[0]?.id}
                             orgUnits={organisationUnits}
@@ -920,33 +921,33 @@ export const Dashboard = ({ me }) => {
                         />
                     </Col>
                     <Col sm={24} md={3}>
-                        <div style={{ marginBottom: '2px' }}>Période</div>
+                        <div style={{ marginBottom: '2px' }}>{translate('Periode')}</div>
                         <DatePicker
                             onChange={handleSelectedPeriod}
                             picker="month"
                             value={selectedPeriod}
                             style={{ width: '100%' }}
-                            placeholder="Période"
+                            placeholder={translate('Periode')}
                             allowClear={false}
                         />
                     </Col>
 
 
                     <Col sm={24} md={4}>
-                        <div style={{ marginBottom: '2px' }}>Planifier par </div>
+                        <div style={{ marginBottom: '2px' }}>{translate('Planifier_Par')} </div>
                         <Select
-                            placeholder="Planification"
+                            placeholder={translate('Planifier_Par')}
                             onChange={handleSelectPlanification}
                             value={selectedPlanification}
                             style={{ width: '100%' }}
                             options={[
                                 {
                                     value: PLANIFICATION_PAR_MOI,
-                                    label: 'Moi',
+                                    label: translate('Moi'),
                                 },
                                 {
                                     value: PLANIFICATION_PAR_TOUS,
-                                    label: 'Tous',
+                                    label: translate('Tous'),
                                 },
                                 // {
                                 //     value: PLANIFICATION_PAR_UN_USER,
@@ -958,9 +959,9 @@ export const Dashboard = ({ me }) => {
                     {
                         0 > 1 && selectedPlanification === PLANIFICATION_PAR_UN_USER && users.length > 0 && (
                             <Col sm={24} md={4}>
-                                <div style={{ marginBottom: '2px' }}>Utilisateurs</div>
+                                <div style={{ marginBottom: '2px' }}>{translate('Utilisateurs')}</div>
                                 <Select
-                                    placeholder="Utilisateurs"
+                                    placeholder={translate('Utilisateurs')}
                                     style={{ width: '100%' }}
                                     onChange={handleSelectPlanificationUser}
                                     value={selectedPlanificationUser?.id}
@@ -973,9 +974,9 @@ export const Dashboard = ({ me }) => {
                     {
                         0 > 1 && (
                             <Col sm={24} md={3}>
-                                <div style={{ marginBottom: '2px' }}>Superviseurs</div>
+                                <div style={{ marginBottom: '2px' }}>{translate('Superviseurs')}</div>
                                 <Select
-                                    placeholder="Superviseurs"
+                                    placeholder={translate('Superviseurs')}
                                     style={{ width: '100%' }}
                                     loading={loadingUsers}
                                     mode='multiple'

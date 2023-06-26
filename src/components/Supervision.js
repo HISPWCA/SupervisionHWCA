@@ -55,6 +55,7 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { BLUE, GRAY_DARK, GREEN, ORANGE, RED, WHITE } from '../utils/couleurs'
 import { getDefaultStatusPaymentIfStatusIsNull, getDefaultStatusSupervisionIfStatusIsNull } from './Dashboard'
+import translate from '../utils/translator'
 const quarterOfYear = require('dayjs/plugin/quarterOfYear')
 const weekOfYear = require('dayjs/plugin/weekOfYear')
 
@@ -154,11 +155,11 @@ const Supervision = ({ me }) => {
         return selectedSupervisionsConfigProgram?.planificationType === ORGANISATION_UNIT ? [
             {
                 accessorKey: 'libelle', //access nested data with dot notation
-                header: "Unité d'organisation",
+                header: translate('Unite_Organisation'),
             },
             {
                 accessorKey: 'period',
-                header: 'Période',
+                header: translate('Periode'),
                 Cell: ({ cell, row }) => {
                     return (
                         <>
@@ -171,7 +172,7 @@ const Supervision = ({ me }) => {
             },
             {
                 accessorKey: 'statusSupervision', //normal accessorKey
-                header: 'Status Supervision',
+                header: translate('Status_Supervision'),
                 Cell: ({ cell, row }) => {
                     return (
                         <>
@@ -183,7 +184,7 @@ const Supervision = ({ me }) => {
                 }
             },
             {
-                header: 'Actions',
+                header: translate('Actions'),
                 width: 100,
                 Cell: ({ cell, row }) => {
                     return (
@@ -193,7 +194,7 @@ const Supervision = ({ me }) => {
                                 href={`${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${row.original.trackedEntityInstance}&program=${row.original.program}&ou=${row.original.orgUnit}`}
                                 style={{ cursor: 'pointer' }}
                             >
-                                <IoMdOpen title='Ouvrir dans le tracker' style={{ fontSize: '18px', color: BLUE, cursor: 'pointer' }} />
+                                <IoMdOpen title={translate('Ouvrir_Dans_Le_Tracker')} style={{ fontSize: '18px', color: BLUE, cursor: 'pointer' }} />
                             </a>
                         </div>
                     )
@@ -203,15 +204,15 @@ const Supervision = ({ me }) => {
             [
                 {
                     accessorKey: 'agent', //access nested data with dot notation
-                    header: "Agent",
+                    header: translate('Agent'),
                 },
                 {
                     accessorKey: 'libelle', //access nested data with dot notation
-                    header: "Unité d'organisation",
+                    header: translate('Unite_Organisation'),
                 },
                 {
                     accessorKey: 'period',
-                    header: 'Période',
+                    header: translate('Periode'),
                     Cell: ({ cell, row }) => {
                         return (
                             <>
@@ -224,7 +225,7 @@ const Supervision = ({ me }) => {
                 },
                 {
                     accessorKey: 'statusSupervision', //normal accessorKey
-                    header: 'Status Supervision',
+                    header: translate('Status_Supervision'),
                     Cell: ({ cell, row }) => {
                         return (
                             <>
@@ -237,7 +238,7 @@ const Supervision = ({ me }) => {
                 },
                 {
                     accessorKey: 'statusPayment',
-                    header: 'Status Paiement',
+                    header: translate('Status_Paiement'),
                     Cell: ({ cell, row }) => {
                         return (
                             <>
@@ -251,10 +252,10 @@ const Supervision = ({ me }) => {
                 ,
                 {
                     accessorKey: 'montant',
-                    header: 'Montants',
+                    header: translate('Montants'),
                 },
                 {
-                    header: 'Actions',
+                    header: translate('Actions'),
                     width: 100,
                     Cell: ({ cell, row }) => {
                         return (
@@ -264,7 +265,7 @@ const Supervision = ({ me }) => {
                                     href={`${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${row.original.trackedEntityInstance}&program=${row.original.program}&ou=${row.original.orgUnit}`}
                                     style={{ cursor: 'pointer' }}
                                 >
-                                    <IoMdOpen title='Ouvrir dans le tracker' style={{ fontSize: '18px', color: BLUE, cursor: 'pointer' }} />
+                                    <IoMdOpen title={translate('Ouvrir_Dans_Le_Tracker')} style={{ fontSize: '18px', color: BLUE, cursor: 'pointer' }} />
                                 </a>
                             </div>
                         )
@@ -276,7 +277,7 @@ const Supervision = ({ me }) => {
     const loadOrganisationUnits = async () => {
         try {
             if (!me)
-                throw new Error("Impossibile de récuperer l'utilisateur actuelle ( me ) ")
+                throw new Error(translate('Erreur_Recuperation_Me'))
 
             setLoadingOrganisationUnits(true)
 
@@ -382,8 +383,8 @@ const Supervision = ({ me }) => {
                 setLoadingDataStoreSupervisionConfigs(false)
                 return setNoticeBox({
                     show: true,
-                    message: "Aucun programme n'est configuré. Veuillez configurer au moins un avant de continuer !",
-                    title: 'Configuration',
+                    message: translate('Aucun_Programme_Configurer'),
+                    title: translate('Configuration'),
                     type: NOTICE_BOX_WARNING
                 })
             }
@@ -575,13 +576,13 @@ const Supervision = ({ me }) => {
         try {
             setLoadingSaveDateElementMappingConfig(true)
             if (!selectedDataElement)
-                throw new Error("L'élément de donnée est obligatoire !")
+                throw new Error(translate('Element_De_Donner_Obligatoire'))
 
             if (!inputDataSourceDisplayName || inputDataSourceDisplayName?.trim().length === 0)
-                throw new Error("La donnée source est obligatoire !")
+                throw new Error(translate('Donne_Source_Obligatoire'))
 
             if (!selectedProgramStage)
-                throw new Error("Le programme stage est obligatoire !")
+                throw new Error(translate('Programme_Stage_Obligatoire'))
 
             if (selectedDataElement && selectedProgramStage) {
                 const existingConfig = mappingConfigs.find(mapping => mapping.dataElement?.id === selectedDataElement.id &&
@@ -602,10 +603,10 @@ const Supervision = ({ me }) => {
                     setInputDataSourceDisplayName('')
                     setInputDataSourceID(null)
                     setSelectedProgramStage(null)
-                    setNotification({ show: true, type: NOTIFICATON_SUCCESS, message: 'Configuration ajoutée !' })
+                    setNotification({ show: true, type: NOTIFICATON_SUCCESS, message: translate('Configuration_Ajoutee') })
                     setLoadingSaveDateElementMappingConfig(false)
                 } else {
-                    throw new Error('Cette configuration à déjà été ajoutée')
+                    throw new Error(translate('Configuration_Deja_Ajoutee'))
                 }
             }
         } catch (err) {
@@ -619,7 +620,7 @@ const Supervision = ({ me }) => {
             if (value) {
                 const newList = mappingConfigs.filter(mapConf => mapConf.id !== value.id)
                 setMappingConfigs(newList)
-                setNotification({ show: true, message: 'Suppression éffectuée !', type: NOTIFICATON_SUCCESS })
+                setNotification({ show: true, message: translate('Suppression_Effectuee'), type: NOTIFICATON_SUCCESS })
             }
         } catch (err) {
             setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
@@ -667,7 +668,7 @@ const Supervision = ({ me }) => {
         loadProgramStages(sup.program?.id)
         setSelectedProgram(sup)
         if (selectedSupervisionType === TYPE_SUPERVISION_AGENT && sup?.attributesToDisplay?.length === 0) {
-            return setNotification({ show: true, message: "Aucun attribut à afficher, n'est encore configuré pour ce programme, Veuillez vous rendre dans partie configuration pour les configurer !", type: NOTIFICATON_CRITICAL })
+            return setNotification({ show: true, message: translate('Attribute_Non_Configurer'), type: NOTIFICATON_CRITICAL })
         }
     }
 
@@ -728,7 +729,7 @@ const Supervision = ({ me }) => {
         try {
             const currentProgram = await axios.get(`${PROGS_ROUTE}/${selectedProgram?.program?.id}?fields=id,displayName,trackedEntityType,programStages[id,programStageDataElements[dataElement]],programTrackedEntityAttributes[trackedEntityAttribute]`)
             if (!currentProgram.data)
-                throw new Error("Program non trouver")
+                throw new Error(translate('Programme_Non_Trouver'))
 
             const generatedCode = await generatedAutoCode(currentProgram.data.programTrackedEntityAttributes[0]?.trackedEntityAttribute?.id)
 
@@ -742,7 +743,7 @@ const Supervision = ({ me }) => {
             const tei_id = createdTEI?.response?.importSummaries[0]?.reference
 
             if (!tei_id)
-                throw new Error("Erreur de création du tracked entity instance ")
+                throw new Error(translate(''))
 
             const enrollment = {
                 orgUnit: payload.orgUnit,
@@ -754,7 +755,7 @@ const Supervision = ({ me }) => {
             const enrollment_id = createdEnrollment?.response?.importSummaries[0]?.reference
 
             if (!enrollment_id)
-                throw new Error("Erreur de création de l'enrôlement ")
+                throw new Error(translate('Erreur_Creation_TEI'))
 
             const availableProgramStages = []
             const newEventsList = []
@@ -912,7 +913,7 @@ const Supervision = ({ me }) => {
                 const enrollment_id = current_tei?.enrollments.filter(en => en.program === selectedProgram?.program?.id)[0]?.enrollment
 
                 if (!enrollment_id)
-                    throw new Error("Erreur de création de l'enrôlement ")
+                    throw new Error(translate('Erreur_Creation_Enrolement'))
 
                 const availableProgramStages = []
                 const newEventsList = []
@@ -1004,19 +1005,10 @@ const Supervision = ({ me }) => {
                                         const currentDE = payload.fieldConfig?.supervisor?.dataElements[i]
                                         const currentSUP = newSupervisorsList[j]
                                         if (currentDE && currentSUP && !newDataValues.map(dv => dv.dataElement).includes(currentDE.id)) {
-
-                                            // if (i === payload.fieldConfig?.supervisor?.dataElements?.length - 1) {
-                                            //     newDataValues.push({
-                                            //         dataElement: currentDE.id,
-                                            //         value: `${currentSUP},${newSupervisorsList?.join(',')}`
-                                            //     })
-                                            // } else {
                                             newDataValues.push({
                                                 dataElement: currentDE.id,
                                                 value: currentSUP
                                             })
-                                            // }
-
                                         }
                                     }
                                 }
@@ -1033,21 +1025,10 @@ const Supervision = ({ me }) => {
                                         const currentDE = payload.fieldConfig?.supervisor?.dataElements[i]
                                         const currentSUP = newSupervisorsList[j]
                                         if (currentDE && currentSUP && !newDataValues.map(dv => dv.dataElement).includes(currentDE.id)) {
-
-                                            // if (i === newSupervisorsList?.length - 1) {
-                                            //     newDataValues.push({
-                                            //         dataElement: currentDE.id,
-                                            //         value: `${currentSUP},${newSupervisorsList?.join(',')}`
-                                            //     })
-                                            // } else {
-
-                                            // }
-
                                             newDataValues.push({
                                                 dataElement: currentDE.id,
                                                 value: currentSUP
                                             })
-
                                         }
                                     }
                                 }
@@ -1096,7 +1077,7 @@ const Supervision = ({ me }) => {
                 const enrollment_id = createdEnrollment?.response?.importSummaries[0]?.reference
 
                 if (!enrollment_id)
-                    throw new Error("Erreur de création de l'enrôlement ")
+                    throw new Error(translate('Erreur_Creation_Enrolement'))
 
                 const availableProgramStages = []
                 const newEventsList = []
@@ -1352,7 +1333,7 @@ const Supervision = ({ me }) => {
             const existing_tei = existing_tei_response.data
 
             if (!existing_tei || !existing_tei.enrollments[0])
-                throw new Error("Impossible de trouver cet Agent !")
+                throw new Error(translate('Agent_Introuvable'))
 
             const availableProgramStages = []
             const newEventsList = []
@@ -1589,7 +1570,7 @@ const Supervision = ({ me }) => {
             loadDataStoreSupervisionConfigs(organisationUnits)
             loadDataStoreSupervisions()
             setLoadingSupervisionPlanification(false)
-            setNotification({ show: true, message: 'Planification effectuée avec succès !', type: NOTIFICATON_SUCCESS })
+            setNotification({ show: true, message: translate('Planification_Effectuer'), type: NOTIFICATON_SUCCESS })
             setEditionMode(false)
             cleanAllNewSupervisionState()
         } catch (err) {
@@ -1647,7 +1628,7 @@ const Supervision = ({ me }) => {
                         <Col md={6}>
                             {/* <div style={{ marginBottom: '2px' }}>Programme</div> */}
                             <Select
-                                placeholder="Programme"
+                                placeholder={translate('Programme')}
                                 onChange={handleSelectSupervisionProgramConfigForTracker}
                                 value={selectedSupervisionsConfigProgram?.program?.id}
                                 style={{ width: '100%' }}
@@ -1671,7 +1652,7 @@ const Supervision = ({ me }) => {
                                 picker="month"
                                 value={selectedPeriodSupervisionConfig}
                                 style={{ width: '100%' }}
-                                placeholder="Période"
+                                placeholder={translate('Periode')}
                                 allowClear={false}
                             />
                         </Col>
@@ -1689,7 +1670,7 @@ const Supervision = ({ me }) => {
                             <div style={{ display: 'flex', alignItems: 'center', }}>
                                 <CircularLoader small />
                                 <span style={{ marginLeft: '20px' }}>
-                                    Chargement des supervisions...
+                                    {translate('Chargement_Des_Supervisions')}
                                 </span>
                             </div>
                         )
@@ -1697,7 +1678,7 @@ const Supervision = ({ me }) => {
                     {
                         allSupervisionsFromTracker.length === 0 && (
                             <div style={{ fontWeight: 'bold', color: '#00000090', marginTop: '10px' }}>
-                                Aucune supervision disponible !
+                                {translate('Aucune_Supervision_Disponible')}
                             </div>
                         )
                     }
@@ -1735,7 +1716,7 @@ const Supervision = ({ me }) => {
                 <Row gutter={[6, 6]}>
 
                     <Col sm={24} md={2}>
-                        <div style={{ fontWeight: 'bold', fontSize: '18px', marginTop: '15px' }}>Supervisions</div>
+                        <div style={{ fontWeight: 'bold', fontSize: '18px', marginTop: '15px' }}>{translate('Supervisions')}</div>
                     </Col>
                     <Col sm={24} md={16}>
                         {isEditionMode && RenderSteps()}
@@ -1745,7 +1726,7 @@ const Supervision = ({ me }) => {
                             isEditionMode && inputFields.length > 0 && (
                                 <div style={{ marginTop: '15px' }}>
                                     <Button onClick={cleanAllNewSupervisionState} icon={<ImCancelCircle style={{ color: '#fff', fontSize: '18px' }} />} destructive >
-                                        Annuler
+                                        {translate('Annuler')}
                                     </Button>
                                 </div>
                             )
@@ -1756,7 +1737,7 @@ const Supervision = ({ me }) => {
                             isEditionMode && inputFields.length > 0 && (
                                 <div style={{ marginTop: '15px' }}>
                                     <Button icon={<FiSave style={{ color: '#fff', fontSize: '18px' }} />} onClick={handleSupervisionPlanificationSaveBtn} primary disabled={loadingSupervisionPlanification} loading={loadingSupervisionPlanification}>
-                                        Planifier la supervision(s)
+                                        { translate('Planifier_Supervision')}
                                     </Button>
                                 </div>
                             )
@@ -1770,7 +1751,7 @@ const Supervision = ({ me }) => {
     const RenderFloatingButton = () => (
         <>
             <FloatButton
-                tooltip={isEditionMode ? 'Liste des supervisions' : 'Nouvelle supervision'}
+                tooltip={isEditionMode ? translate('List_Supervisions') : translate('Nouvelle_Supervision')}
                 icon={isEditionMode ? <IoListCircleOutline style={{ color: '#FFF', fontSize: '20px' }} /> : <IoMdAdd style={{ color: '#FFF' }} />}
                 type="primary"
                 style={{ right: 50, bottom: 50, width: '60px', height: '60px', boxShadow: '10px 10px 20px #00000050' }}
@@ -1795,12 +1776,12 @@ const Supervision = ({ me }) => {
             <div>
                 <Card className='my-shadow' size="small">
                     <div style={{ fontWeight: 'bold' }}>
-                        Que voulez-vous superviser ?
+                        {translate('Que_Voulez_Vous_Superviser')}
                     </div>
                     <div style={{ display: 'flex', marginTop: '10px' }}>
                         <div>
                             <Radio
-                                label="Unité d'organisation"
+                                label={translate('Unite_Organisation')}
                                 className="cursor-pointer"
                                 onChange={handleChangeSupervisionType}
                                 value={TYPE_SUPERVISION_ORGANISATION_UNIT}
@@ -1809,7 +1790,7 @@ const Supervision = ({ me }) => {
                         </div>
                         <div style={{ marginLeft: '20px' }}>
                             <Radio
-                                label="Agent"
+                                label={translate('Agent')}
                                 className="cursor-pointer"
                                 onChange={handleChangeSupervisionType}
                                 value={TYPE_SUPERVISION_AGENT}
@@ -1826,7 +1807,7 @@ const Supervision = ({ me }) => {
         <>
             <div style={{ marginTop: '10px' }}>
                 <Card className='my-shadow my-scrollable' bodyStyle={{ padding: '0px', margin: '0px', maxHeight: '500px' }} size="small">
-                    <div style={{ fontWeight: 'bold', padding: '10px', borderBottom: '1px solid #ccc' }}>Fiches de supervisions</div>
+                    <div style={{ fontWeight: 'bold', padding: '10px', borderBottom: '1px solid #ccc' }}>{translate('Fiches_Supervisions')}</div>
                     <div style={{ padding: '10px' }}>
                         {
                             selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
@@ -1853,7 +1834,7 @@ const Supervision = ({ me }) => {
                             dataStoreSupervisionConfigs
                                 .filter(sup => sup.planificationType === ORGANISATION_UNIT)
                                 .length === 0 && (
-                                <div style={{ fontWeight: 'bold' }}> Aucune fiche de supervision disponible</div>
+                                <div style={{ fontWeight: 'bold' }}> { translate('Aucun_Programme_Supervision')} </div>
                             )
                         }
 
@@ -1862,7 +1843,7 @@ const Supervision = ({ me }) => {
                             dataStoreSupervisionConfigs
                                 .filter(sup => sup.generationType === TYPE_GENERATION_AS_EVENT && sup.planificationType === AGENT)
                                 .length === 0 && (
-                                <div style={{ fontWeight: 'bold' }}> Aucune fiche de supervision disponible</div>
+                                <div style={{ fontWeight: 'bold' }}>  { translate('Aucun_Programme_Supervision')}</div>
                             )
                         }
                     </div>
@@ -1875,12 +1856,12 @@ const Supervision = ({ me }) => {
         <div>
             <Card className='my-shadow' size="small">
                 <div style={{ fontWeight: 'bold' }}>
-                    Planification
+                    {translate('Planification')}
                 </div>
                 <div style={{ display: 'flex', marginTop: '10px' }}>
                     <div>
                         <Radio
-                            label="Directe"
+                            label={translate("Directe")}
                             className="cursor-pointer"
                             onChange={handleChangePlanificationType}
                             value={ORGANISATION_UNIT}
@@ -1889,7 +1870,7 @@ const Supervision = ({ me }) => {
                     </div>
                     <div style={{ marginLeft: '20px' }}>
                         <Radio
-                            label="Basée sur les perfomances"
+                            label={translate("Basee_Sur_Perfomances")}
                             className="cursor-pointer"
                             onChange={handleChangePlanificationType}
                             value={INDICATOR}
@@ -1904,10 +1885,10 @@ const Supervision = ({ me }) => {
     const RenderSupervisionPlanificationOrganisationUnitContent = () => (
         <div style={{ marginTop: '10px' }}>
             <Card bodyStyle={{ padding: '0px' }} className='my-shadow' size='small'>
-                <div style={{ fontWeight: 'bold', padding: '10px', borderBottom: '1px solid #ccc' }}> Planification basée sur les unités d'organisations  </div>
+                <div style={{ fontWeight: 'bold', padding: '10px', borderBottom: '1px solid #ccc' }}> { translate('Planification_Sur_Org_Units')}  </div>
                 <div style={{ padding: '10px' }}>
                     <div>
-                        <div style={{ marginBottom: '5px' }}>Unités d'organisation</div>
+                        <div style={{ marginBottom: '5px' }}>{translate('Unites_Organisation')}</div>
                         <OrganisationUnitsTree
                             meOrgUnitId={me?.organisationUnits[0]?.id}
                             orgUnits={organisationUnits}
@@ -1926,15 +1907,15 @@ const Supervision = ({ me }) => {
         <>
             <div style={{ marginTop: '10px' }}>
                 <Card bodyStyle={{ padding: '0px' }} className='my-shadow' size='small'>
-                    <div style={{ fontWeight: 'bold', padding: '10px', borderBottom: '1px solid #ccc' }}> Planification Basée sur les perfomances configurées </div>
+                    <div style={{ fontWeight: 'bold', padding: '10px', borderBottom: '1px solid #ccc' }}> { translate('Planification_Sur_Performances')} </div>
                     <div style={{ padding: '10px' }}>
-                        <div>Indicateurs</div>
+                        <div>  { translate('Indicateurs')}</div>
                         <Select
                             options={dataStoreIndicatorConfigs.map(ind => ({ label: ind.indicator?.displayName, value: ind.indicator?.id }))}
                             loading={loadingDataStoreIndicatorConfigs}
                             disabled={loadingDataStoreIndicatorConfigs}
                             showSearch
-                            placeholder="Indicateurs"
+                            placeholder={ translate('Indicateurs')}
                             style={{ width: '100%' }}
                             optionFilterProp='label'
                             mode='multiple'
