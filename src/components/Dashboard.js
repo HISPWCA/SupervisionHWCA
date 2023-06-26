@@ -776,7 +776,7 @@ export const Dashboard = ({ me }) => {
     ] :
         [
             { title: translate('Unite_Organisation'), key: 'nom', dataIndex: 'nom' },
-            { title: "Période", key: 'period', dataIndex: 'period', render: value => <div style={{ fontSize: '13px' }}>{dayjs(value).format('YYYY-MM-DD')} </div> },
+            { title: translate('Periode'), key: 'period', dataIndex: 'period', render: value => <div style={{ fontSize: '13px' }}>{dayjs(value).format('YYYY-MM-DD')} </div> },
             {
                 title: translate('Status_Supervision'), key: 'statusSupervision', dataIndex: 'statusSupervision', width: '150px',
                 render: value => (

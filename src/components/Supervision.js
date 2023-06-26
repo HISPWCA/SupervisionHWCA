@@ -155,11 +155,11 @@ const Supervision = ({ me }) => {
         return selectedSupervisionsConfigProgram?.planificationType === ORGANISATION_UNIT ? [
             {
                 accessorKey: 'libelle', //access nested data with dot notation
-                header: translate('Unite_Organisation'),
+                header: `${translate('Unite_Organisation')}`,
             },
             {
                 accessorKey: 'period',
-                header: translate('Periode'),
+                header: `${translate('Periode')}`,
                 Cell: ({ cell, row }) => {
                     return (
                         <>
@@ -172,7 +172,7 @@ const Supervision = ({ me }) => {
             },
             {
                 accessorKey: 'statusSupervision', //normal accessorKey
-                header: translate('Status_Supervision'),
+                header: `${translate('Status_Supervision')}`,
                 Cell: ({ cell, row }) => {
                     return (
                         <>
@@ -184,7 +184,7 @@ const Supervision = ({ me }) => {
                 }
             },
             {
-                header: translate('Actions'),
+                header: `${translate('Actions')}`,
                 width: 100,
                 Cell: ({ cell, row }) => {
                     return (
@@ -204,15 +204,15 @@ const Supervision = ({ me }) => {
             [
                 {
                     accessorKey: 'agent', //access nested data with dot notation
-                    header: translate('Agent'),
+                    header: `${translate('Agent')}`,
                 },
                 {
                     accessorKey: 'libelle', //access nested data with dot notation
-                    header: translate('Unite_Organisation'),
+                    header: `${translate('Unite_Organisation')}`,
                 },
                 {
                     accessorKey: 'period',
-                    header: translate('Periode'),
+                    header: `${translate('Periode')}`,
                     Cell: ({ cell, row }) => {
                         return (
                             <>
@@ -225,7 +225,7 @@ const Supervision = ({ me }) => {
                 },
                 {
                     accessorKey: 'statusSupervision', //normal accessorKey
-                    header: translate('Status_Supervision'),
+                    header: `${translate('Status_Supervision')}`,
                     Cell: ({ cell, row }) => {
                         return (
                             <>
@@ -238,7 +238,7 @@ const Supervision = ({ me }) => {
                 },
                 {
                     accessorKey: 'statusPayment',
-                    header: translate('Status_Paiement'),
+                    header: `${translate('Status_Paiement')}`,
                     Cell: ({ cell, row }) => {
                         return (
                             <>
@@ -248,14 +248,13 @@ const Supervision = ({ me }) => {
                             </>
                         )
                     }
-                }
-                ,
-                {
-                    accessorKey: 'montant',
-                    header: translate('Montants'),
                 },
                 {
-                    header: translate('Actions'),
+                    accessorKey: 'montant',
+                    header: `${translate('Montants')}`,
+                },
+                {
+                    header: `${translate('Actions')}`,
                     width: 100,
                     Cell: ({ cell, row }) => {
                         return (
@@ -743,7 +742,7 @@ const Supervision = ({ me }) => {
             const tei_id = createdTEI?.response?.importSummaries[0]?.reference
 
             if (!tei_id)
-                throw new Error(translate(''))
+                throw new Error(translate('Erreur_Creation_TEI'))
 
             const enrollment = {
                 orgUnit: payload.orgUnit,
@@ -755,7 +754,7 @@ const Supervision = ({ me }) => {
             const enrollment_id = createdEnrollment?.response?.importSummaries[0]?.reference
 
             if (!enrollment_id)
-                throw new Error(translate('Erreur_Creation_TEI'))
+                throw new Error(translate('Erreur_Creation_Enrollment'))
 
             const availableProgramStages = []
             const newEventsList = []
@@ -2857,11 +2856,24 @@ const Supervision = ({ me }) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {inputMeilleurPositif && [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].sort((a, b) => b.score - a.score).slice(0, parseInt(inputMeilleur || 0)).map((an, index) => (<tr style={{ backgroundColor: '#D3FFF3', color: '#000' }} key={index}> <td style={{ border: '1px solid #ccc', padding: '5px' }}><AntCheckbox onChange={() => handleSelectCheckbox(an?.orgUnit)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an.orgUnit?.id)} /></td> <td style={{ border: '1px solid #ccc', padding: '5px' }}>{`${an.orgUnit?.displayName} (  ${an.orgUnit?.parent?.displayName}  ) `}</td>{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.value) : '-'}</td>))}{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.score) : '-'}</td>))} </tr>))}
-                                {inputMeilleurPositif && [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].sort((a, b) => a.score - b.score).slice(0, parseInt(inputMauvais || 0)).map((an, index) => (<tr style={{ backgroundColor: '#FFDDD2', color: '#000' }} key={index}> <td style={{ border: '1px solid #ccc', padding: '5px' }}><AntCheckbox onChange={() => handleSelectCheckbox(an?.orgUnit)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an.orgUnit?.id)} /></td>  <td style={{ border: '1px solid #ccc', padding: '5px' }}>{`${an.orgUnit?.displayName} (  ${an.orgUnit?.parent?.displayName}  ) `}</td>{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.value) : '-'}</td>))}{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.score) : '-'}</td>))} </tr>))}
+                                {inputMeilleurPositif && [...analyticIndicatorResults
+                                    .reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])]
+                                    .sort((a, b) => b.score - a.score)
+                                    .slice(0, parseInt(inputMeilleur || 0))
+                                    .map((an, index) => (
+                                        <tr style={{ backgroundColor: '#D3FFF3', color: '#000' }} key={index}>
+                                            {console.log("Element : ", an)}
+                                            <td style={{ border: '1px solid #ccc', padding: '5px' }}>
+                                                <AntCheckbox onChange={() => handleSelectCheckbox(an?.orgUnit)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an.orgUnit?.id)} /></td>
+                                            <td style={{ border: '1px solid #ccc', padding: '5px' }}>{`${an.orgUnit?.displayName} (  ${an.orgUnit?.parent?.displayName}  ) `}</td>
+                                            {analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.value) : '-'}</td>))}
+                                            {analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.score) : '-'}</td>))}
+                                        </tr>
+                                    ))}
+                                {/* {inputMeilleurPositif && [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].sort((a, b) => a.score - b.score).slice(0, parseInt(inputMauvais || 0)).map((an, index) => (<tr style={{ backgroundColor: '#FFDDD2', color: '#000' }} key={index}> <td style={{ border: '1px solid #ccc', padding: '5px' }}><AntCheckbox onChange={() => handleSelectCheckbox(an?.orgUnit)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an.orgUnit?.id)} /></td>  <td style={{ border: '1px solid #ccc', padding: '5px' }}>{`${an.orgUnit?.displayName} (  ${an.orgUnit?.parent?.displayName}  ) `}</td>{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.value) : '-'}</td>))}{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.score) : '-'}</td>))} </tr>))}
 
                                 {!inputMeilleurPositif && [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].sort((a, b) => a.score - b.score).slice(0, parseInt(inputMeilleur || 0)).map((an, index) => (<tr style={{ backgroundColor: '#D3FFF3', color: '#000' }} key={index}> <td style={{ border: '1px solid #ccc', padding: '5px' }}><AntCheckbox onChange={() => handleSelectCheckbox(an?.orgUnit)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an.orgUnit?.id)} /></td>  <td style={{ border: '1px solid #ccc', padding: '5px' }}>{`${an.orgUnit?.displayName} (  ${an.orgUnit?.parent?.displayName}  ) `}</td>{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.value) : '-'}</td>))}{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.score) : '-'}</td>))} </tr>))}
-                                {!inputMeilleurPositif && [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].sort((a, b) => b.score - a.score).slice(0, parseInt(inputMauvais || 0)).map((an, index) => (<tr style={{ backgroundColor: '#FFDDD2', color: '#000' }} key={index}><td style={{ border: '1px solid #ccc', padding: '5px' }}><AntCheckbox onChange={() => handleSelectCheckbox(an?.orgUnit)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an.orgUnit?.id)} /></td>  <td style={{ border: '1px solid #ccc', padding: '5px' }}>{`${an.orgUnit?.displayName} (  ${an.orgUnit?.parent?.displayName}  ) `}</td>{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.value) : '-'}</td>))}{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.score) : '-'}</td>))} </tr>))}
+                                {!inputMeilleurPositif && [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].sort((a, b) => b.score - a.score).slice(0, parseInt(inputMauvais || 0)).map((an, index) => (<tr style={{ backgroundColor: '#FFDDD2', color: '#000' }} key={index}><td style={{ border: '1px solid #ccc', padding: '5px' }}><AntCheckbox onChange={() => handleSelectCheckbox(an?.orgUnit)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an.orgUnit?.id)} /></td>  <td style={{ border: '1px solid #ccc', padding: '5px' }}>{`${an.orgUnit?.displayName} (  ${an.orgUnit?.parent?.displayName}  ) `}</td>{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.value) : '-'}</td>))}{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.score) : '-'}</td>))} </tr>))} */}
                             </tbody>
                         </table>
                     </div>
