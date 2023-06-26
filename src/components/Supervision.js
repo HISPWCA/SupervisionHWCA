@@ -1737,7 +1737,7 @@ const Supervision = ({ me }) => {
                             isEditionMode && inputFields.length > 0 && (
                                 <div style={{ marginTop: '15px' }}>
                                     <Button icon={<FiSave style={{ color: '#fff', fontSize: '18px' }} />} onClick={handleSupervisionPlanificationSaveBtn} primary disabled={loadingSupervisionPlanification} loading={loadingSupervisionPlanification}>
-                                        { translate('Planifier_Supervision')}
+                                        {translate('Planifier_Supervision')}
                                     </Button>
                                 </div>
                             )
@@ -1834,7 +1834,7 @@ const Supervision = ({ me }) => {
                             dataStoreSupervisionConfigs
                                 .filter(sup => sup.planificationType === ORGANISATION_UNIT)
                                 .length === 0 && (
-                                <div style={{ fontWeight: 'bold' }}> { translate('Aucun_Programme_Supervision')} </div>
+                                <div style={{ fontWeight: 'bold' }}> {translate('Aucun_Programme_Supervision')} </div>
                             )
                         }
 
@@ -1843,7 +1843,7 @@ const Supervision = ({ me }) => {
                             dataStoreSupervisionConfigs
                                 .filter(sup => sup.generationType === TYPE_GENERATION_AS_EVENT && sup.planificationType === AGENT)
                                 .length === 0 && (
-                                <div style={{ fontWeight: 'bold' }}>  { translate('Aucun_Programme_Supervision')}</div>
+                                <div style={{ fontWeight: 'bold' }}>  {translate('Aucun_Programme_Supervision')}</div>
                             )
                         }
                     </div>
@@ -1885,7 +1885,7 @@ const Supervision = ({ me }) => {
     const RenderSupervisionPlanificationOrganisationUnitContent = () => (
         <div style={{ marginTop: '10px' }}>
             <Card bodyStyle={{ padding: '0px' }} className='my-shadow' size='small'>
-                <div style={{ fontWeight: 'bold', padding: '10px', borderBottom: '1px solid #ccc' }}> { translate('Planification_Sur_Org_Units')}  </div>
+                <div style={{ fontWeight: 'bold', padding: '10px', borderBottom: '1px solid #ccc' }}> {translate('Planification_Sur_Org_Units')}  </div>
                 <div style={{ padding: '10px' }}>
                     <div>
                         <div style={{ marginBottom: '5px' }}>{translate('Unites_Organisation')}</div>
@@ -1907,15 +1907,15 @@ const Supervision = ({ me }) => {
         <>
             <div style={{ marginTop: '10px' }}>
                 <Card bodyStyle={{ padding: '0px' }} className='my-shadow' size='small'>
-                    <div style={{ fontWeight: 'bold', padding: '10px', borderBottom: '1px solid #ccc' }}> { translate('Planification_Sur_Performances')} </div>
+                    <div style={{ fontWeight: 'bold', padding: '10px', borderBottom: '1px solid #ccc' }}> {translate('Planification_Sur_Performances')} </div>
                     <div style={{ padding: '10px' }}>
-                        <div>  { translate('Indicateurs')}</div>
+                        <div>  {translate('Indicateurs')}</div>
                         <Select
                             options={dataStoreIndicatorConfigs.map(ind => ({ label: ind.indicator?.displayName, value: ind.indicator?.id }))}
                             loading={loadingDataStoreIndicatorConfigs}
                             disabled={loadingDataStoreIndicatorConfigs}
                             showSearch
-                            placeholder={ translate('Indicateurs')}
+                            placeholder={translate('Indicateurs')}
                             style={{ width: '100%' }}
                             optionFilterProp='label'
                             mode='multiple'
@@ -2028,10 +2028,11 @@ const Supervision = ({ me }) => {
             <Card bodyStyle={{ padding: '0px' }} className="my-shadow" size='small'>
                 <div style={{ padding: '10px', borderBottom: '1px solid #ccc' }}>
                     <div>
-                        Configuration des champs de saisie
+                        {translate('Configuration_Des_Champs_De_Saisie')}
+
                     </div>
                     <div style={{ marginTop: '10px', color: '#00000080', fontSize: '13px' }}>
-                        Configurer les éléments de données dans lesquels vous souhaitez insérer les informations entrées dans le formulaire(s)
+                        {translate('Configuration_Element_De_Donner')}
                     </div>
                 </div>
                 <div style={{ padding: '10px' }}>
@@ -2050,7 +2051,7 @@ const Supervision = ({ me }) => {
                             <Card bodyStyle={{ padding: '0px' }} className="my-shadow" size='small'>
                                 <div style={{ background: '#0A9396', color: '#FFF', fontWeight: 'bold', padding: '10px', position: 'relative' }}>
                                     <span>
-                                        Formulaire de planification sur
+                                        {translate('Formulaire_De_Planification')}
                                     </span>
                                     {
                                         org && (
@@ -2071,8 +2072,8 @@ const Supervision = ({ me }) => {
 
                                     <span className="delete-sup"  >
                                         <Popconfirm
-                                            title="Suppression"
-                                            description="Voulez-vous vraiment supprimer ce formulaire ? "
+                                            title={translate('Suppression')}
+                                            description={translate('Confirmation_Suppression_Du_Formulaire')}
                                             icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
                                             onConfirm={() => handleCloseOrgUnitForm(org, index)}
                                         >
@@ -2084,10 +2085,10 @@ const Supervision = ({ me }) => {
                                     <Row gutter={[10, 10]}>
                                         <Col sm={24} md={24}>
                                             <div>
-                                                <div style={{ marginBottom: '5px' }}>Période</div>
+                                                <div style={{ marginBottom: '5px' }}>{translate('Periode')}</div>
                                                 <DatePicker
                                                     style={{ width: '100%' }}
-                                                    placeholder='Période'
+                                                    placeholder={translate('Periode')}
                                                     value={inputFields[index]?.period}
                                                     onChange={period => handleInputPeriod(period, index)}
                                                 />
@@ -2096,9 +2097,9 @@ const Supervision = ({ me }) => {
                                         {
                                             0 > 1 && <Col sm={24} md={12}>
                                                 <div>
-                                                    <div style={{ marginBottom: '5px' }}>Libellé</div>
+                                                    <div style={{ marginBottom: '5px' }}>{translate('Libelle')}</div>
                                                     <Input
-                                                        placeholder="Libellé"
+                                                        placeholder={translate('Libelle')}
                                                         style={{ width: '100%' }}
                                                         value={inputFields[index]?.libelle}
                                                         onChange={event => handleInputLibelle(event, index)}
@@ -2108,9 +2109,9 @@ const Supervision = ({ me }) => {
                                         }
                                         <Col sm={24} md={24}>
                                             <div>
-                                                <div style={{ marginBottom: '5px' }}>Superviseurs</div>
+                                                <div style={{ marginBottom: '5px' }}>{translate('Superviseurs')}</div>
                                                 <Select
-                                                    placeholder="Superviseurs"
+                                                    placeholder={translate('Superviseurs')}
                                                     style={{ width: '100%' }}
                                                     loading={loadingUsers}
                                                     disabled={loadingUsers}
@@ -2125,11 +2126,11 @@ const Supervision = ({ me }) => {
                                         </Col>
                                         <Col md={24}>
                                             <div>
-                                                <div style={{ marginBottom: '5px' }}>Autre superviseurs</div>
+                                                <div style={{ marginBottom: '5px' }}>{translate('Autre_Superviseurs')}</div>
                                                 <Row gutter={[10, 10]}>
                                                     <Col md={19} sm={24}>
                                                         <Input
-                                                            placeholder='Autre superviseur'
+                                                            placeholder={translate('Autre_Superviseurs')}
                                                             value={inputFields[index]?.inputOtherSupervisor}
                                                             onChange={event => handleInputOtherSupervisor(event, index)}
                                                         />
@@ -2141,7 +2142,7 @@ const Supervision = ({ me }) => {
                                                             disabled={
                                                                 inputFields[index]?.inputOtherSupervisor?.trim() && !inputFields[index]?.otherSupervisorList?.includes(inputFields[index]?.inputOtherSupervisor?.trim()) ? false : true
                                                             }
-                                                        >+ Ajouter </Button>
+                                                        >+ {translate('Ajouter')} </Button>
                                                     </Col>
                                                 </Row>
                                             </div>
@@ -2161,8 +2162,8 @@ const Supervision = ({ me }) => {
                                                                         <div>{item}</div>
                                                                         <div>
                                                                             <Popconfirm
-                                                                                title="Suppression"
-                                                                                description="Voulez-vous vraiment supprimer ce superviseur ? "
+                                                                                title={translate('Suppression')}
+                                                                                description={translate('Confirmation_Suppression_Superviseur')}
                                                                                 icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
                                                                                 onConfirm={() => handleDeleteOtherSupervisor(item, index)}
                                                                             >
@@ -2201,7 +2202,7 @@ const Supervision = ({ me }) => {
                             <Card bodyStyle={{ padding: '0px' }} className="my-shadow" size='small'>
                                 <div style={{ background: '#0A9396', color: '#FFF', fontWeight: 'bold', padding: '10px', position: 'relative' }}>
                                     <span>
-                                        Formulaire de planification sur
+                                        {translate('Formulaire_De_Planification')}
                                     </span>
 
                                     <span
@@ -2221,8 +2222,8 @@ const Supervision = ({ me }) => {
 
                                     <span className="delete-sup"  >
                                         <Popconfirm
-                                            title="Suppression"
-                                            description="Voulez-vous vraiment supprimer ce formulaire ? "
+                                            title={translate('Suppression')}
+                                            description={translate('Confirmation_Suppression_Du_Formulaire')}
                                             icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
                                             onConfirm={() => handleCloseAgentForm(agent)}
                                         >
@@ -2234,10 +2235,10 @@ const Supervision = ({ me }) => {
                                     <Row gutter={[10, 10]}>
                                         <Col sm={24} md={24}>
                                             <div>
-                                                <div style={{ marginBottom: '5px' }}>Période</div>
+                                                <div style={{ marginBottom: '5px' }}>{translate('Periode')}</div>
                                                 <DatePicker
                                                     style={{ width: '100%' }}
-                                                    placeholder='Période'
+                                                    placeholder={translate('Periode')}
                                                     value={inputFields[index]?.period}
                                                     onChange={period => handleInputPeriod(period, index)}
                                                 />
@@ -2246,9 +2247,9 @@ const Supervision = ({ me }) => {
                                         {
                                             0 > 1 && <Col sm={24} md={12}>
                                                 <div>
-                                                    <div style={{ marginBottom: '5px' }}>Libellé</div>
+                                                    <div style={{ marginBottom: '5px' }}>{translate('Libelle')}</div>
                                                     <Input
-                                                        placeholder="Libellé"
+                                                        placeholder={translate('Libelle')}
                                                         style={{ width: '100%' }}
                                                         value={inputFields[index]?.libelle}
                                                         onChange={event => handleInputLibelle(event, index)}
@@ -2261,9 +2262,9 @@ const Supervision = ({ me }) => {
                                             selectedProgram?.paymentConfigs?.length > 0 && (
                                                 <Col sm={24} md={24}>
                                                     <div>
-                                                        <div style={{ marginBottom: '5px' }}>Critères de paiement</div>
+                                                        <div style={{ marginBottom: '5px' }}>{translate('Criteres_De_Paiement')}</div>
                                                         <Select
-                                                            placeholder="Critères de paiement"
+                                                            placeholder={translate('Criteres_De_Paiement')}
                                                             style={{ width: '100%' }}
                                                             loading={loadingDataStoreSupervisionConfigs}
                                                             disabled={loadingDataStoreSupervisionConfigs}
@@ -2281,9 +2282,9 @@ const Supervision = ({ me }) => {
 
                                         <Col sm={24} md={24}>
                                             <div>
-                                                <div style={{ marginBottom: '5px' }}>Superviseurs</div>
+                                                <div style={{ marginBottom: '5px' }}>{translate('Superviseurs')}</div>
                                                 <Select
-                                                    placeholder="Superviseurs"
+                                                    placeholder={translate('Superviseurs')}
                                                     style={{ width: '100%' }}
                                                     loading={loadingUsers}
                                                     disabled={loadingUsers}
@@ -2298,11 +2299,11 @@ const Supervision = ({ me }) => {
                                         </Col>
                                         <Col md={24}>
                                             <div>
-                                                <div style={{ marginBottom: '5px' }}>Autre superviseurs</div>
+                                                <div style={{ marginBottom: '5px' }}>{translate('Autre_Superviseurs')}</div>
                                                 <Row gutter={[10, 10]}>
                                                     <Col md={18} sm={24}>
                                                         <Input
-                                                            placeholder='Autre superviseur'
+                                                            placeholder={translate('Autre_Superviseurs')}
                                                             value={inputFields[index]?.inputOtherSupervisor}
                                                             onChange={event => handleInputOtherSupervisor(event, index)}
                                                         />
@@ -2314,7 +2315,7 @@ const Supervision = ({ me }) => {
                                                             disabled={
                                                                 inputFields[index]?.inputOtherSupervisor?.trim() && !inputFields[index]?.otherSupervisorList?.includes(inputFields[index]?.inputOtherSupervisor?.trim()) ? false : true
                                                             }
-                                                        >+ Ajouter </Button>
+                                                        >+ {translate('Ajouter')} </Button>
                                                     </Col>
                                                 </Row>
                                             </div>
@@ -2334,8 +2335,8 @@ const Supervision = ({ me }) => {
                                                                         <div>{item}</div>
                                                                         <div>
                                                                             <Popconfirm
-                                                                                title="Suppression"
-                                                                                description="Voulez-vous vraiment supprimer ce superviseur ? "
+                                                                                title={translate('Suppression')}
+                                                                                description={translate('Confirmation_Suppression_Superviseur')}
                                                                                 icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
                                                                                 onConfirm={() => handleDeleteOtherSupervisor(item, index)}
                                                                             >
@@ -2409,19 +2410,19 @@ const Supervision = ({ me }) => {
             setAnalyticErrorMessage(null)
 
             if (!selectedOrganisationUnits)
-                throw new Error("L'unité d'organisation est obligatoire !")
+                throw new Error(translate('Unite_Organisation_Obligatoire'))
 
             if (!selectedIndicators || selectedIndicators.length === 0)
-                throw new Error("Veuillez sélectionner les indicateurs de recherches !")
+                throw new Error(translate('Veuillez_Selectionner_Les_Indicateurs'))
 
             if (!selectedOrganisationUnitGroupSet)
-                throw new Error("Ensemble de Groupes d'Unitees d'Organisation est obligatoire ")
+                throw new Error(translate('OrgUnitGroupSet_Obligatoire'))
 
             if (!selectedOrganisationUnitGroup)
-                throw new Error("Groupes d'Unitées d'Organisation !")
+                throw new Error(translate('OrgUnitGroup_Obligatoire'))
 
             if (!selectedPeriod)
-                throw new Error("Veuillez sélectionner la période !")
+                throw new Error(translate('Veuillez_Selectionner_Periode'))
 
             const route = `${ANALYTICS_ROUTE}?dimension=dx:${selectedIndicators.map(ind => ind.indicator?.id).join(';')},ou:${selectedOrganisationUnitInd?.id};OU_GROUP-${selectedOrganisationUnitGroup?.id}&filter=pe:${formatPeriod(selectedPeriod, selectedPeriodType)}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=true&includeNumDen=true&skipRounding=false&completedOnly=false&outputIdScheme=UID`
             const response = await axios.get(route)
@@ -2458,7 +2459,7 @@ const Supervision = ({ me }) => {
 
             setAnalyticIndicatorResults(availableIndicators)
             if (response.data.rows.length === 0) {
-                setAnalyticErrorMessage("Aucun donnés n'a été trouvé pour cette sélection")
+                setAnalyticErrorMessage(translate('Aucun_Donne_Trouver_Pour_Cette_Selection'))
             }
 
             setLoadingAnalyticIndicatorResults(false)
@@ -2474,14 +2475,14 @@ const Supervision = ({ me }) => {
             <Card bodyStyle={{ padding: '0px' }} className="my-shadow" size='small'>
                 <div style={{ background: '#0A9396', color: '#FFF', fontWeight: 'bold', padding: '10px' }}>
                     <span>
-                        Critères de recherches
+                        {translate('Criteres_De_Recherches')}
                     </span>
                 </div>
                 <div style={{ marginTop: '5px', padding: '10px' }}>
                     <Row gutter={[10, 10]}>
                         <Col sm={24} md={6}>
                             <div>
-                                <div style={{ marginBottom: '5px' }}>Unités d'organisation</div>
+                                <div style={{ marginBottom: '5px' }}>{translate('Unites_Organisation')}</div>
                                 <OrganisationUnitsTree
                                     meOrgUnitId={me?.organisationUnits[0]?.id}
                                     orgUnits={organisationUnits}
@@ -2492,21 +2493,21 @@ const Supervision = ({ me }) => {
                             </div>
                         </Col>
                         <Col sm={24} md={6}>
-                            <div style={{ marginBottom: '5px' }}>Meilleur</div>
+                            <div style={{ marginBottom: '5px' }}>{translate('Meilleur')}</div>
                             <InputNumber
                                 style={{ width: '100%' }}
-                                placeholder='Meilleur'
+                                placeholder={translate('Meilleur')}
                                 value={inputMeilleur}
                                 onChange={value => setInputMeilleur(value || 0)}
                             />
                         </Col>
                         <Col sm={24} md={6}>
-                            <div style={{ marginBottom: '5px' }}>Mauvais</div>
+                            <div style={{ marginBottom: '5px' }}>{translate('Mauvais')}</div>
                             <InputNumber
                                 onChange={value => setInputMauvais(value || 0)}
                                 value={inputMauvais}
                                 style={{ width: '100%' }}
-                                placeholder='Mauvais'
+                                placeholder={translate('Mauvais')}
                             />
                         </Col>
                         <Col sm={24} md={6}>
@@ -2519,14 +2520,14 @@ const Supervision = ({ me }) => {
                             </div>
                         </Col>
                         <Col sm={24} md={6}>
-                            <div style={{ marginBottom: '5px' }}>Ensemble de Groupes d'Unitees d'Organisation</div>
+                            <div style={{ marginBottom: '5px' }}>{translate('OrgUnitGroupSet')}</div>
                             <Select
                                 style={{ width: '100%' }}
                                 options={organisationUnitGroupSets.map(org => ({ label: org.displayName, value: org.id }))}
                                 value={selectedOrganisationUnitGroupSet?.id}
                                 disabled={loadingOrganisationUnitGroupSets}
                                 loading={loadingOrganisationUnitGroupSets}
-                                placeholder="Ensemble de Groupes d'Unitees d'Organisation"
+                                placeholder={translate('OrgUnitGroups')}
                                 onChange={handleSelectOrganisationUnitGroupSet}
                             />
                         </Col>
@@ -2534,13 +2535,13 @@ const Supervision = ({ me }) => {
                             selectedOrganisationUnitGroupSet && (
                                 <Col sm={24} md={6}>
                                     <div style={{ marginTop: '20px' }}>
-                                        <div style={{ marginBottom: '5px' }}>Groupes d'Unitées d'Organisation</div>
+                                        <div style={{ marginBottom: '5px' }}>{translate('OrgUnitGroups')}</div>
                                         <Select
                                             style={{ width: '100%' }}
                                             options={selectedOrganisationUnitGroupSet?.organisationUnitGroups?.map(org => ({ value: org.id, label: org.displayName }))}
                                             value={selectedOrganisationUnitGroup?.id}
                                             onChange={handleSelectOrganisationUnitGroup}
-                                            placeholder="Groupes d'Unitees d'Organisation"
+                                            placeholder={translate('OrgUnitGroups')}
                                         />
                                     </div>
                                 </Col>
@@ -2549,11 +2550,11 @@ const Supervision = ({ me }) => {
                         {
                             selectedOrganisationUnitGroup && (<Col sm={24} md={6}>
                                 <div style={{ marginTop: '20px' }}>
-                                    <div style={{ marginBottom: '5px' }}>Type de Période</div>
+                                    <div style={{ marginBottom: '5px' }}>{translate('Type_Periode')}</div>
                                     <Select
                                         style={{ width: '100%' }}
                                         options={periodTypesOptions()}
-                                        placeholder="Type de Période"
+                                        placeholder={translate('Type_Periode')}
                                         onChange={handleSelectPeriodType}
                                         value={selectedPeriodType}
                                     />
@@ -2565,10 +2566,10 @@ const Supervision = ({ me }) => {
                             selectedPeriodType && (
                                 <Col sm={24} md={6}>
                                     <div style={{ marginTop: '20px' }}>
-                                        <div style={{ marginBottom: '5px' }}>Période</div>
+                                        <div style={{ marginBottom: '5px' }}>{translate('Periode')}</div>
                                         <DatePicker
                                             style={{ width: '100%' }}
-                                            placeholder="Période"
+                                            placeholder={translate('Periode')}
                                             onChange={handleSelectPeriode}
                                             value={selectedPeriod}
                                             picker={selectedPeriodType?.toLocaleLowerCase()}
@@ -2582,7 +2583,7 @@ const Supervision = ({ me }) => {
                             <Button
                                 loading={loadingAnalyticIndicatorResults}
                                 disabled={selectedOrganisationUnitInd && selectedOrganisationUnitGroup && selectedIndicators.length > 0 && selectedOrganisationUnitGroupSet && selectedPeriod && (parseInt(inputMeilleur || 0) + parseInt(inputMauvais || 0)) > 0 ? false : true}
-                                primary onClick={handleDisplayIndicatorResult}>Afficher les résultats</Button>
+                                primary onClick={handleDisplayIndicatorResult}>{translate('Afficher_Resultats')}</Button>
                         </Col>
                     </Row>
                 </div>
@@ -2602,7 +2603,7 @@ const Supervision = ({ me }) => {
             {
                 mappingConfigs.length > 0 && (
                     <div className='my-shadow' style={{ padding: '10px', background: '#FFF', marginBottom: '2px', borderRadius: '8px', marginTop: '10px' }}>
-                        <div style={{ marginBottom: '10px', fontWeight: 'bold', fontSize: '16px' }}>Liste des configurations des éléments de données </div>
+                        <div style={{ marginBottom: '10px', fontWeight: 'bold', fontSize: '16px' }}>{translate('Liste_Configuration_Element_De_Donnees')}</div>
                         <Table
                             dataSource={
                                 mappingConfigs.map(mapConf => ({
@@ -2617,29 +2618,29 @@ const Supervision = ({ me }) => {
                             columns={
                                 [
                                     {
-                                        title: 'Program',
+                                        title: translate('Programme'),
                                         dataIndex: 'programName'
                                     },
                                     {
-                                        title: 'Program Stage',
+                                        title: translate('Programme_Stage'),
                                         dataIndex: 'programStageName'
                                     },
                                     {
-                                        title: 'Element de donnée',
+                                        title: translate('Element_De_Donnee'),
                                         dataIndex: 'dataElementName'
                                     },
                                     {
-                                        title: 'Indicateur',
+                                        title: translate('Indicateur'),
                                         dataIndex: 'indicatorName'
                                     },
                                     {
-                                        title: 'Actions',
+                                        title: translate('Actions'),
                                         dataIndex: 'action',
                                         width: '80px',
                                         render: value => (
                                             <Popconfirm
-                                                title="Suppression de la configuration"
-                                                description="Voulez-vous vraiment supprimer cette configuration "
+                                                title={translate('Suppression')}
+                                                description={translate('Confirmation_Suppression_Configuration')}
                                                 icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
                                                 onConfirm={() => handleDeleteConfigItem(value)}
                                             >
@@ -2680,10 +2681,10 @@ const Supervision = ({ me }) => {
                 className='stepper'
                 steps={[
                     {
-                        label: 'Configuration',
+                        label: translate('Configuration'),
                     },
                     {
-                        label: 'Finalisation',
+                        label: translate('Finalisation'),
                     },
                 ]}
             />
@@ -2705,7 +2706,7 @@ const Supervision = ({ me }) => {
     const RenderAnalyticComponentModal = () => visibleAnalyticComponentModal ? (
         <Modal onClose={() => handleCancelAnalyticComponentModal()} large>
             <ModalTitle>
-                Source de donnée
+                {translate('Source_De_Donnee')}
             </ModalTitle>
             <ModalContent>
                 <div>
@@ -2721,10 +2722,10 @@ const Supervision = ({ me }) => {
             <ModalActions>
                 <ButtonStrip end>
                     <Button destructive onClick={() => handleCancelAnalyticComponentModal()} icon={<CgCloseO style={{ fontSize: "18px" }} />}>
-                        Annuler
+                        {translate('Annuler')}
                     </Button>
                     <Button primary onClick={() => handleOkAnalyticComponentModal()} icon={<FiSave style={{ fontSize: "18px" }} />}>
-                        Enrégistrer
+                        {translate('Enregistrer')}
                     </Button>
                 </ButtonStrip>
             </ModalActions>
@@ -2735,14 +2736,14 @@ const Supervision = ({ me }) => {
         <div className='my-shadow' style={{ padding: '20px', background: '#FFF', marginBottom: '2px', borderRadius: '8px', marginTop: '10px' }}>
             <Row gutter={[10, 10]}>
                 <Col md={24}>
-                    <div style={{ fontWeight: 'bold' }}>Configurations globales</div>
+                    <div style={{ fontWeight: 'bold' }}>{translate('Configurations_Globales')}</div>
                 </Col>
                 <Col md={24}>
                     <div style={{ marginTop: '10px' }}>
-                        <div style={{ marginBottom: '5px' }}>Programmes Stage</div>
+                        <div style={{ marginBottom: '5px' }}>{translate('Programmes_Stage')}</div>
                         <Select
                             options={programStages.map(program => ({ label: program.displayName, value: program.id }))}
-                            placeholder="Choisir le program stage"
+                            placeholder={translate('Programmes_Stage')}
                             style={{ width: '100%' }}
                             optionFilterProp='label'
                             value={selectedProgramStage?.id}
@@ -2761,8 +2762,8 @@ const Supervision = ({ me }) => {
                             {
                                 selectedProgramStage && (
                                     <Button icon={isNewMappingMode && <ImCancelCircle style={{ color: '#fff', fontSize: '18px' }} />} primary={!isNewMappingMode ? true : false} destructive={isNewMappingMode ? true : false} onClick={handleAddNewMappingConfig}>
-                                        {!isNewMappingMode && <span>+ Ajouter nouveau mapping</span>}
-                                        {isNewMappingMode && <span>Annuler le mapping</span>}
+                                        {!isNewMappingMode && <span>+ {translate('Ajouter_Nouveau_Mapping')}</span>}
+                                        {isNewMappingMode && <span>{translate('Annuler_Le_Mapping')}</span>}
                                     </Button>
                                 )
                             }
@@ -2775,10 +2776,10 @@ const Supervision = ({ me }) => {
                                                 selectedProgramStage && (
                                                     <Col md={12} xs={24}>
                                                         <div>
-                                                            <div style={{ marginBottom: '5px' }}>Eléments de données</div>
+                                                            <div style={{ marginBottom: '5px' }}>{translate('Elements_De_Donnees')}</div>
                                                             <Select
                                                                 options={selectedProgramStage?.programStageDataElements?.map(progStageDE => ({ label: progStageDE.dataElement?.displayName, value: progStageDE.dataElement?.id }))}
-                                                                placeholder="Element de donnée"
+                                                                placeholder={translate('Elements_De_Donnees')}
                                                                 style={{ width: '100%' }}
                                                                 onChange={handleSelectDataElement}
                                                                 value={selectedDataElement?.id}
@@ -2792,9 +2793,9 @@ const Supervision = ({ me }) => {
 
                                             <Col md={10} xs={24}>
                                                 <div>
-                                                    <div style={{ marginBottom: '5px' }}>Source de donnée</div>
+                                                    <div style={{ marginBottom: '5px' }}>{translate('Source_De_Donnee')}</div>
                                                     <Input
-                                                        placeholder='Source de donnée'
+                                                        placeholder={translate('Source_De_Donnee')}
                                                         style={{ width: '100%' }}
                                                         value={inputDataSourceDisplayName}
                                                         onChange={event => {
@@ -2810,7 +2811,7 @@ const Supervision = ({ me }) => {
                                             </Col>
                                             <Col md={24} xs={24}>
                                                 <div style={{ marginTop: '18px' }}>
-                                                    <Button loading={loadingSaveDateElementMappingConfig} disabled={loadingSaveDateElementMappingConfig} primary onClick={handleSaveNewMappingConfig}>+ Ajouter </Button>
+                                                    <Button loading={loadingSaveDateElementMappingConfig} disabled={loadingSaveDateElementMappingConfig} primary onClick={handleSaveNewMappingConfig}>+ {translate('Ajouter')} </Button>
                                                 </div>
                                             </Col>
                                         </Row>
@@ -2842,7 +2843,7 @@ const Supervision = ({ me }) => {
                             <thead>
                                 <tr style={{ backgroundColor: '#fff' }}>
                                     <th style={{ border: '1px solid #ccc', padding: '5px' }}></th>
-                                    <th style={{ border: '1px solid #ccc', padding: '5px' }}>Organisation unit</th>
+                                    <th style={{ border: '1px solid #ccc', padding: '5px' }}>{translate('Unite_Organisation')}</th>
                                     {
                                         analyticIndicatorResults.map((result, index) => (
                                             <th key={index} style={{ border: '1px solid #ccc', padding: '5px' }}>{result.indicator?.displayName}</th>
@@ -2907,7 +2908,7 @@ const Supervision = ({ me }) => {
             <div>
                 <Card size='small' className='my-shadow'>
                     <div style={{ maxWidth: '500px' }}>
-                        <div style={{ marginBottom: '5px' }}>Unités d'organisation</div>
+                        <div style={{ marginBottom: '5px' }}>{translate('Unites_Organisation')}</div>
                         <OrganisationUnitsTree
                             meOrgUnitId={me?.organisationUnits[0]?.id}
                             orgUnits={organisationUnits}
@@ -2925,16 +2926,13 @@ const Supervision = ({ me }) => {
                     <div style={{ marginTop: '10px' }}>
                         <Card size='small' className='my-shadow'>
                             <>
-                                <div style={{ fontWeight: 'bold' }}>Liste des Agents</div>
-
-
-
+                                <div style={{ fontWeight: 'bold' }}>{translate('Liste_Des_Agents')}</div>
                                 {
                                     loadingTeiList && (
                                         <div style={{ marginTop: '20px' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', }}>
                                                 <CircularLoader small />
-                                                <span style={{ marginLeft: '20px' }}>Chargement...</span>
+                                                <span style={{ marginLeft: '20px' }}>{translate('Chargement')}...</span>
                                             </div>
                                         </div>
                                     )
@@ -2966,7 +2964,7 @@ const Supervision = ({ me }) => {
                                                             }
                                                             columns={[
                                                                 {
-                                                                    title: 'Actions', width: '100px', dataIndex: 'tei', key: 'action', render: value => (
+                                                                    title: translate('Actions'), width: '100px', dataIndex: 'tei', key: 'action', render: value => (
                                                                         <div>
                                                                             <AntCheckbox onChange={() => handleSelectCheckboxAgent(value)} checked={selectedAgents.map(ag => ag.trackedEntityInstance).includes(value.trackedEntityInstance)} />
                                                                         </div>
@@ -2985,7 +2983,7 @@ const Supervision = ({ me }) => {
                                 {
                                     isEmpty && (
                                         <div style={{ marginTop: '20px' }}>
-                                            <span style={{ fontWeight: 'bold', color: '#00000090' }}> Aucun Agent trouvé !</span>
+                                            <span style={{ fontWeight: 'bold', color: '#00000090' }}> {translate('Aucun_Agent_Trouve')}</span>
                                         </div>
                                     )
                                 }
@@ -2995,11 +2993,6 @@ const Supervision = ({ me }) => {
                     </div>
                 )
             }
-
-            {
-
-            }
-
         </>
     )
 
@@ -3012,12 +3005,12 @@ const Supervision = ({ me }) => {
                             <Col md={24}>
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'right' }}>
                                     <div>
-                                        <Button primary small disabled={selectedStep === 0 ? true : false} icon={<BsArrowLeft style={{ color: '#fff', fontSize: '18px' }} />} onClick={() => setSelectedStep(selectedStep - 1)}>Précédent</Button>
+                                        <Button primary small disabled={selectedStep === 0 ? true : false} icon={<BsArrowLeft style={{ color: '#fff', fontSize: '18px' }} />} onClick={() => setSelectedStep(selectedStep - 1)}>{translate('Precedent')}</Button>
                                     </div>
                                     <div style={{ marginLeft: '10px' }}>
                                         <Button
                                             disabled={selectedSupervisionType === TYPE_SUPERVISION_AGENT ? selectedAgents.length > 0 ? false : true : false}
-                                            icon={<BsArrowRight style={{ color: '#fff', fontSize: '18px' }} />} primary small onClick={() => setSelectedStep(selectedStep + 1)}>Suivant</Button>
+                                            icon={<BsArrowRight style={{ color: '#fff', fontSize: '18px' }} />} primary small onClick={() => setSelectedStep(selectedStep + 1)}>{translate('Suivant')}</Button>
                                     </div>
                                 </div>
                             </Col>
@@ -3044,10 +3037,10 @@ const Supervision = ({ me }) => {
                             <Col md={24}>
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'right' }}>
                                     <div >
-                                        <Button primary small icon={<BsArrowLeft style={{ color: '#fff', fontSize: '18px' }} />} onClick={() => setSelectedStep(selectedStep - 1)}>Précédent</Button>
+                                        <Button primary small icon={<BsArrowLeft style={{ color: '#fff', fontSize: '18px' }} />} onClick={() => setSelectedStep(selectedStep - 1)}>{translate('Precedent')}</Button>
                                     </div>
                                     <div style={{ marginLeft: '10px' }}>
-                                        <Button disabled={selectedStep === 1 ? true : false} icon={<BsArrowRight style={{ color: '#fff', fontSize: '18px' }} />} primary small onClick={() => setSelectedStep(selectedStep + 1)}>Suivant</Button>
+                                        <Button disabled={selectedStep === 1 ? true : false} icon={<BsArrowRight style={{ color: '#fff', fontSize: '18px' }} />} primary small onClick={() => setSelectedStep(selectedStep + 1)}>{translate('Suivant')}</Button>
                                     </div>
                                 </div>
                             </Col>
@@ -3084,13 +3077,12 @@ const Supervision = ({ me }) => {
                                             {
                                                 selectedPeriod &&
                                                 <div>
-                                                    <span>Période sélectionnée:</span> <strong> {dayjs(selectedPeriod).format(' MMMM, YYYY')} </strong> /
-                                                    <span>Meilleur Positif:</span> <strong> {inputMeilleurPositif ? 'Oui' : 'No'} </strong> /
+                                                    <span>{translate('Periode_Selectionner')}:</span> <strong> {dayjs(selectedPeriod).format(' MMMM, YYYY')} </strong> /
+                                                    <span>{translate('Meilleur_Positif')}:</span> <strong> {inputMeilleurPositif ? translate('Oui') : translate('Non')} </strong> /
                                                     {analyticIndicatorResults.map(ind => <> <span className="ml-2">{ind.indicator?.displayName}:</span> <strong>{ind.weight}</strong> </>)}
                                                 </div>
                                             }
                                         </div>
-
                                         {analyticErrorMessage && <div style={{ marginTop: '20px' }}> <NoticeBox error > {analyticErrorMessage} </NoticeBox> </div>}
                                     </Card>
                                 </Col>
@@ -3223,7 +3215,7 @@ const Supervision = ({ me }) => {
                 loadingDataStoreSupervisionConfigs && (
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <CircularLoader small />
-                        <span style={{ marginLeft: '10px' }}>Chargement...</span>
+                        <span style={{ marginLeft: '10px' }}>{translate('Chargement')}...</span>
                     </div>
                 )
             }
