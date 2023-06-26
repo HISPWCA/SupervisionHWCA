@@ -1757,10 +1757,11 @@ const Setting = () => {
                     <Tab selected={renderPage === PAGE_CONFIGURATION_TYPE_SUPERVISIONS} onClick={_ => setRenderPage(PAGE_CONFIGURATION_TYPE_SUPERVISIONS)}>
                         Type de supervisions
                     </Tab>
-
-                    <Tab selected={renderPage === PAGE_CONFIGURATION_USER_AUTHORIZATIONS} onClick={_ => setRenderPage(PAGE_CONFIGURATION_USER_AUTHORIZATIONS)}>
-                        Authorisations des utilisateurs
-                    </Tab>
+                    {0 > 1 &&
+                        <Tab selected={renderPage === PAGE_CONFIGURATION_USER_AUTHORIZATIONS} onClick={_ => setRenderPage(PAGE_CONFIGURATION_USER_AUTHORIZATIONS)}>
+                            Authorisations des utilisateurs
+                        </Tab>
+                    }
                 </TabBar>
                 <div style={{ padding: '20px', marginTop: '20px' }}>
                     {renderPage === PAGE_CONFIGURATION_TYPE_SUPERVISIONS && RenderTypeSupervisionContent()}
