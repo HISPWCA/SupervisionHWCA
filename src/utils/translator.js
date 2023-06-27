@@ -6,8 +6,7 @@ const translate = entry => {
             return Fr[entry]
 
         case 'en':
-            return Fr[entry]
-            // return En[entry]
+            return En[entry]
 
         default:
             return entry

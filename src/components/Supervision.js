@@ -2862,7 +2862,6 @@ const Supervision = ({ me }) => {
                                     .slice(0, parseInt(inputMeilleur || 0))
                                     .map((an, index) => (
                                         <tr style={{ backgroundColor: '#D3FFF3', color: '#000' }} key={index}>
-                                            {console.log("Element : ", an)}
                                             <td style={{ border: '1px solid #ccc', padding: '5px' }}>
                                                 <AntCheckbox onChange={() => handleSelectCheckbox(an?.orgUnit)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an.orgUnit?.id)} /></td>
                                             <td style={{ border: '1px solid #ccc', padding: '5px' }}>{`${an.orgUnit?.displayName} (  ${an.orgUnit?.parent?.displayName}  ) `}</td>
