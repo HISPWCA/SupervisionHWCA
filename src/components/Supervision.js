@@ -279,6 +279,7 @@ const Supervision = ({ me }) => {
                 throw new Error(translate('Erreur_Recuperation_Me'))
 
             setLoadingOrganisationUnits(true)
+            setLoadingDataStoreSupervisionConfigs(true)
 
             const userOrganisationUnitId = me.organisationUnits?.length > 0 && me.organisationUnits?.[0].id
 
