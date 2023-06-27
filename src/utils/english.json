@@ -160,5 +160,9 @@
     "Liste_Element_Configurer": "List of configured elements",
     "Type": "Type",
     "Indicateur": "Indicator",
-    "Source_De_Donnee":"Data source"
+    "Source_De_Donnee": "Data source",
+    
+    "Terminer": "Completed",
+    "Planifier": "Planned",
+    "En_Attente": "Pending"
 }

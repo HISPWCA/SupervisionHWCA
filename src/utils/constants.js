@@ -1,3 +1,5 @@
+import translate from "./translator"
+
 export const MAP_BOX_API_KEY = 'dRq6SAPnk2nypi0O4fEY'
 
 export const PAGE_DASHBOARD = 'PAGE_DASHBOARD'
@@ -48,10 +50,10 @@ export const MONTH = 'Month'
 export const QUARTER = 'Quarter'
 export const YEAR = 'Year'
 
-export const CANCELED = { name: 'Annulée', value: 'CANCELED' }
-export const PENDING_VALIDATION = { name: 'En Attente de Validation', value: 'PENDING_VALIDATION' }
+export const CANCELED = { name: translate('Annuler'), value: 'CANCELED' }
+export const PENDING_VALIDATION = { name: translate('En_Attente'), value: 'PENDING_VALIDATION' }
 export const PENDING_PAYMENT = { name: 'En Attente de Paiement', value: 'PENDING_PAYMENT' }
 export const PAYMENT_DONE = { name: 'Paiement Effectué', value: 'PAYMENT_DONE' }
-export const COMPLETED = { name: 'Terminée', value: 'COMPLETED' }
-export const SCHEDULED = { name: 'Planifiée', value: 'SCHEDULED' }
+export const COMPLETED = { name: translate('Terminer'), value: 'COMPLETED' }
+export const SCHEDULED = { name: translate('Planifier'), value: 'SCHEDULED' }
 export const NA = { name: 'Non Applicable', value: 'NA' }

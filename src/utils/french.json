@@ -160,5 +160,8 @@
     "Liste_Element_Configurer": "Liste des éléments configurés",
     "Type": "Type",
     "Indicateur": "Indicateur",
-    "Source_De_Donnee":"Source de donnée"
+    
+    "Terminer": "Terminée",
+    "Planifier": "Planifiée",
+    "En_Attente": "En_Attente"
 }
