@@ -410,11 +410,8 @@ const Setting = () => {
                 if (selectedAttributesToDisplay.length === 0)
                     throw new Error(translate('Veuillez_Configurer_Attribut_A_Utiliser'))
 
-                if (!selectedAttributeNameForAgent)
+                if (!selectedAttributeNameForAgent && !selectedAttributeFirstNameForAgent)
                     throw new Error(translate('Attribute_Nom'))
-
-                if (!selectedAttributeFirstNameForAgent)
-                    throw new Error(translate('Attribute_Prenom'))
             }
 
             if (selectedTEIProgram && selectedSupervisionGenerationType) {
