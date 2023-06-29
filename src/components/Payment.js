@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Button } from "@dhis2/ui"
-import { Card, Col, DatePicker, Row } from "antd"
+import { Card, Col, DatePicker, Divider, Radio, Row, Select } from "antd"
 import { ORGANISATION_UNITS_ROUTE } from "../utils/api.routes"
-import { ASC_GF_RAPPORT, NOTICE_BOX_DEFAULT, SUPERVISOR_RAPPORT } from "../utils/constants"
+import { ALL, ASC_GF_RAPPORT, DISPLAY_SUPERVISIONS, DISPLAY_SUPERVISORS, INVALIDE, NOTICE_BOX_DEFAULT, PENDING, SUPERVISOR_RAPPORT, VALIDE } from "../utils/constants"
 import translate from "../utils/translator"
 import OrganisationUnitsTree from "./OrganisationUnitsTree"
 import { BsCheckCircle } from 'react-icons/bs'
@@ -33,6 +33,8 @@ const Payment = ({ me }) => {
     const [selectedOrganisationUnits, setSelectedOrganisationUnits] = useState(null)
     const [selectedRapportToDisplay, setSelectedRapportToDisplay] = useState(SUPERVISOR_RAPPORT)
     const [selectedPeriod, setSelectedPeriod] = useState(dayjs(new Date()))
+    const [selectedReportType, setSelectedReportType] = useState(ALL)
+    const [selectedTypeListToDisplay, setSelectedTypeListToDisplay] = useState(DISPLAY_SUPERVISORS)
 
     const [loadingOrganisationUnits, setLoadingOrganisationUnits] = useState(false)
 
@@ -244,7 +246,7 @@ const Payment = ({ me }) => {
 
                     </Col>
                     <Col md={5} sm={12}>
-                        <div style={{ marginTop: '20px' }}>
+                        <div style={{ marginTop: '20px', textAlign: 'right' }}>
                             <Button primary>Mettre à jour Rapports Superviseurs</Button>
                         </div>
                     </Col>
@@ -335,29 +337,72 @@ const Payment = ({ me }) => {
         },
     ]
 
+    const getReportTypeName = type => {
+        if (type === ALL)
+            return 'Tous les Rapports'
+
+        if (type === VALIDE)
+            return 'Rapports Validés'
+
+        if (type === INVALIDE)
+            return 'Rapports Invalidés'
+
+        if (type === PENDING)
+            return 'Rapports en Attentes'
+
+    }
 
     const RenderTable = () => (
         <div style={{ marginTop: '30px' }}>
-            <Card className="my-shadow" size="small">
-                <MantineReactTable
-                    enableStickyHeader
-                    columns={columns}
-                    data={datas}
-                    mantinePaperProps={{
-                        shadow: 'none',
-                        radius: '8px',
-                        withBorder: false,
-                    }}
-                    initialState={
-                        {
-                            density: 'xs',
+            <Card className="my-shadow" size="small" style={{ padding: '0px' }}>
+                <div style={{ padding: '10px' }}>
+                    <Row gutter={[10, 10]}>
+                        <Col md={4}>
+                            <Select
+                                style={{ width: '100%' }}
+                                value={selectedReportType}
+                                onChange={value => setSelectedReportType(value)}
+                                optionFilterProp="label"
+                                options={
+                                    [
+                                        { value: ALL, label: getReportTypeName(ALL) },
+                                        { value: VALIDE, label: getReportTypeName(VALIDE) },
+                                        { value: INVALIDE, label: getReportTypeName(INVALIDE) },
+                                        { value: PENDING, label: getReportTypeName(PENDING) }
+                                    ]
+                                }
+                            />
+                        </Col>
+                        <Col md={12}>
+                            <Radio.Group onChange={event => setSelectedTypeListToDisplay(event.target.value)} value={selectedTypeListToDisplay}>
+                                <Radio value={DISPLAY_SUPERVISORS}>{translate('Display_Supervisors')}</Radio>
+                                <Radio value={DISPLAY_SUPERVISIONS}>{translate('Display_Supervisions')}</Radio>
+                            </Radio.Group>
+                        </Col>
+                    </Row>
+                </div>
+                <Divider style={{ marginTop: '0px', marginBottom: '0px' }} />
+                <div style={{ padding: '10px' }}>
+                    <MantineReactTable
+                        enableStickyHeader
+                        columns={columns}
+                        data={datas}
+                        mantinePaperProps={{
+                            shadow: 'none',
+                            radius: '8px',
+                            withBorder: false,
+                        }}
+                        initialState={
+                            {
+                                density: 'xs',
+                            }
                         }
-                    }
-                    mantineTableProps={{
-                        striped: true,
-                        highlightOnHover: true,
-                    }}
-                />
+                        mantineTableProps={{
+                            striped: true,
+                            highlightOnHover: true,
+                        }}
+                    />
+                </div>
             </Card>
         </div>
     )

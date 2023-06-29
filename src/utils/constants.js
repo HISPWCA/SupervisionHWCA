@@ -61,3 +61,11 @@ export const NA = { name: 'Non Applicable', value: 'NA' }
 
 export const SUPERVISOR_RAPPORT = 'SUPERVISOR_RAPPORT'
 export const ASC_GF_RAPPORT = 'ASC_GF_RAPPORT'
+
+export const VALIDE = 'VALIDE'
+export const INVALIDE = 'INVALIDE'
+export const PENDING = 'PENDING'
+export const ALL = 'ALL'
+
+export const DISPLAY_SUPERVISIONS = "DISPLAY_SUPERVISIONS"
+export const DISPLAY_SUPERVISORS = "DISPLAY_SUPERVISORS"
