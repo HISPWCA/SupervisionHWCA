@@ -4,6 +4,7 @@ export const MAP_BOX_API_KEY = 'dRq6SAPnk2nypi0O4fEY'
 
 export const PAGE_DASHBOARD = 'PAGE_DASHBOARD'
 export const PAGE_SETTINGS = 'PAGE_SETTINGS'
+export const PAGE_PAYMENT = 'PAGE_PAYMENT'
 export const PAGE_SUPERVISIONS = 'PAGE_SUPERVISIONS'
 
 export const PAGE_CONFIGURATION_TYPE_SUPERVISIONS = 'PAGE_CONFIGURATION_TYPE_SUPERVISIONS'
@@ -57,3 +58,6 @@ export const PAYMENT_DONE = { name: 'Paiement Effectué', value: 'PAYMENT_DONE' 
 export const COMPLETED = { name: translate('Terminer'), value: 'COMPLETED' }
 export const SCHEDULED = { name: translate('Planifier'), value: 'SCHEDULED' }
 export const NA = { name: 'Non Applicable', value: 'NA' }
+
+export const SUPERVISOR_RAPPORT = 'SUPERVISOR_RAPPORT'
+export const ASC_GF_RAPPORT = 'ASC_GF_RAPPORT'

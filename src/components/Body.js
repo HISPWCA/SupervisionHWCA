@@ -2,7 +2,7 @@ import { CircularLoader, NoticeBox } from '@dhis2/ui'
 import axios from 'axios'
 import { useState, useEffect } from 'react'
 import { ME_ROUTE, ME_SETTINGS_ROUTE } from '../utils/api.routes'
-import { PAGE_DASHBOARD, PAGE_SUPERVISIONS, PAGE_SETTINGS } from "../utils/constants"
+import { PAGE_DASHBOARD, PAGE_SUPERVISIONS, PAGE_SETTINGS, PAGE_PAYMENT } from "../utils/constants"
 import { BORDER_COLOR } from '../utils/couleurs'
 import { loadDataStore } from '../utils/functions'
 import Dashboard from './Dashboard'
@@ -10,7 +10,10 @@ import Setting from './Setting'
 import Supervision from './Supervision'
 import { AiOutlineSetting } from 'react-icons/ai'
 import { RxDashboard } from 'react-icons/rx'
+import { MdAttachMoney } from 'react-icons/md'
 import { MdOutlineEditNote } from 'react-icons/md'
+import translate from '../utils/translator'
+import Payment from './Payment'
 
 
 
@@ -75,17 +78,22 @@ export const Body = () => {
         <div style={{ borderRight: `1px solid ${BORDER_COLOR}`, width: '250px', height: '100%', padding: '2px 0px' }}>
             <div className={`menu-item ${renderPage === PAGE_DASHBOARD ? 'active' : ''}`} onClick={_ => handleClickMenu(PAGE_DASHBOARD)}>
                 <span><RxDashboard style={{ fontSize: '22px' }} /></span>
-                <span style={{ marginLeft: '10px' }}>Dashboard</span>
+                <span style={{ marginLeft: '10px' }}>{translate('Dashboard')}</span>
+            </div>
+
+            <div className={`menu-item ${renderPage === PAGE_PAYMENT ? 'active' : ''}`} onClick={_ => handleClickMenu(PAGE_PAYMENT)}>
+                <span><MdAttachMoney style={{ fontSize: '22px' }} /></span>
+                <span style={{ marginLeft: '10px' }}>{translate('Paiements')}</span>
             </div>
 
             <div className={`menu-item ${renderPage === PAGE_SUPERVISIONS ? 'active' : ''}`} onClick={_ => handleClickMenu(PAGE_SUPERVISIONS)}>
                 <span><MdOutlineEditNote style={{ fontSize: '22px' }} /></span>
-                <span style={{ marginLeft: '10px' }}>Planifications</span>
+                <span style={{ marginLeft: '10px' }}>{translate('Planifications')}</span>
             </div>
 
             <div className={`menu-item ${renderPage === PAGE_SETTINGS ? 'active' : ''}`} onClick={_ => handleClickMenu(PAGE_SETTINGS)}>
                 <span><AiOutlineSetting style={{ fontSize: '22px' }} /></span>
-                <span style={{ marginLeft: '10px' }}>Settings</span>
+                <span style={{ marginLeft: '10px' }}>{translate('Parametres')}</span>
             </div>
         </div>
     )
@@ -100,6 +108,13 @@ export const Body = () => {
                     </div>
                 )
 
+            case PAGE_PAYMENT:
+                return (
+                    <div className='my-scrollable' style={{ height: '100%', width: '100%', overflowY: 'scroll' }}>
+                        <Payment me={me} />
+                    </div>
+                )
+
             case PAGE_SUPERVISIONS:
                 return (
                     <div className='my-scrollable' style={{ height: '100%', width: '100%', overflowY: 'scroll' }}>
@@ -110,7 +125,7 @@ export const Body = () => {
             case PAGE_SETTINGS:
                 return (
                     <div className='my-scrollable' style={{ height: '100%', width: '100%', overflowY: 'scroll' }}>
-                        <Setting />
+                        <Setting me={me} />
                     </div>
                 )
 

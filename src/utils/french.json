@@ -150,7 +150,7 @@
     "Poids": "Poids",
     "Meilleur_Positif": "Meilleur Positif",
     "Liste_Indicateurs_Configurer": "Liste des indicateurs configurés ",
-    "Agregee": "Agrégee",
+    "Agregee": "Agrégée",
     "Indicateur_Programme": "Indicateur de programme",
     "Type_De_Supervision": "Type de supervisions",
     "Configuration_Des_Indicateurs": "Configuration des indicateurs",
@@ -160,8 +160,11 @@
     "Liste_Element_Configurer": "Liste des éléments configurés",
     "Type": "Type",
     "Indicateur": "Indicateur",
-    
     "Terminer": "Terminée",
     "Planifier": "Planifiée",
-    "En_Attente": "En_Attente"
+    "En_Attente": "En_Attente",
+    "Parametres": "Paramètres",
+    "Planifications": "Planifications",
+    "Paiements": "Paiements",
+    "Dashboard": "Dashboard"
 }

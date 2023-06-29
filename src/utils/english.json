@@ -161,8 +161,11 @@
     "Type": "Type",
     "Indicateur": "Indicator",
     "Source_De_Donnee": "Data source",
-    
     "Terminer": "Completed",
     "Planifier": "Planned",
-    "En_Attente": "Pending"
+    "En_Attente": "Pending",
+    "Parametres": "Settings",
+    "Planifications": "Planifications",
+    "Paiements": "Payments",
+    "Dashboard": "Dashboard"
 }

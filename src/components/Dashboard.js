@@ -923,11 +923,11 @@ export const Dashboard = ({ me }) => {
                     <Col sm={24} md={3}>
                         <div style={{ marginBottom: '2px' }}>{translate('Periode')}</div>
                         <DatePicker
-                            onChange={handleSelectedPeriod}
                             picker="month"
-                            value={selectedPeriod}
                             style={{ width: '100%' }}
                             placeholder={translate('Periode')}
+                            onChange={handleSelectedPeriod}
+                            value={selectedPeriod}
                             allowClear={false}
                         />
                     </Col>
