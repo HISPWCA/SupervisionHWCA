@@ -2905,7 +2905,7 @@ const Supervision = ({ me }) => {
     }
 
     const onOrgUnitSelected = (value) => {
-        return loadTEIs(value.id)
+        return selectedPlanificationType === ORGANISATION_UNIT && loadTEIs(value.id)
     }
 
     const handleSelectCheckboxAgent = (value) => {
@@ -2917,21 +2917,119 @@ const Supervision = ({ me }) => {
         }
     }
 
+    const handleChangePlanificationTypeAgent = ({ value }) => {
+        setSelectedPlanificationType(value)
+    }
+
+    const handleSearchByPerformances = () => {
+        try {
+            console.log("selectedPeriod: ", selectedPeriod)
+            console.log("selectedIndicators:", selectedIndicators)
+            console.log("selectedOrganisationUnitInd:", selectedOrganisationUnitInd)
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
     const RenderAgentConfigList = () => (
         <>
             <div>
                 <Card size='small' className='my-shadow'>
-                    <div style={{ maxWidth: '500px' }}>
-                        <div style={{ marginBottom: '5px' }}>{translate('Unites_Organisation')}</div>
-                        <OrganisationUnitsTree
-                            meOrgUnitId={me?.organisationUnits[0]?.id}
-                            orgUnits={organisationUnits}
-                            currentOrgUnits={selectedOrganisationUnitInd}
-                            setCurrentOrgUnits={setSelectedOrganisationUnitInd}
-                            loadingOrganisationUnits={loadingOrganisationUnits}
-                            onChange={onOrgUnitSelected}
-                        />
+                    <div>
+                        <div style={{ fontWeight: 'bold' }}>
+                            {translate('Planification')}
+                        </div>
+                        <div style={{ display: 'flex', marginTop: '10px' }}>
+                            <div>
+                                <Radio
+                                    label={translate("Directe")}
+                                    className="cursor-pointer"
+                                    onChange={handleChangePlanificationTypeAgent}
+                                    value={ORGANISATION_UNIT}
+                                    checked={selectedPlanificationType === ORGANISATION_UNIT}
+                                />
+                            </div>
+                            <div style={{ marginLeft: '20px' }}>
+                                <Radio
+                                    label={translate("Basee_Sur_Perfomances")}
+                                    className="cursor-pointer"
+                                    onChange={handleChangePlanificationTypeAgent}
+                                    value={INDICATOR}
+                                    checked={selectedPlanificationType === INDICATOR}
+                                />
+                            </div>
+                        </div>
                     </div>
+                    {
+                        selectedPlanificationType && (
+                            <>
+                                <Divider style={{ marginTop: '10px', marginBottom: '10px' }} />
+                                <Row gutter={[8, 8]}>
+                                    <Col md={8} sm={24}>
+                                        <div style={{ marginBottom: '5px' }}>{translate('Unites_Organisation')}</div>
+                                        <OrganisationUnitsTree
+                                            meOrgUnitId={me?.organisationUnits[0]?.id}
+                                            orgUnits={organisationUnits}
+                                            currentOrgUnits={selectedOrganisationUnitInd}
+                                            setCurrentOrgUnits={setSelectedOrganisationUnitInd}
+                                            loadingOrganisationUnits={loadingOrganisationUnits}
+                                            onChange={onOrgUnitSelected}
+                                        />
+                                    </Col>
+
+                                    {
+                                        selectedPlanificationType === INDICATOR && (
+                                            <Col md={6} sm={24}>
+                                                <div>
+                                                    <div style={{ marginBottom: '5px' }}>  {translate('Indicateurs')}</div>
+                                                    <Select
+                                                        options={dataStoreIndicatorConfigs.map(ind => ({ label: ind.indicator?.displayName, value: ind.indicator?.id }))}
+                                                        loading={loadingDataStoreIndicatorConfigs}
+                                                        disabled={loadingDataStoreIndicatorConfigs}
+                                                        showSearch
+                                                        placeholder={translate('Indicateurs')}
+                                                        style={{ width: '100%' }}
+                                                        optionFilterProp='label'
+                                                        mode='multiple'
+                                                        onChange={handleSelectIndicators}
+                                                        value={selectedIndicators?.map(ind => ind.indicator?.id)}
+                                                    />
+                                                </div>
+                                            </Col>
+                                        )
+                                    }
+
+                                    {
+                                        selectedPlanificationType === INDICATOR && (
+                                            <Col md={6} sm={24}>
+                                                <div>
+                                                    <div style={{ marginBottom: '5px' }}>{translate('Periode')}</div>
+                                                    <DatePicker
+                                                        style={{ width: '100%' }}
+                                                        placeholder={translate('Periode')}
+                                                        onChange={handleSelectPeriode}
+                                                        value={selectedPeriod}
+                                                        picker="month"
+                                                    />
+                                                </div>
+                                            </Col>
+                                        )
+                                    }
+
+                                    {
+
+                                        selectedPlanificationType === INDICATOR && (
+                                            <Col md={4} sm={24}>
+                                                <div style={{ marginTop: '20px' }}>
+                                                    <Button disabled={selectedPeriod && selectedIndicators.length > 0 && selectedOrganisationUnitInd ? false : true} primary onClick={handleSearchByPerformances}>{translate('Recherche')}</Button>
+                                                </div>
+                                            </Col>
+                                        )
+                                    }
+                                </Row>
+                            </>
+                        )
+                    }
                 </Card>
             </div>
 
@@ -2953,7 +3051,7 @@ const Supervision = ({ me }) => {
                                 }
 
                                 {
-                                    teisList.length > 0 && (
+                                    selectedPlanificationType === ORGANISATION_UNIT && teisList.length > 0 && (
 
                                         <div style={{ marginTop: '20px' }}>
                                             {
