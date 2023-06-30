@@ -2258,27 +2258,29 @@ const Supervision = ({ me }) => {
                                             </Col>
                                         }
 
+                                        {/* 
                                         {
-                                            selectedProgram?.paymentConfigs?.length > 0 && (
-                                                <Col sm={24} md={24}>
-                                                    <div>
-                                                        <div style={{ marginBottom: '5px' }}>{translate('Criteres_De_Paiement')}</div>
-                                                        <Select
-                                                            placeholder={translate('Criteres_De_Paiement')}
-                                                            style={{ width: '100%' }}
-                                                            loading={loadingDataStoreSupervisionConfigs}
-                                                            disabled={loadingDataStoreSupervisionConfigs}
-                                                            value={inputFields[index]?.payment}
-                                                            onChange={(value) => handleInputPayment(value, index)}
-                                                            optionFilterProp='label'
-                                                            showSearch
-                                                            allowClear
-                                                            options={selectedProgram?.paymentConfigs?.map(p => ({ label: p.libelle, value: p.id }))}
-                                                        />
-                                                    </div>
-                                                </Col>
-                                            )
-                                        }
+                                            0 >1 &&  selectedProgram?.paymentConfigs?.length > 0 && (
+                                                    <Col sm={24} md={24}>
+                                                        <div>
+                                                            <div style={{ marginBottom: '5px' }}>{translate('Criteres_De_Paiement')}</div>
+                                                            <Select
+                                                                placeholder={translate('Criteres_De_Paiement')}
+                                                                style={{ width: '100%' }}
+                                                                loading={loadingDataStoreSupervisionConfigs}
+                                                                disabled={loadingDataStoreSupervisionConfigs}
+                                                                value={inputFields[index]?.payment}
+                                                                onChange={(value) => handleInputPayment(value, index)}
+                                                                optionFilterProp='label'
+                                                                showSearch
+                                                                allowClear
+                                                                options={selectedProgram?.paymentConfigs?.map(p => ({ label: p.libelle, value: p.id }))}
+                                                            />
+                                                        </div>
+                                                    </Col>
+                                                )
+                                            } 
+                                            */}
 
                                         <Col sm={24} md={24}>
                                             <div>

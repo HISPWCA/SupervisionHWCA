@@ -463,7 +463,6 @@ const Payment = ({ me }) => {
     const handleSelectSupervisionProgramConfigForTracker = (value) => {
         if (value) {
             const supFound = dataStoreSupervisionConfigs.find(d => d.program?.id === value)
-            setAllSupervisionsFromTracker([])
             setSelectedSupervisionConfigProgram(supFound)
         }
     }
@@ -664,7 +663,12 @@ const Payment = ({ me }) => {
                     </Col>
                     <Col md={5} sm={12}>
                         <div style={{ marginTop: '20px', textAlign: 'right' }}>
-                            <Button onClick={loadTEIs} loading={selectedRapportToDisplay === SUPERVISOR_RAPPORT ? loadingProcessing : false} disable={selectedPeriod && selectedOrganisationUnit && selectedSupervisionsConfigProgram ? false : true} primary>Mettre à jour Rapports Superviseurs</Button>
+                            <Button
+                                onClick={loadTEIs}
+                                loading={selectedRapportToDisplay === SUPERVISOR_RAPPORT ? loadingProcessing : false}
+                                disabled={selectedPeriod && selectedOrganisationUnit && selectedSupervisionsConfigProgram ? false : true}
+                                primary
+                            >Mettre à jour Rapports Superviseurs</Button>
                         </div>
                     </Col>
                     <Col md={5} sm={12}>
@@ -675,7 +679,9 @@ const Payment = ({ me }) => {
 
                     <Col md={24}>
                         <div style={{ color: "#0096c7", background: '#eeeeee', padding: '5px' }}>
-                            <span style={{ background: "#ff5400", color: "#fff", fontSize: "15px", borderRadius: "15px", fontWeight: 'bold', padding: '5px' }} > period selectionner </span>
+                            <span style={{ background: "#ff5400", color: "#fff", fontSize: "15px", borderRadius: "15px", fontWeight: 'bold', padding: '5px' }} >
+                                {`${selectedOrganisationUnit?.displayName} | ${dayjs(selectedPeriod).format()}`}
+                             </span>
                         </div>
                     </Col>
                 </Row>
