@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect, useState } from 'react'
 import { MantineReactTable } from 'mantine-react-table'
-import { Card, Col, DatePicker, Divider, FloatButton, Input, InputNumber, List, Popconfirm, Row, Select, Checkbox as AntCheckbox, Table, Grid } from 'antd'
+import { Card, Col, DatePicker, Divider, FloatButton, Input, InputNumber, List, Popconfirm, Row, Select, Checkbox as AntCheckbox, Table, Grid, message } from 'antd'
 import { IoMdAdd } from 'react-icons/io'
 import { IoListCircleOutline } from 'react-icons/io5'
 import { Button, ButtonStrip, Checkbox, CircularLoader, Modal, ModalActions, ModalContent, ModalTitle, NoticeBox, Radio } from '@dhis2/ui'
@@ -33,7 +33,7 @@ import {
 } from '../utils/constants'
 import { loadDataStore, saveDataToDataStore } from '../utils/functions'
 import { MyNoticeBox } from './MyNoticeBox'
-import { ANALYTICS_ROUTE, ENROLLMENTS_ROUTE, EVENTS_ROUTE, ORGANISATION_UNITS_ROUTE, ORGANISATION_UNIT_GROUP_SETS_ROUTE, PROGRAMS_STAGE_ROUTE, PROGRAM_INDICATOR_GROUPS, PROGS_ROUTE, SERVER_URL, TRACKED_ENTITY_ATTRIBUTES_ROUTE, TRACKED_ENTITY_INSTANCES_ROUTE, USERS_ROUTE } from '../utils/api.routes'
+import { ANALYTICS_ROUTE, API_BASE_ROUTE, ENROLLMENTS_ROUTE, EVENTS_ROUTE, ORGANISATION_UNITS_ROUTE, ORGANISATION_UNIT_GROUPS_ROUTE, ORGANISATION_UNIT_GROUP_SETS_ROUTE, PROGRAMS_STAGE_ROUTE, PROGRAM_INDICATOR_GROUPS, PROGS_ROUTE, SERVER_URL, TRACKED_ENTITY_ATTRIBUTES_ROUTE, TRACKED_ENTITY_INSTANCES_ROUTE, USERS_ROUTE } from '../utils/api.routes'
 import axios from 'axios'
 import OrganisationUnitsTree from './OrganisationUnitsTree'
 import { QuestionCircleOutlined } from '@ant-design/icons'
@@ -295,6 +295,19 @@ const Supervision = ({ me }) => {
         }
         catch (err) {
             setLoadingOrganisationUnits(false)
+        }
+    }
+
+    const loadOrganisationUnitGroups = async () => {
+        try {
+            setLoadingOrganisationUnitGroups(true)
+
+            const response = await axios.get(ORGANISATION_UNIT_GROUPS_ROUTE)
+            setOrganisationUnitGroups(response.data.organisationUnitGroups)
+            setLoadingOrganisationUnitGroups(false)
+        }
+        catch (err) {
+            setLoadingOrganisationUnitGroups(false)
         }
     }
 
@@ -1225,6 +1238,7 @@ const Supervision = ({ me }) => {
     }
 
     const handleSelectIndicators = (values) => setSelectedIndicators(values.map(val => dataStoreIndicatorConfigs.find(dsInd => dsInd.indicator?.id === val)))
+    const handleSelectOrgUnitGroup = (values) => setSelectedOrganisationUnitGroups(values.map(val => organisationUnitGroups.find(orgGp => orgGp.id === val)))
 
     const savePanificationToDataStore = async (payload) => {
         try {
@@ -2893,7 +2907,7 @@ const Supervision = ({ me }) => {
                 setLoadingTeiList(true)
                 setEmpty(false)
 
-                const route = `${TRACKED_ENTITY_INSTANCES_ROUTE}.json?ou=${orgUnitId}&ouMode=SELECTED&program=${selectedProgram.program?.id}&fields=trackedEntityInstance,attributes,orgUnit,trackedEntityType,enrollments=[enrollment,orgUnit,orgUnitName,status,program,enrollmentDate,trackedEntityInstance]&order=created:DESC`
+                const route = `${TRACKED_ENTITY_INSTANCES_ROUTE}.json?ou=${orgUnitId}&ouMode=DESCENDANTS&program=${selectedProgram.program?.id}&fields=trackedEntityInstance,attributes,orgUnit,trackedEntityType,enrollments=[enrollment,orgUnit,orgUnitName,status,program,enrollmentDate,trackedEntityInstance]&order=created:DESC&paging=false`
                 const response = await axios.get(route)
                 setTeisList(response.data.trackedEntityInstances)
                 if (!response.data.trackedEntityInstances || response.data.trackedEntityInstances?.length === 0) {
@@ -2924,13 +2938,49 @@ const Supervision = ({ me }) => {
         setSelectedPlanificationType(value)
     }
 
-    const handleSearchByPerformances = () => {
+    const handleSearchByPerformances = async () => {
         try {
             console.log("selectedPeriod: ", selectedPeriod)
             console.log("selectedIndicators:", selectedIndicators)
             console.log("selectedOrganisationUnitInd:", selectedOrganisationUnitInd)
+            console.log("selectedOrganisationUnitGroups:", selectedOrganisationUnitGroups)
+            setLoadingTeiList(true)
+
+            if (!selectedPeriod)
+                throw new Error(translate('Veuillez_Selectionner_Periode'))
+
+            if (selectedIndicators.length === 0)
+                throw new Error(translate('Indicateur_Obligatoire'))
+
+            if (!selectedOrganisationUnitInd)
+                throw new Error(translate('Veuillez_Selectionner_Unite_Organisation'))
+
+            const routeLevel = `${API_BASE_ROUTE}/organisationUnitLevels.json?paging=false&fields=id,displayName,level&order=level:DESC`
+            const responseLevels = await axios.get(routeLevel)
+            const postLevel = responseLevels.data.organisationUnitLevels[0]
+
+            const routeTeis = `${TRACKED_ENTITY_INSTANCES_ROUTE}.json?ou=${selectedOrganisationUnitInd?.id}&ouMode=DESCENDANTS&program=${selectedProgram.program?.id}&fields=trackedEntityInstance,attributes,orgUnit,trackedEntityType,enrollments=[enrollment,orgUnit,orgUnitName,status,program,enrollmentDate,trackedEntityInstance]&order=created:DESC`
+            const teiResponse = await axios.get(routeTeis)
+            const teis = teiResponse.data.trackedEntityInstances
+
+            let ouGroupString = ''
+            if (selectedOrganisationUnitGroups.length > 0) {
+                for (let o of selectedOrganisationUnitGroups) {
+                    ouGroupString = ouGroupString.concat(`OU_GROUP-${o.id};`)
+                }
+            }
+            if (teis.length > 0) {
+                const routeAnalytic = `${API_BASE_ROUTE}/analytics/dataValueSet.json?dimension=dx:${selectedIndicators.map(ind => ind.indicator?.id).join(';')}&dimension=ou:${selectedOrganisationUnitInd?.id};LEVEL-${postLevel?.id}${ouGroupString?.trim()?.length > 0 ? ';' + ouGroupString : ''}&dimension=pe:${dayjs(selectedPeriod).format('YYYYMM')}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=true&includeNumDen=true&skipRounding=false&completedOnly=false`
+                const analyticResponse = await axios.get(routeAnalytic)
+                console.log(analyticResponse.data)
+            }
+
+            setTeisList([])
+            setLoadingTeiList(false)
         } catch (err) {
             console.log(err)
+            setLoadingTeiList(false)
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
         }
     }
 
@@ -2968,7 +3018,7 @@ const Supervision = ({ me }) => {
                             <>
                                 <Divider style={{ marginTop: '10px', marginBottom: '10px' }} />
                                 <Row gutter={[8, 8]}>
-                                    <Col md={6} sm={24}>
+                                    <Col md={8} sm={24}>
                                         <div style={{ marginBottom: '5px' }}>{translate('Unites_Organisation')}</div>
                                         <OrganisationUnitsTree
                                             meOrgUnitId={me?.organisationUnits[0]?.id}
@@ -2982,7 +3032,7 @@ const Supervision = ({ me }) => {
 
                                     {
                                         selectedPlanificationType === INDICATOR && (
-                                            <Col md={4} sm={24}>
+                                            <Col md={8} sm={24}>
                                                 <div>
                                                     <div style={{ marginBottom: '5px' }}>  {translate('Indicateurs')}</div>
                                                     <Select
@@ -3003,20 +3053,20 @@ const Supervision = ({ me }) => {
                                     }
                                     {
                                         selectedPlanificationType === INDICATOR && (
-                                            <Col md={4} sm={24}>
+                                            <Col md={8} sm={24}>
                                                 <div>
-                                                    <div style={{ marginBottom: '5px' }}>  {translate('Indicateurs')}</div>
+                                                    <div style={{ marginBottom: '5px' }}>  {translate('Groupe_Unite_Organisations')}</div>
                                                     <Select
-                                                        options={dataStoreIndicatorConfigs.map(ind => ({ label: ind.indicator?.displayName, value: ind.indicator?.id }))}
-                                                        loading={loadingDataStoreIndicatorConfigs}
-                                                        disabled={loadingDataStoreIndicatorConfigs}
+                                                        options={organisationUnitGroups.map(org => ({ label: org.displayName, value: org.id }))}
+                                                        loading={loadingOrganisationUnitGroups}
+                                                        disabled={loadingOrganisationUnitGroups}
                                                         showSearch
-                                                        placeholder={translate('Indicateurs')}
+                                                        placeholder={translate('Groupe_Unite_Organisations')}
                                                         style={{ width: '100%' }}
                                                         optionFilterProp='label'
                                                         mode='multiple'
-                                                        onChange={handleSelectIndicators}
-                                                        value={selectedIndicators?.map(ind => ind.indicator?.id)}
+                                                        onChange={handleSelectOrgUnitGroup}
+                                                        value={selectedOrganisationUnitGroup?.map(org => org?.id)}
                                                     />
                                                 </div>
                                             </Col>
@@ -3044,8 +3094,8 @@ const Supervision = ({ me }) => {
 
                                         selectedPlanificationType === INDICATOR && (
                                             <Col md={4} sm={24}>
-                                                <div style={{ marginTop: '20px' }}>
-                                                    <Button disabled={selectedPeriod && selectedIndicators.length > 0 && selectedOrganisationUnitInd ? false : true} primary onClick={handleSearchByPerformances}>{translate('Recherche')}</Button>
+                                                <div style={{ marginTop: '22px' }}>
+                                                    <Button loading={loadingTeiList} disabled={selectedPeriod && selectedIndicators.length > 0 && selectedOrganisationUnitInd ? false : true} primary onClick={handleSearchByPerformances}>{translate('Recherche')}</Button>
                                                 </div>
                                             </Col>
                                         )
@@ -3074,7 +3124,7 @@ const Supervision = ({ me }) => {
                                     )
                                 }
 
-                                {
+                                {/* {
                                     selectedPlanificationType === ORGANISATION_UNIT && teisList.length > 0 && (
 
                                         <div style={{ marginTop: '20px' }}>
@@ -3113,6 +3163,69 @@ const Supervision = ({ me }) => {
                                                 )
                                             }
                                         </div>
+                                    )
+                                } */}
+
+
+                                {
+                                    selectedPlanificationType === ORGANISATION_UNIT && teisList.length > 0 && (
+                                        <MantineReactTable
+                                            enableStickyHeader
+                                            columns={
+                                                [
+                                                    {
+                                                        accessorKey: 'tei',
+                                                        header: translate('Actions'),
+                                                        Cell: ({ cell, row }) => {
+                                                            console.log("row.original: ", row.original)
+                                                            return (
+                                                                <>
+                                                                    <div>
+                                                                        <AntCheckbox onChange={() => handleSelectCheckboxAgent(cell.getValue)} checked={selectedAgents.map(ag => ag.trackedEntityInstance).includes(cell.getValue)} />
+                                                                    </div>
+                                                                </>
+                                                            )
+                                                        }
+                                                    },
+                                                    ...selectedProgram.attributesToDisplay.map(att => (
+                                                        {
+                                                            header: att.displayName,
+                                                            accessorKey: att.displayName
+                                                        }
+                                                    ))
+                                                ]
+                                            }
+
+                                            data={
+                                                teisList.map(tei => {
+                                                    let payload = {
+                                                        tei
+                                                    }
+                                                    for (let att of selectedProgram.attributesToDisplay) {
+                                                        for (let teiAttr of tei.attributes) {
+                                                            if (att.id === teiAttr.attribute) {
+                                                                payload[`${att.displayName}`] = teiAttr.value
+                                                            }
+                                                        }
+                                                    }
+                                                    return payload
+                                                })
+                                            }
+                                            mantinePaperProps={{
+                                                shadow: 'none',
+                                                radius: '8px',
+                                                withBorder: false,
+                                            }}
+                                            initialState={
+                                                {
+                                                    density: 'xs',
+                                                }
+                                            }
+                                            mantineTableProps={{
+                                                striped: true,
+                                                highlightOnHover: true,
+                                            }}
+                                        />
                                     )
                                 }
 
@@ -3334,6 +3447,7 @@ const Supervision = ({ me }) => {
     useEffect(() => {
         if (me) {
             loadOrganisationUnits()
+            loadOrganisationUnitGroups()
             loadDataStoreSupervisions()
             loadDataStoreIndicators()
             loadUsers(me?.organisationUnits?.[0]?.id)

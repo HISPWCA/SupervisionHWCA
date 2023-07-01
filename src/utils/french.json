@@ -170,7 +170,7 @@
     "Display_Supervisors": "Afficher les Superviseurs",
     "Display_Supervisions": "Afficher les Supervisions",
 
-
-"Recherche":"Recherché"
-
+    "Recherche": "Rechercher",
+    "Groupe_Unite_Organisations": "Groupe d'unité d'organisation",
+    "Veuillez_Selectionner_Unite_Organisation":"Veuillez sélectionner l'unité d'organisation"
 }
