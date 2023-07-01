@@ -3181,7 +3181,7 @@ const Supervision = ({ me }) => {
                                                             return (
                                                                 <>
                                                                     <div>
-                                                                        <AntCheckbox onChange={() => handleSelectCheckboxAgent(cell.getValue)} checked={selectedAgents.map(ag => ag.trackedEntityInstance).includes(cell.getValue)} />
+                                                                        <AntCheckbox onChange={() => handleSelectCheckboxAgent(cell.getValue())} checked={selectedAgents.map(ag => ag.trackedEntityInstance).includes(cell.getValue()?.trackedEntityInstance)} />
                                                                     </div>
                                                                 </>
                                                             )
