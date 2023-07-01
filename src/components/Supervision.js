@@ -3266,7 +3266,7 @@ const Supervision = ({ me }) => {
                                     )
                                 }
 
-                                { console.log(teisPerformanceList)}
+                                {console.log(teisPerformanceList)}
 
                                 {
                                     selectedPlanificationType === INDICATOR && teisPerformanceList.length > 0 && (
@@ -3275,14 +3275,12 @@ const Supervision = ({ me }) => {
                                             columns={
                                                 [
                                                     {
-                                                        accessorKey: 'tei',
                                                         header: translate('Actions'),
                                                         Cell: ({ cell, row }) => {
-                                                            console.log("row.original: ", row.original)
                                                             return (
                                                                 <>
                                                                     <div>
-                                                                        <AntCheckbox onChange={() => handleSelectCheckboxAgent(cell.getValue())} checked={selectedAgents.map(ag => ag.trackedEntityInstance).includes(cell.getValue()?.trackedEntityInstance)} />
+                                                                        <AntCheckbox onChange={() => handleSelectCheckboxAgent(row.original)} checked={selectedAgents.map(ag => ag.trackedEntityInstance).includes(row.original.trackedEntityInstance)} />
                                                                     </div>
                                                                 </>
                                                             )
@@ -3292,16 +3290,16 @@ const Supervision = ({ me }) => {
                                                         accessorKey: 'agentName',
                                                         header: translate('Agent'),
                                                     },
-                                                    ...selectedIndicators.map(att => (
+                                                    ...selectedIndicators.map(ind => (
                                                         {
-                                                            header: att.indicator?.name,
-                                                            accessorKey: `${att.indicator?.id}.indicatorValue`
+                                                            header: ind.indicator?.displayName,
+                                                            accessorKey: `${ind.indicator?.id}.indicatorValue`
                                                         }
                                                     ))
                                                 ]
                                             }
 
-                                            data={teisPerformanceList }
+                                            data={teisPerformanceList}
                                             mantinePaperProps={{
                                                 shadow: 'none',
                                                 radius: '8px',
