@@ -85,6 +85,7 @@ const Supervision = ({ me }) => {
     const [isEmpty, setEmpty] = useState(false)
     const [allSupervisionsFromTracker, setAllSupervisionsFromTracker] = useState([])
     const [organisationUnitGroups, setOrganisationUnitGroups] = useState([])
+    const [teisPerformanceList, setTeisPerformanceList] = useState([])
 
     const [selectedStep, setSelectedStep] = useState(0)
     const [selectedSupervisionType, setSelectedSupervisionType] = useState(null)
@@ -173,6 +174,7 @@ const Supervision = ({ me }) => {
                     )
                 }
             },
+
             {
                 accessorKey: 'statusSupervision', //normal accessorKey
                 header: `${translate('Status_Supervision')}`,
@@ -2969,13 +2971,48 @@ const Supervision = ({ me }) => {
                     ouGroupString = ouGroupString.concat(`OU_GROUP-${o.id};`)
                 }
             }
+
+            let nouveauTeiList = []
+
             if (teis.length > 0) {
                 const routeAnalytic = `${API_BASE_ROUTE}/analytics/dataValueSet.json?dimension=dx:${selectedIndicators.map(ind => ind.indicator?.id).join(';')}&dimension=ou:${selectedOrganisationUnitInd?.id};LEVEL-${postLevel?.id}${ouGroupString?.trim()?.length > 0 ? ';' + ouGroupString : ''}&dimension=pe:${dayjs(selectedPeriod).format('YYYYMM')}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=true&includeNumDen=true&skipRounding=false&completedOnly=false`
                 const analyticResponse = await axios.get(routeAnalytic)
-                console.log(analyticResponse.data)
+                const dataValues = analyticResponse.data.dataValues
+
+                nouveauTeiList = teis.reduce((prev, current) => {
+
+                    const currentEnrollment = current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)?.[0]
+                    if (currentEnrollment) {
+
+                        const payload = {
+                            ...current,
+                            agentName: `${current.attributes?.find(att => att.attribute === selectedProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedProgram?.attributeFirstName?.id)?.value || ''}`
+                        }
+                        const indicatorPayload = {}
+
+                        for (let ind of selectedIndicators) {
+                            const dValues = dataValues.filter(dv => ind.indicator?.id === dv.dataElement && dv.orgUnit === currentEnrollment.orgUnit && dayjs(selectedPeriod).format('YYYYMM') === dayjs(dv.period).format('YYYYMM')) || []
+                            const dValue = dValues.reduce((pv, cr) => cr.value + cr.value, 0) || 0
+
+                            indicatorPayload[`${ind.indicator?.id}`] = {
+                                indicatorDataValues: dValues,
+                                indicatorValue: dValue,
+                                indicatorName: ind.nom,
+                                indicatorScore: dValue * (ind.weight && ind.weight > 0 ? ind.weight : 1)
+                            }
+                        }
+
+                        prev.push({ ...payload, ...indicatorPayload })
+
+                    }
+
+                    return prev
+
+                }, [])
+
             }
 
-            setTeisList([])
+            setTeisPerformanceList(nouveauTeiList)
             setLoadingTeiList(false)
         } catch (err) {
             console.log(err)
@@ -3211,6 +3248,60 @@ const Supervision = ({ me }) => {
                                                     return payload
                                                 })
                                             }
+                                            mantinePaperProps={{
+                                                shadow: 'none',
+                                                radius: '8px',
+                                                withBorder: false,
+                                            }}
+                                            initialState={
+                                                {
+                                                    density: 'xs',
+                                                }
+                                            }
+                                            mantineTableProps={{
+                                                striped: true,
+                                                highlightOnHover: true,
+                                            }}
+                                        />
+                                    )
+                                }
+
+                                { console.log(teisPerformanceList)}
+
+                                {
+                                    selectedPlanificationType === INDICATOR && teisPerformanceList.length > 0 && (
+                                        <MantineReactTable
+                                            enableStickyHeader
+                                            columns={
+                                                [
+                                                    {
+                                                        accessorKey: 'tei',
+                                                        header: translate('Actions'),
+                                                        Cell: ({ cell, row }) => {
+                                                            console.log("row.original: ", row.original)
+                                                            return (
+                                                                <>
+                                                                    <div>
+                                                                        <AntCheckbox onChange={() => handleSelectCheckboxAgent(cell.getValue())} checked={selectedAgents.map(ag => ag.trackedEntityInstance).includes(cell.getValue()?.trackedEntityInstance)} />
+                                                                    </div>
+                                                                </>
+                                                            )
+                                                        }
+                                                    },
+                                                    {
+                                                        accessorKey: 'agentName',
+                                                        header: translate('Agent'),
+                                                    },
+                                                    ...selectedIndicators.map(att => (
+                                                        {
+                                                            header: att.indicator?.name,
+                                                            accessorKey: `${att.indicator?.id}.indicatorValue`
+                                                        }
+                                                    ))
+                                                ]
+                                            }
+
+                                            data={teisPerformanceList }
                                             mantinePaperProps={{
                                                 shadow: 'none',
                                                 radius: '8px',
