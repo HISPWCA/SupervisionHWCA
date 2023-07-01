@@ -84,6 +84,7 @@ const Supervision = ({ me }) => {
     const [teisList, setTeisList] = useState([])
     const [isEmpty, setEmpty] = useState(false)
     const [allSupervisionsFromTracker, setAllSupervisionsFromTracker] = useState([])
+    const [organisationUnitGroups, setOrganisationUnitGroups] = useState([])
 
     const [selectedStep, setSelectedStep] = useState(0)
     const [selectedSupervisionType, setSelectedSupervisionType] = useState(null)
@@ -103,6 +104,7 @@ const Supervision = ({ me }) => {
     const [selectedSupervisionsConfigProgram, setSelectedSupervisionConfigProgram] = useState(null)
     const [selectedOrgUnitSupervisionFromTracker, setSelectedOrgUnitSupervisionFromTracker] = useState(null)
     const [selectedPeriodSupervisionConfig, setSelectedPeriodSupervisionConfig] = useState(null)
+    const [selectedOrganisationUnitGroups, setSelectedOrganisationUnitGroups] = useState([])
 
     const [inputMeilleur, setInputMeilleur] = useState(0)
     const [inputMauvais, setInputMauvais] = useState(0)
@@ -124,6 +126,7 @@ const Supervision = ({ me }) => {
     const [loadingTeiList, setLoadingTeiList] = useState(false)
     const [loadingAllSupervisionsFromTracker, setLoadingAllSupervisionsFromTracker] = useState(false)
     const [loadingOrgUnitsSupervisionsFromTracker, setLoadingOrgUnitsSupervisionsFromTracker] = useState(false)
+    const [loadingOrganisationUnitGroups, setLoadingOrganisationUnitGroups] = useState(false)
 
     const periodTypesOptions = () => {
         return [
@@ -2965,7 +2968,7 @@ const Supervision = ({ me }) => {
                             <>
                                 <Divider style={{ marginTop: '10px', marginBottom: '10px' }} />
                                 <Row gutter={[8, 8]}>
-                                    <Col md={8} sm={24}>
+                                    <Col md={6} sm={24}>
                                         <div style={{ marginBottom: '5px' }}>{translate('Unites_Organisation')}</div>
                                         <OrganisationUnitsTree
                                             meOrgUnitId={me?.organisationUnits[0]?.id}
@@ -2979,7 +2982,28 @@ const Supervision = ({ me }) => {
 
                                     {
                                         selectedPlanificationType === INDICATOR && (
-                                            <Col md={6} sm={24}>
+                                            <Col md={4} sm={24}>
+                                                <div>
+                                                    <div style={{ marginBottom: '5px' }}>  {translate('Indicateurs')}</div>
+                                                    <Select
+                                                        options={dataStoreIndicatorConfigs.map(ind => ({ label: ind.indicator?.displayName, value: ind.indicator?.id }))}
+                                                        loading={loadingDataStoreIndicatorConfigs}
+                                                        disabled={loadingDataStoreIndicatorConfigs}
+                                                        showSearch
+                                                        placeholder={translate('Indicateurs')}
+                                                        style={{ width: '100%' }}
+                                                        optionFilterProp='label'
+                                                        mode='multiple'
+                                                        onChange={handleSelectIndicators}
+                                                        value={selectedIndicators?.map(ind => ind.indicator?.id)}
+                                                    />
+                                                </div>
+                                            </Col>
+                                        )
+                                    }
+                                    {
+                                        selectedPlanificationType === INDICATOR && (
+                                            <Col md={4} sm={24}>
                                                 <div>
                                                     <div style={{ marginBottom: '5px' }}>  {translate('Indicateurs')}</div>
                                                     <Select
