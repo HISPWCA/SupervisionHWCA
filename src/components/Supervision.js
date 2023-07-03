@@ -241,23 +241,23 @@ const Supervision = ({ me }) => {
                         )
                     }
                 },
-                {
-                    accessorKey: 'statusPayment',
-                    header: `${translate('Status_Paiement')}`,
-                    Cell: ({ cell, row }) => {
-                        return (
-                            <>
-                                <span title={getStatusNameAndColorForPayment(cell.getValue())?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColorForPayment(cell.getValue())?.color?.background, color: getStatusNameAndColorForPayment(cell.getValue())?.color?.text, padding: '4px', fontSize: '12px', borderRadius: '5px' }}>
-                                    {getStatusNameAndColorForPayment(cell.getValue())?.name}
-                                </span>
-                            </>
-                        )
-                    }
-                },
-                {
-                    accessorKey: 'montant',
-                    header: `${translate('Montants')}`,
-                },
+                // {
+                //     accessorKey: 'statusPayment',
+                //     header: `${translate('Status_Paiement')}`,
+                //     Cell: ({ cell, row }) => {
+                //         return (
+                //             <>
+                //                 <span title={getStatusNameAndColorForPayment(cell.getValue())?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColorForPayment(cell.getValue())?.color?.background, color: getStatusNameAndColorForPayment(cell.getValue())?.color?.text, padding: '4px', fontSize: '12px', borderRadius: '5px' }}>
+                //                     {getStatusNameAndColorForPayment(cell.getValue())?.name}
+                //                 </span>
+                //             </>
+                //         )
+                //     }
+                // },
+                // {
+                //     accessorKey: 'montant',
+                //     header: `${translate('Montants')}`,
+                // },
                 {
                     header: `${translate('Actions')}`,
                     width: 100,
@@ -2936,16 +2936,25 @@ const Supervision = ({ me }) => {
         }
     }
 
+    const handleSelectCheckboxAgentForPerformance = (value) => {
+        if (selectedAgents.map(ag => ag.trackedEntityInstance).includes(value.trackedEntityInstance)) {
+            setSelectedAgents(selectedAgents.filter(ag => ag.trackedEntityInstance !== value.trackedEntityInstance))
+            setInputFields(inputFields.filter(o => o.trackedEntityInstance !== value.trackedEntityInstance))
+        } else {
+            setSelectedAgents([...selectedAgents, teisPerformanceList.find(tei => tei.trackedEntityInstance === value.trackedEntityInstance)])
+        }
+    }
+
     const handleChangePlanificationTypeAgent = ({ value }) => {
+        setSelectedOrganisationUnitInd(null)
+        selectedPeriod(null)
+        setSelectedPeriod([])
+        setSelectedOrganisationUnitGroups([])
         setSelectedPlanificationType(value)
     }
 
     const handleSearchByPerformances = async () => {
         try {
-            console.log("selectedPeriod: ", selectedPeriod)
-            console.log("selectedIndicators:", selectedIndicators)
-            console.log("selectedOrganisationUnitInd:", selectedOrganisationUnitInd)
-            console.log("selectedOrganisationUnitGroups:", selectedOrganisationUnitGroups)
             setLoadingTeiList(true)
 
             if (!selectedPeriod)
@@ -3277,10 +3286,12 @@ const Supervision = ({ me }) => {
                                                     {
                                                         header: translate('Actions'),
                                                         Cell: ({ cell, row }) => {
+                                                            console.log("row.original.trackedEntityInstance:", row.original.trackedEntityInstance)
+                                                            console.log("selectedAgents: ", selectedAgents)
                                                             return (
                                                                 <>
                                                                     <div>
-                                                                        <AntCheckbox onChange={() => handleSelectCheckboxAgent(row.original)} checked={selectedAgents.map(ag => ag.trackedEntityInstance).includes(row.original.trackedEntityInstance)} />
+                                                                        <AntCheckbox onChange={() => handleSelectCheckboxAgentForPerformance(row.original)} checked={selectedAgents.map(ag => ag.trackedEntityInstance).includes(row.original.trackedEntityInstance)} />
                                                                     </div>
                                                                 </>
                                                             )
@@ -3288,7 +3299,7 @@ const Supervision = ({ me }) => {
                                                     },
                                                     {
                                                         accessorKey: 'agentName',
-                                                        header: translate('Agent'),
+                                                        header: translate('Agent')
                                                     },
                                                     ...selectedIndicators.map(ind => (
                                                         {

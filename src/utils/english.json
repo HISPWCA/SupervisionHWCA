@@ -169,5 +169,9 @@
     "Paiements": "Payments",
     "Dashboard": "Dashboard",
     "Display_Supervisors": "Display Supervisors",
-    "Display_Supervisions": "Display Supervisions"
+    "Display_Supervisions": "Display Supervisions",
+
+    "Recherche": "Research",
+    "Groupe_Unite_Organisations": "Organisation unit groups",
+    "Veuillez_Selectionner_Unite_Organisation":"Please select the organisation unit !"
 }
