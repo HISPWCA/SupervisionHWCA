@@ -163,16 +163,7 @@ const Supervision = ({ me }) => {
             },
             {
                 accessorKey: 'period',
-                header: `${translate('Periode')}`,
-                Cell: ({ cell, row }) => {
-                    return (
-                        <>
-                            <span>
-                                {dayjs(cell.getValue()).format('YYYY-MM-DD')}
-                            </span>
-                        </>
-                    )
-                }
+                header: `${translate('Periode')}`
             },
 
             {
@@ -217,16 +208,7 @@ const Supervision = ({ me }) => {
                 },
                 {
                     accessorKey: 'period',
-                    header: `${translate('Periode')}`,
-                    Cell: ({ cell, row }) => {
-                        return (
-                            <>
-                                <span>
-                                    {dayjs(cell.getValue()).format('YYYY-MM-DD')}
-                                </span>
-                            </>
-                        )
-                    }
+                    header: `${translate('Periode')}`
                 },
                 {
                     accessorKey: 'statusSupervision', //normal accessorKey
@@ -1706,7 +1688,7 @@ const Supervision = ({ me }) => {
                             <MantineReactTable
                                 enableStickyHeader
                                 columns={columns()}
-                                data={filterAndGetPlanfications()}
+                                data={filterAndGetPlanfications().map(d => ({ ...d, period: dayjs(d.period).format('YYYY-MM-DD') }))}
                                 mantinePaperProps={{
                                     shadow: 'none',
                                     radius: '8px',
@@ -2947,8 +2929,12 @@ const Supervision = ({ me }) => {
 
     const handleChangePlanificationTypeAgent = ({ value }) => {
         setSelectedOrganisationUnitInd(null)
-        selectedPeriod(null)
-        setSelectedPeriod([])
+        setInputFields([])
+        setSelectedAgents([])
+        setSelectedPeriod(dayjs())
+        setTeisList([])
+        setTeisPerformanceList([])
+        setSelectedIndicators([])
         setSelectedOrganisationUnitGroups([])
         setSelectedPlanificationType(value)
     }
@@ -2986,7 +2972,7 @@ const Supervision = ({ me }) => {
             if (teis.length > 0) {
                 const routeAnalytic = `${API_BASE_ROUTE}/analytics/dataValueSet.json?dimension=dx:${selectedIndicators.map(ind => ind.indicator?.id).join(';')}&dimension=ou:${selectedOrganisationUnitInd?.id};LEVEL-${postLevel?.id}${ouGroupString?.trim()?.length > 0 ? ';' + ouGroupString : ''}&dimension=pe:${dayjs(selectedPeriod).format('YYYYMM')}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=true&includeNumDen=true&skipRounding=false&completedOnly=false`
                 const analyticResponse = await axios.get(routeAnalytic)
-                const dataValues = analyticResponse.data.dataValues
+                const dataValues = analyticResponse.data.dataValues || []
 
                 nouveauTeiList = teis.reduce((prev, current) => {
 
@@ -3223,7 +3209,6 @@ const Supervision = ({ me }) => {
                                                         accessorKey: 'tei',
                                                         header: translate('Actions'),
                                                         Cell: ({ cell, row }) => {
-                                                            console.log("row.original: ", row.original)
                                                             return (
                                                                 <>
                                                                     <div>
@@ -3275,8 +3260,6 @@ const Supervision = ({ me }) => {
                                     )
                                 }
 
-                                {console.log(teisPerformanceList)}
-
                                 {
                                     selectedPlanificationType === INDICATOR && teisPerformanceList.length > 0 && (
                                         <MantineReactTable
@@ -3286,8 +3269,6 @@ const Supervision = ({ me }) => {
                                                     {
                                                         header: translate('Actions'),
                                                         Cell: ({ cell, row }) => {
-                                                            console.log("row.original.trackedEntityInstance:", row.original.trackedEntityInstance)
-                                                            console.log("selectedAgents: ", selectedAgents)
                                                             return (
                                                                 <>
                                                                     <div>
@@ -3484,19 +3465,19 @@ const Supervision = ({ me }) => {
         </>
     )
 
-    const initInputFields = () => {
+    const initAgentInput = (agentList) => {
         const newList = []
-
-        if (selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT && selectedOrganisationUnits && selectedOrganisationUnits?.length > 0) {
-            for (let org of selectedOrganisationUnits) {
-                if (inputFields.map(inp => inp.organisationUnit.id).includes(org.id)) {
-                    newList.push(
-                        inputFields.find(inp => inp.organisationUnit.id === org.id)
-                    )
-                } else {
+        for (let ag of agentList) {
+            if (inputFields.map(inp => inp.trackedEntityInstance).includes(ag.trackedEntityInstance)) {
+                newList.push(
+                    inputFields.find(inp => inp.trackedEntityInstance === ag.trackedEntityInstance)
+                )
+            } else {
+                if (ag.enrollments?.length > 0) {
                     newList.push(
                         {
-                            organisationUnit: { id: org.id, displayName: org.displayName },
+                            organisationUnit: { id: ag.enrollments[0]?.orgUnit, displayName: ag.enrollments[0]?.orgUnitName },
+                            trackedEntityInstance: ag.enrollments[0]?.trackedEntityInstance,
                             program: { id: selectedProgram.program?.id, displayName: selectedProgram.program?.displayName },
                             fieldConfig: selectedProgram.fieldConfig,
                             generationType: selectedProgram.generationType,
@@ -3505,40 +3486,54 @@ const Supervision = ({ me }) => {
                             period: null,
                             supervisors: [],
                             otherSupervisors: [],
-                            inputOtherSupervisor: ''
+                            inputOtherSupervisor: '',
+
                         }
                     )
                 }
             }
         }
 
-        if (selectedSupervisionType === TYPE_SUPERVISION_AGENT && selectedAgents && selectedAgents?.length > 0) {
-            for (let ag of selectedAgents) {
-                if (inputFields.map(inp => inp.trackedEntityInstance).includes(ag.trackedEntityInstance)) {
-                    newList.push(
-                        inputFields.find(inp => inp.trackedEntityInstance === ag.trackedEntityInstance)
-                    )
-                } else {
-                    if (ag.enrollments?.length > 0) {
-                        newList.push(
-                            {
-                                organisationUnit: { id: ag.enrollments[0]?.orgUnit, displayName: ag.enrollments[0]?.orgUnitName },
-                                trackedEntityInstance: ag.enrollments[0]?.trackedEntityInstance,
-                                program: { id: selectedProgram.program?.id, displayName: selectedProgram.program?.displayName },
-                                fieldConfig: selectedProgram.fieldConfig,
-                                generationType: selectedProgram.generationType,
-                                libelle: '',
-                                payment: null,
-                                period: null,
-                                supervisors: [],
-                                otherSupervisors: [],
-                                inputOtherSupervisor: '',
+        return newList
+    }
 
-                            }
-                        )
+
+    const initInputOrganisation = () => ouList => {
+        const newList = []
+        for (let org of ouList) {
+            if (inputFields.map(inp => inp.organisationUnit.id).includes(org.id)) {
+                newList.push(
+                    inputFields.find(inp => inp.organisationUnit.id === org.id)
+                )
+            } else {
+                newList.push(
+                    {
+                        organisationUnit: { id: org.id, displayName: org.displayName },
+                        program: { id: selectedProgram.program?.id, displayName: selectedProgram.program?.displayName },
+                        fieldConfig: selectedProgram.fieldConfig,
+                        generationType: selectedProgram.generationType,
+                        libelle: '',
+                        payment: null,
+                        period: null,
+                        supervisors: [],
+                        otherSupervisors: [],
+                        inputOtherSupervisor: ''
                     }
-                }
+                )
             }
+        }
+        return newList
+    }
+
+    const initInputFields = () => {
+        let newList = []
+
+        if (selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT && selectedOrganisationUnits && selectedOrganisationUnits?.length > 0) {
+            newList = initInputOrganisation(selectedOrganisationUnits)
+        }
+
+        if (selectedSupervisionType === TYPE_SUPERVISION_AGENT && selectedAgents && selectedAgents?.length > 0) {
+            newList = initAgentInput(selectedAgents)
         }
 
         setInputFields(newList)
