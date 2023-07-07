@@ -750,16 +750,16 @@ export const Dashboard = ({ me }) => {
                 </>
             )
         },
-        {
-            title: translate('Status_Paiement'), key: 'statusPayment', dataIndex: 'statusPayment', width: '150px',
-            render: value => (
-                <>
-                    <span className='text-truncate-one' title={getStatusNameAndColorForPayment(value)?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColorForPayment(value)?.color?.background, color: getStatusNameAndColorForPayment(value)?.color?.text, padding: '3px', fontSize: '12px', borderRadius: '5px' }}>
-                        {getStatusNameAndColorForPayment(value)?.name}
-                    </span>
-                </>
-            )
-        },
+        // {
+        //     title: translate('Status_Paiement'), key: 'statusPayment', dataIndex: 'statusPayment', width: '150px',
+        //     render: value => (
+        //         <>
+        //             <span className='text-truncate-one' title={getStatusNameAndColorForPayment(value)?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColorForPayment(value)?.color?.background, color: getStatusNameAndColorForPayment(value)?.color?.text, padding: '3px', fontSize: '12px', borderRadius: '5px' }}>
+        //                 {getStatusNameAndColorForPayment(value)?.name}
+        //             </span>
+        //         </>
+        //     )
+        // },
         {
             title: translate('Actions'), key: 'action', width: '50px', dataIndex: 'tei', render: tei => (
                 <div style={{ textAlign: 'center', }}>
@@ -817,13 +817,12 @@ export const Dashboard = ({ me }) => {
                         />
                     </div>
                 </Col>
-                <Col sm={24} md={selectedProgram?.planificationType === AGENT ? 12 : 24}>
+                <Col sm={24} md={24}>
                     {0 > 1 && <div className='my-shadow' style={{ backgroundColor: '#fff', borderRadius: '8px', marginBottom: '2px', padding: '5px' }}>
                         <MapView
                             coordinates={coordinates}
                             style={{ height: '500px' }}
                         />
-
                     </div>
                     }
 
@@ -843,7 +842,7 @@ export const Dashboard = ({ me }) => {
 
                 </Col>
                 {
-                    selectedProgram?.planificationType === AGENT && (
+                    0 > 1 && selectedProgram?.planificationType === AGENT && (
                         <Col md={12} sm={24}>
                             <div className='my-shadow' style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '10px', marginBottom: '2px', height: '100%', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
 
