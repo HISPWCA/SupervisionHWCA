@@ -5,7 +5,7 @@ import ReactEchart from 'echarts-for-react'
 import axios from 'axios';
 import { DATA_ELEMENT_OPTION_SETS, ORGANISATION_UNITS_ROUTE, SERVER_URL, TRACKED_ENTITY_INSTANCES_ROUTE, USERS_ROUTE } from '../utils/api.routes'
 import OrganisationUnitsTree from './OrganisationUnitsTree'
-import { CANCELED, DESCENDANTS, NOTICE_BOX_DEFAULT, NOTIFICATON_CRITICAL, PENDING_VALIDATION, PLANIFICATION_PAR_MOI, PLANIFICATION_PAR_TOUS, PLANIFICATION_PAR_UN_USER, COMPLETED, SCHEDULED, TYPE_GENERATION_AS_ENROLMENT, TYPE_GENERATION_AS_EVENT, TYPE_GENERATION_AS_TEI, NA, PAYMENT_DONE, PENDING_PAYMENT, AGENT } from '../utils/constants'
+import { CANCELED, DESCENDANTS, NOTICE_BOX_DEFAULT, NOTIFICATION_CRITICAL, PENDING_VALIDATION, PLANIFICATION_PAR_MOI, PLANIFICATION_PAR_TOUS, PLANIFICATION_PAR_UN_USER, COMPLETED, SCHEDULED, TYPE_GENERATION_AS_ENROLMENT, TYPE_GENERATION_AS_EVENT, TYPE_GENERATION_AS_TEI, NA, PAYMENT_DONE, PENDING_PAYMENT, AGENT } from '../utils/constants'
 import MapView from './MapView'
 import { loadDataStore } from '../utils/functions'
 import { IoMdOpen } from 'react-icons/io'
@@ -198,7 +198,7 @@ export const Dashboard = ({ me }) => {
         }
         catch (err) {
             setLoadingOrganisationUnits(false)
-            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
         }
     }
 
@@ -211,7 +211,7 @@ export const Dashboard = ({ me }) => {
             setLoadingTeiList(false)
             setCalendarDate(selectedPeriod)
         } catch (err) {
-            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
             setLoadingTeiList(false)
         }
     }

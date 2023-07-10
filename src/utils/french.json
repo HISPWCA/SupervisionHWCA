@@ -174,5 +174,11 @@
     "Veuillez_Selectionner_Unite_Organisation": "Veuillez sélectionner l'unité d'organisation",
 
 
-    "Configuration_Equipes":"Configuration des Equipes"
+    "Configuration_Equipes":"Configuration des Equipes",
+    "Nom_De_Equipe":"Nom de l'équipe",
+    "Equipe_Ajouter":"Equipe ajoutée !",
+    "Equipe_Deja_Ajouter":"Equipe déjà ajoutée !",
+    "Nouvelle_Equipe":"Nouvelle Equipe",
+    "Confirmation_De_Suppression_De_Equipe":"Voulez-vous vraiment supprimer cette équipe ? ",
+    "Equipes":"Equipes"
 }

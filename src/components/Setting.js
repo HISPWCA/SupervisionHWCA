@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Button, Radio, Tab, TabBar } from "@dhis2/ui"
-import { AGGREGATE_INDICATOR, NOTIFICATON_CRITICAL, NOTIFICATON_SUCCESS, INDICATOR_GROUP, PAGE_CONFIGURATION_TYPE_SUPERVISIONS, PAGE_CONFIGURATION_USER_AUTHORIZATIONS, PAGE_CONFIG_INDICATORS, PAGE_CONFIG_SUPERVISION, PAGPE_CONFIGURATION_INDICATEURS, PROGRAM_INDICATOR, TYPE_GENERATION_AS_ENROLMENT, TYPE_GENERATION_AS_EVENT, TYPE_GENERATION_AS_TEI, PAGE_SUPERVISIONS, TYPE_ANALYSE_DATA_ELEMENT, PAGE_CONFIG_ANALYSE, TYPE_ANALYSE_INDICATOR, ORGANISATION_UNIT, AGENT } from "../utils/constants"
+import { AGGREGATE_INDICATOR, NOTIFICATION_CRITICAL, NOTIFICATION_SUCCESS, INDICATOR_GROUP, PAGE_CONFIGURATION_TYPE_SUPERVISIONS, PAGE_CONFIGURATION_USER_AUTHORIZATIONS, PAGE_CONFIG_INDICATORS, PAGE_CONFIG_SUPERVISION, PAGPE_CONFIGURATION_INDICATEURS, PROGRAM_INDICATOR, TYPE_GENERATION_AS_ENROLMENT, TYPE_GENERATION_AS_EVENT, TYPE_GENERATION_AS_TEI, PAGE_SUPERVISIONS, TYPE_ANALYSE_DATA_ELEMENT, PAGE_CONFIG_ANALYSE, TYPE_ANALYSE_INDICATOR, ORGANISATION_UNIT, AGENT } from "../utils/constants"
 import { Card, Checkbox, Col, Divider, Input, InputNumber, Popconfirm, Row, Select, Table } from 'antd'
 import { DATA_ELEMENTS_ROUTE, INDICATORS_GROUP_ROUTE, INDICATORS_ROUTE, PROGRAMS_ROUTE, PROGRAMS_STAGE_ROUTE, PROGRAM_INDICATOR_GROUPS } from '../utils/api.routes'
 import axios from 'axios'
@@ -240,10 +240,10 @@ const Setting = () => {
                 }
 
                 setMappingConfigs(newList)
-                setNotification({ show: true, message: translate('Suppression_Effectuee'), type: NOTIFICATON_SUCCESS })
+                setNotification({ show: true, message: translate('Suppression_Effectuee'), type: NOTIFICATION_SUCCESS })
             }
         } catch (err) {
-            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
         }
     }
 
@@ -268,7 +268,7 @@ const Setting = () => {
             const response = await loadDataStore(process.env.REACT_APP_INDICATORS_CONFIG_KEY, null, null, null)
             setMappingConfigs(response)
         } catch (err) {
-            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
         }
     }
 
@@ -286,7 +286,7 @@ const Setting = () => {
             const response = await loadDataStore(process.env.REACT_APP_ANALYSES_CONFIG_KEY, null, null, null)
             setAnalyseConfigs(response)
         } catch (err) {
-            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
 
         }
     }
@@ -309,7 +309,7 @@ const Setting = () => {
             const responseSupervisionTracker = await loadDataStore(process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY, null, null, null)
             setMappingConfigSupervisions(responseSupervisionTracker)
         } catch (err) {
-            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
         }
     }
 
@@ -333,7 +333,7 @@ const Setting = () => {
                 const newList = mappingConfigSupervisions.filter(mapConf => mapConf.id !== item.id)
                 await saveDataToDataStore(process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY, newList, null, null, null)
                 setMappingConfigSupervisions(newList)
-                setNotification({ show: true, message: translate('Suppression_Effectuee'), type: NOTIFICATON_SUCCESS })
+                setNotification({ show: true, message: translate('Suppression_Effectuee'), type: NOTIFICATION_SUCCESS })
 
                 setFieldEditingMode(false)
                 setSelectedTEIProgram(null)
@@ -351,7 +351,7 @@ const Setting = () => {
                 cleanPaymentConfigState()
             }
         } catch (err) {
-            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
         }
     }
 
@@ -395,7 +395,7 @@ const Setting = () => {
                 }
             }
         } catch (err) {
-            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
         }
     }
 
@@ -487,11 +487,11 @@ const Setting = () => {
                 setSelectedAttributesToDisplay([])
                 setLoadingSaveSupervionsConfig(false)
                 cleanPaymentConfigState()
-                setNotification({ show: true, type: NOTIFICATON_SUCCESS, message: isFieldEditingMode ? translate('Mise_A_Jour_Effectuer') : translate('Configuration_Ajoutee') })
+                setNotification({ show: true, type: NOTIFICATION_SUCCESS, message: isFieldEditingMode ? translate('Mise_A_Jour_Effectuer') : translate('Configuration_Ajoutee') })
             }
 
         } catch (err) {
-            setNotification({ show: true, type: NOTIFICATON_CRITICAL, message: err.response?.data?.message || err.message })
+            setNotification({ show: true, type: NOTIFICATION_CRITICAL, message: err.response?.data?.message || err.message })
             setLoadingSaveSupervionsConfig(false)
         }
     }
@@ -544,7 +544,7 @@ const Setting = () => {
 
                 await saveDataToDataStore(process.env.REACT_APP_INDICATORS_CONFIG_KEY, newList, setLoadingSaveIndicatorsConfig, null, null)
                 setMappingConfigs(newList)
-                setNotification({ show: true, message: !currentItem ? translate('Configuration_Ajoutee') : translate('Mise_A_Jour_Succes'), type: NOTIFICATON_SUCCESS })
+                setNotification({ show: true, message: !currentItem ? translate('Configuration_Ajoutee') : translate('Mise_A_Jour_Succes'), type: NOTIFICATION_SUCCESS })
                 setSelectedIndicator(null)
                 setIndicatorName(null)
                 setIndicatorBestPositive(true)
@@ -555,7 +555,7 @@ const Setting = () => {
             }
         } catch (err) {
             setLoadingSaveIndicatorsConfig(false)
-            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
         }
     }
 
@@ -581,10 +581,10 @@ const Setting = () => {
                 const newList = analyseConfigs.filter(analyseConf => analyseConf.id !== value.id)
                 await saveDataToDataStore(process.env.REACT_APP_ANALYSES_CONFIG_KEY, newList, null, null, null)
                 setAnalyseConfigs(newList)
-                setNotification({ show: true, message: translate('Suppression_Effectuee'), type: NOTIFICATON_SUCCESS })
+                setNotification({ show: true, message: translate('Suppression_Effectuee'), type: NOTIFICATION_SUCCESS })
             }
         } catch (err) {
-            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
         }
     }
 
@@ -641,13 +641,13 @@ const Setting = () => {
                 setAnalyseConfigs(newList)
                 setSelectedAnalyseDataElement(null)
                 setSelectedAnalyseIndicator(null)
-                setNotification({ show: true, type: NOTIFICATON_SUCCESS, message: translate('Configuration_Ajoutee') })
+                setNotification({ show: true, type: NOTIFICATION_SUCCESS, message: translate('Configuration_Ajoutee') })
                 return setLoadingAddAnalyseConfigs(false)
             } else {
                 throw new Error(translate('Configuration_Deja_Ajoutee'))
             }
         } catch (err) {
-            setNotification({ show: true, type: NOTIFICATON_CRITICAL, message: err.response?.data?.message || err.message })
+            setNotification({ show: true, type: NOTIFICATION_CRITICAL, message: err.response?.data?.message || err.message })
             setLoadingAddAnalyseConfigs(false)
         }
     }
@@ -829,7 +829,7 @@ const Setting = () => {
             setPaymentConfigList(prog?.paymentConfigs || [])
             setFieldEditingMode(true)
         } catch (err) {
-            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
         }
     }
 
@@ -999,10 +999,10 @@ const Setting = () => {
             setInputFraisMobileMoneyPayment(0)
             setInputMontantConstantPayment(0)
             setInputLibellePayment('')
-            setNotification({ show: true, message: isEditModePayment ? translate('Paiement_Mise_A_Jour') : translate('Paiement_Ajouter'), type: NOTIFICATON_SUCCESS })
+            setNotification({ show: true, message: isEditModePayment ? translate('Paiement_Mise_A_Jour') : translate('Paiement_Ajouter'), type: NOTIFICATION_SUCCESS })
 
         } catch (err) {
-            setNotification({ show: true, message: err.message, type: NOTIFICATON_CRITICAL })
+            setNotification({ show: true, message: err.message, type: NOTIFICATION_CRITICAL })
         }
 
     }
@@ -1110,7 +1110,7 @@ const Setting = () => {
         cleanPaymentConfigState()
         setPaymentConfigList(paymentConfigList.filter(p => p.id !== value.id))
 
-        return setNotification({ show: true, message: translate('Configuration_Supprimer'), type: NOTIFICATON_SUCCESS })
+        return setNotification({ show: true, message: translate('Configuration_Supprimer'), type: NOTIFICATION_SUCCESS })
     }
 
     const RenderPageSupervisionConfig = () => (

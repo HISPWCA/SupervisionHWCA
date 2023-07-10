@@ -1,5 +1,5 @@
 import { AlertBar } from "@dhis2/ui"
-import { NOTIFICATON_CRITICAL, NOTIFICATON_SUCCESS } from "../utils/constants"
+import { NOTIFICATION_CRITICAL, NOTIFICATION_SUCCESS } from "../utils/constants"
 
 const MyNotification = ({
     notification,
@@ -8,14 +8,14 @@ const MyNotification = ({
 
     const getNotificationContent = () => {
         if (notification?.show) {
-            if (notification?.type === NOTIFICATON_CRITICAL)
+            if (notification?.type === NOTIFICATION_CRITICAL)
                 return (
                     <AlertBar critical permanent onHidden={() => setNotification({ show: false, message: null, type: null })}>
                         {notification?.message}
                     </AlertBar>
                 )
 
-            if (notification?.type === NOTIFICATON_SUCCESS)
+            if (notification?.type === NOTIFICATION_SUCCESS)
                 return (
                     <AlertBar success onHidden={() => setNotification({ show: false, message: null, type: null })}>
                         {notification?.message}

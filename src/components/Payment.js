@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Button } from "@dhis2/ui"
 import { Card, Col, DatePicker, Divider, Radio, Row, Select } from "antd"
 import { API_BASE_ROUTE, ORGANISATION_UNITS_ROUTE, TRACKED_ENTITY_INSTANCES_ROUTE } from "../utils/api.routes"
-import { ALL, ASC_GF_RAPPORT, DISPLAY_SUPERVISIONS, DISPLAY_SUPERVISORS, INVALIDE, NOTICE_BOX_DEFAULT, NOTICE_BOX_WARNING, NOTIFICATON_CRITICAL, PENDING, SUPERVISOR_RAPPORT, VALIDE } from "../utils/constants"
+import { ALL, ASC_GF_RAPPORT, DISPLAY_SUPERVISIONS, DISPLAY_SUPERVISORS, INVALIDE, NOTICE_BOX_DEFAULT, NOTICE_BOX_WARNING, NOTIFICATION_CRITICAL, PENDING, SUPERVISOR_RAPPORT, VALIDE } from "../utils/constants"
 import translate from "../utils/translator"
 import OrganisationUnitsTree from "./OrganisationUnitsTree"
 import { BsCheckCircle } from 'react-icons/bs'
@@ -330,7 +330,7 @@ const Payment = ({ me }) => {
             console.log(err)
             setLoadingProcessing(false)
             cleanResultStates()
-            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
         }
     }
 
@@ -434,7 +434,7 @@ const Payment = ({ me }) => {
             setNotification({
                 show: true,
                 message: err.response?.data?.message || err.message,
-                type: NOTIFICATON_CRITICAL
+                type: NOTIFICATION_CRITICAL
             })
         }
     }

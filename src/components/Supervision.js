@@ -15,8 +15,8 @@ import {
     NA,
     NOTICE_BOX_DEFAULT,
     NOTICE_BOX_WARNING,
-    NOTIFICATON_CRITICAL,
-    NOTIFICATON_SUCCESS,
+    NOTIFICATION_CRITICAL,
+    NOTIFICATION_SUCCESS,
     ORGANISATION_UNIT,
     PAYMENT_DONE,
     PENDING_PAYMENT,
@@ -86,6 +86,7 @@ const Supervision = ({ me }) => {
     const [allSupervisionsFromTracker, setAllSupervisionsFromTracker] = useState([])
     const [organisationUnitGroups, setOrganisationUnitGroups] = useState([])
     const [teisPerformanceList, setTeisPerformanceList] = useState([])
+    const [equipeList, setEquipeList] = useState([])
 
     const [visibleAddEquipeModal, setVisibleAddEquipeModal] = useState(false)
 
@@ -108,13 +109,17 @@ const Supervision = ({ me }) => {
     const [selectedOrgUnitSupervisionFromTracker, setSelectedOrgUnitSupervisionFromTracker] = useState(null)
     const [selectedPeriodSupervisionConfig, setSelectedPeriodSupervisionConfig] = useState(null)
     const [selectedOrganisationUnitGroups, setSelectedOrganisationUnitGroups] = useState([])
+    const [selectedEquipeSuperviseurs, setSelectedEquipeSuperviseurs] = useState([])
+    const [selectedEquipeAutreSuperviseurs, setSelectedEquipeAutreSuperviseurs] = useState([])
 
+    const [inputEquipeAutreSuperviseur, setInputEquipeAutreSuperviseur] = useState('')
     const [inputMeilleur, setInputMeilleur] = useState(0)
     const [inputMauvais, setInputMauvais] = useState(0)
     const [inputMeilleurPositif, setInputMeilleurPositif] = useState(true)
     const [inputFields, setInputFields] = useState([])
     const [inputDataSourceDisplayName, setInputDataSourceDisplayName] = useState('')
     const [inputDataSourceID, setInputDataSourceID] = useState(null)
+    const [inputEquipeName, setInputEquipeName] = useState('')
 
     const [loadingDataStoreSupervisionConfigs, setLoadingDataStoreSupervisionConfigs] = useState(false)
     const [loadingDataStoreSupervisions, setLoadingDataStoreSupervisions] = useState(false)
@@ -326,7 +331,7 @@ const Supervision = ({ me }) => {
 
             setLoadingAllSupervisionsFromTracker(false)
         } catch (err) {
-            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
             setLoadingAllSupervisionsFromTracker(false)
         }
     }
@@ -605,14 +610,14 @@ const Supervision = ({ me }) => {
                     setInputDataSourceDisplayName('')
                     setInputDataSourceID(null)
                     setSelectedProgramStage(null)
-                    setNotification({ show: true, type: NOTIFICATON_SUCCESS, message: translate('Configuration_Ajoutee') })
+                    setNotification({ show: true, type: NOTIFICATION_SUCCESS, message: translate('Configuration_Ajoutee') })
                     setLoadingSaveDateElementMappingConfig(false)
                 } else {
                     throw new Error(translate('Configuration_Deja_Ajoutee'))
                 }
             }
         } catch (err) {
-            setNotification({ show: true, type: NOTIFICATON_CRITICAL, message: err.response?.data?.message || err.message })
+            setNotification({ show: true, type: NOTIFICATION_CRITICAL, message: err.response?.data?.message || err.message })
             setLoadingSaveDateElementMappingConfig(false)
         }
     }
@@ -622,10 +627,10 @@ const Supervision = ({ me }) => {
             if (value) {
                 const newList = mappingConfigs.filter(mapConf => mapConf.id !== value.id)
                 setMappingConfigs(newList)
-                setNotification({ show: true, message: translate('Suppression_Effectuee'), type: NOTIFICATON_SUCCESS })
+                setNotification({ show: true, message: translate('Suppression_Effectuee'), type: NOTIFICATION_SUCCESS })
             }
         } catch (err) {
-            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
         }
     }
 
@@ -670,7 +675,7 @@ const Supervision = ({ me }) => {
         loadProgramStages(sup.program?.id)
         setSelectedProgram(sup)
         if (selectedSupervisionType === TYPE_SUPERVISION_AGENT && sup?.attributesToDisplay?.length === 0) {
-            return setNotification({ show: true, message: translate('Attribute_Non_Configurer'), type: NOTIFICATON_CRITICAL })
+            return setNotification({ show: true, message: translate('Attribute_Non_Configurer'), type: NOTIFICATION_CRITICAL })
         }
     }
 
@@ -1573,12 +1578,12 @@ const Supervision = ({ me }) => {
             loadDataStoreSupervisionConfigs(organisationUnits)
             loadDataStoreSupervisions()
             setLoadingSupervisionPlanification(false)
-            setNotification({ show: true, message: translate('Planification_Effectuer'), type: NOTIFICATON_SUCCESS })
+            setNotification({ show: true, message: translate('Planification_Effectuer'), type: NOTIFICATION_SUCCESS })
             setEditionMode(false)
             cleanAllNewSupervisionState()
         } catch (err) {
             setLoadingSupervisionPlanification(false)
-            setNotification({ show: true, type: NOTIFICATON_CRITICAL, message: err.response?.data?.message || err.message })
+            setNotification({ show: true, type: NOTIFICATION_CRITICAL, message: err.response?.data?.message || err.message })
         }
     }
     const handleSelectSupervisionProgramConfigForTracker = (value) => {
@@ -1886,28 +1891,129 @@ const Supervision = ({ me }) => {
     )
 
     const handleAddNewEquipeClose = () => {
+        setInputEquipeName('')
+        setInputEquipeAutreSuperviseur('')
+        setSelectedEquipeAutreSuperviseurs([])
+        setSelectedEquipeSuperviseurs([])
         setVisibleAddEquipeModal(false)
     }
 
     const handleAddNewEquipeSave = () => {
+        try {
+            if (selectedEquipeSuperviseurs.length > 0) {
 
+                if (equipeList.map(e => e.name).includes(inputEquipeName))
+                    throw new Error(translate('Equipe_Deja_Ajouter'))
+
+                const equipePayload = {
+                    name: inputEquipeName,
+                    superviseurs: selectedEquipeSuperviseurs,
+                    autreSuperviseurs: selectedEquipeAutreSuperviseurs
+                }
+                setEquipeList([equipePayload, ...equipeList])
+                setInputEquipeAutreSuperviseur('')
+                setSelectedEquipeAutreSuperviseurs([])
+                setSelectedEquipeSuperviseurs([])
+                setInputEquipeName('')
+                setVisibleAddEquipeModal(false)
+                setNotification({ show: true, message: translate('Equipe_Ajouter'), type: NOTIFICATION_SUCCESS })
+            }
+        } catch (err) {
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
+        }
+    }
+
+    const handleSelectSuperviseurs = (values) => setSelectedEquipeSuperviseurs(values.map(value => users.find(u => u.id === value)))
+
+    const handleAddEquipeAutreSuperviseurs = () => {
+        if (inputEquipeAutreSuperviseur && !selectedEquipeAutreSuperviseurs?.includes(inputEquipeAutreSuperviseur?.trim())) {
+            setSelectedEquipeAutreSuperviseurs([...selectedEquipeAutreSuperviseurs, inputEquipeAutreSuperviseur])
+            setInputEquipeAutreSuperviseur('')
+        }
     }
 
     const RenderAddEquipeModal = () => visibleAddEquipeModal && (
         <>
             <Modal onClose={() => handleAddNewEquipeClose()}>
                 <ModalTitle>
-                    {translate('Source_De_Donnee')}
+                    {translate('Nouvelle_Equipe')}
                 </ModalTitle>
                 <ModalContent>
-                    <div>
-                        <DataDimension
-                            selectedDimensions={selectedMetaDatas.map(it => ({ ...it, isDeactivated: true }))}
-                            onSelect={value => {
-                                setSelectedMetaDatas(value?.items?.length > 0 ? [value.items[0]] : [])
-                            }}
-                            displayNameProp="displayName"
-                        />
+                    <div style={{ padding: '10px' }}>
+                        <div style={{ marginTop: '20px' }}>
+                            <div style={{ marginBottom: '5px' }}>{translate('Nom_De_Equipe')}</div>
+                            <Input
+                                placeholder={translate('Nom_De_Equipe')}
+                                style={{ width: '100%' }}
+                                value={inputEquipeName}
+                                onChange={event => setInputEquipeName(event.target.value)}
+                            />
+                        </div>
+
+                        <div style={{ marginTop: '10px' }}>
+                            <div style={{ marginBottom: '5px' }}>{translate('Superviseurs')}</div>
+                            <Select
+                                placeholder={translate('Superviseurs')}
+                                style={{ width: '100%' }}
+                                loading={loadingUsers}
+                                disabled={loadingUsers}
+                                value={selectedEquipeSuperviseurs.map(sup => sup.id)}
+                                onChange={handleSelectSuperviseurs}
+                                mode='multiple'
+                                optionFilterProp='label'
+                                showSearch
+                                options={users.map(user => ({ label: user.displayName, value: user.id }))}
+                            />
+                        </div>
+                        <div style={{ marginTop: '10px' }}>
+                            <div style={{ marginBottom: '5px' }}>{translate('Autre_Superviseurs')}</div>
+                            <Row gutter={[10, 10]}>
+                                <Col md={19} sm={24}>
+                                    <Input
+                                        placeholder={translate('Autre_Superviseurs')}
+                                        value={inputEquipeAutreSuperviseur}
+                                        style={{ width: '100%' }}
+                                        onChange={event => setInputEquipeAutreSuperviseur(event.target.value)}
+                                    />
+                                </Col>
+                                <Col flex='auto' style={{ textAlign: 'right' }}>
+                                    <Button
+                                        primary
+                                        onClick={handleAddEquipeAutreSuperviseurs}
+                                        disabled={!inputEquipeAutreSuperviseur?.trim() || selectedEquipeAutreSuperviseurs.map(e => e.displayName?.trim()).includes(inputEquipeAutreSuperviseur?.trim())}
+                                    >+ {translate('Ajouter')} </Button>
+                                </Col>
+                            </Row>
+                        </div>
+                        {
+                            selectedEquipeAutreSuperviseurs.length > 0 && (
+                                <div style={{ marginTop: '20px' }}>
+                                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                        {
+                                            selectedEquipeAutreSuperviseurs.map(item => (
+                                                <tr>
+                                                    <td style={{ padding: '5px', border: '1px solid #ccc' }}>
+                                                        <div>{item}</div>
+                                                    </td>
+                                                    <td style={{ padding: '5px', border: '1px solid #ccc', fontWeight: '50px' }}>
+                                                        <div>
+                                                            <Popconfirm
+                                                                title={translate('Suppression')}
+                                                                description={translate('Confirmation_Suppression_Superviseur')}
+                                                                icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+                                                                onConfirm={() => console.log("Delete : ", item)}
+                                                            >
+                                                                <RiDeleteBinLine style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }} />
+                                                            </Popconfirm>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        }
+                                    </table>
+                                </div>
+                            )
+                        }
                     </div>
                 </ModalContent>
                 <ModalActions>
@@ -1942,11 +2048,28 @@ const Supervision = ({ me }) => {
                             <th style={{ padding: '5px', border: '1px solid #ccc' }}>{translate('Superviseurs')}</th>
                             <th style={{ padding: '5px', border: '1px solid #ccc' }}>{translate('Actions')}</th>
                         </tr>
-                        <tr>
-                            <td style={{ padding: '5px', border: '1px solid #ccc', fontSize: '14px' }}>Equipe 1</td>
-                            <td style={{ padding: '5px', border: '1px solid #ccc', fontSize: '14px' }}>Aradio</td>
-                            <td style={{ padding: '5px', border: '1px solid #ccc', fontSize: '14px', width:'50px' }}>sup</td>
-                        </tr>
+                        {
+                            equipeList.map((eq, index) => (
+                                <tr key={index}>
+                                    <td style={{ padding: '5px', border: '1px solid #ccc', width: '100px' }}> {eq.name}</td>
+                                    <td style={{ padding: '5px', border: '1px solid #ccc' }}>
+                                        <span style={{ background: "#cccccc80", padding: '5px', borderRadius: '8px' }}>
+                                            {[...eq.superviseurs, ...eq.autreSuperviseurs].map(e => e.displayName ? e.displayName : e).join(',')}
+                                        </span>
+                                    </td>
+                                    <td style={{ padding: '5px', border: '1px solid #ccc' }}>
+                                        <Popconfirm
+                                            title={translate('Suppression')}
+                                            description={translate('Confirmation_De_Suppression_De_Equipe')}
+                                            icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+                                            onConfirm={() => handleDeleteOtherSupervisor(item, index)}
+                                        >
+                                            <RiDeleteBinLine style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }} />
+                                        </Popconfirm>
+                                    </td>
+                                </tr>
+                            ))
+                        }
                     </table>
                 </div>
             </Card>
@@ -2089,6 +2212,29 @@ const Supervision = ({ me }) => {
             })
         )
     }
+
+
+    const handleInputEquipe = (value, index) => {
+        setInputFields(
+            inputFields.map((field, fieldIndex) => {
+                if (index === fieldIndex) {
+                    const equipe = equipeList.find(eq => eq.name === value)
+                    const superviseurs = equipe?.superviseurs || []
+                    const autreSuperviseurs = equipe?.autreSuperviseurs || []
+                    return {
+                        ...field,
+                        equipe: equipe,
+                        supervisors: superviseurs,
+                        otherSupervisors: autreSuperviseurs
+
+                    }
+                }
+                return field
+            })
+        )
+    }
+
+
     const handleCloseOrgUnitForm = (org, index) => {
         setSelectedOrganisationUnits(selectedOrganisationUnits.filter(ou => ou.id !== org.id))
         setInputFields(inputFields.filter(o => o.organisationUnit?.id !== org.id))
@@ -2178,6 +2324,22 @@ const Supervision = ({ me }) => {
                                                 </div>
                                             </Col>
                                         }
+
+                                        <Col sm={24} md={24}>
+                                            <div>
+                                                <div style={{ marginBottom: '5px' }}>{translate('Equipes')}</div>
+                                                <Select
+                                                    placeholder={translate('Equipes')}
+                                                    style={{ width: '100%' }}
+                                                    value={inputFields[index]?.equipe?.id}
+                                                    onChange={(values) => handleInputEquipe(values, index)}
+                                                    optionFilterProp='label'
+                                                    showSearch
+                                                    options={equipeList.map(eq => ({ label: eq.name, id: eq.name }))}
+                                                />
+                                            </div>
+                                        </Col>
+
                                         <Col sm={24} md={24}>
                                             <div>
                                                 <div style={{ marginBottom: '5px' }}>{translate('Superviseurs')}</div>
@@ -2537,7 +2699,7 @@ const Supervision = ({ me }) => {
 
             setLoadingAnalyticIndicatorResults(false)
         } catch (err) {
-            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
             setLoadingAnalyticIndicatorResults(false)
             setAnalyticErrorMessage(null)
         }
@@ -3082,7 +3244,7 @@ const Supervision = ({ me }) => {
         } catch (err) {
             console.log(err)
             setLoadingTeiList(false)
-            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATON_CRITICAL })
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
         }
     }
 
@@ -3452,7 +3614,7 @@ const Supervision = ({ me }) => {
                                     {selectedProgram && RenderSupervisionPlanificationType()}
                                     {selectedPlanificationType === INDICATOR && RenderSupervisionPlanificationIndicatorContent()}
                                     {selectedPlanificationType === ORGANISATION_UNIT && RenderSupervisionPlanificationOrganisationUnitContent()}
-                                    {selectedProgram && RenderEquipePlanificationContent()}
+                                    {selectedProgram && selectedPlanificationType && RenderEquipePlanificationContent()}
                                 </Col>
                             )
                         }
