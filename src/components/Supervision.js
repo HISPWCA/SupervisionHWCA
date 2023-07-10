@@ -3772,9 +3772,10 @@ const Supervision = ({ me }) => {
 
 
     const initInputOrganisation = () => ouList => {
+        console.log("init : ", ouList)
         const newList = []
         for (let org of ouList) {
-            if (inputFields.map(inp => inp.organisationUnit.id).includes(org.id)) {
+            if (inputFields.map(inp => inp.organisationUnit?.id).includes(org.id)) {
                 newList.push(
                     inputFields.find(inp => inp.organisationUnit.id === org.id)
                 )
@@ -3809,6 +3810,8 @@ const Supervision = ({ me }) => {
         if (selectedSupervisionType === TYPE_SUPERVISION_AGENT && selectedAgents && selectedAgents?.length > 0) {
             newList = initAgentInput(selectedAgents)
         }
+
+        console.log("List : ", newList)
 
         setInputFields(newList)
     }
