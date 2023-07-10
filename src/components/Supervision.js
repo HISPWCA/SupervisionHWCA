@@ -3598,137 +3598,139 @@ const Supervision = ({ me }) => {
         </>
     )
 
-    const RenderStepsContent = () => <>
-        {
-            selectedStep === 0 && (
-                <>
-                    <Row gutter={[12, 12]}>
-                        {selectedProgram && (
-                            <Col md={24}>
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'right' }}>
-                                    <div>
-                                        <Button primary small disabled={selectedStep === 0 ? true : false} icon={<BsArrowLeft style={{ color: '#fff', fontSize: '18px' }} />} onClick={() => setSelectedStep(selectedStep - 1)}>{translate('Precedent')}</Button>
-                                    </div>
-                                    <div style={{ marginLeft: '10px' }}>
-                                        <Button
-                                            disabled={selectedSupervisionType === TYPE_SUPERVISION_AGENT ? selectedAgents.length > 0 ? false : true : false}
-                                            icon={<BsArrowRight style={{ color: '#fff', fontSize: '18px' }} />} primary small onClick={() => setSelectedStep(selectedStep + 1)}>{translate('Suivant')}</Button>
-                                    </div>
-                                </div>
-                            </Col>
-                        )}
-                        <Col sm={24} md={8}>
-                            {RenderSupervisionTypeContent()}
-                            {selectedSupervisionType && RenderSelectedSupervisionTypeList()}
-                            {selectedProgram && RenderDataElementConfigContent()}
-                        </Col>
-                        <Col sm={24} md={16}>
-                            {selectedProgram && selectedSupervisionType === TYPE_SUPERVISION_AGENT && selectedProgram.attributesToDisplay?.length > 0 && RenderAgentConfigList()}
-                            {selectedProgram && RenderDataElementConfigList()}
-                        </Col>
-                    </Row>
-                </>
-            )
-        }
-
-        {
-            selectedStep === 1 && (
-                <>
-                    <Row gutter={[10, 10]}>
-                        {selectedProgram && (
-                            <Col md={24}>
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'right' }}>
-                                    <div >
-                                        <Button primary small icon={<BsArrowLeft style={{ color: '#fff', fontSize: '18px' }} />} onClick={() => setSelectedStep(selectedStep - 1)}>{translate('Precedent')}</Button>
-                                    </div>
-                                    <div style={{ marginLeft: '10px' }}>
-                                        <Button disabled={selectedStep === 1 ? true : false} icon={<BsArrowRight style={{ color: '#fff', fontSize: '18px' }} />} primary small onClick={() => setSelectedStep(selectedStep + 1)}>{translate('Suivant')}</Button>
-                                    </div>
-                                </div>
-                            </Col>
-                        )}
-
-                        {
-                            selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT && (
-                                <Col sm={24} md={8}>
-                                    {selectedProgram && RenderSupervisionPlanificationType()}
-                                    {selectedPlanificationType === INDICATOR && RenderSupervisionPlanificationIndicatorContent()}
-                                    {selectedPlanificationType === ORGANISATION_UNIT && RenderSupervisionPlanificationOrganisationUnitContent()}
-                                    {selectedProgram && selectedPlanificationType && RenderEquipePlanificationContent()}
-                                </Col>
-                            )
-                        }
-
-                        {
-                            selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT && (
-                                <Col sm={24} md={16}>
-                                    {RenderPlanificationForm()}
-                                </Col>
-                            )
-                        }
-
-                        {
-                            selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
-                            selectedPlanificationType === INDICATOR &&
-                            selectedIndicators.length > 0 &&
-                            selectedOrganisationUnitInd &&
-                            selectedOrganisationUnitGroup &&
-                            selectedPeriod && (
+    const RenderStepsContent = () => (
+        <>
+            {
+                selectedStep === 0 && (
+                    <>
+                        <Row gutter={[12, 12]}>
+                            {selectedProgram && (
                                 <Col md={24}>
-                                    <Card size='small' className='my-shadow'>
-                                        <div style={{ textAlign: 'center' }}>
-                                            {
-                                                selectedPeriod &&
-                                                <div>
-                                                    <span>{translate('Periode_Selectionner')}:</span> <strong> {dayjs(selectedPeriod).format(' MMMM, YYYY')} </strong> /
-                                                    <span>{translate('Meilleur_Positif')}:</span> <strong> {inputMeilleurPositif ? translate('Oui') : translate('Non')} </strong> /
-                                                    {analyticIndicatorResults.map(ind => <> <span className="ml-2">{ind.indicator?.displayName}:</span> <strong>{ind.weight}</strong> </>)}
-                                                </div>
-                                            }
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'right' }}>
+                                        <div>
+                                            <Button primary small disabled={selectedStep === 0 ? true : false} icon={<BsArrowLeft style={{ color: '#fff', fontSize: '18px' }} />} onClick={() => setSelectedStep(selectedStep - 1)}>{translate('Precedent')}</Button>
                                         </div>
-                                        {analyticErrorMessage && <div style={{ marginTop: '20px' }}> <NoticeBox error > {analyticErrorMessage} </NoticeBox> </div>}
-                                    </Card>
+                                        <div style={{ marginLeft: '10px' }}>
+                                            <Button
+                                                disabled={selectedSupervisionType === TYPE_SUPERVISION_AGENT ? selectedAgents.length > 0 ? false : true : false}
+                                                icon={<BsArrowRight style={{ color: '#fff', fontSize: '18px' }} />} primary small onClick={() => setSelectedStep(selectedStep + 1)}>{translate('Suivant')}</Button>
+                                        </div>
+                                    </div>
                                 </Col>
-                            )
-                        }
+                            )}
+                            <Col sm={24} md={8}>
+                                {RenderSupervisionTypeContent()}
+                                {selectedSupervisionType && RenderSelectedSupervisionTypeList()}
+                                {selectedProgram && RenderDataElementConfigContent()}
+                            </Col>
+                            <Col sm={24} md={16}>
+                                {selectedProgram && selectedSupervisionType === TYPE_SUPERVISION_AGENT && selectedProgram.attributesToDisplay?.length > 0 && RenderAgentConfigList()}
+                                {selectedProgram && RenderDataElementConfigList()}
+                            </Col>
+                        </Row>
+                    </>
+                )
+            }
 
-                        {
-                            selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
-                            selectedPlanificationType === INDICATOR &&
-                            selectedIndicators.length > 0 &&
-                            selectedOrganisationUnitInd &&
-                            selectedOrganisationUnitGroup &&
-                            selectedPeriod &&
-                            analyticIndicatorResults.length > 0 &&
-                            [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].length >= parseInt(inputMeilleur || 0) + parseInt(inputMauvais || 0) &&
-                            (
-                                <Col md={24}>{RenderAnalyticIndicatorsResults()} </Col>
-                            )
-                        }
-
-                        {
-                            selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT && selectedPlanificationType === INDICATOR && selectedIndicators.length > 0 && selectedOrganisationUnits.length > 0 && (
+            {
+                selectedStep === 1 && (
+                    <>
+                        <Row gutter={[10, 10]}>
+                            {selectedProgram && (
                                 <Col md={24}>
-                                    {RenderOrganisationUnitForm(8)}
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'right' }}>
+                                        <div >
+                                            <Button primary small icon={<BsArrowLeft style={{ color: '#fff', fontSize: '18px' }} />} onClick={() => setSelectedStep(selectedStep - 1)}>{translate('Precedent')}</Button>
+                                        </div>
+                                        <div style={{ marginLeft: '10px' }}>
+                                            <Button disabled={selectedStep === 1 ? true : false} icon={<BsArrowRight style={{ color: '#fff', fontSize: '18px' }} />} primary small onClick={() => setSelectedStep(selectedStep + 1)}>{translate('Suivant')}</Button>
+                                        </div>
+                                    </div>
                                 </Col>
-                            )
-                        }
+                            )}
 
-                        {
-                            selectedSupervisionType === TYPE_SUPERVISION_AGENT &&
-                            selectedAgents.length > 0 && (
-                                <Col sm={24} md={24}>
-                                    {RenderAgentsForm(6)}
-                                </Col>
-                            )
-                        }
+                            {
+                                selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT && (
+                                    <Col sm={24} md={8}>
+                                        {selectedProgram && RenderSupervisionPlanificationType()}
+                                        {selectedPlanificationType === INDICATOR && RenderSupervisionPlanificationIndicatorContent()}
+                                        {selectedPlanificationType === ORGANISATION_UNIT && RenderSupervisionPlanificationOrganisationUnitContent()}
+                                        {selectedProgram && selectedPlanificationType && RenderEquipePlanificationContent()}
+                                    </Col>
+                                )
+                            }
 
-                    </Row>
-                </>
-            )
-        }
+                            {
+                                selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT && (
+                                    <Col sm={24} md={16}>
+                                        {RenderPlanificationForm()}
+                                    </Col>
+                                )
+                            }
 
-    </>
+                            {
+                                selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
+                                selectedPlanificationType === INDICATOR &&
+                                selectedIndicators.length > 0 &&
+                                selectedOrganisationUnitInd &&
+                                selectedOrganisationUnitGroup &&
+                                selectedPeriod && (
+                                    <Col md={24}>
+                                        <Card size='small' className='my-shadow'>
+                                            <div style={{ textAlign: 'center' }}>
+                                                {
+                                                    selectedPeriod &&
+                                                    <div>
+                                                        <span>{translate('Periode_Selectionner')}:</span> <strong> {dayjs(selectedPeriod).format(' MMMM, YYYY')} </strong> /
+                                                        <span>{translate('Meilleur_Positif')}:</span> <strong> {inputMeilleurPositif ? translate('Oui') : translate('Non')} </strong> /
+                                                        {analyticIndicatorResults.map(ind => <> <span className="ml-2">{ind.indicator?.displayName}:</span> <strong>{ind.weight}</strong> </>)}
+                                                    </div>
+                                                }
+                                            </div>
+                                            {analyticErrorMessage && <div style={{ marginTop: '20px' }}> <NoticeBox error > {analyticErrorMessage} </NoticeBox> </div>}
+                                        </Card>
+                                    </Col>
+                                )
+                            }
+
+                            {
+                                selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
+                                selectedPlanificationType === INDICATOR &&
+                                selectedIndicators.length > 0 &&
+                                selectedOrganisationUnitInd &&
+                                selectedOrganisationUnitGroup &&
+                                selectedPeriod &&
+                                analyticIndicatorResults.length > 0 &&
+                                [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].length >= parseInt(inputMeilleur || 0) + parseInt(inputMauvais || 0) &&
+                                (
+                                    <Col md={24}>{RenderAnalyticIndicatorsResults()} </Col>
+                                )
+                            }
+
+                            {
+                                selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT && selectedPlanificationType === INDICATOR && selectedIndicators.length > 0 && selectedOrganisationUnits.length > 0 && (
+                                    <Col md={24}>
+                                        {RenderOrganisationUnitForm(8)}
+                                    </Col>
+                                )
+                            }
+
+                            {
+                                selectedSupervisionType === TYPE_SUPERVISION_AGENT &&
+                                selectedAgents.length > 0 && (
+                                    <Col sm={24} md={24}>
+                                        {RenderAgentsForm(6)}
+                                    </Col>
+                                )
+                            }
+
+                        </Row>
+                    </>
+                )
+            }
+
+        </>
+    )
 
     const RenderSupervisionForm = () => (
         <>
@@ -3771,7 +3773,7 @@ const Supervision = ({ me }) => {
     }
 
 
-    const initInputOrganisation = () => ouList => {
+    const initInputOrganisation = ouList => {
         console.log("init : ", ouList)
         const newList = []
         for (let org of ouList) {
@@ -3804,6 +3806,7 @@ const Supervision = ({ me }) => {
         let newList = []
 
         if (selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT && selectedOrganisationUnits && selectedOrganisationUnits?.length > 0) {
+            console.log("Selected our: ", initInputOrganisation(selectedOrganisationUnits))
             newList = initInputOrganisation(selectedOrganisationUnits)
         }
 
