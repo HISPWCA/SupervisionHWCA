@@ -681,7 +681,7 @@ const Payment = ({ me }) => {
                         <div style={{ color: "#0096c7", background: '#eeeeee', padding: '5px' }}>
                             <span style={{ background: "#ff5400", color: "#fff", fontSize: "15px", borderRadius: "15px", fontWeight: 'bold', padding: '5px' }} >
                                 {`${selectedOrganisationUnit?.displayName} | ${dayjs(selectedPeriod).format()}`}
-                             </span>
+                            </span>
                         </div>
                     </Col>
                 </Row>
@@ -797,10 +797,12 @@ const Payment = ({ me }) => {
                             />
                         </Col>
                         <Col md={12}>
-                            <Radio.Group onChange={event => setSelectedTypeListToDisplay(event.target.value)} value={selectedTypeListToDisplay}>
-                                <Radio value={DISPLAY_SUPERVISORS}>{translate('Display_Supervisors')}</Radio>
-                                <Radio value={DISPLAY_SUPERVISIONS}>{translate('Display_Supervisions')}</Radio>
-                            </Radio.Group>
+                            <div style={{ marginLeft: '20px' }}>
+                                <Radio.Group onChange={event => setSelectedTypeListToDisplay(event.target.value)} value={selectedTypeListToDisplay}>
+                                    <Radio value={DISPLAY_SUPERVISORS}>{translate('Display_Supervisors')}</Radio>
+                                    <Radio value={DISPLAY_SUPERVISIONS}>{translate('Display_Supervisions')}</Radio>
+                                </Radio.Group>
+                            </div>
                         </Col>
                     </Row>
                 </div>
