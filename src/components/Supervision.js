@@ -1995,7 +1995,7 @@ const Supervision = ({ me }) => {
                                                     <td style={{ padding: '5px', border: '1px solid #ccc' }}>
                                                         <div>{item}</div>
                                                     </td>
-                                                    <td style={{ padding: '5px', border: '1px solid #ccc', fontWeight: '50px' }}>
+                                                    <td style={{ padding: '5px', border: '1px solid #ccc', width: '50px' }}>
                                                         <div>
                                                             <Popconfirm
                                                                 title={translate('Suppression')}
@@ -2021,7 +2021,11 @@ const Supervision = ({ me }) => {
                         <Button destructive onClick={() => handleAddNewEquipeClose()} icon={<CgCloseO style={{ fontSize: "18px" }} />}>
                             {translate('Annuler')}
                         </Button>
-                        <Button primary onClick={() => handleAddNewEquipeSave()} icon={<FiSave style={{ fontSize: "18px" }} />}>
+                        <Button
+                            primary
+                            disabled={inputEquipeName?.trim()?.length > 0 ? false : true}
+                            onClick={() => handleAddNewEquipeSave()}
+                            icon={<FiSave style={{ fontSize: "18px" }} />}>
                             {translate('Enregistrer')}
                         </Button>
                     </ButtonStrip>
@@ -2053,7 +2057,7 @@ const Supervision = ({ me }) => {
                                 <tr key={index}>
                                     <td style={{ padding: '5px', border: '1px solid #ccc', width: '100px' }}> {eq.name}</td>
                                     <td style={{ padding: '5px', border: '1px solid #ccc' }}>
-                                        <span style={{ background: "#cccccc80", padding: '5px', borderRadius: '8px' }}>
+                                        <span style={{ background: "#cccccc70", padding: '5px', borderRadius: '8px', fontSize: '14px' }}>
                                             {[...eq.superviseurs, ...eq.autreSuperviseurs].map(e => e.displayName ? e.displayName : e).join(',')}
                                         </span>
                                     </td>
@@ -2221,6 +2225,8 @@ const Supervision = ({ me }) => {
                     const equipe = equipeList.find(eq => eq.name === value)
                     const superviseurs = equipe?.superviseurs || []
                     const autreSuperviseurs = equipe?.autreSuperviseurs || []
+
+                    console.log("Found equipe : ", equipe)
                     return {
                         ...field,
                         equipe: equipe,
@@ -2331,8 +2337,8 @@ const Supervision = ({ me }) => {
                                                 <Select
                                                     placeholder={translate('Equipes')}
                                                     style={{ width: '100%' }}
-                                                    value={inputFields[index]?.equipe?.id}
-                                                    onChange={(values) => handleInputEquipe(values, index)}
+                                                    value={inputFields[index]?.equipe?.name}
+                                                    onChange={value => handleInputEquipe(value, index)}
                                                     optionFilterProp='label'
                                                     showSearch
                                                     options={equipeList.map(eq => ({ label: eq.name, id: eq.name }))}
