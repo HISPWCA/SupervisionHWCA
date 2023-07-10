@@ -797,7 +797,7 @@ const Payment = ({ me }) => {
                             />
                         </Col>
                         <Col md={12}>
-                            <div style={{ marginLeft: '20px' }}>
+                            <div style={{ marginLeft: '2x0px' }}>
                                 <Radio.Group onChange={event => setSelectedTypeListToDisplay(event.target.value)} value={selectedTypeListToDisplay}>
                                     <Radio value={DISPLAY_SUPERVISORS}>{translate('Display_Supervisors')}</Radio>
                                     <Radio value={DISPLAY_SUPERVISIONS}>{translate('Display_Supervisions')}</Radio>

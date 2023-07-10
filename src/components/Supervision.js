@@ -87,6 +87,8 @@ const Supervision = ({ me }) => {
     const [organisationUnitGroups, setOrganisationUnitGroups] = useState([])
     const [teisPerformanceList, setTeisPerformanceList] = useState([])
 
+    const [visibleAddEquipeModal, setVisibleAddEquipeModal] = useState(false)
+
     const [selectedStep, setSelectedStep] = useState(0)
     const [selectedSupervisionType, setSelectedSupervisionType] = useState(null)
     const [selectedProgram, setSelectedProgram] = useState(null)
@@ -1883,6 +1885,74 @@ const Supervision = ({ me }) => {
         </div>
     )
 
+    const handleAddNewEquipeClose = () => {
+        setVisibleAddEquipeModal(false)
+    }
+
+    const handleAddNewEquipeSave = () => {
+
+    }
+
+    const RenderAddEquipeModal = () => visibleAddEquipeModal && (
+        <>
+            <Modal onClose={() => handleAddNewEquipeClose()}>
+                <ModalTitle>
+                    {translate('Source_De_Donnee')}
+                </ModalTitle>
+                <ModalContent>
+                    <div>
+                        <DataDimension
+                            selectedDimensions={selectedMetaDatas.map(it => ({ ...it, isDeactivated: true }))}
+                            onSelect={value => {
+                                setSelectedMetaDatas(value?.items?.length > 0 ? [value.items[0]] : [])
+                            }}
+                            displayNameProp="displayName"
+                        />
+                    </div>
+                </ModalContent>
+                <ModalActions>
+                    <ButtonStrip end>
+                        <Button destructive onClick={() => handleAddNewEquipeClose()} icon={<CgCloseO style={{ fontSize: "18px" }} />}>
+                            {translate('Annuler')}
+                        </Button>
+                        <Button primary onClick={() => handleAddNewEquipeSave()} icon={<FiSave style={{ fontSize: "18px" }} />}>
+                            {translate('Enregistrer')}
+                        </Button>
+                    </ButtonStrip>
+                </ModalActions>
+            </Modal>
+        </>
+    )
+
+    const handleAddNewEquipe = () => {
+        setVisibleAddEquipeModal(true)
+    }
+
+    const RenderEquipePlanificationContent = () => (
+        <div style={{ marginTop: '10px' }}>
+            <Card bodyStyle={{ padding: '0px' }} className='my-shadow' size='small'>
+                <div style={{ fontWeight: 'bold', padding: '10px', borderBottom: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    {translate('Configuration_Equipes')}
+                    <Button primary onClick={handleAddNewEquipe} small>+ {translate('Ajouter')}</Button>
+                </div>
+                <div style={{ padding: '10px' }}>
+                    <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+                        <tr>
+                            <th style={{ padding: '5px', border: '1px solid #ccc' }}>{translate('Nom')}</th>
+                            <th style={{ padding: '5px', border: '1px solid #ccc' }}>{translate('Superviseurs')}</th>
+                            <th style={{ padding: '5px', border: '1px solid #ccc' }}>{translate('Actions')}</th>
+                        </tr>
+                        <tr>
+                            <td style={{ padding: '5px', border: '1px solid #ccc', fontSize: '14px' }}>Equipe 1</td>
+                            <td style={{ padding: '5px', border: '1px solid #ccc', fontSize: '14px' }}>Aradio</td>
+                            <td style={{ padding: '5px', border: '1px solid #ccc', fontSize: '14px', width:'50px' }}>sup</td>
+                        </tr>
+                    </table>
+                </div>
+            </Card>
+        </div>
+    )
+
     const RenderSupervisionPlanificationOrganisationUnitContent = () => (
         <div style={{ marginTop: '10px' }}>
             <Card bodyStyle={{ padding: '0px' }} className='my-shadow' size='small'>
@@ -3382,6 +3452,7 @@ const Supervision = ({ me }) => {
                                     {selectedProgram && RenderSupervisionPlanificationType()}
                                     {selectedPlanificationType === INDICATOR && RenderSupervisionPlanificationIndicatorContent()}
                                     {selectedPlanificationType === ORGANISATION_UNIT && RenderSupervisionPlanificationOrganisationUnitContent()}
+                                    {selectedProgram && RenderEquipePlanificationContent()}
                                 </Col>
                             )
                         }
@@ -3575,6 +3646,7 @@ const Supervision = ({ me }) => {
                     </>
                 )
             }
+            {RenderAddEquipeModal()}
             {RenderAnalyticComponentModal()}
             {RenderNoticeBox()}
             <MyNotification notification={notification} setNotification={setNotification} />

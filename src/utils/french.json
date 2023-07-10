@@ -169,8 +169,10 @@
     "Dashboard": "Dashboard",
     "Display_Supervisors": "Afficher les Superviseurs",
     "Display_Supervisions": "Afficher les Supervisions",
-
     "Recherche": "Rechercher",
     "Groupe_Unite_Organisations": "Groupe d'unité d'organisation",
-    "Veuillez_Selectionner_Unite_Organisation":"Veuillez sélectionner l'unité d'organisation"
+    "Veuillez_Selectionner_Unite_Organisation": "Veuillez sélectionner l'unité d'organisation",
+
+
+    "Configuration_Equipes":"Configuration des Equipes"
 }

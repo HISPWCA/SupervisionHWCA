@@ -81,10 +81,14 @@ export const Body = () => {
                 <span style={{ marginLeft: '10px' }}>{translate('Dashboard')}</span>
             </div>
 
-            <div className={`menu-item ${renderPage === PAGE_PAYMENT ? 'active' : ''}`} onClick={_ => handleClickMenu(PAGE_PAYMENT)}>
-                <span><MdAttachMoney style={{ fontSize: '22px' }} /></span>
-                <span style={{ marginLeft: '10px' }}>{translate('Paiements')}</span>
-            </div>
+            {
+                0 > 1 && (
+                    <div className={`menu-item ${renderPage === PAGE_PAYMENT ? 'active' : ''}`} onClick={_ => handleClickMenu(PAGE_PAYMENT)}>
+                        <span><MdAttachMoney style={{ fontSize: '22px' }} /></span>
+                        <span style={{ marginLeft: '10px' }}>{translate('Paiements')}</span>
+                    </div>
+                )
+            }
 
             <div className={`menu-item ${renderPage === PAGE_SUPERVISIONS ? 'active' : ''}`} onClick={_ => handleClickMenu(PAGE_SUPERVISIONS)}>
                 <span><MdOutlineEditNote style={{ fontSize: '22px' }} /></span>
