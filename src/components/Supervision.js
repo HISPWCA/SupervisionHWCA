@@ -3760,7 +3760,7 @@ const Supervision = ({ me }) => {
                             supervisors: [],
                             otherSupervisors: [],
                             inputOtherSupervisor: '',
-
+                            equipe: null,
                         }
                     )
                 }
