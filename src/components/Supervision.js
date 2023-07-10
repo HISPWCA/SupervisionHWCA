@@ -661,6 +661,8 @@ const Supervision = ({ me }) => {
         setSelectedPlanificationType(value)
     }
 
+
+
     const handleClickFloatingBtn = () => {
         setEditionMode(!isEditionMode)
     }
@@ -1890,6 +1892,22 @@ const Supervision = ({ me }) => {
         </div>
     )
 
+
+    const handleDelelteEquipe = async (value) => {
+        try {
+            if (value) {
+                setEquipeList(equipeList.filter(eq => eq.name !== value))
+                setInputEquipeName('')
+                setInputEquipeAutreSuperviseur('')
+                setSelectedEquipeAutreSuperviseurs([])
+                setSelectedEquipeSuperviseurs([])
+                setNotification({ show: true, message: translate('Suppression_Effectuee'), type: NOTIFICATION_SUCCESS })
+            }
+        } catch (err) {
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
+        }
+    }
+
     const handleAddNewEquipeClose = () => {
         setInputEquipeName('')
         setInputEquipeAutreSuperviseur('')
@@ -2056,17 +2074,25 @@ const Supervision = ({ me }) => {
                             equipeList.map((eq, index) => (
                                 <tr key={index}>
                                     <td style={{ padding: '5px', border: '1px solid #ccc', width: '100px' }}> {eq.name}</td>
-                                    <td style={{ padding: '5px', border: '1px solid #ccc' }}>
-                                        <span style={{ background: "#cccccc70", padding: '5px', borderRadius: '8px', fontSize: '14px' }}>
-                                            {[...eq.superviseurs, ...eq.autreSuperviseurs].map(e => e.displayName ? e.displayName : e).join(',')}
-                                        </span>
+                                    <td style={{ padding: '5px', border: '1px solid #ccc', display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
+                                        {
+                                            [...eq.superviseurs, ...eq.autreSuperviseurs].map(e => e.displayName ? (
+                                                <span key={e.displayName} style={{ background: '#0a939640', padding: '5px', borderRadius: '8px', fontSize: '12px', marginRight: '2px', marginTop: '2px' }}>
+                                                    {e.displayName}
+                                                </span>
+                                            ) : (
+                                                <span key={e} style={{ background: '#0a939640', padding: '5px', borderRadius: '8px', fontSize: '12px', marginRight: '2px', marginTop: '2px' }}>
+                                                    {e}
+                                                </span>
+                                            ))
+                                        }
                                     </td>
-                                    <td style={{ padding: '5px', border: '1px solid #ccc' }}>
+                                    <td style={{ padding: '5px', border: '1px solid #ccc', textAlign: 'center' }}>
                                         <Popconfirm
                                             title={translate('Suppression')}
                                             description={translate('Confirmation_De_Suppression_De_Equipe')}
                                             icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
-                                            onConfirm={() => handleDeleteOtherSupervisor(item, index)}
+                                            onConfirm={() => handleDelelteEquipe(eq.name)}
                                         >
                                             <RiDeleteBinLine style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }} />
                                         </Popconfirm>
@@ -2219,25 +2245,33 @@ const Supervision = ({ me }) => {
 
 
     const handleInputEquipe = (value, index) => {
-        setInputFields(
-            inputFields.map((field, fieldIndex) => {
-                if (index === fieldIndex) {
-                    const equipe = equipeList.find(eq => eq.name === value)
-                    const superviseurs = equipe?.superviseurs || []
-                    const autreSuperviseurs = equipe?.autreSuperviseurs || []
+        try {
+            console.log("Input value: ", value)
+            console.log("equipeList : ", equipeList)
+            console.log("index: ", index)
+            setInputFields(
+                inputFields.map((field, fieldIndex) => {
+                    console.log("fiel index: ", fieldIndex)
+                    console.log("index: ", index)
+                    if (index === fieldIndex) {
+                        const equipe = equipeList.find(eq => eq.name === value)
+                        const superviseurs = equipe?.superviseurs || []
+                        const autreSuperviseurs = equipe?.autreSuperviseurs || []
 
-                    console.log("Found equipe : ", equipe)
-                    return {
-                        ...field,
-                        equipe: equipe,
-                        supervisors: superviseurs,
-                        otherSupervisors: autreSuperviseurs
-
+                        console.log("Found equipe : ", equipe)
+                        return {
+                            ...field,
+                            equipe: equipe,
+                            supervisors: superviseurs,
+                            otherSupervisors: autreSuperviseurs
+                        }
                     }
-                }
-                return field
-            })
-        )
+                    return field
+                })
+            )
+        } catch (err) {
+            console.log(err)
+        }
     }
 
 
@@ -2293,7 +2327,7 @@ const Supervision = ({ me }) => {
                                         )
                                     }
 
-                                    <span className="delete-sup"  >
+                                    <span className="delete-sup" >
                                         <Popconfirm
                                             title={translate('Suppression')}
                                             description={translate('Confirmation_Suppression_Du_Formulaire')}
@@ -2332,7 +2366,7 @@ const Supervision = ({ me }) => {
                                         }
 
                                         <Col sm={24} md={24}>
-                                            <div>
+                                            <div> {console.log("inputFields: ", inputFields)}
                                                 <div style={{ marginBottom: '5px' }}>{translate('Equipes')}</div>
                                                 <Select
                                                     placeholder={translate('Equipes')}
@@ -2341,7 +2375,7 @@ const Supervision = ({ me }) => {
                                                     onChange={value => handleInputEquipe(value, index)}
                                                     optionFilterProp='label'
                                                     showSearch
-                                                    options={equipeList.map(eq => ({ label: eq.name, id: eq.name }))}
+                                                    options={equipeList.map(eq => ({ label: eq.name, value: eq.name }))}
                                                 />
                                             </div>
                                         </Col>
@@ -2378,9 +2412,9 @@ const Supervision = ({ me }) => {
                                                         <Button
                                                             primary
                                                             onClick={() => handleInputAddOtherSupervisors(index)}
-                                                            disabled={
-                                                                inputFields[index]?.inputOtherSupervisor?.trim() && !inputFields[index]?.otherSupervisorList?.includes(inputFields[index]?.inputOtherSupervisor?.trim()) ? false : true
-                                                            }
+                                                        // disabled={
+                                                        //     inputFields[index]?.inputOtherSupervisor?.trim() && !inputFields[index]?.otherSupervisorList?.includes(inputFields[index]?.inputOtherSupervisor?.trim()) ? false : true
+                                                        // }
                                                         >+ {translate('Ajouter')} </Button>
                                                     </Col>
                                                 </Row>
@@ -3754,6 +3788,7 @@ const Supervision = ({ me }) => {
                         libelle: '',
                         payment: null,
                         period: null,
+                        equipe: null,
                         supervisors: [],
                         otherSupervisors: [],
                         inputOtherSupervisor: ''
