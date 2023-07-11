@@ -174,11 +174,20 @@
     "Veuillez_Selectionner_Unite_Organisation": "Veuillez sélectionner l'unité d'organisation",
 
 
-    "Configuration_Equipes":"Configuration des Equipes",
+    "Configuration_Equipes":"Configuration des Equipes de superviseurs",
     "Nom_De_Equipe":"Nom de l'équipe",
     "Equipe_Ajouter":"Equipe ajoutée !",
     "Equipe_Deja_Ajouter":"Equipe déjà ajoutée !",
     "Nouvelle_Equipe":"Nouvelle Equipe",
     "Confirmation_De_Suppression_De_Equipe":"Voulez-vous vraiment supprimer cette équipe ? ",
-    "Equipes":"Equipes"
+    "Equipes":"Equipes",
+    "Selectionnez_Indicateurs_De_Performance" :"Sélectionnez les indicateurs de performances: ",
+    "Venant_Des_Favoris":"Venant des favoris ?",
+    "Element_De_Performance_Obligatoire":"Veuillez Sélectionner l'élément de performance !",
+    "Indicateurs_Selectionnes":"Indicateurs sélectionnés",
+    "Enregistrer_Comme_Favorites":"Enrégistrer comme favoris",
+    "Favorit_Exist_Deja":"Cette favoris existe déjà !",
+    "Selectionnez_La_Favorit":"Sélectionnez la favoris",
+    "Enregistrement_Favorit":"Enrégistrement de la favoris",
+    "Favorit_Enregistrer_Avec_Succes":"Favoris enrégistrée avec succès !"
 }

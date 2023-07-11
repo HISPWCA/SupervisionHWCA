@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect, useState } from 'react'
 import { MantineReactTable } from 'mantine-react-table'
-import { Card, Col, DatePicker, Divider, FloatButton, Input, InputNumber, List, Popconfirm, Row, Select, Checkbox as AntCheckbox, Table, Grid, message } from 'antd'
+import { Card, Col, DatePicker, Divider, FloatButton, Input, InputNumber, List, Popconfirm, Row, Select, Checkbox as AntCheckbox, Table, Grid, message, Popover } from 'antd'
 import { IoMdAdd } from 'react-icons/io'
 import { IoListCircleOutline } from 'react-icons/io5'
 import { Button, ButtonStrip, Checkbox, CircularLoader, Modal, ModalActions, ModalContent, ModalTitle, NoticeBox, Radio } from '@dhis2/ui'
@@ -10,6 +10,8 @@ import {
     COMPLETED,
     DAY,
     DESCENDANTS,
+    DIRECTE,
+    FAVORIS,
     INDICATOR,
     MONTH,
     NA,
@@ -49,6 +51,7 @@ import { CgCloseO } from 'react-icons/cg'
 import { TbSelect } from 'react-icons/tb'
 import { DataDimension } from '@dhis2/analytics'
 import { IoMdOpen } from 'react-icons/io'
+import { MdFavorite } from 'react-icons/md'
 
 
 import dayjs from 'dayjs';
@@ -79,6 +82,7 @@ const Supervision = ({ me }) => {
     const [isNewMappingMode, setIsNewMappingMode] = useState(false)
     const [mappingConfigs, setMappingConfigs] = useState([])
     const [visibleAnalyticComponentModal, setVisibleAnalyticComponentModal] = useState(false)
+    const [visibleAnalyticComponentPerformanceModal, setVisibleAnalyticComponentPerformanceModal] = useState(false)
     const [analyticIndicatorResults, setAnalyticIndicatorResults] = useState([])
     const [analyticErrorMessage, setAnalyticErrorMessage] = useState(null)
     const [teisList, setTeisList] = useState([])
@@ -87,8 +91,10 @@ const Supervision = ({ me }) => {
     const [organisationUnitGroups, setOrganisationUnitGroups] = useState([])
     const [teisPerformanceList, setTeisPerformanceList] = useState([])
     const [equipeList, setEquipeList] = useState([])
+    const [favoritPerformanceList, setFavoritPerformanceList] = useState([])
 
     const [visibleAddEquipeModal, setVisibleAddEquipeModal] = useState(false)
+    const [visibleAddFavoritPerformanceModal, setVisibleAddFavoritPerformanceModal] = useState(false)
 
     const [selectedStep, setSelectedStep] = useState(0)
     const [selectedSupervisionType, setSelectedSupervisionType] = useState(null)
@@ -111,7 +117,17 @@ const Supervision = ({ me }) => {
     const [selectedOrganisationUnitGroups, setSelectedOrganisationUnitGroups] = useState([])
     const [selectedEquipeSuperviseurs, setSelectedEquipeSuperviseurs] = useState([])
     const [selectedEquipeAutreSuperviseurs, setSelectedEquipeAutreSuperviseurs] = useState([])
+    const [selectedSelectionTypeForPerformance, setSelectedSelectionTypeForPerformance] = useState(DIRECTE)
+    const [selectedElementForPerformances, setSelectedElementForPerformances] = useState([])
+    const [selectedIndicatorsConfiguratedForPerformances, setSelectedIndicatorsConfiguratedForPerformances] = useState([])
+    const [selectedFavoritForPerformance, setSelectedFavoritForPerformance] = useState(null)
 
+    const [inputFavorisName, setInputFavoritName] = useState('')
+    const [inputIndicatorWeightForPerormance, setInputIndicatorWeightForPerormance] = useState(0)
+    const [inputIndicatorBestPositiveForPerormance, setInputIndicatorBestPositiveForPerormance] = useState(true)
+    const [inputIndicatorNameForPerformance, setInputIndicatorNameForPerformance] = useState('')
+    const [inputIndicatorIdForPerformance, setInputIndicatorIdForPerformance] = useState(null)
+    const [inputWeightForPerformance, setInputWeightForPerformance] = useState('')
     const [inputEquipeAutreSuperviseur, setInputEquipeAutreSuperviseur] = useState('')
     const [inputMeilleur, setInputMeilleur] = useState(0)
     const [inputMauvais, setInputMauvais] = useState(0)
@@ -1231,6 +1247,7 @@ const Supervision = ({ me }) => {
     }
 
     const handleSelectIndicators = (values) => setSelectedIndicators(values.map(val => dataStoreIndicatorConfigs.find(dsInd => dsInd.indicator?.id === val)))
+
     const handleSelectOrgUnitGroup = (values) => setSelectedOrganisationUnitGroups(values.map(val => organisationUnitGroups.find(orgGp => orgGp.id === val)))
 
     const savePanificationToDataStore = async (payload) => {
@@ -1957,8 +1974,8 @@ const Supervision = ({ me }) => {
                     {translate('Nouvelle_Equipe')}
                 </ModalTitle>
                 <ModalContent>
-                    <div style={{ padding: '10px' }}>
-                        <div style={{ marginTop: '20px' }}>
+                    <div style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '5px' }}>
+                        <div>
                             <div style={{ marginBottom: '5px' }}>{translate('Nom_De_Equipe')}</div>
                             <Input
                                 placeholder={translate('Nom_De_Equipe')}
@@ -2019,7 +2036,10 @@ const Supervision = ({ me }) => {
                                                                 title={translate('Suppression')}
                                                                 description={translate('Confirmation_Suppression_Superviseur')}
                                                                 icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
-                                                                onConfirm={() => console.log("Delete : ", item)}
+                                                                onConfirm={() => {
+                                                                    setInputEquipeAutreSuperviseur('')
+                                                                    setSelectedEquipeAutreSuperviseurs(selectedEquipeAutreSuperviseurs.filter(e => e !== item))
+                                                                }}
                                                             >
                                                                 <RiDeleteBinLine style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }} />
                                                             </Popconfirm>
@@ -2052,6 +2072,78 @@ const Supervision = ({ me }) => {
         </>
     )
 
+
+    const handleCloseAddFavoritForPerformance = () => {
+        setVisibleAddFavoritPerformanceModal(false)
+        setInputFavoritName('')
+    }
+
+    const handleAddFavoritPerformanceSave = () => {
+        try {
+            if (!inputFavorisName || inputFavorisName?.trim()?.length === 0)
+                throw new Error(translate('Nom_Obligatoire'))
+
+            if (favoritPerformanceList.map(f => f.nom).includes(inputFavorisName))
+                throw new Error(translate('Favorit_Exist_Deja'))
+
+            const payload = {
+                id: uuid(),
+                name: inputFavorisName,
+                indicators: selectedIndicators
+            }
+
+            setFavoritPerformanceList([payload, ...favoritPerformanceList])
+
+            setNotification({ show: true, message: translate('Favorit_Enregistrer_Avec_Succes'), type: NOTIFICATION_SUCCESS })
+            setInputFavoritName('')
+            setVisibleAddFavoritPerformanceModal(false)
+        } catch (err) {
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
+            setVisibleAddFavoritPerformanceModal(false)
+        }
+    }
+
+    const RenderAddFavoritPerformanceModal = () => visibleAddFavoritPerformanceModal && (
+        <>
+            <Modal onClose={() => handleAddNewEquipeClose()} dense small>
+                <ModalTitle>
+                    <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
+                        {translate('Enregistrement_Favorit')}
+                    </div>
+                </ModalTitle>
+                <ModalContent>
+                    <div style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '5px' }}>
+                        <div>
+                            <div style={{ marginBottom: '5px' }}>{translate('Nom')}</div>
+                            <Input
+                                placeholder={translate('Nom')}
+                                style={{ width: '100%' }}
+                                value={inputFavorisName}
+                                onChange={event => setInputFavoritName(event.target.value)}
+                            />
+                        </div>
+                    </div>
+                </ModalContent>
+                <ModalActions>
+                    <ButtonStrip end>
+                        <Button destructive onClick={handleCloseAddFavoritForPerformance} icon={<CgCloseO style={{ fontSize: "18px" }} />} small>
+                            {translate('Annuler')}
+                        </Button>
+                        <Button
+                            small
+                            primary
+                            disabled={inputFavorisName?.trim()?.length > 0 ? false : true}
+                            onClick={handleAddFavoritPerformanceSave}
+                            icon={<FiSave style={{ fontSize: "18px" }} />}>
+                            {translate('Enregistrer')}
+                        </Button>
+                    </ButtonStrip>
+                </ModalActions>
+            </Modal>
+        </>
+    )
+
+
     const handleAddNewEquipe = () => {
         setVisibleAddEquipeModal(true)
     }
@@ -2065,41 +2157,49 @@ const Supervision = ({ me }) => {
                 </div>
                 <div style={{ padding: '10px' }}>
                     <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-                        <tr>
-                            <th style={{ padding: '5px', border: '1px solid #ccc' }}>{translate('Nom')}</th>
-                            <th style={{ padding: '5px', border: '1px solid #ccc' }}>{translate('Superviseurs')}</th>
-                            <th style={{ padding: '5px', border: '1px solid #ccc' }}>{translate('Actions')}</th>
-                        </tr>
-                        {
-                            equipeList.map((eq, index) => (
-                                <tr key={index}>
-                                    <td style={{ padding: '5px', border: '1px solid #ccc', width: '100px' }}> {eq.name}</td>
-                                    <td style={{ padding: '5px', border: '1px solid #ccc', display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
-                                        {
-                                            [...eq.superviseurs, ...eq.autreSuperviseurs].map(e => e.displayName ? (
-                                                <span key={e.displayName} style={{ background: '#0a939640', padding: '5px', borderRadius: '8px', fontSize: '12px', marginRight: '2px', marginTop: '2px' }}>
-                                                    {e.displayName}
-                                                </span>
-                                            ) : (
-                                                <span key={e} style={{ background: '#0a939640', padding: '5px', borderRadius: '8px', fontSize: '12px', marginRight: '2px', marginTop: '2px' }}>
-                                                    {e}
-                                                </span>
-                                            ))
-                                        }
-                                    </td>
-                                    <td style={{ padding: '5px', border: '1px solid #ccc', textAlign: 'center' }}>
-                                        <Popconfirm
-                                            title={translate('Suppression')}
-                                            description={translate('Confirmation_De_Suppression_De_Equipe')}
-                                            icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
-                                            onConfirm={() => handleDelelteEquipe(eq.name)}
-                                        >
-                                            <RiDeleteBinLine style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }} />
-                                        </Popconfirm>
-                                    </td>
-                                </tr>
-                            ))
-                        }
+                        <thead>
+                            <tr>
+                                <th style={{ padding: '5px', border: '1px solid #ccc' }}>{translate('Nom')}</th>
+                                <th style={{ padding: '5px', border: '1px solid #ccc' }}>{translate('Superviseurs')}</th>
+                                <th style={{ padding: '5px', border: '1px solid #ccc' }}>{translate('Actions')}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            {
+                                equipeList.map((eq, index) => (
+                                    <tr key={index}>
+                                        <td style={{ padding: '5px', border: '1px solid #ccc', width: '100px' }}> {eq.name}</td>
+                                        <td style={{ padding: '5px', border: '1px solid #ccc' }}>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
+                                                {
+                                                    [...eq.superviseurs, ...eq.autreSuperviseurs].map(e => e.displayName ? (
+                                                        <span key={e.displayName} style={{ background: '#0a939640', padding: '5px', borderRadius: '8px', fontSize: '12px', marginRight: '2px', marginTop: '2px' }}>
+                                                            {e.displayName}
+                                                        </span>
+                                                    ) : (
+                                                        <span key={e} style={{ background: '#0a939640', padding: '5px', borderRadius: '8px', fontSize: '12px', marginRight: '2px', marginTop: '2px' }}>
+                                                            {e}
+                                                        </span>
+                                                    ))
+                                                }
+                                            </div>
+                                        </td>
+                                        <td style={{ padding: '5px', border: '1px solid #ccc', textAlign: 'center' }}>
+                                            <Popconfirm
+                                                title={translate('Suppression')}
+                                                description={translate('Confirmation_De_Suppression_De_Equipe')}
+                                                icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+                                                onConfirm={() => handleDelelteEquipe(eq.name)}
+                                            >
+                                                <RiDeleteBinLine style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }} />
+                                            </Popconfirm>
+                                        </td>
+                                    </tr>
+                                ))
+                            }
+                        </tbody>
+
                     </table>
                 </div>
             </Card>
@@ -2127,25 +2227,210 @@ const Supervision = ({ me }) => {
         </div>
     )
 
+    const handleChangeSelectionTypeForPerformance = ({ value }) => {
+        setSelectedIndicators([])
+        setSelectedFavoritForPerformance(null)
+        setSelectedIndicatorsConfiguratedForPerformances([])
+        setSelectedSelectionTypeForPerformance(value)
+    }
+
+    const handleClickAddIndicatorForPerformance = () => {
+        try {
+            console.log("inputIndicatorNameForPerformance:", inputIndicatorNameForPerformance)
+            console.log("inputIndicatorIdForPerformance:", inputIndicatorIdForPerformance)
+            if (!inputIndicatorNameForPerformance || inputIndicatorNameForPerformance?.trim()?.length === 0 || !inputIndicatorIdForPerformance)
+                throw new Error(translate('Element_De_Performance_Obligatoire'))
+
+            if (selectedIndicatorsConfiguratedForPerformances.map(ind => ind.indicator?.id).includes(inputIndicatorIdForPerformance))
+                throw new Error(translate('Indicateur_Deja_Configurer'))
+
+            const paylaod = {
+                id: uuid(),
+                nom: inputIndicatorNameForPerformance,
+                indicator: { displayName: inputIndicatorNameForPerformance, id: inputIndicatorIdForPerformance },
+                weight: inputWeightForPerformance,
+                bestPositive: inputIndicatorBestPositiveForPerormance
+            }
+
+            setSelectedIndicatorsConfiguratedForPerformances([...selectedIndicatorsConfiguratedForPerformances, paylaod])
+            setSelectedIndicators([...selectedIndicators, paylaod])
+
+            setNotification({ show: true, message: translate('Configuration_Ajoutee'), type: NOTIFICATION_SUCCESS })
+            setInputWeightForPerformance(0)
+            setInputIndicatorNameForPerformance('')
+            setInputIndicatorIdForPerformance(null)
+            setSelectedElementForPerformances([])
+
+        } catch (err) {
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
+        }
+    }
+
+
+    const handleSelectIndicatorsForPerformance = (values) => {
+        setSelectedIndicators(values.map(val => selectedIndicatorsConfiguratedForPerformances.find(dsInd => dsInd.indicator?.id === val)))
+    }
+
+    const handleSaveAsFavorites = () => {
+        setVisibleAddFavoritPerformanceModal(true)
+    }
+
+    const handleSelectFavoritForPerformance = (value) => {
+        const currentFavorit = favoritPerformanceList.find(f => f.id === value)
+        setSelectedFavoritForPerformance(currentFavorit)
+        setSelectedIndicators(currentFavorit?.indicators || [])
+        setSelectedIndicatorsConfiguratedForPerformances(currentFavorit?.indicators?.map(i => ({ indicator: i })) || [])
+    }
+
     const RenderSupervisionPlanificationIndicatorContent = () => (
         <>
             <div style={{ marginTop: '10px' }}>
                 <Card bodyStyle={{ padding: '0px' }} className='my-shadow' size='small'>
                     <div style={{ fontWeight: 'bold', padding: '10px', borderBottom: '1px solid #ccc' }}> {translate('Planification_Sur_Performances')} </div>
                     <div style={{ padding: '10px' }}>
-                        <div>  {translate('Indicateurs')}</div>
-                        <Select
-                            options={dataStoreIndicatorConfigs.map(ind => ({ label: ind.indicator?.displayName, value: ind.indicator?.id }))}
-                            loading={loadingDataStoreIndicatorConfigs}
-                            disabled={loadingDataStoreIndicatorConfigs}
-                            showSearch
-                            placeholder={translate('Indicateurs')}
-                            style={{ width: '100%' }}
-                            optionFilterProp='label'
-                            mode='multiple'
-                            onChange={handleSelectIndicators}
-                            value={selectedIndicators?.map(ind => ind.indicator?.id)}
-                        />
+
+                        <div>
+                            {translate('Selectionnez_Indicateurs_De_Performance')}
+                        </div>
+
+                        <div style={{ marginTop: '10px' }}>
+                            <div>
+                                <Radio
+                                    label={translate("Venant_Des_Favoris")}
+                                    className="cursor-pointer"
+                                    onChange={handleChangeSelectionTypeForPerformance}
+                                    value={FAVORIS}
+                                    checked={selectedSelectionTypeForPerformance === FAVORIS}
+                                />
+                            </div>
+                            <div>
+                                <Radio
+                                    label={translate("Directe") + ' ? '}
+                                    className="cursor-pointer"
+                                    onChange={handleChangeSelectionTypeForPerformance}
+                                    value={DIRECTE}
+                                    checked={selectedSelectionTypeForPerformance === DIRECTE}
+                                />
+                            </div>
+                        </div>
+                        <div><Divider style={{ marginTop: '10px', marginBottom: '10px' }} /></div>
+
+                        {
+                            selectedSelectionTypeForPerformance === DIRECTE && (
+                                <>
+                                    <div>
+                                        <Row gutter={[10, 10]}>
+                                            <Col md={22} xs={24}>
+                                                <div>
+                                                    <div style={{ marginBottom: '5px' }}>{translate('Source_De_Donnee')}</div>
+                                                    <Input
+                                                        placeholder={translate('Source_De_Donnee')}
+                                                        style={{ width: '100%' }}
+                                                        disabled
+                                                        value={inputIndicatorNameForPerformance}
+                                                        onChange={event => {
+                                                            setInputIndicatorNameForPerformance(''.concat(event.target.value))
+                                                        }}
+                                                    />
+                                                </div>
+                                            </Col>
+                                            <Col md={2} xs={24}>
+                                                <div style={{ marginTop: '28px' }}>
+                                                    <Button title="Select" small primary icon={<TbSelect style={{ fontSize: '18px', color: '#fff', }} />} onClick={() => setVisibleAnalyticComponentPerformanceModal(true)}></Button>
+                                                </div>
+                                            </Col>
+                                            <Col md={11} sm={24}>
+                                                <div style={{ marginBottom: '5px' }}>{translate('Poids')}</div>
+                                                <InputNumber style={{ width: '100%' }} name='indicatorName' value={inputIndicatorWeightForPerormance} onChange={event => setInputIndicatorWeightForPerormance(event)} />
+                                            </Col>
+                                            <Col md={9}>
+                                                <div style={{ display: 'flex', alignItems: 'center', marginTop: '30px', cursor: 'pointer' }} onClick={() => setInputIndicatorBestPositiveForPerormance(!inputIndicatorBestPositiveForPerormance)}>
+                                                    <Checkbox checked={inputIndicatorBestPositiveForPerormance} onChange={() => setInputIndicatorBestPositiveForPerormance(!inputIndicatorBestPositiveForPerormance)} />
+                                                    <span style={{ marginLeft: '10px' }}> {translate('Meilleur_Positif')}</span>
+                                                </div>
+                                            </Col>
+                                            <Col md={4}>
+                                                <div style={{ display: 'flex', alignItems: 'center', marginTop: '25px' }}>
+                                                    <Button
+                                                        disabled={!inputIndicatorNameForPerformance || inputIndicatorNameForPerformance?.trim()?.length === 0 ? true : false}
+                                                        primary
+                                                        small
+                                                        onClick={handleClickAddIndicatorForPerformance}> + {translate('Ajouter')}</Button>
+                                                </div>
+                                            </Col>
+                                        </Row>
+
+                                    </div>
+                                    <div>
+                                        <Divider style={{ marginTop: '10px', marginBottom: '10px' }} />
+                                    </div>
+
+                                    {
+                                        selectedIndicatorsConfiguratedForPerformances.length > 0 && (
+                                            <div>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+                                                    <div>
+                                                        {translate('Indicateurs_Selectionnes')}
+                                                    </div>
+                                                    <Popover content={<>{translate('Enregistrer_Comme_Favorites')}</>}>
+                                                        <Button disabled={selectedIndicators.length > 0 ? false : true} small onClick={handleSaveAsFavorites} icon={<MdFavorite style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }} />}>
+                                                            {translate('Enregistrer')}
+                                                        </Button>
+                                                    </Popover>
+                                                </div>
+                                                <Select
+                                                    options={selectedIndicatorsConfiguratedForPerformances.map(ind => ({ label: ind.indicator?.displayName, value: ind.indicator?.id }))}
+                                                    showSearch
+                                                    placeholder={translate('Indicateurs')}
+                                                    style={{ width: '100%' }}
+                                                    optionFilterProp='label'
+                                                    mode='multiple'
+                                                    onChange={handleSelectIndicatorsForPerformance}
+                                                    value={selectedIndicators?.map(ind => ind.indicator?.id)}
+                                                />
+                                            </div>
+                                        )
+                                    }
+                                </>
+                            )
+                        }
+
+                        {
+                            selectedSelectionTypeForPerformance === FAVORIS && (
+                                <>
+                                    <div>
+                                        <div style={{ marginBottom: '5px' }}>
+                                            {translate('Selectionnez_La_Favorit')}
+                                        </div>
+                                        <Select
+                                            options={favoritPerformanceList.map(fav => ({ label: fav.name, value: fav.id }))}
+                                            showSearch
+                                            placeholder={translate('Selectionnez_La_Favorit')}
+                                            style={{ width: '100%' }}
+                                            optionFilterProp='label'
+                                            onChange={handleSelectFavoritForPerformance}
+                                            value={selectedFavoritForPerformance?.id}
+                                        />
+                                    </div>
+                                    <div style={{ marginTop: '10px' }}>
+                                        <div style={{ marginBottom: '5px' }}>
+                                            {translate('Indicateurs_Selectionnes')}
+                                        </div>
+                                        <Select
+                                            disabled
+                                            options={selectedIndicatorsConfiguratedForPerformances.map(ind => ({ label: ind.indicator?.displayName, value: ind.indicator?.id }))}
+                                            showSearch
+                                            placeholder={translate('Indicateurs')}
+                                            style={{ width: '100%' }}
+                                            optionFilterProp='label'
+                                            mode='multiple'
+                                            onChange={handleSelectIndicatorsForPerformance}
+                                            value={selectedIndicators?.map(ind => ind.indicator?.id)}
+                                        />
+                                    </div>
+                                </>
+                            )
+                        }
                     </div>
                 </Card>
             </div>
@@ -2981,7 +3266,9 @@ const Supervision = ({ me }) => {
     const RenderAnalyticComponentModal = () => visibleAnalyticComponentModal ? (
         <Modal onClose={() => handleCancelAnalyticComponentModal()} large>
             <ModalTitle>
-                {translate('Source_De_Donnee')}
+                <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
+                    {translate('Source_De_Donnee')}
+                </div>
             </ModalTitle>
             <ModalContent>
                 <div>
@@ -3000,6 +3287,49 @@ const Supervision = ({ me }) => {
                         {translate('Annuler')}
                     </Button>
                     <Button primary onClick={() => handleOkAnalyticComponentModal()} icon={<FiSave style={{ fontSize: "18px" }} />}>
+                        {translate('Enregistrer')}
+                    </Button>
+                </ButtonStrip>
+            </ModalActions>
+        </Modal>
+    ) : <></>
+
+    const handleOkAnalyticComponentForPerformanceModal = () => {
+        setInputIndicatorNameForPerformance(selectedElementForPerformances[0]?.name)
+        setInputIndicatorIdForPerformance(selectedElementForPerformances[0]?.id)
+        setSelectedElementForPerformances([])
+        setVisibleAnalyticComponentPerformanceModal(false)
+    }
+
+    const handleCancelAnalyticComponentForPerformanceModal = () => {
+        setSelectedElementForPerformances([])
+        setVisibleAnalyticComponentPerformanceModal(false)
+    }
+
+    const RenderAnalyticComponenPerformancetModal = () => visibleAnalyticComponentPerformanceModal ? (
+        <Modal onClose={() => handleCancelAnalyticComponentForPerformanceModal()} large>
+            <ModalTitle>
+                <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
+                    {translate('Source_De_Donnee')}
+                </div>
+            </ModalTitle>
+            <ModalContent>
+                <div>
+                    <DataDimension
+                        selectedDimensions={selectedElementForPerformances.map(it => ({ ...it, isDeactivated: true }))}
+                        onSelect={value => {
+                            setSelectedElementForPerformances(value?.items?.length > 0 ? [value.items[0]] : [])
+                        }}
+                        displayNameProp="displayName"
+                    />
+                </div>
+            </ModalContent>
+            <ModalActions>
+                <ButtonStrip end>
+                    <Button destructive onClick={() => handleCancelAnalyticComponentForPerformanceModal()} icon={<CgCloseO style={{ fontSize: "18px" }} />}>
+                        {translate('Annuler')}
+                    </Button>
+                    <Button primary onClick={() => handleOkAnalyticComponentForPerformanceModal()} icon={<FiSave style={{ fontSize: "18px" }} />}>
                         {translate('Enregistrer')}
                     </Button>
                 </ButtonStrip>
@@ -3287,6 +3617,8 @@ const Supervision = ({ me }) => {
             setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
         }
     }
+
+
 
     const RenderAgentConfigList = () => (
         <>
@@ -3655,7 +3987,7 @@ const Supervision = ({ me }) => {
                                         {selectedProgram && RenderSupervisionPlanificationType()}
                                         {selectedPlanificationType === INDICATOR && RenderSupervisionPlanificationIndicatorContent()}
                                         {selectedPlanificationType === ORGANISATION_UNIT && RenderSupervisionPlanificationOrganisationUnitContent()}
-                                        {selectedProgram && selectedPlanificationType && RenderEquipePlanificationContent()}
+                                        {selectedProgram && selectedPlanificationType === ORGANISATION_UNIT && RenderEquipePlanificationContent()}
                                     </Col>
                                 )
                             }
@@ -3856,6 +4188,8 @@ const Supervision = ({ me }) => {
                 )
             }
             {RenderAddEquipeModal()}
+            {RenderAnalyticComponenPerformancetModal()}
+            {RenderAddFavoritPerformanceModal()}
             {RenderAnalyticComponentModal()}
             {RenderNoticeBox()}
             <MyNotification notification={notification} setNotification={setNotification} />

@@ -69,3 +69,6 @@ export const ALL = 'ALL'
 
 export const DISPLAY_SUPERVISIONS = "DISPLAY_SUPERVISIONS"
 export const DISPLAY_SUPERVISORS = "DISPLAY_SUPERVISORS"
+
+export const DIRECTE = 'DIRECTE'
+export const FAVORIS = 'FAVORIS'
