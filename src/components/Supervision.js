@@ -152,6 +152,7 @@ const Supervision = ({ me }) => {
     const [loadingAllSupervisionsFromTracker, setLoadingAllSupervisionsFromTracker] = useState(false)
     const [loadingOrgUnitsSupervisionsFromTracker, setLoadingOrgUnitsSupervisionsFromTracker] = useState(false)
     const [loadingOrganisationUnitGroups, setLoadingOrganisationUnitGroups] = useState(false)
+    const [loadingPerformanceFavoritsConfigs, setLoadingPerformanceFavoritsConfigs] = useState(false)
 
     const periodTypesOptions = () => {
         return [
@@ -188,12 +189,37 @@ const Supervision = ({ me }) => {
             {
                 accessorKey: 'superviseurs',
                 header: `${translate('Superviseurs')}`,
-                Cell: ({ cell, row }) => (
-                    <div>
-                        {row.getValue()}
-                        {console.log(" superviseurs : ", row.getValue())}
+                Cell: ({ cell, row }) => cell.getValue()?.split(',')?.length > 0 ? (
+
+                    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                        {
+                            cell.getValue()?.split(',')?.length >= 6 ?
+                                (
+                                    <Popover content={
+                                        <div style={{ maxWidth: '300px' }}>
+                                            {
+                                                cell.getValue()?.split(',')?.map((sup, index) => (
+                                                    <span key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '8px', marginTop: '2px' }}> {sup}</span>
+                                                ))
+                                            }
+                                        </div>
+                                    } title={translate('Superviseurs')} trigger="hover">
+                                        {
+                                            cell.getValue()?.split(',')?.map((sup, index) => index < 6 && (
+                                                <span key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', cursor: 'pointer', marginRight: '5px', borderRadius: '8px', marginTop: '2px' }}> {sup}</span>
+                                            ))
+                                        }
+                                        <span style={{ cursor: 'pointer' }}>...</span>
+                                    </Popover>
+                                )
+                                :
+                                cell.getValue()?.split(',')?.map((sup, index) => (
+                                    <span key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '8px', marginTop: '2px' }}> {sup}</span>
+                                ))
+
+                        }
                     </div>
-                )
+                ) : <></>
             },
             {
                 accessorKey: 'period',
@@ -240,6 +266,40 @@ const Supervision = ({ me }) => {
                 {
                     accessorKey: 'libelle', //access nested data with dot notation
                     header: `${translate('Unite_Organisation')}`,
+                },
+                {
+                    accessorKey: 'superviseurs',
+                    header: `${translate('Superviseurs')}`,
+                    Cell: ({ cell, row }) => cell.getValue()?.split(',')?.length > 0 ? (
+
+                        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                            {
+                                cell.getValue()?.split(',')?.length >= 6 ?
+                                    (
+                                        <Popover content={
+                                            <div>
+                                                {
+                                                    cell.getValue()?.split(',')?.map((sup, index) => (
+                                                        <span key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '8px', marginTop: '2px' }}> {sup}</span>
+                                                    ))
+                                                }
+                                            </div>
+                                        } title={translate('Superviseurs')} trigger="hover">
+                                            {
+                                                cell.getValue()?.split(',')?.map((sup, index) => index < 6 && (
+                                                    <span key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '8px', marginTop: '2px' }}> {sup}</span>
+                                                ))
+                                            }
+                                        </Popover>
+                                    )
+                                    :
+                                    cell.getValue()?.split(',')?.map((sup, index) => (
+                                        <span key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '8px', marginTop: '2px' }}> {sup}</span>
+                                    ))
+
+                            }
+                        </div>
+                    ) : <></>
                 },
                 {
                     accessorKey: 'period',
@@ -417,6 +477,20 @@ const Supervision = ({ me }) => {
         }
     }
 
+    const loadDataStorePerformanceFavoritsConfigs = async () => {
+        try {
+            setLoadingPerformanceFavoritsConfigs(true)
+            const response = await loadDataStore(process.env.REACT_APP_PERFORMANCE_FAVORITS_KEY, null, null, null)
+
+            setFavoritPerformanceList(response)
+            setSelectedFavoritForPerformance(null)
+            setLoadingPerformanceFavoritsConfigs(false)
+        }
+        catch (err) {
+            setLoadingPerformanceFavoritsConfigs(false)
+        }
+    }
+
     const loadDataStoreSupervisions = async () => {
         try {
             setLoadingDataStoreSupervisions(true)
@@ -514,24 +588,18 @@ const Supervision = ({ me }) => {
                 const trackedEntityInstance = current.trackedEntityInstance
                 const program = current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.program
 
-                console.log("selectedSupervisionsConfigProgram?.fieldConfig?.supervisor?.dataElements: ", selectedSupervisionsConfigProgram?.fieldConfig?.supervisor?.dataElements)
-
                 const superviseursEvents = selectedSupervisionsConfigProgram?.fieldConfig?.supervisor?.dataElements?.reduce((prevEl, curr) => {
-                    console.log("current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events: ", current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events)
-                    const foundedEvent = current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events[0]?.dataValues?.find(el => el.dataElement === curr.id)
-                    if (foundedEvent)
-                        prevEl.push(foundedEvent)
+                    const foundedDataValue = current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events[0]?.dataValues?.find(el => el.dataElement === curr.id)
+                    if (foundedDataValue)
+                        prevEl.push(foundedDataValue)
                     return prevEl
                 }, []) || []
 
-                console.log("superviseursEvent : ", superviseursEvents)
                 const superviseurs = superviseursEvents.reduce((prevEl, curr) => {
                     if (curr.value && curr.value?.trim()?.length > 0)
-                        prevEl = prevEl.concat(curr.value)
+                        prevEl.push(curr.value)
                     return prevEl
-                }, '')
-
-                console.log("Superviseurs : ", superviseurs)
+                }, []).join(',')
 
                 return [
                     ...prev,
@@ -568,11 +636,11 @@ const Supervision = ({ me }) => {
                         agent: `${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeFirstName?.id)?.value || ''}`,
                         period: en?.events[0]?.eventDate,
                         superviseurs: selectedSupervisionsConfigProgram?.fieldConfig?.supervisor?.dataElements?.reduce((prevEl, curr) => {
-                            const foundedEvent = en?.events[0]?.dataValues?.find(el => el.dataElement === curr.id)
-                            if (foundedEvent && foundedEvent.value && foundedEvent.value?.trim()?.length > 0)
-                                prevEl = prevEl.concat(foundedEvent.value)
+                            const foundedDataValue = en?.events[0]?.dataValues?.find(el => el.dataElement === curr.id)
+                            if (foundedDataValue && foundedDataValue.value && foundedDataValue.value?.trim()?.length > 0)
+                                prevEl.push(foundedDataValue.value)
                             return prevEl
-                        }, ''),
+                        }, [])?.join(','),
                         montant: calculateMontant(en.trackedEntityInstance, en?.events[0]?.eventDate, current.orgUnit, en.program),
                         enrollment: en.enrollment,
                         program: en.program,
@@ -609,12 +677,12 @@ const Supervision = ({ me }) => {
                         storedBy: currentEnrollment?.storedBy,
                         libelle: currentEnrollment?.orgUnitName,
                         superviseurs: selectedSupervisionsConfigProgram?.fieldConfig?.supervisor?.dataElements?.reduce((prevEl, curr) => {
-                            console.log("data value ", ev.dataValues)
-                            const foundedEvent = ev?.dataValues?.find(el => el.dataElement === curr.id)
-                            if (foundedEvent && foundedEvent.value && foundedEvent.value?.trim()?.length > 0)
-                                prevEl = prevEl.concat(foundedEvent.value)
+                            const foundedDataValue = ev?.dataValues?.find(el => el.dataElement === curr.id)
+                            if (foundedDataValue && foundedDataValue.value && foundedDataValue.value?.trim()?.length > 0)
+                                prevEl.push(foundedDataValue.value)
+
                             return prevEl
-                        }, ''),
+                        }, [])?.join(','),
                         statusSupervision: dayjs(ev.eventDate).isAfter(dayjs()) ? getDefaultStatusSupervisionIfStatusIsNull() : currentEnrollment?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
                         statusPayment: currentEnrollment?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusPayment?.dataElement?.id)?.value || getDefaultStatusPaymentIfStatusIsNull()
                     }))
@@ -1290,6 +1358,16 @@ const Supervision = ({ me }) => {
         }
     }
 
+    const savePerformanceFavoritsToDataStore = async (payloads) => {
+        try {
+            if (payloads) {
+                await saveDataToDataStore(process.env.REACT_APP_PERFORMANCE_FAVORITS_KEY, payloads)
+            }
+        } catch (err) {
+            throw err
+        }
+    }
+
     const saveSupervisionAsTEIStrategy = async (inputFieldsList) => {
         try {
             if (inputFieldsList.length > 0) {
@@ -1625,6 +1703,7 @@ const Supervision = ({ me }) => {
                 await saveSupervisionAsEventStrategy(inputFields)
 
             loadDataStoreSupervisionConfigs(organisationUnits)
+            loadDataStorePerformanceFavoritsConfigs()
             loadDataStoreSupervisions()
             setLoadingSupervisionPlanification(false)
             setNotification({ show: true, message: translate('Planification_Effectuer'), type: NOTIFICATION_SUCCESS })
@@ -2121,23 +2200,26 @@ const Supervision = ({ me }) => {
                 indicators: selectedIndicators
             }
 
+            let performanceList = []
+
             if (selectedSelectionTypeForPerformance === FAVORIS && selectedFavoritForPerformance) {
-                setFavoritPerformanceList(
-                    favoritPerformanceList.map(ind => {
-                        if (ind.id === selectedFavoritForPerformance?.id) {
-                            return {
-                                ...ind,
-                                ...payload
-                            }
+                performanceList = favoritPerformanceList.map(ind => {
+                    if (ind.id === selectedFavoritForPerformance?.id) {
+                        return {
+                            ...ind,
+                            ...payload
                         }
-                        return ind
-                    })
-                )
+                    }
+                    return ind
+                })
+
             } else {
                 payload.id = uuid()
-                setFavoritPerformanceList([payload, ...favoritPerformanceList])
+                performanceList = [payload, ...favoritPerformanceList]
             }
 
+            setFavoritPerformanceList(performanceList)
+            savePerformanceFavoritsToDataStore(performanceList)
             setNotification({ show: true, message: translate('Favorit_Enregistrer_Avec_Succes'), type: NOTIFICATION_SUCCESS })
             setInputFavoritName('')
             setVisibleAddFavoritPerformanceModal(false)
@@ -2160,7 +2242,7 @@ const Supervision = ({ me }) => {
                     <div style={{ marginTop: '10px', padding: '10px', border: '1px solid #ccc', background: "#eee", color: '#00000090', fontSize: '13px' }}>
                         {translate('Nom_Claire_Favorit')}
                     </div>
-                    <div style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '5px' }}>
+                    <div style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '5px', maginTop: '10px' }}>
                         <div>
                             <div style={{ marginBottom: '5px' }}>{translate('Nom')}</div>
                             <Input
@@ -2397,6 +2479,8 @@ const Supervision = ({ me }) => {
                                         <Select
                                             options={favoritPerformanceList.map(fav => ({ label: fav.name, value: fav.id }))}
                                             showSearch
+                                            loading={loadingPerformanceFavoritsConfigs}
+                                            disabled={loadingPerformanceFavoritsConfigs}
                                             placeholder={translate('Selectionnez_La_Favorit')}
                                             style={{ width: '100%' }}
                                             optionFilterProp='label'
@@ -4221,6 +4305,7 @@ const Supervision = ({ me }) => {
             loadOrganisationUnits()
             loadOrganisationUnitGroups()
             loadDataStoreSupervisions()
+            loadDataStorePerformanceFavoritsConfigs()
             loadDataStoreIndicators()
             loadUsers(me?.organisationUnits?.[0]?.id)
         }

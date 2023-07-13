@@ -34,6 +34,7 @@ export const Body = () => {
             await loadDataStore(process.env.REACT_APP_INDICATORS_CONFIG_KEY, null, null, [])
             await loadDataStore(process.env.REACT_APP_SUPERVISIONS_KEY, null, null, [])
             await loadDataStore(process.env.REACT_APP_ANALYSES_CONFIG_KEY, null, null, [])
+            await loadDataStore(process.env.REACT_APP_PERFORMANCE_FAVORITS_KEY, null, null, [])
             await loadMe()
             setDataStoreInitialized(true)
             setLoadingDataStoreInitialization(false)
