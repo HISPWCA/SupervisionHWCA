@@ -119,16 +119,9 @@ const Supervision = ({ me }) => {
     const [selectedEquipeAutreSuperviseurs, setSelectedEquipeAutreSuperviseurs] = useState([])
     const [selectedSelectionTypeForPerformance, setSelectedSelectionTypeForPerformance] = useState(DIRECTE)
     const [selectedElementForPerformances, setSelectedElementForPerformances] = useState([])
-    const [selectedIndicatorsConfiguratedForPerformances, setSelectedIndicatorsConfiguratedForPerformances] = useState([])
     const [selectedFavoritForPerformance, setSelectedFavoritForPerformance] = useState(null)
 
-    const [inputIndicatorFieldsForPerformances, setInputIndicatorFieldsForPerformances] = useState([])
     const [inputFavorisName, setInputFavoritName] = useState('')
-    const [inputIndicatorWeightForPerormance, setInputIndicatorWeightForPerormance] = useState(0)
-    const [inputIndicatorBestPositiveForPerormance, setInputIndicatorBestPositiveForPerormance] = useState(true)
-    const [inputIndicatorNameForPerformance, setInputIndicatorNameForPerformance] = useState('')
-    const [inputIndicatorIdForPerformance, setInputIndicatorIdForPerformance] = useState(null)
-    const [inputWeightForPerformance, setInputWeightForPerformance] = useState('')
     const [inputEquipeAutreSuperviseur, setInputEquipeAutreSuperviseur] = useState('')
     const [inputMeilleur, setInputMeilleur] = useState(0)
     const [inputMauvais, setInputMauvais] = useState(0)
@@ -190,31 +183,35 @@ const Supervision = ({ me }) => {
                 accessorKey: 'superviseurs',
                 header: `${translate('Superviseurs')}`,
                 Cell: ({ cell, row }) => cell.getValue()?.split(',')?.length > 0 ? (
-
                     <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                         {
-                            cell.getValue()?.split(',')?.length >= 6 ?
+                            cell.getValue()?.split(',')?.length >= 3 ?
                                 (
                                     <Popover content={
-                                        <div style={{ maxWidth: '300px' }}>
-                                            {
-                                                cell.getValue()?.split(',')?.map((sup, index) => (
-                                                    <span key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '8px', marginTop: '2px' }}> {sup}</span>
-                                                ))
-                                            }
+                                        <div style={{ maxWidth: '400px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                                                {
+                                                    cell.getValue()?.split(',')?.map((sup, index) => (
+                                                        <div key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '6px', marginTop: '5px' }}> {sup}</div>
+                                                    ))
+                                                }
+                                            </div>
                                         </div>
                                     } title={translate('Superviseurs')} trigger="hover">
-                                        {
-                                            cell.getValue()?.split(',')?.map((sup, index) => index < 6 && (
-                                                <span key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', cursor: 'pointer', marginRight: '5px', borderRadius: '8px', marginTop: '2px' }}> {sup}</span>
-                                            ))
-                                        }
-                                        <span style={{ cursor: 'pointer' }}>...</span>
+                                        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+
+                                            {
+                                                cell.getValue()?.split(',')?.map((sup, index) => index < 3 && (
+                                                    <div key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', cursor: 'pointer', marginRight: '5px', borderRadius: '6px', marginTop: '5px' }}> {sup}</div>
+                                                ))
+                                            }
+                                            <div style={{ cursor: 'pointer', marginLeft: '5px' }}>...</div>
+                                        </div>
                                     </Popover>
                                 )
                                 :
                                 cell.getValue()?.split(',')?.map((sup, index) => (
-                                    <span key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '8px', marginTop: '2px' }}> {sup}</span>
+                                    <div key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '6px', marginTop: '5px' }}> {sup}</div>
                                 ))
 
                         }
@@ -274,27 +271,27 @@ const Supervision = ({ me }) => {
 
                         <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                             {
-                                cell.getValue()?.split(',')?.length >= 6 ?
+                                cell.getValue()?.split(',')?.length >= 3 ?
                                     (
                                         <Popover content={
                                             <div>
                                                 {
                                                     cell.getValue()?.split(',')?.map((sup, index) => (
-                                                        <span key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '8px', marginTop: '2px' }}> {sup}</span>
+                                                        <span key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '6px', marginTop: '2px' }}> {sup}</span>
                                                     ))
                                                 }
                                             </div>
                                         } title={translate('Superviseurs')} trigger="hover">
                                             {
-                                                cell.getValue()?.split(',')?.map((sup, index) => index < 6 && (
-                                                    <span key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '8px', marginTop: '2px' }}> {sup}</span>
+                                                cell.getValue()?.split(',')?.map((sup, index) => index < 3 && (
+                                                    <span key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '6px', marginTop: '2px' }}> {sup}</span>
                                                 ))
                                             }
                                         </Popover>
                                     )
                                     :
                                     cell.getValue()?.split(',')?.map((sup, index) => (
-                                        <span key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '8px', marginTop: '2px' }}> {sup}</span>
+                                        <span key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '6px', marginTop: '2px' }}> {sup}</span>
                                     ))
 
                             }
@@ -767,6 +764,8 @@ const Supervision = ({ me }) => {
         setSelectedOrganisationUnits([])
         setSelectedOrganisationUnitGroup(null)
         setSelectedOrganisationUnitGroupSet(null)
+        setSelectedElementForPerformances([])
+        
 
         if (value === INDICATOR && organisationUnitGroupSets.length === 0) {
             loadOrganisationUnitsGroupSets()
@@ -1708,6 +1707,7 @@ const Supervision = ({ me }) => {
             setLoadingSupervisionPlanification(false)
             setNotification({ show: true, message: translate('Planification_Effectuer'), type: NOTIFICATION_SUCCESS })
             setEditionMode(false)
+            setEquipeList([])
             cleanAllNewSupervisionState()
         } catch (err) {
             setLoadingSupervisionPlanification(false)
@@ -2242,7 +2242,7 @@ const Supervision = ({ me }) => {
                     <div style={{ marginTop: '10px', padding: '10px', border: '1px solid #ccc', background: "#eee", color: '#00000090', fontSize: '13px' }}>
                         {translate('Nom_Claire_Favorit')}
                     </div>
-                    <div style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '5px', maginTop: '10px' }}>
+                    <div style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '5px', marginTop: '10px' }}>
                         <div>
                             <div style={{ marginBottom: '5px' }}>{translate('Nom')}</div>
                             <Input
@@ -2374,8 +2374,6 @@ const Supervision = ({ me }) => {
 
     // const handleClickAddIndicatorForPerformance = () => {
     //     try {
-    //         console.log("inputIndicatorNameForPerformance:", inputIndicatorNameForPerformance)
-    //         console.log("inputIndicatorIdForPerformance:", inputIndicatorIdForPerformance)
     //         if (!inputIndicatorNameForPerformance || inputIndicatorNameForPerformance?.trim()?.length === 0 || !inputIndicatorIdForPerformance)
     //             throw new Error(translate('Element_De_Performance_Obligatoire'))
 
@@ -2679,19 +2677,13 @@ const Supervision = ({ me }) => {
 
     const handleInputEquipe = (value, index) => {
         try {
-            console.log("Input value: ", value)
-            console.log("equipeList : ", equipeList)
-            console.log("index: ", index)
             setInputFields(
                 inputFields.map((field, fieldIndex) => {
-                    console.log("fiel index: ", fieldIndex)
-                    console.log("index: ", index)
                     if (index === fieldIndex) {
                         const equipe = equipeList.find(eq => eq.name === value)
                         const superviseurs = equipe?.superviseurs || []
                         const autreSuperviseurs = equipe?.autreSuperviseurs || []
 
-                        console.log("Found equipe : ", equipe)
                         return {
                             ...field,
                             equipe: equipe,
@@ -2799,7 +2791,7 @@ const Supervision = ({ me }) => {
                                         }
 
                                         <Col sm={24} md={24}>
-                                            <div> {console.log("inputFields: ", inputFields)}
+                                            <div>
                                                 <div style={{ marginBottom: '5px' }}>{translate('Equipes')}</div>
                                                 <Select
                                                     placeholder={translate('Equipes')}
@@ -3121,15 +3113,7 @@ const Supervision = ({ me }) => {
                 const currentIndicator = selectedIndicators.find(i => i.indicator?.id === currentElement)
                 const score = parseFloat(currentIndicator?.weight) > 0 ? parseFloat(currentIndicator?.weight) * parseFloat(currentValue) : parseFloat(currentValue)
 
-                console.log("Score: ", score)
-
                 if (prev[currentOrgUnit]) {
-
-                    console.log("prev[currentOrgUnit].scoreTotal + parseFloat(score): ", prev[currentOrgUnit].scoreTotal + parseFloat(score))
-
-                    console.log("---------------------")
-                    console.log(prev[currentOrgUnit][currentElement])
-                    console.log(currentElement)
 
                     prev[currentOrgUnit][currentElement] = {
                         id: currentElement,
@@ -3640,8 +3624,6 @@ const Supervision = ({ me }) => {
                             </thead>
                             <tbody>
 
-                                {console.log("analyticIndicatorResults: ", analyticIndicatorResults)}
-
                                 {
                                     !inputMeilleurPositif && analyticIndicatorResults
                                         .sort((a, b) => parseFloat(a.scoreTotal) - parseFloat(b.scoreTotal))
@@ -4151,7 +4133,7 @@ const Supervision = ({ me }) => {
                                 )
                             }
 
-                            {
+                            {/* {
                                 selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
                                 selectedPlanificationType === INDICATOR &&
                                 selectedIndicators.length > 0 &&
@@ -4174,7 +4156,7 @@ const Supervision = ({ me }) => {
                                         </Card>
                                     </Col>
                                 )
-                            }
+                            } */}
 
                             {
                                 selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
@@ -4287,15 +4269,12 @@ const Supervision = ({ me }) => {
         let newList = []
 
         if (selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT && selectedOrganisationUnits && selectedOrganisationUnits?.length > 0) {
-            console.log("Selected our: ", initInputOrganisation(selectedOrganisationUnits))
             newList = initInputOrganisation(selectedOrganisationUnits)
         }
 
         if (selectedSupervisionType === TYPE_SUPERVISION_AGENT && selectedAgents && selectedAgents?.length > 0) {
             newList = initAgentInput(selectedAgents)
         }
-
-        console.log("List : ", newList)
 
         setInputFields(newList)
     }
