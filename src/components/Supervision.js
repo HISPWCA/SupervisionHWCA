@@ -1,9 +1,9 @@
-import React, { useMemo, useEffect, useState } from 'react'
+import React, {  useEffect, useState } from 'react'
 import { MantineReactTable } from 'mantine-react-table'
-import { Card, Col, DatePicker, Divider, FloatButton, Input, InputNumber, List, Popconfirm, Row, Select, Checkbox as AntCheckbox, Table, Grid, message, Popover } from 'antd'
+import { Card, Col, DatePicker, Divider, FloatButton, Input, InputNumber, List, Popconfirm, Row, Select, Checkbox as AntCheckbox, Table, Popover } from 'antd'
 import { IoMdAdd } from 'react-icons/io'
 import { IoListCircleOutline } from 'react-icons/io5'
-import { Button, ButtonStrip, Checkbox, CircularLoader, Modal, ModalActions, ModalContent, ModalTitle, NoticeBox, Radio } from '@dhis2/ui'
+import { Button, ButtonStrip, Checkbox, CircularLoader, Modal, ModalActions, ModalContent, ModalTitle, Radio } from '@dhis2/ui'
 import {
     AGENT,
     CANCELED,
@@ -35,7 +35,7 @@ import {
 } from '../utils/constants'
 import { loadDataStore, saveDataToDataStore } from '../utils/functions'
 import { MyNoticeBox } from './MyNoticeBox'
-import { ANALYTICS_ROUTE, API_BASE_ROUTE, ENROLLMENTS_ROUTE, EVENTS_ROUTE, ORGANISATION_UNITS_ROUTE, ORGANISATION_UNIT_GROUPS_ROUTE, ORGANISATION_UNIT_GROUP_SETS_ROUTE, PROGRAMS_STAGE_ROUTE, PROGRAM_INDICATOR_GROUPS, PROGS_ROUTE, SERVER_URL, TRACKED_ENTITY_ATTRIBUTES_ROUTE, TRACKED_ENTITY_INSTANCES_ROUTE, USERS_ROUTE } from '../utils/api.routes'
+import { ANALYTICS_ROUTE, API_BASE_ROUTE, ENROLLMENTS_ROUTE, EVENTS_ROUTE, ORGANISATION_UNITS_ROUTE, ORGANISATION_UNIT_GROUPS_ROUTE, ORGANISATION_UNIT_GROUP_SETS_ROUTE, PROGRAMS_STAGE_ROUTE, PROGS_ROUTE, SERVER_URL, TRACKED_ENTITY_ATTRIBUTES_ROUTE, TRACKED_ENTITY_INSTANCES_ROUTE, USERS_ROUTE } from '../utils/api.routes'
 import axios from 'axios'
 import OrganisationUnitsTree from './OrganisationUnitsTree'
 import { QuestionCircleOutlined } from '@ant-design/icons'
@@ -52,7 +52,6 @@ import { TbSelect } from 'react-icons/tb'
 import { DataDimension } from '@dhis2/analytics'
 import { IoMdOpen } from 'react-icons/io'
 import { MdStars } from 'react-icons/md'
-
 
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat'
@@ -2184,7 +2183,6 @@ const Supervision = ({ me }) => {
 
     const handleCloseAddFavoritForPerformance = () => {
         setVisibleAddFavoritPerformanceModal(false)
-        setInputFavoritName('')
     }
 
     const handleAddFavoritPerformanceSave = () => {
@@ -3438,10 +3436,6 @@ const Supervision = ({ me }) => {
     }
 
     const handleOkAnalyticComponentForPerformanceModal = () => {
-        // setInputIndicatorNameForPerformance(selectedElementForPerformances[0]?.name)
-        // setInputIndicatorIdForPerformance(selectedElementForPerformances[0]?.id)
-        // setSelectedElementForPerformances([])
-
         setSelectedIndicators(generateArrayOfFieldsInputForPerformances(selectedElementForPerformances))
         setVisibleAnalyticComponentPerformanceModal(false)
     }
