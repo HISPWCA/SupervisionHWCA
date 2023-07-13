@@ -51,7 +51,7 @@ import { CgCloseO } from 'react-icons/cg'
 import { TbSelect } from 'react-icons/tb'
 import { DataDimension } from '@dhis2/analytics'
 import { IoMdOpen } from 'react-icons/io'
-import { MdFavorite } from 'react-icons/md'
+import { MdStars } from 'react-icons/md'
 
 
 import dayjs from 'dayjs';
@@ -122,6 +122,7 @@ const Supervision = ({ me }) => {
     const [selectedIndicatorsConfiguratedForPerformances, setSelectedIndicatorsConfiguratedForPerformances] = useState([])
     const [selectedFavoritForPerformance, setSelectedFavoritForPerformance] = useState(null)
 
+    const [inputIndicatorFieldsForPerformances, setInputIndicatorFieldsForPerformances] = useState([])
     const [inputFavorisName, setInputFavoritName] = useState('')
     const [inputIndicatorWeightForPerormance, setInputIndicatorWeightForPerormance] = useState(0)
     const [inputIndicatorBestPositiveForPerormance, setInputIndicatorBestPositiveForPerormance] = useState(true)
@@ -185,6 +186,16 @@ const Supervision = ({ me }) => {
                 header: `${translate('Unite_Organisation')}`,
             },
             {
+                accessorKey: 'superviseurs',
+                header: `${translate('Superviseurs')}`,
+                Cell: ({ cell, row }) => (
+                    <div>
+                        {row.getValue()}
+                        {console.log(" superviseurs : ", row.getValue())}
+                    </div>
+                )
+            },
+            {
                 accessorKey: 'period',
                 header: `${translate('Periode')}`
             },
@@ -192,6 +203,7 @@ const Supervision = ({ me }) => {
             {
                 accessorKey: 'statusSupervision', //normal accessorKey
                 header: `${translate('Status_Supervision')}`,
+                size: 150,
                 Cell: ({ cell, row }) => {
                     return (
                         <>
@@ -204,7 +216,7 @@ const Supervision = ({ me }) => {
             },
             {
                 header: `${translate('Actions')}`,
-                width: 100,
+                size: 50,
                 Cell: ({ cell, row }) => {
                     return (
                         <div style={{ textAlign: 'center', }}>
@@ -246,26 +258,10 @@ const Supervision = ({ me }) => {
                         )
                     }
                 },
-                // {
-                //     accessorKey: 'statusPayment',
-                //     header: `${translate('Status_Paiement')}`,
-                //     Cell: ({ cell, row }) => {
-                //         return (
-                //             <>
-                //                 <span title={getStatusNameAndColorForPayment(cell.getValue())?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColorForPayment(cell.getValue())?.color?.background, color: getStatusNameAndColorForPayment(cell.getValue())?.color?.text, padding: '4px', fontSize: '12px', borderRadius: '5px' }}>
-                //                     {getStatusNameAndColorForPayment(cell.getValue())?.name}
-                //                 </span>
-                //             </>
-                //         )
-                //     }
-                // },
-                // {
-                //     accessorKey: 'montant',
-                //     header: `${translate('Montants')}`,
-                // },
+
                 {
                     header: `${translate('Actions')}`,
-                    width: 100,
+                    size: 100,
                     Cell: ({ cell, row }) => {
                         return (
                             <div style={{ textAlign: 'center', }}>
@@ -517,6 +513,26 @@ const Supervision = ({ me }) => {
                 const eventDate = current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events[0]?.eventDate
                 const trackedEntityInstance = current.trackedEntityInstance
                 const program = current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.program
+
+                console.log("selectedSupervisionsConfigProgram?.fieldConfig?.supervisor?.dataElements: ", selectedSupervisionsConfigProgram?.fieldConfig?.supervisor?.dataElements)
+
+                const superviseursEvents = selectedSupervisionsConfigProgram?.fieldConfig?.supervisor?.dataElements?.reduce((prevEl, curr) => {
+                    console.log("current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events: ", current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events)
+                    const foundedEvent = current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events[0]?.dataValues?.find(el => el.dataElement === curr.id)
+                    if (foundedEvent)
+                        prevEl.push(foundedEvent)
+                    return prevEl
+                }, []) || []
+
+                console.log("superviseursEvent : ", superviseursEvents)
+                const superviseurs = superviseursEvents.reduce((prevEl, curr) => {
+                    if (curr.value && curr.value?.trim()?.length > 0)
+                        prevEl = prevEl.concat(curr.value)
+                    return prevEl
+                }, '')
+
+                console.log("Superviseurs : ", superviseurs)
+
                 return [
                     ...prev,
                     {
@@ -524,6 +540,7 @@ const Supervision = ({ me }) => {
                         agent: `${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeFirstName?.id)?.value || ''}`,
                         montant: calculateMontant(trackedEntityInstance, eventDate, current.orgUnit, program),
                         period: eventDate,
+                        superviseurs: superviseurs,
                         enrollment: current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.enrollment,
                         program: program,
                         orgUnit: current.orgUnit,
@@ -550,6 +567,12 @@ const Supervision = ({ me }) => {
                         trackedEntityInstance: en.trackedEntityInstance,
                         agent: `${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeFirstName?.id)?.value || ''}`,
                         period: en?.events[0]?.eventDate,
+                        superviseurs: selectedSupervisionsConfigProgram?.fieldConfig?.supervisor?.dataElements?.reduce((prevEl, curr) => {
+                            const foundedEvent = en?.events[0]?.dataValues?.find(el => el.dataElement === curr.id)
+                            if (foundedEvent && foundedEvent.value && foundedEvent.value?.trim()?.length > 0)
+                                prevEl = prevEl.concat(foundedEvent.value)
+                            return prevEl
+                        }, ''),
                         montant: calculateMontant(en.trackedEntityInstance, en?.events[0]?.eventDate, current.orgUnit, en.program),
                         enrollment: en.enrollment,
                         program: en.program,
@@ -585,6 +608,13 @@ const Supervision = ({ me }) => {
                         orgUnit: currentEnrollment?.orgUnit,
                         storedBy: currentEnrollment?.storedBy,
                         libelle: currentEnrollment?.orgUnitName,
+                        superviseurs: selectedSupervisionsConfigProgram?.fieldConfig?.supervisor?.dataElements?.reduce((prevEl, curr) => {
+                            console.log("data value ", ev.dataValues)
+                            const foundedEvent = ev?.dataValues?.find(el => el.dataElement === curr.id)
+                            if (foundedEvent && foundedEvent.value && foundedEvent.value?.trim()?.length > 0)
+                                prevEl = prevEl.concat(foundedEvent.value)
+                            return prevEl
+                        }, ''),
                         statusSupervision: dayjs(ev.eventDate).isAfter(dayjs()) ? getDefaultStatusSupervisionIfStatusIsNull() : currentEnrollment?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
                         statusPayment: currentEnrollment?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusPayment?.dataElement?.id)?.value || getDefaultStatusPaymentIfStatusIsNull()
                     }))
@@ -2083,16 +2113,30 @@ const Supervision = ({ me }) => {
             if (!inputFavorisName || inputFavorisName?.trim()?.length === 0)
                 throw new Error(translate('Nom_Obligatoire'))
 
-            if (favoritPerformanceList.map(f => f.nom).includes(inputFavorisName))
+            if (!selectedFavoritForPerformance && selectedSelectionTypeForPerformance === DIRECTE && favoritPerformanceList.map(f => f.nom).includes(inputFavorisName))
                 throw new Error(translate('Favorit_Exist_Deja'))
 
-            const payload = {
-                id: uuid(),
+            let payload = {
                 name: inputFavorisName,
                 indicators: selectedIndicators
             }
 
-            setFavoritPerformanceList([payload, ...favoritPerformanceList])
+            if (selectedSelectionTypeForPerformance === FAVORIS && selectedFavoritForPerformance) {
+                setFavoritPerformanceList(
+                    favoritPerformanceList.map(ind => {
+                        if (ind.id === selectedFavoritForPerformance?.id) {
+                            return {
+                                ...ind,
+                                ...payload
+                            }
+                        }
+                        return ind
+                    })
+                )
+            } else {
+                payload.id = uuid()
+                setFavoritPerformanceList([payload, ...favoritPerformanceList])
+            }
 
             setNotification({ show: true, message: translate('Favorit_Enregistrer_Avec_Succes'), type: NOTIFICATION_SUCCESS })
             setInputFavoritName('')
@@ -2110,8 +2154,12 @@ const Supervision = ({ me }) => {
                     <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
                         {translate('Enregistrement_Favorit')}
                     </div>
+
                 </ModalTitle>
                 <ModalContent>
+                    <div style={{ marginTop: '10px', padding: '10px', border: '1px solid #ccc', background: "#eee", color: '#00000090', fontSize: '13px' }}>
+                        {translate('Nom_Claire_Favorit')}
+                    </div>
                     <div style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '5px' }}>
                         <div>
                             <div style={{ marginBottom: '5px' }}>{translate('Nom')}</div>
@@ -2165,6 +2213,14 @@ const Supervision = ({ me }) => {
                             </tr>
                         </thead>
                         <tbody>
+
+                            {
+                                equipeList.length === 0 && (
+                                    <tr style={{ color: '#00000080' }}>
+                                        <td colSpan={3}>{translate('List_Vide')}</td>
+                                    </tr>
+                                )
+                            }
 
                             {
                                 equipeList.map((eq, index) => (
@@ -2229,47 +2285,47 @@ const Supervision = ({ me }) => {
 
     const handleChangeSelectionTypeForPerformance = ({ value }) => {
         setSelectedIndicators([])
+        setSelectedElementForPerformances([])
         setSelectedFavoritForPerformance(null)
-        setSelectedIndicatorsConfiguratedForPerformances([])
         setSelectedSelectionTypeForPerformance(value)
     }
 
-    const handleClickAddIndicatorForPerformance = () => {
-        try {
-            console.log("inputIndicatorNameForPerformance:", inputIndicatorNameForPerformance)
-            console.log("inputIndicatorIdForPerformance:", inputIndicatorIdForPerformance)
-            if (!inputIndicatorNameForPerformance || inputIndicatorNameForPerformance?.trim()?.length === 0 || !inputIndicatorIdForPerformance)
-                throw new Error(translate('Element_De_Performance_Obligatoire'))
+    // const handleClickAddIndicatorForPerformance = () => {
+    //     try {
+    //         console.log("inputIndicatorNameForPerformance:", inputIndicatorNameForPerformance)
+    //         console.log("inputIndicatorIdForPerformance:", inputIndicatorIdForPerformance)
+    //         if (!inputIndicatorNameForPerformance || inputIndicatorNameForPerformance?.trim()?.length === 0 || !inputIndicatorIdForPerformance)
+    //             throw new Error(translate('Element_De_Performance_Obligatoire'))
 
-            if (selectedIndicatorsConfiguratedForPerformances.map(ind => ind.indicator?.id).includes(inputIndicatorIdForPerformance))
-                throw new Error(translate('Indicateur_Deja_Configurer'))
+    //         if (selectedIndicatorsConfiguratedForPerformances.map(ind => ind.indicator?.id).includes(inputIndicatorIdForPerformance))
+    //             throw new Error(translate('Indicateur_Deja_Configurer'))
 
-            const paylaod = {
-                id: uuid(),
-                nom: inputIndicatorNameForPerformance,
-                indicator: { displayName: inputIndicatorNameForPerformance, id: inputIndicatorIdForPerformance },
-                weight: inputWeightForPerformance,
-                bestPositive: inputIndicatorBestPositiveForPerormance
-            }
+    //         const paylaod = {
+    //             id: uuid(),
+    //             nom: inputIndicatorNameForPerformance,
+    //             indicator: { displayName: inputIndicatorNameForPerformance, id: inputIndicatorIdForPerformance },
+    //             weight: inputWeightForPerformance,
+    //             bestPositive: inputIndicatorBestPositiveForPerormance
+    //         }
 
-            setSelectedIndicatorsConfiguratedForPerformances([...selectedIndicatorsConfiguratedForPerformances, paylaod])
-            setSelectedIndicators([...selectedIndicators, paylaod])
+    //         setSelectedIndicatorsConfiguratedForPerformances([...selectedIndicatorsConfiguratedForPerformances, paylaod])
+    //         setSelectedIndicators([...selectedIndicators, paylaod])
 
-            setNotification({ show: true, message: translate('Configuration_Ajoutee'), type: NOTIFICATION_SUCCESS })
-            setInputWeightForPerformance(0)
-            setInputIndicatorNameForPerformance('')
-            setInputIndicatorIdForPerformance(null)
-            setSelectedElementForPerformances([])
+    //         setNotification({ show: true, message: translate('Configuration_Ajoutee'), type: NOTIFICATION_SUCCESS })
+    //         setInputWeightForPerformance(0)
+    //         setInputIndicatorNameForPerformance('')
+    //         setInputIndicatorIdForPerformance(null)
+    //         setSelectedElementForPerformances([])
 
-        } catch (err) {
-            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
-        }
-    }
+    //     } catch (err) {
+    //         setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
+    //     }
+    // }
 
 
-    const handleSelectIndicatorsForPerformance = (values) => {
-        setSelectedIndicators(values.map(val => selectedIndicatorsConfiguratedForPerformances.find(dsInd => dsInd.indicator?.id === val)))
-    }
+    // const handleSelectIndicatorsForPerformance = (values) => {
+    //     setSelectedIndicators(values.map(val => selectedIndicatorsConfiguratedForPerformances.find(dsInd => dsInd.indicator?.id === val)))
+    // }
 
     const handleSaveAsFavorites = () => {
         setVisibleAddFavoritPerformanceModal(true)
@@ -2278,8 +2334,23 @@ const Supervision = ({ me }) => {
     const handleSelectFavoritForPerformance = (value) => {
         const currentFavorit = favoritPerformanceList.find(f => f.id === value)
         setSelectedFavoritForPerformance(currentFavorit)
+        setInputFavoritName(currentFavorit.name)
+        setSelectedElementForPerformances(currentFavorit?.indicators?.map(i => i.indicator))
         setSelectedIndicators(currentFavorit?.indicators || [])
-        setSelectedIndicatorsConfiguratedForPerformances(currentFavorit?.indicators?.map(i => ({ indicator: i })) || [])
+    }
+
+    const handleChangePoidsForFieldsPerformances = (event, index) => {
+        setSelectedIndicators(
+            selectedIndicators.map((ind, indexInd) => {
+                if (indexInd === index) {
+                    return {
+                        ...ind,
+                        weight: event
+                    }
+                }
+                return ind
+            })
+        )
     }
 
     const RenderSupervisionPlanificationIndicatorContent = () => (
@@ -2288,7 +2359,6 @@ const Supervision = ({ me }) => {
                 <Card bodyStyle={{ padding: '0px' }} className='my-shadow' size='small'>
                     <div style={{ fontWeight: 'bold', padding: '10px', borderBottom: '1px solid #ccc' }}> {translate('Planification_Sur_Performances')} </div>
                     <div style={{ padding: '10px' }}>
-
                         <div>
                             {translate('Selectionnez_Indicateurs_De_Performance')}
                         </div>
@@ -2315,85 +2385,7 @@ const Supervision = ({ me }) => {
                         </div>
                         <div><Divider style={{ marginTop: '10px', marginBottom: '10px' }} /></div>
 
-                        {
-                            selectedSelectionTypeForPerformance === DIRECTE && (
-                                <>
-                                    <div>
-                                        <Row gutter={[10, 10]}>
-                                            <Col md={22} xs={24}>
-                                                <div>
-                                                    <div style={{ marginBottom: '5px' }}>{translate('Source_De_Donnee')}</div>
-                                                    <Input
-                                                        placeholder={translate('Source_De_Donnee')}
-                                                        style={{ width: '100%' }}
-                                                        disabled
-                                                        value={inputIndicatorNameForPerformance}
-                                                        onChange={event => {
-                                                            setInputIndicatorNameForPerformance(''.concat(event.target.value))
-                                                        }}
-                                                    />
-                                                </div>
-                                            </Col>
-                                            <Col md={2} xs={24}>
-                                                <div style={{ marginTop: '28px' }}>
-                                                    <Button title="Select" small primary icon={<TbSelect style={{ fontSize: '18px', color: '#fff', }} />} onClick={() => setVisibleAnalyticComponentPerformanceModal(true)}></Button>
-                                                </div>
-                                            </Col>
-                                            <Col md={11} sm={24}>
-                                                <div style={{ marginBottom: '5px' }}>{translate('Poids')}</div>
-                                                <InputNumber style={{ width: '100%' }} name='indicatorName' value={inputIndicatorWeightForPerormance} onChange={event => setInputIndicatorWeightForPerormance(event)} />
-                                            </Col>
-                                            <Col md={9}>
-                                                <div style={{ display: 'flex', alignItems: 'center', marginTop: '30px', cursor: 'pointer' }} onClick={() => setInputIndicatorBestPositiveForPerormance(!inputIndicatorBestPositiveForPerormance)}>
-                                                    <Checkbox checked={inputIndicatorBestPositiveForPerormance} onChange={() => setInputIndicatorBestPositiveForPerormance(!inputIndicatorBestPositiveForPerormance)} />
-                                                    <span style={{ marginLeft: '10px' }}> {translate('Meilleur_Positif')}</span>
-                                                </div>
-                                            </Col>
-                                            <Col md={4}>
-                                                <div style={{ display: 'flex', alignItems: 'center', marginTop: '25px' }}>
-                                                    <Button
-                                                        disabled={!inputIndicatorNameForPerformance || inputIndicatorNameForPerformance?.trim()?.length === 0 ? true : false}
-                                                        primary
-                                                        small
-                                                        onClick={handleClickAddIndicatorForPerformance}> + {translate('Ajouter')}</Button>
-                                                </div>
-                                            </Col>
-                                        </Row>
 
-                                    </div>
-                                    <div>
-                                        <Divider style={{ marginTop: '10px', marginBottom: '10px' }} />
-                                    </div>
-
-                                    {
-                                        selectedIndicatorsConfiguratedForPerformances.length > 0 && (
-                                            <div>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
-                                                    <div>
-                                                        {translate('Indicateurs_Selectionnes')}
-                                                    </div>
-                                                    <Popover content={<>{translate('Enregistrer_Comme_Favorites')}</>}>
-                                                        <Button disabled={selectedIndicators.length > 0 ? false : true} small onClick={handleSaveAsFavorites} icon={<MdFavorite style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }} />}>
-                                                            {translate('Enregistrer')}
-                                                        </Button>
-                                                    </Popover>
-                                                </div>
-                                                <Select
-                                                    options={selectedIndicatorsConfiguratedForPerformances.map(ind => ({ label: ind.indicator?.displayName, value: ind.indicator?.id }))}
-                                                    showSearch
-                                                    placeholder={translate('Indicateurs')}
-                                                    style={{ width: '100%' }}
-                                                    optionFilterProp='label'
-                                                    mode='multiple'
-                                                    onChange={handleSelectIndicatorsForPerformance}
-                                                    value={selectedIndicators?.map(ind => ind.indicator?.id)}
-                                                />
-                                            </div>
-                                        )
-                                    }
-                                </>
-                            )
-                        }
 
                         {
                             selectedSelectionTypeForPerformance === FAVORIS && (
@@ -2412,21 +2404,93 @@ const Supervision = ({ me }) => {
                                             value={selectedFavoritForPerformance?.id}
                                         />
                                     </div>
+                                </>
+                            )
+                        }
+
+                        {
+                            selectedSelectionTypeForPerformance === DIRECTE ? (
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '10px' }}>
+                                    <div>
+                                        <Button small primary icon={<TbSelect style={{ fontSize: '18px', color: '#fff', }} />} onClick={() => setVisibleAnalyticComponentPerformanceModal(true)}>
+                                            {translate('Selectionnez_Les_Indicateurs')}
+                                        </Button>
+                                    </div>
+
+                                    {
+                                        selectedIndicators.length > 0 && (
+                                            <div style={{ marginLeft: '10px' }}>
+                                                <Popover trigger="hover" content={<>{translate('Enregistrer_Comme_Favorites')}</>}>
+                                                    <Button disabled={selectedIndicators.length > 0 ? false : true} small onClick={handleSaveAsFavorites} icon={<MdStars style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }} />}>
+                                                        {translate('Enregistrer')}
+                                                    </Button>
+                                                </Popover>
+                                            </div>
+                                        )
+                                    }
+                                </div>
+                            ) : selectedIndicators.length > 0 && (
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '10px' }}>
+                                    <div>
+                                        <Button small primary icon={<TbSelect style={{ fontSize: '18px', color: '#fff', }} />} onClick={() => setVisibleAnalyticComponentPerformanceModal(true)}>
+                                            {translate('Selectionnez_Les_Indicateurs')}
+                                        </Button>
+                                    </div>
+
+                                    <div style={{ marginLeft: '10px' }}>
+                                        <Popover trigger="hover" content={<>{translate('Enregistrer_Comme_Favorites')}</>}>
+                                            <Button disabled={selectedIndicators.length > 0 ? false : true} small onClick={handleSaveAsFavorites} icon={<MdStars style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }} />}>
+                                                {translate('Mise_A_Jour')}
+                                            </Button>
+                                        </Popover>
+                                    </div>
+                                </div>
+                            )
+                        }
+
+
+                        {
+                            selectedIndicators.length > 0 && (
+                                <>
                                     <div style={{ marginTop: '10px' }}>
-                                        <div style={{ marginBottom: '5px' }}>
-                                            {translate('Indicateurs_Selectionnes')}
-                                        </div>
-                                        <Select
-                                            disabled
-                                            options={selectedIndicatorsConfiguratedForPerformances.map(ind => ({ label: ind.indicator?.displayName, value: ind.indicator?.id }))}
-                                            showSearch
-                                            placeholder={translate('Indicateurs')}
-                                            style={{ width: '100%' }}
-                                            optionFilterProp='label'
-                                            mode='multiple'
-                                            onChange={handleSelectIndicatorsForPerformance}
-                                            value={selectedIndicators?.map(ind => ind.indicator?.id)}
-                                        />
+                                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                            <tr>
+                                                <th style={{ padding: '5px', border: '1px solid #ccc', fontSize: '14px' }}> {translate('Nom')}</th>
+                                                <th style={{ padding: '5px', border: '1px solid #ccc', fontSize: '14px' }}> {translate('Poids')}</th>
+                                                <th style={{ padding: '5px', border: '1px solid #ccc', fontSize: '14px' }}> {translate('Actions')}</th>
+                                            </tr>
+                                            {
+                                                selectedIndicators.map((ind, index) => (
+                                                    <tr key={index}>
+                                                        <td style={{ padding: '5px', border: '1px solid #ccc', fontSize: '14px' }}>
+                                                            <div>{ind.name}</div>
+                                                        </td>
+                                                        <td style={{ padding: '5px', border: '1px solid #ccc', fontSize: '14px', width: '30%' }}>
+                                                            <div>
+                                                                <InputNumber value={ind.weight} onChange={(event) => handleChangePoidsForFieldsPerformances(event, index)} style={{ width: '100%' }} placeholder={translate('Poids')} />
+                                                            </div>
+                                                        </td>
+                                                        <td style={{ padding: '5px', border: '1px solid #ccc', width: '10%', textAlign: 'center' }}>
+                                                            <div>
+                                                                <Popconfirm
+                                                                    title={translate('Suppression')}
+                                                                    description={translate('Confirmation_Suppression_Indicateur')}
+                                                                    icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+                                                                    onConfirm={() => {
+                                                                        const newArray = selectedIndicators.filter(e => e.id !== ind.id)
+                                                                        setSelectedIndicators(newArray)
+                                                                        setSelectedElementForPerformances(selectedElementForPerformances.filter(el => el.id !== ind.indicator?.id))
+                                                                    }}
+                                                                >
+                                                                    <RiDeleteBinLine style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }} />
+                                                                </Popconfirm>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                )
+                                                )
+                                            }
+                                        </table>
                                     </div>
                                 </>
                             )
@@ -2465,19 +2529,19 @@ const Supervision = ({ me }) => {
         )
     }
 
-    const handleInputPayment = (value, index) => {
-        setInputFields(
-            inputFields.map((field, fieldIndex) => {
-                if (index === fieldIndex) {
-                    return {
-                        ...field,
-                        payment: value
-                    }
-                }
-                return field
-            })
-        )
-    }
+    // const handleInputPayment = (value, index) => {
+    //     setInputFields(
+    //         inputFields.map((field, fieldIndex) => {
+    //             if (index === fieldIndex) {
+    //                 return {
+    //                     ...field,
+    //                     payment: value
+    //                 }
+    //             }
+    //             return field
+    //         })
+    //     )
+    // }
 
     const handleInputOtherSupervisor = (event, index) => {
         setInputFields(
@@ -2565,24 +2629,24 @@ const Supervision = ({ me }) => {
         setInputFields(inputFields.filter(o => o.organisationUnit?.id !== org.id))
     }
 
-    const RenderEntryInputConfiguration = () => (
-        <div style={{ marginBottom: '20px' }}>
-            <Card bodyStyle={{ padding: '0px' }} className="my-shadow" size='small'>
-                <div style={{ padding: '10px', borderBottom: '1px solid #ccc' }}>
-                    <div>
-                        {translate('Configuration_Des_Champs_De_Saisie')}
+    // const RenderEntryInputConfiguration = () => (
+    //     <div style={{ marginBottom: '20px' }}>
+    //         <Card bodyStyle={{ padding: '0px' }} className="my-shadow" size='small'>
+    //             <div style={{ padding: '10px', borderBottom: '1px solid #ccc' }}>
+    //                 <div>
+    //                     {translate('Configuration_Des_Champs_De_Saisie')}
 
-                    </div>
-                    <div style={{ marginTop: '10px', color: '#00000080', fontSize: '13px' }}>
-                        {translate('Configuration_Element_De_Donner')}
-                    </div>
-                </div>
-                <div style={{ padding: '10px' }}>
+    //                 </div>
+    //                 <div style={{ marginTop: '10px', color: '#00000080', fontSize: '13px' }}>
+    //                     {translate('Configuration_Element_De_Donner')}
+    //                 </div>
+    //             </div>
+    //             <div style={{ padding: '10px' }}>
 
-                </div>
-            </Card>
-        </div>
-    )
+    //             </div>
+    //         </Card>
+    //     </div>
+    // )
 
     const RenderOrganisationUnitForm = (colMd = 12) => (
         <div>
@@ -2816,30 +2880,6 @@ const Supervision = ({ me }) => {
                                             </Col>
                                         }
 
-                                        {/* 
-                                        {
-                                            0 >1 &&  selectedProgram?.paymentConfigs?.length > 0 && (
-                                                    <Col sm={24} md={24}>
-                                                        <div>
-                                                            <div style={{ marginBottom: '5px' }}>{translate('Criteres_De_Paiement')}</div>
-                                                            <Select
-                                                                placeholder={translate('Criteres_De_Paiement')}
-                                                                style={{ width: '100%' }}
-                                                                loading={loadingDataStoreSupervisionConfigs}
-                                                                disabled={loadingDataStoreSupervisionConfigs}
-                                                                value={inputFields[index]?.payment}
-                                                                onChange={(value) => handleInputPayment(value, index)}
-                                                                optionFilterProp='label'
-                                                                showSearch
-                                                                allowClear
-                                                                options={selectedProgram?.paymentConfigs?.map(p => ({ label: p.libelle, value: p.id }))}
-                                                            />
-                                                        </div>
-                                                    </Col>
-                                                )
-                                            } 
-                                            */}
-
                                         <Col sm={24} md={24}>
                                             <div>
                                                 <div style={{ marginBottom: '5px' }}>{translate('Superviseurs')}</div>
@@ -2984,41 +3024,55 @@ const Supervision = ({ me }) => {
             if (!selectedPeriod)
                 throw new Error(translate('Veuillez_Selectionner_Periode'))
 
-            const route = `${ANALYTICS_ROUTE}?dimension=dx:${selectedIndicators.map(ind => ind.indicator?.id).join(';')},ou:${selectedOrganisationUnitInd?.id};OU_GROUP-${selectedOrganisationUnitGroup?.id}&filter=pe:${formatPeriod(selectedPeriod, selectedPeriodType)}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=true&includeNumDen=true&skipRounding=false&completedOnly=false&outputIdScheme=UID`
+            const route = `${ANALYTICS_ROUTE}.json?dimension=dx:${selectedIndicators.map(ind => ind.indicator?.id).join(';')},ou:${selectedOrganisationUnitInd?.id};OU_GROUP-${selectedOrganisationUnitGroup?.id}&filter=pe:${formatPeriod(selectedPeriod, selectedPeriodType)}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=false&includeNumDen=false&skipRounding=false&completedOnly=false&outputIdScheme=UID`
             const response = await axios.get(route)
 
-            let availableIndicators = []
+            const analyticResult = response.data.rows || []
 
-            for (let ind of selectedIndicators) {
-                const payload = {
-                    indicator: ind.indicator,
-                    weight: ind.weight,
-                    dataValues: response.data.rows.reduce((prev, cur) => {
-                        const currentElement = cur[0]
-                        const currentOrgUnit = cur[1]
-                        const currentValue = cur[2]
+            const ouPayload = analyticResult.reduce((prev, cur) => {
 
-                        if (ind.indicator?.id === currentElement) {
-                            const payload = {
-                                dataElement: currentElement,
-                                orgUnit: organisationUnits.find(ou => ou.id === currentOrgUnit),
-                                value: currentValue,
-                                period: selectedPeriod,
-                                score: parseFloat(currentValue) * parseFloat(ind.weight || 1),
-                            }
+                const currentElement = cur[0]
+                const currentOrgUnit = cur[1]
+                const currentValue = cur[2]
+                const currentIndicator = selectedIndicators.find(i => i.indicator?.id === currentElement)
+                const score = parseFloat(currentIndicator?.weight) > 0 ? parseFloat(currentIndicator?.weight) * parseFloat(currentValue) : parseFloat(currentValue)
 
-                            prev.push(payload)
-                        }
+                console.log("Score: ", score)
 
-                        return prev
-                    }, [])
+                if (prev[currentOrgUnit]) {
+
+                    console.log("prev[currentOrgUnit].scoreTotal + parseFloat(score): ", prev[currentOrgUnit].scoreTotal + parseFloat(score))
+
+                    console.log("---------------------")
+                    console.log(prev[currentOrgUnit][currentElement])
+                    console.log(currentElement)
+
+                    prev[currentOrgUnit][currentElement] = {
+                        id: currentElement,
+                        score: parseFloat(score).toFixed(1)
+                    }
+                    prev[currentOrgUnit] = {
+                        ...prev[currentOrgUnit],
+                        scoreTotal: parseFloat(parseFloat(prev[currentOrgUnit].scoreTotal) + parseFloat(score)).toFixed(1)
+                    }
+
+                } else {
+                    prev[currentOrgUnit] = {
+                        orgUnit: organisationUnits.find(ou => ou.id === currentOrgUnit),
+                        period: dayjs(selectedPeriod).format('DD-MM-YYYY'),
+                        scoreTotal: parseFloat(score).toFixed(1)
+                    }
+                    prev[currentOrgUnit][currentElement] = {
+                        id: currentElement,
+                        score: parseFloat(score).toFixed(1)
+                    }
                 }
 
-                availableIndicators.push(payload)
-            }
+                return prev
+            }, {})
 
-            setAnalyticIndicatorResults(availableIndicators)
-            if (response.data.rows.length === 0) {
+            setAnalyticIndicatorResults(Object.values(ouPayload))
+            if (analyticResult.length === 0) {
                 setAnalyticErrorMessage(translate('Aucun_Donne_Trouver_Pour_Cette_Selection'))
             }
 
@@ -3294,16 +3348,39 @@ const Supervision = ({ me }) => {
         </Modal>
     ) : <></>
 
+    const generateArrayOfFieldsInputForPerformances = (indicatorList) => {
+        const newList = []
+        for (let ind of indicatorList) {
+            if (selectedIndicators.map(inp => inp.indicator?.id).includes(ind.id)) {
+                newList.push(
+                    selectedIndicators.find(inp => inp.indicator.id === ind.id)
+                )
+            } else {
+                newList.push(
+                    {
+                        id: uuid(),
+                        name: ind.name,
+                        weight: 0,
+                        indicator: ind,
+                    }
+                )
+            }
+        }
+        return newList
+    }
+
     const handleOkAnalyticComponentForPerformanceModal = () => {
-        setInputIndicatorNameForPerformance(selectedElementForPerformances[0]?.name)
-        setInputIndicatorIdForPerformance(selectedElementForPerformances[0]?.id)
-        setSelectedElementForPerformances([])
+        // setInputIndicatorNameForPerformance(selectedElementForPerformances[0]?.name)
+        // setInputIndicatorIdForPerformance(selectedElementForPerformances[0]?.id)
+        // setSelectedElementForPerformances([])
+
+        setSelectedIndicators(generateArrayOfFieldsInputForPerformances(selectedElementForPerformances))
         setVisibleAnalyticComponentPerformanceModal(false)
     }
 
     const handleCancelAnalyticComponentForPerformanceModal = () => {
-        setSelectedElementForPerformances([])
         setVisibleAnalyticComponentPerformanceModal(false)
+        setSelectedElementForPerformances(selectedIndicators?.map(ind => ind.indicator))
     }
 
     const RenderAnalyticComponenPerformancetModal = () => visibleAnalyticComponentPerformanceModal ? (
@@ -3316,9 +3393,9 @@ const Supervision = ({ me }) => {
             <ModalContent>
                 <div>
                     <DataDimension
-                        selectedDimensions={selectedElementForPerformances.map(it => ({ ...it, isDeactivated: true }))}
+                        selectedDimensions={selectedElementForPerformances}
                         onSelect={value => {
-                            setSelectedElementForPerformances(value?.items?.length > 0 ? [value.items[0]] : [])
+                            setSelectedElementForPerformances(value?.items?.length > 0 ? value.items : [])
                         }}
                         displayNameProp="displayName"
                     />
@@ -3326,10 +3403,10 @@ const Supervision = ({ me }) => {
             </ModalContent>
             <ModalActions>
                 <ButtonStrip end>
-                    <Button destructive onClick={() => handleCancelAnalyticComponentForPerformanceModal()} icon={<CgCloseO style={{ fontSize: "18px" }} />}>
+                    <Button destructive onClick={handleCancelAnalyticComponentForPerformanceModal} icon={<CgCloseO style={{ fontSize: "18px" }} />}>
                         {translate('Annuler')}
                     </Button>
-                    <Button primary onClick={() => handleOkAnalyticComponentForPerformanceModal()} icon={<FiSave style={{ fontSize: "18px" }} />}>
+                    <Button primary onClick={handleOkAnalyticComponentForPerformanceModal} icon={<FiSave style={{ fontSize: "18px" }} />}>
                         {translate('Enregistrer')}
                     </Button>
                 </ButtonStrip>
@@ -3439,6 +3516,26 @@ const Supervision = ({ me }) => {
         }
     }
 
+    const RenderTableRow = (backgroundColor, an, index) => (
+        <tr style={{ backgroundColor, color: '#000' }} key={index}>
+            <td style={{ border: '1px solid #ccc', padding: '5px' }}>
+                <AntCheckbox onChange={() => handleSelectCheckbox(an?.orgUnit)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an.orgUnit?.id)} /></td>
+            <td style={{ border: '1px solid #ccc', padding: '5px' }}>{`${an.orgUnit?.displayName} (  ${an.orgUnit?.parent?.displayName}  ) `}</td>
+            {
+                selectedIndicators.map((ind, indIndex) => (
+                    <td key={indIndex} style={{ border: '1px solid #ccc', padding: '5px', textAlign: 'center' }}>
+                        {an[ind.indicator?.id]?.score || ''}
+                    </td>
+                ))
+            }
+            {
+                <td style={{ border: '1px solid #ccc', padding: '5px', textAlign: 'center' }}>
+                    {an.scoreTotal}
+                </td>
+            }
+        </tr>
+    )
+
     const RenderAnalyticIndicatorsResults = () => (
         <div style={{ marginTop: '10px' }}>
             <Card size='small' className='my-shadow'>
@@ -3447,38 +3544,49 @@ const Supervision = ({ me }) => {
                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <thead>
                                 <tr style={{ backgroundColor: '#fff' }}>
-                                    <th style={{ border: '1px solid #ccc', padding: '5px' }}></th>
-                                    <th style={{ border: '1px solid #ccc', padding: '5px' }}>{translate('Unite_Organisation')}</th>
+                                    <th style={{ border: '1px solid #ccc', padding: '5px', textAlign: 'center' }}></th>
+                                    <th style={{ border: '1px solid #ccc', padding: '5px', textAlign: 'center' }}>{translate('Unite_Organisation')}</th>
                                     {
-                                        analyticIndicatorResults.map((result, index) => (
-                                            <th key={index} style={{ border: '1px solid #ccc', padding: '5px' }}>{result.indicator?.displayName}</th>
+                                        selectedIndicators.map((ind, index) => (
+                                            <th key={index} style={{ border: '1px solid #ccc', padding: '5px', textAlign: 'center' }}>{ind.indicator?.name}</th>
                                         ))
                                     }
-                                    {
-                                        analyticIndicatorResults.map((result, index) => (
-                                            <th style={{ border: '1px solid #ccc', padding: '5px' }} key={index}>{result.indicator?.displayName}  Score</th>
-                                        ))
-                                    }
+                                    <th style={{ border: '1px solid #ccc', padding: '5px', textAlign: 'center' }}>Scores</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {inputMeilleurPositif && [...analyticIndicatorResults
-                                    .reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])]
-                                    .sort((a, b) => b.score - a.score)
-                                    .slice(0, parseInt(inputMeilleur || 0))
-                                    .map((an, index) => (
-                                        <tr style={{ backgroundColor: '#D3FFF3', color: '#000' }} key={index}>
-                                            <td style={{ border: '1px solid #ccc', padding: '5px' }}>
-                                                <AntCheckbox onChange={() => handleSelectCheckbox(an?.orgUnit)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an.orgUnit?.id)} /></td>
-                                            <td style={{ border: '1px solid #ccc', padding: '5px' }}>{`${an.orgUnit?.displayName} (  ${an.orgUnit?.parent?.displayName}  ) `}</td>
-                                            {analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.value) : '-'}</td>))}
-                                            {analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.score) : '-'}</td>))}
-                                        </tr>
-                                    ))}
-                                {inputMeilleurPositif && [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].sort((a, b) => a.score - b.score).slice(0, parseInt(inputMauvais || 0)).map((an, index) => (<tr style={{ backgroundColor: '#FFDDD2', color: '#000' }} key={index}> <td style={{ border: '1px solid #ccc', padding: '5px' }}><AntCheckbox onChange={() => handleSelectCheckbox(an?.orgUnit)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an.orgUnit?.id)} /></td>  <td style={{ border: '1px solid #ccc', padding: '5px' }}>{`${an.orgUnit?.displayName} (  ${an.orgUnit?.parent?.displayName}  ) `}</td>{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.value) : '-'}</td>))}{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.score) : '-'}</td>))} </tr>))}
 
-                                {!inputMeilleurPositif && [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].sort((a, b) => a.score - b.score).slice(0, parseInt(inputMeilleur || 0)).map((an, index) => (<tr style={{ backgroundColor: '#D3FFF3', color: '#000' }} key={index}> <td style={{ border: '1px solid #ccc', padding: '5px' }}><AntCheckbox onChange={() => handleSelectCheckbox(an?.orgUnit)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an.orgUnit?.id)} /></td>  <td style={{ border: '1px solid #ccc', padding: '5px' }}>{`${an.orgUnit?.displayName} (  ${an.orgUnit?.parent?.displayName}  ) `}</td>{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.value) : '-'}</td>))}{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.score) : '-'}</td>))} </tr>))}
-                                {!inputMeilleurPositif && [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].sort((a, b) => b.score - a.score).slice(0, parseInt(inputMauvais || 0)).map((an, index) => (<tr style={{ backgroundColor: '#FFDDD2', color: '#000' }} key={index}><td style={{ border: '1px solid #ccc', padding: '5px' }}><AntCheckbox onChange={() => handleSelectCheckbox(an?.orgUnit)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an.orgUnit?.id)} /></td>  <td style={{ border: '1px solid #ccc', padding: '5px' }}>{`${an.orgUnit?.displayName} (  ${an.orgUnit?.parent?.displayName}  ) `}</td>{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.value) : '-'}</td>))}{analyticIndicatorResults.map((result, indicatorIndex) => (<td style={{ border: '1px solid #ccc', padding: '5px' }} key={indicatorIndex}>{result.indicator?.id === an.dataElement ? parseInt(an.score) : '-'}</td>))} </tr>))}
+                                {console.log("analyticIndicatorResults: ", analyticIndicatorResults)}
+
+                                {
+                                    !inputMeilleurPositif && analyticIndicatorResults
+                                        .sort((a, b) => parseFloat(a.scoreTotal) - parseFloat(b.scoreTotal))
+                                        .slice(0, parseInt(inputMeilleur || 0))
+                                        .map((an, index) => RenderTableRow('#D3FFF3', an, index))
+                                }
+
+                                {
+                                    !inputMeilleurPositif && analyticIndicatorResults
+                                        .sort((a, b) => parseFloat(b.scoreTotal) - parseFloat(a.scoreTotal))
+                                        .slice(0, parseInt(inputMauvais || 0))
+                                        .map((an, index) => RenderTableRow('#FFDDD2', an, index))
+                                }
+
+                                {
+                                    inputMeilleurPositif && analyticIndicatorResults
+                                        .sort((a, b) => parseFloat(b.scoreTotal) - parseFloat(a.scoreTotal))
+                                        .slice(0, parseInt(inputMeilleur || 0))
+                                        .map((an, index) => RenderTableRow('#D3FFF3', an, index))
+                                }
+
+
+                                {
+                                    inputMeilleurPositif && analyticIndicatorResults
+                                        .sort((a, b) => parseFloat(a.scoreTotal) - parseFloat(b.scoreTotal))
+                                        .slice(0, parseInt(inputMauvais || 0))
+                                        .map((an, index) => RenderTableRow('#FFDDD2', an, index))
+                                }
+
                             </tbody>
                         </table>
                     </div>
@@ -3760,48 +3868,6 @@ const Supervision = ({ me }) => {
                                     )
                                 }
 
-                                {/* {
-                                    selectedPlanificationType === ORGANISATION_UNIT && teisList.length > 0 && (
-
-                                        <div style={{ marginTop: '20px' }}>
-                                            {
-                                                teisList.length > 0 && (
-                                                    <div>
-                                                        <Table
-                                                            size='small'
-                                                            dataSource={
-                                                                teisList.map(tei => {
-                                                                    let payload = {
-                                                                        tei
-                                                                    }
-                                                                    for (let att of selectedProgram.attributesToDisplay) {
-                                                                        for (let teiAttr of tei.attributes) {
-                                                                            if (att.id === teiAttr.attribute) {
-                                                                                payload[`${att.displayName}`] = teiAttr.value
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                    return payload
-                                                                })
-                                                            }
-                                                            columns={[
-                                                                {
-                                                                    title: translate('Actions'), width: '100px', dataIndex: 'tei', key: 'action', render: value => (
-                                                                        <div>
-                                                                            <AntCheckbox onChange={() => handleSelectCheckboxAgent(value)} checked={selectedAgents.map(ag => ag.trackedEntityInstance).includes(value.trackedEntityInstance)} />
-                                                                        </div>
-                                                                    )
-                                                                },
-                                                                ...selectedProgram.attributesToDisplay.map(at => ({ title: at.displayName, dataIndex: at.displayName, key: at.displayName }))
-                                                            ]}
-                                                        />
-                                                    </div>
-                                                )
-                                            }
-                                        </div>
-                                    )
-                                } */}
-
 
                                 {
                                     selectedPlanificationType === ORGANISATION_UNIT && teisList.length > 0 && (
@@ -3986,6 +4052,7 @@ const Supervision = ({ me }) => {
                                     <Col sm={24} md={8}>
                                         {selectedProgram && RenderSupervisionPlanificationType()}
                                         {selectedPlanificationType === INDICATOR && RenderSupervisionPlanificationIndicatorContent()}
+                                        {selectedPlanificationType === INDICATOR && selectedIndicators.length > 0 && RenderEquipePlanificationContent()}
                                         {selectedPlanificationType === ORGANISATION_UNIT && RenderSupervisionPlanificationOrganisationUnitContent()}
                                         {selectedProgram && selectedPlanificationType === ORGANISATION_UNIT && RenderEquipePlanificationContent()}
                                     </Col>
@@ -4013,9 +4080,9 @@ const Supervision = ({ me }) => {
                                                 {
                                                     selectedPeriod &&
                                                     <div>
-                                                        <span>{translate('Periode_Selectionner')}:</span> <strong> {dayjs(selectedPeriod).format(' MMMM, YYYY')} </strong> /
-                                                        <span>{translate('Meilleur_Positif')}:</span> <strong> {inputMeilleurPositif ? translate('Oui') : translate('Non')} </strong> /
-                                                        {analyticIndicatorResults.map(ind => <> <span className="ml-2">{ind.indicator?.displayName}:</span> <strong>{ind.weight}</strong> </>)}
+                                                        <span style={{ color: '#00000090' }}>{translate('Periode_Selectionner')}:</span> <strong> {dayjs(selectedPeriod).format(' MMMM, YYYY')} </strong> /
+                                                        <span style={{ color: '#00000090' }}>{translate('Meilleur_Positif')}:</span> <strong> {inputMeilleurPositif ? translate('Oui') : translate('Non')} </strong> /
+                                                        {selectedIndicators.map(ind => <> <span className="ml-2">{ind.indicator?.name}:</span> <strong>{ind.weight}</strong> </>)}
                                                     </div>
                                                 }
                                             </div>
@@ -4033,7 +4100,6 @@ const Supervision = ({ me }) => {
                                 selectedOrganisationUnitGroup &&
                                 selectedPeriod &&
                                 analyticIndicatorResults.length > 0 &&
-                                [...analyticIndicatorResults.reduce((prev, cur) => { return prev.concat(cur.dataValues) }, [])].length >= parseInt(inputMeilleur || 0) + parseInt(inputMauvais || 0) &&
                                 (
                                     <Col md={24}>{RenderAnalyticIndicatorsResults()} </Col>
                                 )
@@ -4106,7 +4172,6 @@ const Supervision = ({ me }) => {
 
 
     const initInputOrganisation = ouList => {
-        console.log("init : ", ouList)
         const newList = []
         for (let org of ouList) {
             if (inputFields.map(inp => inp.organisationUnit?.id).includes(org.id)) {

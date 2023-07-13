@@ -181,13 +181,17 @@
     "Nouvelle_Equipe":"Nouvelle Equipe",
     "Confirmation_De_Suppression_De_Equipe":"Voulez-vous vraiment supprimer cette équipe ? ",
     "Equipes":"Equipes",
-    "Selectionnez_Indicateurs_De_Performance" :"Sélectionnez les indicateurs de performances: ",
+    "Selectionnez_Indicateurs_De_Performance" :"Sélectionnez les indicateurs: ",
     "Venant_Des_Favoris":"Venant des favoris ?",
     "Element_De_Performance_Obligatoire":"Veuillez Sélectionner l'élément de performance !",
     "Indicateurs_Selectionnes":"Indicateurs sélectionnés",
     "Enregistrer_Comme_Favorites":"Enrégistrer comme favoris",
-    "Favorit_Exist_Deja":"Cette favoris existe déjà !",
-    "Selectionnez_La_Favorit":"Sélectionnez la favoris",
-    "Enregistrement_Favorit":"Enrégistrement de la favoris",
-    "Favorit_Enregistrer_Avec_Succes":"Favoris enrégistrée avec succès !"
+    "Favorit_Exist_Deja":"Ce favori existe déjà !",
+    "Selectionnez_La_Favorit":"Sélectionnez le favori",
+    "Enregistrement_Favorit":"Enrégistrement du favori",
+    "Favorit_Enregistrer_Avec_Succes":"Favori enrégistré avec succès !",
+    "Selectionnez_Les_Indicateurs":"Sélectionnez les indicateurs",
+    "Confirmation_Suppression_Indicateur":"Voulez-vous vraiment supprimer l'indicateur ? ",
+    "Nom_Claire_Favorit":"Veuillez définir un nom bien clair à ce favori",
+    "List_Vide":"Liste Vide !"
 }
