@@ -191,5 +191,8 @@
     "Selectionnez_Les_Indicateurs": "Sélectionnez les indicateurs",
     "Confirmation_Suppression_Indicateur": "Voulez-vous vraiment supprimer l'indicateur ? ",
     "Nom_Claire_Favorit": "Veuillez définir un nom bien clair à ce favori",
-    "List_Vide": "Liste Vide !"
+    "List_Vide": "Liste Vide !",
+
+
+    "Best_Input_Is_Too_Gratter":"Le nombres meilleurs et mauvaises valeurs saisies sont plus grand que le résultat trouver !"
 }

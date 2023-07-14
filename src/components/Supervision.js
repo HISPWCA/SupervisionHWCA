@@ -2297,7 +2297,7 @@ const Supervision = ({ me }) => {
                             {
                                 equipeList.length === 0 && (
                                     <tr style={{ color: '#00000080' }}>
-                                        <td colSpan={3}>{translate('List_Vide')}</td>
+                                        <td colSpan={3} tyle={{ padding: '5px', border: '1px solid #ccc' }}>{translate('List_Vide')}</td>
                                     </tr>
                                 )
                             }
@@ -3598,6 +3598,59 @@ const Supervision = ({ me }) => {
         </tr>
     )
 
+    const RenderMauvaisPositifInputMeilleur = () => {
+
+        if (analyticIndicatorResults.length < ((inputMeilleur || 0) + (inputMauvais || 0))) {
+            setNotification({ show: true, message: translate('Best_Input_Is_Too_Gratter'), type: NOTIFICATION_CRITICAL })
+            return <></>
+        }
+
+        return !inputMeilleurPositif && analyticIndicatorResults
+            .sort((a, b) => parseFloat(a.scoreTotal) - parseFloat(b.scoreTotal))
+            .slice(0, parseInt(inputMeilleur || 0))
+            .map((an, index) => RenderTableRow('#D3FFF3', an, index))
+    }
+
+    const RenderMauvaisPositifInputMauvais = () => {
+
+        if (analyticIndicatorResults.length < ((inputMeilleur || 0) + (inputMauvais || 0))) {
+            setNotification({ show: true, message: translate('Best_Input_Is_Too_Gratter'), type: NOTIFICATION_CRITICAL })
+            return <></>
+        }
+
+        return !inputMeilleurPositif && analyticIndicatorResults
+            .sort((a, b) => parseFloat(a.scoreTotal) - parseFloat(b.scoreTotal))
+            .slice(-(inputMauvais || 0))
+            .map((an, index) => RenderTableRow('#FFDDD2', an, index))
+    }
+
+    const RenderMeilleurPositifInputMeilleur = () => {
+
+        if (analyticIndicatorResults.length < ((inputMeilleur || 0) + (inputMauvais || 0))) {
+            setNotification({ show: true, message: translate('Best_Input_Is_Too_Gratter'), type: NOTIFICATION_CRITICAL })
+            return <></>
+        }
+
+        return inputMeilleurPositif && analyticIndicatorResults
+            .sort((a, b) => parseFloat(b.scoreTotal) - parseFloat(a.scoreTotal))
+            .slice(0, parseInt(inputMeilleur || 0))
+            .map((an, index) => RenderTableRow('#D3FFF3', an, index))
+    }
+
+
+    const RenderMeilleurPositifInputMauvais = () => {
+
+        if (analyticIndicatorResults.length < ((inputMeilleur || 0) + (inputMauvais || 0))) {
+            setNotification({ show: true, message: translate('Best_Input_Is_Too_Gratter'), type: NOTIFICATION_CRITICAL })
+            return <></>
+        }
+
+        return inputMeilleurPositif && analyticIndicatorResults
+            .sort((a, b) => parseFloat(b.scoreTotal) - parseFloat(a.scoreTotal))
+            .slice(-(inputMauvais || 0))
+            .map((an, index) => RenderTableRow('#FFDDD2', an, index))
+    }
+
     const RenderAnalyticIndicatorsResults = () => (
         <div style={{ marginTop: '10px' }}>
             <Card size='small' className='my-shadow'>
@@ -3617,36 +3670,10 @@ const Supervision = ({ me }) => {
                                 </tr>
                             </thead>
                             <tbody>
-
-                                {
-                                    !inputMeilleurPositif && analyticIndicatorResults
-                                        .sort((a, b) => parseFloat(a.scoreTotal) - parseFloat(b.scoreTotal))
-                                        .slice(0, parseInt(inputMeilleur || 0))
-                                        .map((an, index) => RenderTableRow('#D3FFF3', an, index))
-                                }
-                                {console.log('-(analyticIndicatorResults.length - (inputMauvais || 0)) : ', -(analyticIndicatorResults.length - (inputMauvais || 0)))}
-                                {
-                                    !inputMeilleurPositif && analyticIndicatorResults
-                                        .sort((a, b) => parseFloat(a.scoreTotal) - parseFloat(b.scoreTotal))
-                                        .slice(-(analyticIndicatorResults.length - (inputMauvais || 0)))
-                                        .map((an, index) => RenderTableRow('#FFDDD2', an, index))
-                                }
-
-                                {
-                                    inputMeilleurPositif && analyticIndicatorResults
-                                        .sort((a, b) => parseFloat(b.scoreTotal) - parseFloat(a.scoreTotal))
-                                        .slice(0, parseInt(inputMeilleur || 0))
-                                        .map((an, index) => RenderTableRow('#D3FFF3', an, index))
-                                }
-
-
-                                {
-                                    inputMeilleurPositif && analyticIndicatorResults
-                                        .sort((a, b) => parseFloat(b.scoreTotal) - parseFloat(a.scoreTotal))
-                                        .slice(-(analyticIndicatorResults.length - (inputMauvais || 0)))
-                                        .map((an, index) => RenderTableRow('#FFDDD2', an, index))
-                                }
-
+                                {RenderMeilleurPositifInputMeilleur()}
+                                {RenderMeilleurPositifInputMauvais()}
+                                {RenderMauvaisPositifInputMeilleur()}
+                                {RenderMauvaisPositifInputMauvais()}
                             </tbody>
                         </table>
                     </div>
