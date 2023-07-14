@@ -192,7 +192,5 @@
     "Confirmation_Suppression_Indicateur": "Voulez-vous vraiment supprimer l'indicateur ? ",
     "Nom_Claire_Favorit": "Veuillez définir un nom bien clair à ce favori",
     "List_Vide": "Liste Vide !",
-
-
-    "Best_Input_Is_Too_Gratter":"Le nombres meilleurs et mauvaises valeurs saisies sont plus grand que le résultat trouver !"
+    "Best_Input_Is_Too_Gratter": "Le nombre de meilleure et mauvaise valeur saisie sont plus grands que le résultat trouvé !"
 }

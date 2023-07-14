@@ -192,5 +192,6 @@
     "Selectionnez_Les_Indicateurs": "Select the indicators",
     "Confirmation_Suppression_Indicateur": "Do you really want to delete the indicator ? ",
     "Nom_Claire_Favorit": "Please provide a clear name for this favorite. ",
-    "List_Vide": "Empty list !"
+    "List_Vide": "Empty list !",
+    "Best_Input_Is_Too_Gratter": "The number of best and bad values ​​entered are greater than the result found !"
 }

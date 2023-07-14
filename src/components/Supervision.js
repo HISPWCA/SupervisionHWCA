@@ -3,7 +3,7 @@ import { MantineReactTable } from 'mantine-react-table'
 import { Card, Col, DatePicker, Divider, FloatButton, Input, InputNumber, List, Popconfirm, Row, Select, Checkbox as AntCheckbox, Table, Popover } from 'antd'
 import { IoMdAdd } from 'react-icons/io'
 import { IoListCircleOutline } from 'react-icons/io5'
-import { Button, ButtonStrip, Checkbox, CircularLoader, Modal, ModalActions, ModalContent, ModalTitle, Radio } from '@dhis2/ui'
+import { Button, ButtonStrip, Checkbox, CircularLoader, Modal, ModalActions, ModalContent, ModalTitle, NoticeBox, Radio } from '@dhis2/ui'
 import {
     AGENT,
     CANCELED,
@@ -16,6 +16,7 @@ import {
     MONTH,
     NA,
     NOTICE_BOX_DEFAULT,
+    NOTICE_BOX_ERROR,
     NOTICE_BOX_WARNING,
     NOTIFICATION_CRITICAL,
     NOTIFICATION_SUCCESS,
@@ -3600,55 +3601,57 @@ const Supervision = ({ me }) => {
 
     const RenderMauvaisPositifInputMeilleur = () => {
 
-        if (analyticIndicatorResults.length < ((inputMeilleur || 0) + (inputMauvais || 0))) {
-            setNotification({ show: true, message: translate('Best_Input_Is_Too_Gratter'), type: NOTIFICATION_CRITICAL })
+        if (analyticIndicatorResults.length < (parseInt(inputMeilleur) + parseInt(inputMauvais))) {
             return <></>
+        } else {
+            return !inputMeilleurPositif && parseInt(inputMeilleur) > 0 && analyticIndicatorResults
+                .sort((a, b) => parseFloat(a.scoreTotal) - parseFloat(b.scoreTotal))
+                .slice(0, parseInt(inputMeilleur || 0))
+                .map((an, index) => RenderTableRow('#D3FFF3', an, index))
         }
 
-        return !inputMeilleurPositif && analyticIndicatorResults
-            .sort((a, b) => parseFloat(a.scoreTotal) - parseFloat(b.scoreTotal))
-            .slice(0, parseInt(inputMeilleur || 0))
-            .map((an, index) => RenderTableRow('#D3FFF3', an, index))
+
     }
 
     const RenderMauvaisPositifInputMauvais = () => {
 
-        if (analyticIndicatorResults.length < ((inputMeilleur || 0) + (inputMauvais || 0))) {
-            setNotification({ show: true, message: translate('Best_Input_Is_Too_Gratter'), type: NOTIFICATION_CRITICAL })
+        if (analyticIndicatorResults.length < (parseInt(inputMeilleur) + parseInt(inputMauvais))) {
+            è
             return <></>
+        } else {
+            return !inputMeilleurPositif && parseInt(inputMauvais) > 0 && analyticIndicatorResults
+                .sort((a, b) => parseFloat(a.scoreTotal) - parseFloat(b.scoreTotal))
+                .slice(-(parseInt(inputMauvais || 0)))
+                .map((an, index) => RenderTableRow('#FFDDD2', an, index))
         }
 
-        return !inputMeilleurPositif && analyticIndicatorResults
-            .sort((a, b) => parseFloat(a.scoreTotal) - parseFloat(b.scoreTotal))
-            .slice(-(inputMauvais || 0))
-            .map((an, index) => RenderTableRow('#FFDDD2', an, index))
     }
 
     const RenderMeilleurPositifInputMeilleur = () => {
 
-        if (analyticIndicatorResults.length < ((inputMeilleur || 0) + (inputMauvais || 0))) {
-            setNotification({ show: true, message: translate('Best_Input_Is_Too_Gratter'), type: NOTIFICATION_CRITICAL })
+        if (analyticIndicatorResults.length < (parseInt(inputMeilleur) + parseInt(inputMauvais))) {
             return <></>
+        } else {
+            return inputMeilleurPositif && parseInt(inputMeilleur) > 0 && analyticIndicatorResults
+                .sort((a, b) => parseFloat(b.scoreTotal) - parseFloat(a.scoreTotal))
+                .slice(0, parseInt(inputMeilleur || 0))
+                .map((an, index) => RenderTableRow('#D3FFF3', an, index))
         }
-
-        return inputMeilleurPositif && analyticIndicatorResults
-            .sort((a, b) => parseFloat(b.scoreTotal) - parseFloat(a.scoreTotal))
-            .slice(0, parseInt(inputMeilleur || 0))
-            .map((an, index) => RenderTableRow('#D3FFF3', an, index))
     }
 
 
     const RenderMeilleurPositifInputMauvais = () => {
 
-        if (analyticIndicatorResults.length < ((inputMeilleur || 0) + (inputMauvais || 0))) {
-            setNotification({ show: true, message: translate('Best_Input_Is_Too_Gratter'), type: NOTIFICATION_CRITICAL })
+        if (analyticIndicatorResults.length < (parseInt(inputMeilleur) + parseInt(inputMauvais))) {
             return <></>
+        } else {
+            return inputMeilleurPositif && parseInt(inputMauvais) > 0 && analyticIndicatorResults
+                .sort((a, b) => parseFloat(b.scoreTotal) - parseFloat(a.scoreTotal))
+                .slice(-(parseInt(inputMauvais || 0)))
+                .map((an, index) => RenderTableRow('#FFDDD2', an, index))
         }
 
-        return inputMeilleurPositif && analyticIndicatorResults
-            .sort((a, b) => parseFloat(b.scoreTotal) - parseFloat(a.scoreTotal))
-            .slice(-(inputMauvais || 0))
-            .map((an, index) => RenderTableRow('#FFDDD2', an, index))
+
     }
 
     const RenderAnalyticIndicatorsResults = () => (
@@ -3656,6 +3659,8 @@ const Supervision = ({ me }) => {
             <Card size='small' className='my-shadow'>
                 <div>
                     <div>
+                        {console.log("analyticIndicatorResults.length < (parseInt(inputMeilleur) + parseInt(inputMauvais): ", analyticIndicatorResults.length < (parseInt(inputMeilleur) + parseInt(inputMauvais)))}
+                        {console.log("lenght: ", analyticIndicatorResults.length)}
                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <thead>
                                 <tr style={{ backgroundColor: '#fff' }}>
@@ -3676,6 +3681,13 @@ const Supervision = ({ me }) => {
                                 {RenderMauvaisPositifInputMauvais()}
                             </tbody>
                         </table>
+                        {
+                            analyticIndicatorResults.length < (parseInt(inputMeilleur) + parseInt(inputMauvais)) && (
+                                <div style={{ marginTop: '20px' }}>
+                                    <MyNoticeBox message={translate('Best_Input_Is_Too_Gratter')} title={translate('Recherche')} type={NOTICE_BOX_ERROR} show={true} />
+                                </div>
+                            )
+                        }
                     </div>
                 </div>
             </Card>
