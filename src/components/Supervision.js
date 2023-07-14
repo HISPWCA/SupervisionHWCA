@@ -1,4 +1,4 @@
-import React, {  useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { MantineReactTable } from 'mantine-react-table'
 import { Card, Col, DatePicker, Divider, FloatButton, Input, InputNumber, List, Popconfirm, Row, Select, Checkbox as AntCheckbox, Table, Popover } from 'antd'
 import { IoMdAdd } from 'react-icons/io'
@@ -532,47 +532,47 @@ const Supervision = ({ me }) => {
 
 
     const getStatusNameAndColor = status => {
-
         if (status === NA.value) {
-            return { name: NA.name, color: { background: GRAY_DARK, text: WHITE } }
+            return { name: translate(`${NA.name}`), color: { background: GRAY_DARK, text: WHITE } }
         }
 
         if (status === CANCELED.value) {
-            return { name: CANCELED.name, color: { background: RED, text: WHITE } }
+            return { name: translate(`${CANCELED.name}`), color: { background: RED, text: WHITE } }
         }
 
         if (status === PENDING_VALIDATION.value) {
-            return { name: PENDING_VALIDATION.name, color: { background: ORANGE, text: WHITE } }
+            return { name: translate(`${PENDING_VALIDATION.name}`), color: { background: ORANGE, text: WHITE } }
         }
 
         if (status === COMPLETED.value) {
-            return { name: COMPLETED.name, color: { background: GREEN, text: WHITE } }
+            return { name: translate(`${COMPLETED.name}`), color: { background: GREEN, text: WHITE } }
         }
 
         if (status === SCHEDULED.value) {
-            return { name: SCHEDULED.name, color: { background: BLUE, text: WHITE } }
+            return { name: translate(`${SCHEDULED.name}`), color: { background: BLUE, text: WHITE } }
         }
 
-        return { name: SCHEDULED.name, color: { background: BLUE, text: WHITE } }
+        return { name: translate(`${SCHEDULED.name}`), color: { background: BLUE, text: WHITE } }
 
     }
 
     const getStatusNameAndColorForPayment = status => {
         if (status === PAYMENT_DONE.value) {
-            return { name: PAYMENT_DONE.name, color: { background: GREEN, text: WHITE } }
+            return { name: translate(`${PAYMENT_DONE.name}`), color: { background: GREEN, text: WHITE } }
         }
 
         if (status === PENDING_PAYMENT.value) {
-            return { name: PENDING_PAYMENT.name, color: { background: ORANGE, text: WHITE } }
+            return { name: translate(`${PENDING_PAYMENT.name}`), color: { background: ORANGE, text: WHITE } }
         }
 
         if (status === NA.value) {
-            return { name: NA.name, color: { background: GRAY_DARK, text: WHITE } }
+            return { name: translate(`${NA.name}`), color: { background: GRAY_DARK, text: WHITE } }
         }
 
-        return { name: NA.name, color: { background: GRAY_DARK, text: WHITE } }
+        return { name: translate(`${NA.name}`), color: { background: GRAY_DARK, text: WHITE } }
 
     }
+
 
     const filterAndGetPlanfications = () => allSupervisionsFromTracker.reduce((prev, current) => {
         if (selectedSupervisionsConfigProgram.generationType === TYPE_GENERATION_AS_TEI) {
@@ -764,7 +764,7 @@ const Supervision = ({ me }) => {
         setSelectedOrganisationUnitGroup(null)
         setSelectedOrganisationUnitGroupSet(null)
         setSelectedElementForPerformances([])
-        
+
 
         if (value === INDICATOR && organisationUnitGroupSets.length === 0) {
             loadOrganisationUnitsGroupSets()
@@ -3627,8 +3627,8 @@ const Supervision = ({ me }) => {
 
                                 {
                                     !inputMeilleurPositif && analyticIndicatorResults
-                                        .sort((a, b) => parseFloat(b.scoreTotal) - parseFloat(a.scoreTotal))
-                                        .slice(0, parseInt(inputMauvais || 0))
+                                        .sort((a, b) => parseFloat(a.scoreTotal) - parseFloat(b.scoreTotal))
+                                        .slice(-(analyticIndicatorResults.length - (inputMauvais || 0)))
                                         .map((an, index) => RenderTableRow('#FFDDD2', an, index))
                                 }
 
@@ -3642,8 +3642,8 @@ const Supervision = ({ me }) => {
 
                                 {
                                     inputMeilleurPositif && analyticIndicatorResults
-                                        .sort((a, b) => parseFloat(a.scoreTotal) - parseFloat(b.scoreTotal))
-                                        .slice(0, parseInt(inputMauvais || 0))
+                                        .sort((a, b) => parseFloat(b.scoreTotal) - parseFloat(a.scoreTotal))
+                                        .slice(-(analyticIndicatorResults.length - (inputMauvais || 0)))
                                         .map((an, index) => RenderTableRow('#FFDDD2', an, index))
                                 }
 
@@ -4126,31 +4126,6 @@ const Supervision = ({ me }) => {
                                     </Col>
                                 )
                             }
-
-                            {/* {
-                                selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
-                                selectedPlanificationType === INDICATOR &&
-                                selectedIndicators.length > 0 &&
-                                selectedOrganisationUnitInd &&
-                                selectedOrganisationUnitGroup &&
-                                selectedPeriod && (
-                                    <Col md={24}>
-                                        <Card size='small' className='my-shadow'>
-                                            <div style={{ textAlign: 'center' }}>
-                                                {
-                                                    selectedPeriod &&
-                                                    <div>
-                                                        <span style={{ color: '#00000090' }}>{translate('Periode_Selectionner')}:</span> <strong> {dayjs(selectedPeriod).format(' MMMM, YYYY')} </strong> /
-                                                        <span style={{ color: '#00000090' }}>{translate('Meilleur_Positif')}:</span> <strong> {inputMeilleurPositif ? translate('Oui') : translate('Non')} </strong> /
-                                                        {selectedIndicators.map(ind => <> <span className="ml-2">{ind.indicator?.name}:</span> <strong>{ind.weight}</strong> </>)}
-                                                    </div>
-                                                }
-                                            </div>
-                                            {analyticErrorMessage && <div style={{ marginTop: '20px' }}> <NoticeBox error > {analyticErrorMessage} </NoticeBox> </div>}
-                                        </Card>
-                                    </Col>
-                                )
-                            } */}
 
                             {
                                 selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&

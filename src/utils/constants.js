@@ -51,12 +51,12 @@ export const MONTH = 'Month'
 export const QUARTER = 'Quarter'
 export const YEAR = 'Year'
 
-export const CANCELED = { name: translate('Annuler'), value: 'CANCELED' }
-export const PENDING_VALIDATION = { name: translate('En_Attente'), value: 'PENDING_VALIDATION' }
+export const CANCELED = { name: 'Annuler', value: 'CANCELED' }
+export const PENDING_VALIDATION = { name: 'En_Attente', value: 'PENDING_VALIDATION' }
 export const PENDING_PAYMENT = { name: 'En Attente de Paiement', value: 'PENDING_PAYMENT' }
 export const PAYMENT_DONE = { name: 'Paiement Effectué', value: 'PAYMENT_DONE' }
-export const COMPLETED = { name: translate('Terminer'), value: 'COMPLETED' }
-export const SCHEDULED = { name: translate('Planifier'), value: 'SCHEDULED' }
+export const COMPLETED = { name: 'Terminer', value: 'COMPLETED' }
+export const SCHEDULED = { name: 'Planifier', value: 'SCHEDULED' }
 export const NA = { name: 'Non Applicable', value: 'NA' }
 
 export const SUPERVISOR_RAPPORT = 'SUPERVISOR_RAPPORT'

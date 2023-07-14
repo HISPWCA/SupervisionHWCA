@@ -1,6 +1,6 @@
 const FULL_ROUTE = window.location.href
 
-export const APP_NAME = "supervisionFusion"
+export const APP_NAME = "supervision"
 
 export const API_BASE_ROUTE = FULL_ROUTE.substring(0, FULL_ROUTE.indexOf('/apps/'.concat(APP_NAME).concat('/')))
 export const SERVER_URL = FULL_ROUTE.substring(0, FULL_ROUTE.indexOf('/api/apps/'.concat(APP_NAME)))
@@ -26,4 +26,3 @@ export const ANALYTICS_ROUTE = API_BASE_ROUTE.concat('/analytics')
 export const OPTION_SETS_ROUTE = API_BASE_ROUTE.concat('/optionSets')
 export const DATA_ELEMENT_OPTION_SETS = API_BASE_ROUTE.concat('/dataElements')
 export const ME_SETTINGS_ROUTE = API_BASE_ROUTE.concat('/userSettings.json')
-

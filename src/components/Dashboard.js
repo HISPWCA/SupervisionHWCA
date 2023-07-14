@@ -678,43 +678,43 @@ export const Dashboard = ({ me }) => {
     const getStatusNameAndColor = status => {
 
         if (status === NA.value) {
-            return { name: NA.name, color: { background: GRAY_DARK, text: WHITE } }
+            return { name: translate(`${NA.name}`), color: { background: GRAY_DARK, text: WHITE } }
         }
 
         if (status === CANCELED.value) {
-            return { name: CANCELED.name, color: { background: RED, text: WHITE } }
+            return { name: translate(`${CANCELED.name}`), color: { background: RED, text: WHITE } }
         }
 
         if (status === PENDING_VALIDATION.value) {
-            return { name: PENDING_VALIDATION.name, color: { background: ORANGE, text: WHITE } }
+            return { name: translate(`${PENDING_VALIDATION.name}`), color: { background: ORANGE, text: WHITE } }
         }
 
         if (status === COMPLETED.value) {
-            return { name: COMPLETED.name, color: { background: GREEN, text: WHITE } }
+            return { name: translate(`${COMPLETED.name}`), color: { background: GREEN, text: WHITE } }
         }
 
         if (status === SCHEDULED.value) {
-            return { name: SCHEDULED.name, color: { background: BLUE, text: WHITE } }
+            return { name: translate(`${SCHEDULED.name}`), color: { background: BLUE, text: WHITE } }
         }
 
-        return { name: SCHEDULED.name, color: { background: BLUE, text: WHITE } }
+        return { name: translate(`${SCHEDULED.name}`), color: { background: BLUE, text: WHITE } }
 
     }
 
     const getStatusNameAndColorForPayment = status => {
         if (status === PAYMENT_DONE.value) {
-            return { name: PAYMENT_DONE.name, color: { background: GREEN, text: WHITE } }
+            return { name: translate(`${PAYMENT_DONE.name}`), color: { background: GREEN, text: WHITE } }
         }
 
         if (status === PENDING_PAYMENT.value) {
-            return { name: PENDING_PAYMENT.name, color: { background: ORANGE, text: WHITE } }
+            return { name: translate(`${PENDING_PAYMENT.name}`), color: { background: ORANGE, text: WHITE } }
         }
 
         if (status === NA.value) {
-            return { name: NA.name, color: { background: GRAY_DARK, text: WHITE } }
+            return { name: translate(`${NA.name}`), color: { background: GRAY_DARK, text: WHITE } }
         }
 
-        return { name: NA.name, color: { background: GRAY_DARK, text: WHITE } }
+        return { name: translate(`${NA.name}`), color: { background: GRAY_DARK, text: WHITE } }
 
     }
 
