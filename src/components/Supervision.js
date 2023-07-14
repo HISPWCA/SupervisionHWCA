@@ -3616,7 +3616,6 @@ const Supervision = ({ me }) => {
     const RenderMauvaisPositifInputMauvais = () => {
 
         if (analyticIndicatorResults.length < (parseInt(inputMeilleur) + parseInt(inputMauvais))) {
-            è
             return <></>
         } else {
             return !inputMeilleurPositif && parseInt(inputMauvais) > 0 && analyticIndicatorResults
