@@ -3624,7 +3624,7 @@ const Supervision = ({ me }) => {
                                         .slice(0, parseInt(inputMeilleur || 0))
                                         .map((an, index) => RenderTableRow('#D3FFF3', an, index))
                                 }
-
+                                {console.log('-(analyticIndicatorResults.length - (inputMauvais || 0)) : ', -(analyticIndicatorResults.length - (inputMauvais || 0)))}
                                 {
                                     !inputMeilleurPositif && analyticIndicatorResults
                                         .sort((a, b) => parseFloat(a.scoreTotal) - parseFloat(b.scoreTotal))
