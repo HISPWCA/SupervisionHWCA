@@ -182,7 +182,7 @@ const Supervision = ({ me }) => {
             {
                 accessorKey: 'superviseurs',
                 header: `${translate('Superviseurs')}`,
-                Cell: ({ cell, row }) => cell.getValue()?.split(',')?.length > 0 ? (
+                Cell: ({ cell, row }) => cell.getValue()?.trim()?.length > 0 && cell.getValue()?.trim()?.split(',')?.length > 0 ? (
                     <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                         {
                             cell.getValue()?.split(',')?.length >= 3 ?
@@ -267,7 +267,7 @@ const Supervision = ({ me }) => {
                 {
                     accessorKey: 'superviseurs',
                     header: `${translate('Superviseurs')}`,
-                    Cell: ({ cell, row }) => cell.getValue()?.split(',')?.length > 0 ? (
+                    Cell: ({ cell, row }) => cell.getValue()?.trim()?.length > 0 && cell.getValue()?.trim()?.split(',')?.length > 0 ? (
 
                         <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                             {
@@ -3658,8 +3658,6 @@ const Supervision = ({ me }) => {
             <Card size='small' className='my-shadow'>
                 <div>
                     <div>
-                        {console.log("analyticIndicatorResults.length < (parseInt(inputMeilleur) + parseInt(inputMauvais): ", analyticIndicatorResults.length < (parseInt(inputMeilleur) + parseInt(inputMauvais)))}
-                        {console.log("lenght: ", analyticIndicatorResults.length)}
                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <thead>
                                 <tr style={{ backgroundColor: '#fff' }}>

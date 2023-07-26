@@ -1720,9 +1720,9 @@ const Setting = () => {
             <Row gutter={[8, 8]}>
                 <Col md={4} sm={24}>
                     <div style={{ marginBottom: '2px', position: 'sticky', top: 30 }}>
-                        <div className={`setting-menu-item ${selectedTypeSupervisionPage === PAGE_CONFIG_INDICATORS ? 'active' : ''}`} onClick={() => handleClickConfigMenu(PAGE_CONFIG_INDICATORS)} >
+                        {0 > 1 && <div className={`setting-menu-item ${selectedTypeSupervisionPage === PAGE_CONFIG_INDICATORS ? 'active' : ''}`} onClick={() => handleClickConfigMenu(PAGE_CONFIG_INDICATORS)} >
                             {translate('Configuration_Des_Indicateurs')}
-                        </div>
+                        </div>}
                         <div className={`setting-menu-item ${selectedTypeSupervisionPage === PAGE_CONFIG_SUPERVISION ? 'active' : ''}`} onClick={() => handleClickConfigMenu(PAGE_CONFIG_SUPERVISION)}>
                             {translate('Parametre_Supervision')}
                         </div>
