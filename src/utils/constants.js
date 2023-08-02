@@ -66,6 +66,7 @@ export const VALIDE = 'VALIDE'
 export const INVALIDE = 'INVALIDE'
 export const PENDING = 'PENDING'
 export const ALL = 'ALL'
+export const ELEMENT_GROUP = "ELEMENT_GROUP"
 
 export const DISPLAY_SUPERVISIONS = "DISPLAY_SUPERVISIONS"
 export const DISPLAY_SUPERVISORS = "DISPLAY_SUPERVISORS"

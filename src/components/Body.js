@@ -44,8 +44,6 @@ export const Body = () => {
         }
     }
 
-
-
     const loadMe = async () => {
         try {
             setLoadingMe(true)

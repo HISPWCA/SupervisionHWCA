@@ -193,5 +193,8 @@
     "Confirmation_Suppression_Indicateur": "Do you really want to delete the indicator ? ",
     "Nom_Claire_Favorit": "Please provide a clear name for this favorite. ",
     "List_Vide": "Empty list !",
-    "Best_Input_Is_Too_Gratter": "The number of best and bad values ​​entered are greater than the result found !"
+    "Best_Input_Is_Too_Gratter": "The number of best and bad values ​​entered are greater than the result found !",
+    "Group_Element_Donnee": "Data element groups",
+    "Element_Donne_A_Partie_De_Liste": "Select Data element from all data element list ?",
+    "Choisir_Element_Donne_De_Group": "Select Data element from data element groups ?"
 }
