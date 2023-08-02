@@ -3601,7 +3601,7 @@ const Supervision = ({ me }) => {
                                                                     options={
                                                                         selectedProgramStage?.programStageDataElements
                                                                             ?.filter(progStageDE => selectedDataElementFromWhere === ELEMENT_GROUP &&
-                                                                                selectedDataElementGroup ? progStageDE.dataElementGroups?.map(gp => gp.id)?.includes(selectedDataElementGroup?.id) : true
+                                                                                selectedDataElementGroup ? progStageDE.dataElement?.dataElementGroups?.map(gp => gp.id)?.includes(selectedDataElementGroup?.id) : true
                                                                             )
                                                                             ?.map(progStageDE => ({ label: progStageDE.dataElement?.displayName, value: progStageDE.dataElement?.id })) || []
                                                                     }
