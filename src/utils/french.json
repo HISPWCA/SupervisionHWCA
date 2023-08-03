@@ -195,5 +195,11 @@
     "Best_Input_Is_Too_Gratter": "Le nombre de meilleure et mauvaise valeur saisie sont plus grands que le résultat trouvé !",
     "Group_Element_Donnee": "Groupe d'élément de données",
     "Element_Donne_A_Partie_De_Liste": "Choisir les éléments de données à partie d'une liste d'élement de donnée ?",
-    "Choisir_Element_Donne_De_Group": "Choisir les éléments de données à partir d'un groupe ?"
+    "Choisir_Element_Donne_De_Group": "Choisir les éléments de données à partir d'un groupe ?",
+
+    "Aleatoire":"Aléatoire",
+    "Recherche_Aleatoire":"Recherche aléatoire",
+    "Nombres_Unites_Organisations":"Nombres d'unités d'organisations",
+    "RDQA_Case":"Configuration dynamique des indicateurs à vérifier comme dans le cas d'RDQA ?",
+    "Nombre_De_Structure_Trop_Grand":"Nombres de d'unité d'organisations a recupérer par rapport à votre sélection, est plus grand que le résultat trouvé !"
 }

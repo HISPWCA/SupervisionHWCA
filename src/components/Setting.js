@@ -46,7 +46,7 @@ const Setting = () => {
     const [selectedTEIProgram, setSelectedTEIProgram] = useState(null)
     const [selectedSupervisionGenerationType, setSelectedSupervisionGenerationType] = useState(TYPE_GENERATION_AS_TEI)
     const [selectedProgram, setSelectedProgram] = useState(null)
-    const [selectedTypeSupervisionPage, setSelectedTypeSupervisionPage] = useState(PAGE_CONFIG_INDICATORS)
+    const [selectedTypeSupervisionPage, setSelectedTypeSupervisionPage] = useState(PAGE_CONFIG_SUPERVISION)
     const [selectedAnalyseType, setSelectedAnalyseType] = useState(TYPE_ANALYSE_DATA_ELEMENT)
     const [selectedAnalyseIndicator, setSelectedAnalyseIndicator] = useState(null)
     const [selectedAnalyseDataElement, setSelectedAnalyseDataElement] = useState(null)
@@ -57,6 +57,7 @@ const Setting = () => {
     const [selectedStatutPaymentDataElement, setSelectedStatutPaymentDataElement] = useState(null)
     const [selectedDataElements, setSelectedDataElements] = useState([])
     const [selectedAttributesToDisplay, setSelectedAttributesToDisplay] = useState([])
+    const [selectedPlanificationIndicatorRDQeCase, setSelectedPlanificationIndicatorRDQeCase] = useState(false)
 
     const [selectedPlanificationType, setSelectedPlanificationType] = useState(ORGANISATION_UNIT)
     const [selectedAttributeNameForAgent, setSelectedAttributeNameForAgent] = useState(null)
@@ -189,6 +190,7 @@ const Setting = () => {
         setPaymentConfigList([])
         setCurrentPaymentConfig(null)
         setSelectedPlanificationType(ORGANISATION_UNIT)
+        setSelectedPlanificationIndicatorRDQeCase(false)
         setSelectedAttributesToDisplay([])
         setSelectedAttributeNameForAgent(null)
         setSelectedAttributeFirstNameForAgent(null)
@@ -222,6 +224,7 @@ const Setting = () => {
     const handleSupervisionPlanificationType = ({ value }) => {
         setSelectedPlanificationType(value)
     }
+
 
     const handleDeleteConfigItem = async (value) => {
         try {
@@ -263,7 +266,6 @@ const Setting = () => {
             setIndicatorWeight(0)
             setCurrentItem(null)
 
-
             loadIndicatorGroups()
             const response = await loadDataStore(process.env.REACT_APP_INDICATORS_CONFIG_KEY, null, null, null)
             setMappingConfigs(response)
@@ -279,7 +281,6 @@ const Setting = () => {
             setSelectedAnalyseType(TYPE_ANALYSE_DATA_ELEMENT)
             setSelectedAnalyseIndicator(null)
             setCurrentItem(null)
-
 
             loadDataElements()
             loadIndicators()
@@ -345,6 +346,7 @@ const Setting = () => {
                 setSelectedStatutPaymentDataElement(null)
                 setSelectedSupervisionGenerationType(TYPE_GENERATION_AS_TEI)
                 setSelectedPlanificationType(ORGANISATION_UNIT)
+                setSelectedPlanificationIndicatorRDQeCase(false)
                 setSelectedAttributesToDisplay([])
                 setSelectedAttributeNameForAgent(null)
                 setSelectedAttributeFirstNameForAgent(null)
@@ -430,6 +432,7 @@ const Setting = () => {
                     attributesToDisplay: selectedPlanificationType === AGENT && selectedAttributesToDisplay || [],
                     attributeName: selectedPlanificationType === AGENT && selectedAttributeNameForAgent,
                     attributeFirstName: selectedPlanificationType === AGENT && selectedAttributeFirstNameForAgent,
+                    isRDQAConfigCase: selectedPlanificationIndicatorRDQeCase,
                     fieldConfig: null,
                     statusSupervision: null,
                     statusPayment: null,
@@ -481,6 +484,7 @@ const Setting = () => {
                 setSelectedStatutSupervisionDataElement(null)
                 setSelectedStatutPaymentProgramStage(null)
                 setSelectedStatutPaymentDataElement(null)
+                setSelectedPlanificationIndicatorRDQeCase(false)
                 setSelectedProgramStage(null)
                 setFieldEditingMode(false)
                 setSelectedDataElements([])
@@ -752,7 +756,7 @@ const Setting = () => {
                         allowClear
                     />
                 </div>
-                <div style={{ marginTop: '10px' }}>
+                <div style={{ marginTop: '20px' }}>
                     <div style={{ marginTop: '5px' }}>
                         <Radio
                             label={translate('Generer_Supervision_Comme_TEI')}
@@ -778,10 +782,10 @@ const Setting = () => {
                         />
                     </div>
                 </div>
-
                 {
                     selectedTEIProgram && (
-                        <div style={{ marginTop: '20px' }}>
+                        <div >
+                            <Divider style={{ margin: '20px 0px' }} />
                             <div style={{ fontWeight: 'bold' }}>{translate('Planifier_Sur_OrgUnit_Ou_Agent')}</div>
                             <div style={{ marginTop: '10px' }}>
                                 <div >
@@ -801,6 +805,17 @@ const Setting = () => {
                                     />
                                 </div>
                             </div>
+                        </div>
+                    )
+                }
+
+                {
+                    selectedTEIProgram && (
+                        <div>
+                            <Divider style={{ margin: '20px 0px' }} />
+                            <Checkbox onChange={_ => setSelectedPlanificationIndicatorRDQeCase(!selectedPlanificationIndicatorRDQeCase)} checked={selectedPlanificationIndicatorRDQeCase}>
+                                <div style={{ fontWeight: 'bold' }}> {translate('RDQA_Case')}</div>
+                            </Checkbox>
                         </div>
                     )
                 }
@@ -826,6 +841,7 @@ const Setting = () => {
             setSelectedAttributeFirstNameForAgent(prog.attributeFirstName)
             setSelectedSupervisionGenerationType(prog?.generationType)
             setSelectedPlanificationType(prog.planificationType)
+            setSelectedPlanificationIndicatorRDQeCase(prog.isRDQAConfigCase || false)
             setPaymentConfigList(prog?.paymentConfigs || [])
             setFieldEditingMode(true)
         } catch (err) {

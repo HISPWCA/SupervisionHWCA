@@ -196,5 +196,10 @@
     "Best_Input_Is_Too_Gratter": "The number of best and bad values ​​entered are greater than the result found !",
     "Group_Element_Donnee": "Data element groups",
     "Element_Donne_A_Partie_De_Liste": "Select Data element from all data element list ?",
-    "Choisir_Element_Donne_De_Group": "Select Data element from data element groups ?"
+    "Choisir_Element_Donne_De_Group": "Select Data element from data element groups ?",
+    "Aleatoire": "Random",
+    "Recherche_Aleatoire": "Random search",
+    "Nombres_Unites_Organisations": "Organiation unit number",
+    "RDQA_Case": "Dynamic configuration of the indicators to be checked as in the case of RDQA ?",
+    "Nombre_De_Structure_Trop_Grand": "Number of organization units to retrieve compared to your selection, is greater than the result found !"
 }

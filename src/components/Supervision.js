@@ -27,6 +27,7 @@ import {
     PENDING_PAYMENT,
     PENDING_VALIDATION,
     QUARTER,
+    RANDOM,
     SCHEDULED,
     TYPE_GENERATION_AS_ENROLMENT,
     TYPE_GENERATION_AS_EVENT,
@@ -55,6 +56,7 @@ import { TbSelect } from 'react-icons/tb'
 import { DataDimension } from '@dhis2/analytics'
 import { IoMdOpen } from 'react-icons/io'
 import { MdStars } from 'react-icons/md'
+import shuffle from 'shuffle-array'
 
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat'
@@ -87,6 +89,7 @@ const Supervision = ({ me }) => {
     const [visibleAnalyticComponentModal, setVisibleAnalyticComponentModal] = useState(false)
     const [visibleAnalyticComponentPerformanceModal, setVisibleAnalyticComponentPerformanceModal] = useState(false)
     const [analyticIndicatorResults, setAnalyticIndicatorResults] = useState([])
+    const [randomResults, setRandomResults] = useState([])
     const [_, setAnalyticErrorMessage] = useState(null)
     const [teisList, setTeisList] = useState([])
     const [isEmpty, setEmpty] = useState(false)
@@ -113,7 +116,7 @@ const Supervision = ({ me }) => {
     const [selectedProgramStage, setSelectedProgramStage] = useState(null)
     const [selectedDataElement, setSelectedDataElement] = useState(null)
     const [selectedMetaDatas, setSelectedMetaDatas] = useState([])
-    const [selectedOrganisationUnitInd, setSelectedOrganisationUnitInd] = useState(null)
+    const [selectedOrganisationUnitSingle, setSelectedOrganisationUnitSingle] = useState(null)
     const [selectedAgents, setSelectedAgents] = useState([])
     const [selectedSupervisionsConfigProgram, setSelectedSupervisionConfigProgram] = useState(null)
     const [selectedOrgUnitSupervisionFromTracker, setSelectedOrgUnitSupervisionFromTracker] = useState(null)
@@ -136,6 +139,7 @@ const Supervision = ({ me }) => {
     const [inputDataSourceDisplayName, setInputDataSourceDisplayName] = useState('')
     const [inputDataSourceID, setInputDataSourceID] = useState(null)
     const [inputEquipeName, setInputEquipeName] = useState('')
+    const [inputNbrOrgUnit, setInputNbrOrgUnit] = useState(false)
 
     const [loadingDataStoreSupervisionConfigs, setLoadingDataStoreSupervisionConfigs] = useState(false)
     const [loadingDataStoreSupervisions, setLoadingDataStoreSupervisions] = useState(false)
@@ -178,6 +182,7 @@ const Supervision = ({ me }) => {
             },
         ]
     }
+
 
     const columns = () => {
 
@@ -342,6 +347,7 @@ const Supervision = ({ me }) => {
                 },
             ]
     }
+
 
     const loadOrganisationUnits = async () => {
         try {
@@ -773,7 +779,7 @@ const Supervision = ({ me }) => {
     const handleChangeSupervisionType = ({ value }) => {
         setSelectedProgram(null)
         setSelectedAgents([])
-        setSelectedOrganisationUnitInd(null)
+        setSelectedOrganisationUnitSingle(null)
         setSelectedSupervisionType(value)
     }
 
@@ -809,7 +815,7 @@ const Supervision = ({ me }) => {
         setSelectedProgramStage(null)
         setSelectedDataElement(null)
         setSelectedAgents([])
-        setSelectedOrganisationUnitInd(null)
+        setSelectedOrganisationUnitSingle(null)
 
 
         loadProgramStages(sup.program?.id)
@@ -1705,8 +1711,9 @@ const Supervision = ({ me }) => {
         setInputFields([])
         setInputDataSourceDisplayName('')
         setInputDataSourceID(null)
-        setSelectedOrganisationUnitInd(null)
+        setSelectedOrganisationUnitSingle(null)
         setAnalyticIndicatorResults([])
+        setRandomResults([])
         setAnalyticErrorMessage(null)
     }
 
@@ -2038,6 +2045,15 @@ const Supervision = ({ me }) => {
                             checked={selectedPlanificationType === INDICATOR}
                         />
                     </div>
+                    <div style={{ marginLeft: '20px' }}>
+                        <Radio
+                            label={translate("Aleatoire")}
+                            className="cursor-pointer"
+                            onChange={handleChangePlanificationType}
+                            value={RANDOM}
+                            checked={selectedPlanificationType === RANDOM}
+                        />
+                    </div>
                 </div>
             </Card>
         </div>
@@ -2130,6 +2146,7 @@ const Supervision = ({ me }) => {
                                 onChange={handleSelectSuperviseurs}
                                 mode='multiple'
                                 optionFilterProp='label'
+                                allowClear
                                 showSearch
                                 options={users.map(user => ({ label: user.displayName, value: user.id }))}
                             />
@@ -2508,6 +2525,7 @@ const Supervision = ({ me }) => {
                                             optionFilterProp='label'
                                             onChange={handleSelectFavoritForPerformance}
                                             value={selectedFavoritForPerformance?.id}
+                                            allowClear
                                         />
                                     </div>
                                 </>
@@ -2719,7 +2737,6 @@ const Supervision = ({ me }) => {
                 })
             )
         } catch (err) {
-            console.log(err)
         }
     }
 
@@ -2825,6 +2842,7 @@ const Supervision = ({ me }) => {
                                                     optionFilterProp='label'
                                                     showSearch
                                                     options={equipeList.map(eq => ({ label: eq.name, value: eq.name }))}
+                                                    allowClear
                                                 />
                                             </div>
                                         </Col>
@@ -2843,6 +2861,7 @@ const Supervision = ({ me }) => {
                                                     optionFilterProp='label'
                                                     showSearch
                                                     options={users.map(user => ({ label: user.displayName, value: user.id }))}
+                                                    allowClear
                                                 />
                                             </div>
                                         </Col>
@@ -2909,7 +2928,6 @@ const Supervision = ({ me }) => {
             </Row>
         </div>
     )
-
 
     const handleCloseAgentForm = (ag) => {
         setSelectedAgents(selectedAgents.filter(agent => agent.trackedEntityInstance !== ag.trackedEntityInstance))
@@ -2993,6 +3011,7 @@ const Supervision = ({ me }) => {
                                                     mode='multiple'
                                                     optionFilterProp='label'
                                                     showSearch
+                                                    allowClear
                                                     options={users.map(user => ({ label: user.displayName, value: user.id }))}
                                                 />
                                             </div>
@@ -3082,6 +3101,12 @@ const Supervision = ({ me }) => {
         setSelectedOrganisationUnitGroup(selectedOrganisationUnitGroupSet.organisationUnitGroups?.find(org => org.id === value))
     }
 
+    const handleSelectOrganisationUnitGroupForRandomCase = (values) => {
+        setSelectedOrganisationUnitGroups(
+            values.map(value => organisationUnitGroups?.find(org => org.id === value))
+        )
+    }
+
     const formatPeriod = (period, periodType) => {
 
         let currentPeriod = dayjs(period).format('YYYY')
@@ -3109,7 +3134,7 @@ const Supervision = ({ me }) => {
             setLoadingAnalyticIndicatorResults(true)
             setAnalyticErrorMessage(null)
 
-            if (!selectedOrganisationUnits)
+            if (!selectedOrganisationUnitSingle)
                 throw new Error(translate('Unite_Organisation_Obligatoire'))
 
             if (!selectedIndicators || selectedIndicators.length === 0)
@@ -3124,7 +3149,7 @@ const Supervision = ({ me }) => {
             if (!selectedPeriod)
                 throw new Error(translate('Veuillez_Selectionner_Periode'))
 
-            const route = `${ANALYTICS_ROUTE}.json?dimension=dx:${selectedIndicators.map(ind => ind.indicator?.id).join(';')},ou:${selectedOrganisationUnitInd?.id};OU_GROUP-${selectedOrganisationUnitGroup?.id}&filter=pe:${formatPeriod(selectedPeriod, selectedPeriodType)}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=false&includeNumDen=false&skipRounding=false&completedOnly=false&outputIdScheme=UID`
+            const route = `${ANALYTICS_ROUTE}.json?dimension=dx:${selectedIndicators.map(ind => ind.indicator?.id).join(';')},ou:${selectedOrganisationUnitSingle?.id};OU_GROUP-${selectedOrganisationUnitGroup?.id}&filter=pe:${formatPeriod(selectedPeriod, selectedPeriodType)}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=false&includeNumDen=false&skipRounding=false&completedOnly=false&outputIdScheme=UID`
             const response = await axios.get(route)
 
             const analyticResult = response.data.rows || []
@@ -3176,6 +3201,32 @@ const Supervision = ({ me }) => {
         }
     }
 
+    const handleDisplayIndicatorResultForRandomCase = async () => {
+        try {
+            setLoadingAnalyticIndicatorResults(true)
+            setAnalyticErrorMessage(null)
+
+            if (!selectedOrganisationUnitSingle)
+                throw new Error(translate('Unite_Organisation_Obligatoire'))
+
+            if (selectedOrganisationUnitGroups.length === 0)
+                throw new Error(translate('OrgUnitGroup_Obligatoire'))
+
+
+            const route = `${ORGANISATION_UNITS_ROUTE}&filter=path:like:${selectedOrganisationUnitSingle.id}&filter=organisationUnitGroups.id:in:[${selectedOrganisationUnitGroups.map(ou => ou.id).join(',')}]`
+            const response = await axios.get(route)
+            const orgUnits = response.data.organisationUnits
+            console.log(shuffle(orgUnits))
+
+            setRandomResults(shuffle(orgUnits))
+            setLoadingAnalyticIndicatorResults(false)
+        } catch (err) {
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
+            setLoadingAnalyticIndicatorResults(false)
+            setAnalyticErrorMessage(null)
+        }
+    }
+
     const RenderIndicatorForm = () => (
         <div>
             <Card bodyStyle={{ padding: '0px' }} className="my-shadow" size='small'>
@@ -3192,8 +3243,8 @@ const Supervision = ({ me }) => {
                                 <OrganisationUnitsTree
                                     meOrgUnitId={me?.organisationUnits[0]?.id}
                                     orgUnits={organisationUnits}
-                                    currentOrgUnits={selectedOrganisationUnitInd}
-                                    setCurrentOrgUnits={setSelectedOrganisationUnitInd}
+                                    currentOrgUnits={selectedOrganisationUnitSingle}
+                                    setCurrentOrgUnits={setSelectedOrganisationUnitSingle}
                                     loadingOrganisationUnits={loadingOrganisationUnits}
                                 />
                             </div>
@@ -3235,6 +3286,8 @@ const Supervision = ({ me }) => {
                                 loading={loadingOrganisationUnitGroupSets}
                                 placeholder={translate('OrgUnitGroups')}
                                 onChange={handleSelectOrganisationUnitGroupSet}
+                                optionFilterProp='label'
+                                showSearch
                             />
                         </Col>
                         {
@@ -3248,6 +3301,9 @@ const Supervision = ({ me }) => {
                                             value={selectedOrganisationUnitGroup?.id}
                                             onChange={handleSelectOrganisationUnitGroup}
                                             placeholder={translate('OrgUnitGroups')}
+                                            optionFilterProp='label'
+                                            showSearch
+                                            allowClear
                                         />
                                     </div>
                                 </Col>
@@ -3263,6 +3319,7 @@ const Supervision = ({ me }) => {
                                         placeholder={translate('Type_Periode')}
                                         onChange={handleSelectPeriodType}
                                         value={selectedPeriodType}
+                                        showSearch
                                     />
                                 </div>
                             </Col>
@@ -3279,6 +3336,7 @@ const Supervision = ({ me }) => {
                                             onChange={handleSelectPeriode}
                                             value={selectedPeriod}
                                             picker={selectedPeriodType?.toLocaleLowerCase()}
+
                                         />
                                     </div>
                                 </Col>
@@ -3288,8 +3346,91 @@ const Supervision = ({ me }) => {
                             <Divider style={{ margin: '10px' }} />
                             <Button
                                 loading={loadingAnalyticIndicatorResults}
-                                disabled={selectedOrganisationUnitInd && selectedOrganisationUnitGroup && selectedIndicators.length > 0 && selectedOrganisationUnitGroupSet && selectedPeriod && (parseInt(inputMeilleur || 0) + parseInt(inputMauvais || 0)) > 0 ? false : true}
+                                disabled={selectedOrganisationUnitSingle && selectedOrganisationUnitGroup && selectedIndicators.length > 0 && selectedOrganisationUnitGroupSet && selectedPeriod && (parseInt(inputMeilleur || 0) + parseInt(inputMauvais || 0)) > 0 ? false : true}
                                 primary onClick={handleDisplayIndicatorResult}>{translate('Afficher_Resultats')}</Button>
+                        </Col>
+                    </Row>
+                </div>
+            </Card>
+        </div>
+    )
+
+
+
+    const RenderRandomForm = () => (
+        <div>
+            <Card bodyStyle={{ padding: '0px' }} className="my-shadow" size='small'>
+                <div style={{ background: '#0A9396', color: '#FFF', fontWeight: 'bold', padding: '10px' }}>
+                    <span>
+                        {translate('Recherche_Aleatoire')}
+                    </span>
+                </div>
+                <div style={{ marginTop: '5px', padding: '10px' }}>
+                    <Row gutter={[10, 10]}>
+                        <Col sm={24} md={9}>
+                            <div>
+                                <div style={{ marginBottom: '5px' }}>{translate('Unites_Organisation')}</div>
+                                <OrganisationUnitsTree
+                                    meOrgUnitId={me?.organisationUnits[0]?.id}
+                                    orgUnits={organisationUnits}
+                                    currentOrgUnits={selectedOrganisationUnitSingle}
+                                    setCurrentOrgUnits={setSelectedOrganisationUnitSingle}
+                                    loadingOrganisationUnits={loadingOrganisationUnits}
+                                />
+                            </div>
+                        </Col>
+                        {
+                            0 > 1 && (
+                                <Col sm={24} md={9}>
+                                    <div style={{ marginBottom: '5px' }}>{translate('OrgUnitGroupSet')}</div>
+                                    <Select
+                                        style={{ width: '100%' }}
+                                        options={organisationUnitGroupSets.map(org => ({ label: org.displayName, value: org.id }))}
+                                        value={selectedOrganisationUnitGroupSet?.id}
+                                        disabled={loadingOrganisationUnitGroupSets}
+                                        loading={loadingOrganisationUnitGroupSets}
+                                        placeholder={translate('OrgUnitGroups')}
+                                        onChange={handleSelectOrganisationUnitGroupSet}
+                                        allowClear
+                                    />
+                                </Col>
+                            )
+                        }
+                        {
+                            <Col sm={24} md={9}>
+                                <div>
+                                    <div style={{ marginBottom: '5px' }}>{translate('OrgUnitGroups')}</div>
+                                    <Select
+                                        style={{ width: '100%' }}
+                                        options={organisationUnitGroups?.map(org => ({ value: org.id, label: org.displayName }))}
+                                        value={selectedOrganisationUnitGroups?.map(ou => ou.id)}
+                                        onChange={handleSelectOrganisationUnitGroupForRandomCase}
+                                        placeholder={translate('OrgUnitGroups')}
+                                        mode='multiple'
+                                        optionFilterProp='label'
+                                        showSearch
+                                        allowClear
+                                    />
+                                </div>
+                            </Col>
+                        }
+                        <Col sm={24} md={6}>
+                            <div style={{ marginBottom: '5px' }}>{translate('Nombres_Unites_Organisations')}</div>
+                            <InputNumber
+                                style={{ width: '100%' }}
+                                placeholder={translate('Nombres_Unites_Organisations')}
+                                value={inputNbrOrgUnit}
+                                onChange={value => setInputNbrOrgUnit(value || 0)}
+                            />
+                        </Col>
+                        <Col sm={24} md={6}>
+                            <div>
+                                <Button
+                                    loading={loadingAnalyticIndicatorResults}
+                                    disabled={selectedOrganisationUnitSingle && selectedOrganisationUnitGroups.length > 0 && parseInt(inputNbrOrgUnit) > 0 ? false : true}
+                                    primary onClick={handleDisplayIndicatorResultForRandomCase}>{translate('Afficher_Resultats')}
+                                </Button>
+                            </div>
                         </Col>
                     </Row>
                 </div>
@@ -3301,6 +3442,7 @@ const Supervision = ({ me }) => {
         <>
             {selectedPlanificationType === ORGANISATION_UNIT && selectedOrganisationUnits && RenderOrganisationUnitForm()}
             {selectedPlanificationType === INDICATOR && selectedIndicators.length > 0 && RenderIndicatorForm()}
+            {selectedPlanificationType === RANDOM && RenderRandomForm()}
         </>
     )
 
@@ -3586,6 +3728,7 @@ const Supervision = ({ me }) => {
                                                                 showSearch
                                                                 loading={loadingDataElementGroups}
                                                                 disabled={loadingDataElementGroups}
+                                                                allowClear
                                                             />
                                                         </Col>
 
@@ -3773,6 +3916,48 @@ const Supervision = ({ me }) => {
         </div>
     )
 
+    const RenderRandomTableBody = () => randomResults
+        .slice(0, inputNbrOrgUnit)
+        .map((an, index) => (
+            <tr key={index}>
+                <td style={{ border: '1px solid #ccc', padding: '5px', textAlign: 'center', width: '80px' }}>
+                    <span> <AntCheckbox onChange={() => handleSelectCheckbox(an)} checked={selectedOrganisationUnits.map(ou => ou.id).includes(an?.id)} /></span>
+                </td>
+                <td style={{ border: '1px solid #ccc', padding: '5px' }}>{`${an?.displayName} (  ${an?.parent?.displayName}  ) `}</td>
+            </tr>
+        ))
+
+
+
+    const RenderRandomResults = () => (
+        <div style={{ marginTop: '10px' }}>
+            <Card size='small' className='my-shadow'>
+                <div>
+                    <div>
+                        {
+                            randomResults.length < parseInt(inputNbrOrgUnit) && (
+                                <div style={{ marginTop: '20px' }}>
+                                    <MyNoticeBox message={translate('Nombre_De_Structure_Trop_Grand')} title={translate('Recherche')} type={NOTICE_BOX_WARNING} show={true} />
+                                </div>
+                            )
+                        }
+                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <thead>
+                                <tr style={{ backgroundColor: '#fff' }}>
+                                    <th style={{ border: '1px solid #ccc', padding: '5px', textAlign: 'center' }}>{translate('Actions')}</th>
+                                    <th style={{ border: '1px solid #ccc', padding: '5px', textAlign: 'center' }}>{translate('Unite_Organisation')}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {RenderRandomTableBody()}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </Card>
+        </div>
+    )
+
     const loadTEIs = async (orgUnitId) => {
         try {
             if (selectedProgram && orgUnitId) {
@@ -3816,7 +4001,7 @@ const Supervision = ({ me }) => {
     }
 
     const handleChangePlanificationTypeAgent = ({ value }) => {
-        setSelectedOrganisationUnitInd(null)
+        setSelectedOrganisationUnitSingle(null)
         setInputFields([])
         setSelectedAgents([])
         setSelectedPeriod(dayjs())
@@ -3837,14 +4022,14 @@ const Supervision = ({ me }) => {
             if (selectedIndicators.length === 0)
                 throw new Error(translate('Indicateur_Obligatoire'))
 
-            if (!selectedOrganisationUnitInd)
+            if (!selectedOrganisationUnitSingle)
                 throw new Error(translate('Veuillez_Selectionner_Unite_Organisation'))
 
             const routeLevel = `${API_BASE_ROUTE}/organisationUnitLevels.json?paging=false&fields=id,displayName,level&order=level:DESC`
             const responseLevels = await axios.get(routeLevel)
             const postLevel = responseLevels.data.organisationUnitLevels[0]
 
-            const routeTeis = `${TRACKED_ENTITY_INSTANCES_ROUTE}.json?ou=${selectedOrganisationUnitInd?.id}&ouMode=DESCENDANTS&program=${selectedProgram.program?.id}&fields=trackedEntityInstance,attributes,orgUnit,trackedEntityType,enrollments=[enrollment,orgUnit,orgUnitName,status,program,enrollmentDate,trackedEntityInstance]&order=created:DESC`
+            const routeTeis = `${TRACKED_ENTITY_INSTANCES_ROUTE}.json?ou=${selectedOrganisationUnitSingle?.id}&ouMode=DESCENDANTS&program=${selectedProgram.program?.id}&fields=trackedEntityInstance,attributes,orgUnit,trackedEntityType,enrollments=[enrollment,orgUnit,orgUnitName,status,program,enrollmentDate,trackedEntityInstance]&order=created:DESC`
             const teiResponse = await axios.get(routeTeis)
             const teis = teiResponse.data.trackedEntityInstances
 
@@ -3858,7 +4043,7 @@ const Supervision = ({ me }) => {
             let nouveauTeiList = []
 
             if (teis.length > 0) {
-                const routeAnalytic = `${API_BASE_ROUTE}/analytics/dataValueSet.json?dimension=dx:${selectedIndicators.map(ind => ind.indicator?.id).join(';')}&dimension=ou:${selectedOrganisationUnitInd?.id};LEVEL-${postLevel?.id}${ouGroupString?.trim()?.length > 0 ? ';' + ouGroupString : ''}&dimension=pe:${dayjs(selectedPeriod).format('YYYYMM')}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=true&includeNumDen=true&skipRounding=false&completedOnly=false`
+                const routeAnalytic = `${API_BASE_ROUTE}/analytics/dataValueSet.json?dimension=dx:${selectedIndicators.map(ind => ind.indicator?.id).join(';')}&dimension=ou:${selectedOrganisationUnitSingle?.id};LEVEL-${postLevel?.id}${ouGroupString?.trim()?.length > 0 ? ';' + ouGroupString : ''}&dimension=pe:${dayjs(selectedPeriod).format('YYYYMM')}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=true&includeNumDen=true&skipRounding=false&completedOnly=false`
                 const analyticResponse = await axios.get(routeAnalytic)
                 const dataValues = analyticResponse.data.dataValues || []
 
@@ -3898,7 +4083,6 @@ const Supervision = ({ me }) => {
             setTeisPerformanceList(nouveauTeiList)
             setLoadingTeiList(false)
         } catch (err) {
-            console.log(err)
             setLoadingTeiList(false)
             setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
         }
@@ -3945,8 +4129,8 @@ const Supervision = ({ me }) => {
                                         <OrganisationUnitsTree
                                             meOrgUnitId={me?.organisationUnits[0]?.id}
                                             orgUnits={organisationUnits}
-                                            currentOrgUnits={selectedOrganisationUnitInd}
-                                            setCurrentOrgUnits={setSelectedOrganisationUnitInd}
+                                            currentOrgUnits={selectedOrganisationUnitSingle}
+                                            setCurrentOrgUnits={setSelectedOrganisationUnitSingle}
                                             loadingOrganisationUnits={loadingOrganisationUnits}
                                             onChange={onOrgUnitSelected}
                                         />
@@ -3968,6 +4152,7 @@ const Supervision = ({ me }) => {
                                                         mode='multiple'
                                                         onChange={handleSelectIndicators}
                                                         value={selectedIndicators?.map(ind => ind.indicator?.id)}
+                                                        allowClear
                                                     />
                                                 </div>
                                             </Col>
@@ -4017,7 +4202,7 @@ const Supervision = ({ me }) => {
                                         selectedPlanificationType === INDICATOR && (
                                             <Col md={4} sm={24}>
                                                 <div style={{ marginTop: '22px' }}>
-                                                    <Button loading={loadingTeiList} disabled={selectedPeriod && selectedIndicators.length > 0 && selectedOrganisationUnitInd ? false : true} primary onClick={handleSearchByPerformances}>{translate('Recherche')}</Button>
+                                                    <Button loading={loadingTeiList} disabled={selectedPeriod && selectedIndicators.length > 0 && selectedOrganisationUnitSingle ? false : true} primary onClick={handleSearchByPerformances}>{translate('Recherche')}</Button>
                                                 </div>
                                             </Col>
                                         )
@@ -4030,7 +4215,7 @@ const Supervision = ({ me }) => {
             </div>
 
             {
-                selectedOrganisationUnitInd && (
+                selectedOrganisationUnitSingle && (
                     <div style={{ marginTop: '10px' }}>
                         <Card size='small' className='my-shadow'>
                             <>
@@ -4186,10 +4371,8 @@ const Supervision = ({ me }) => {
                                         <div>
                                             <Button primary small disabled={selectedStep === 0 ? true : false} icon={<BsArrowLeft style={{ color: '#fff', fontSize: '18px' }} />} onClick={() => setSelectedStep(selectedStep - 1)}>{translate('Precedent')}</Button>
                                         </div>
-                                        <div style={{ marginLeft: '10px' }}>
-                                            <Button
-                                                disabled={selectedSupervisionType === TYPE_SUPERVISION_AGENT ? selectedAgents.length > 0 ? false : true : false}
-                                                icon={<BsArrowRight style={{ color: '#fff', fontSize: '18px' }} />} primary small onClick={() => setSelectedStep(selectedStep + 1)}>{translate('Suivant')}</Button>
+                                        <div style={{ marginLeft: '10px', display: `${selectedSupervisionType === TYPE_SUPERVISION_AGENT ? selectedAgents.length > 0 ? 'block' : 'none' : 'block'}` }}>
+                                            <Button icon={<BsArrowRight style={{ color: '#fff', fontSize: '18px' }} />} primary small onClick={() => setSelectedStep(selectedStep + 1)}>{translate('Suivant')}</Button>
                                         </div>
                                     </div>
                                 </Col>
@@ -4197,7 +4380,7 @@ const Supervision = ({ me }) => {
                             <Col sm={24} md={8}>
                                 {RenderSupervisionTypeContent()}
                                 {selectedSupervisionType && RenderSelectedSupervisionTypeList()}
-                                {selectedProgram && RenderDataElementConfigContent()}
+                                {selectedProgram && selectedProgram?.isRDQAConfigCase && RenderDataElementConfigContent()}
                             </Col>
                             <Col sm={24} md={16}>
                                 {selectedProgram && selectedSupervisionType === TYPE_SUPERVISION_AGENT && selectedProgram.attributesToDisplay?.length > 0 && RenderAgentConfigList()}
@@ -4218,7 +4401,7 @@ const Supervision = ({ me }) => {
                                         <div >
                                             <Button primary small icon={<BsArrowLeft style={{ color: '#fff', fontSize: '18px' }} />} onClick={() => setSelectedStep(selectedStep - 1)}>{translate('Precedent')}</Button>
                                         </div>
-                                        <div style={{ marginLeft: '10px' }}>
+                                        <div style={{ marginLeft: '10px', display: `${selectedStep === 1 ? 'none' : 'block'}` }}>
                                             <Button disabled={selectedStep === 1 ? true : false} icon={<BsArrowRight style={{ color: '#fff', fontSize: '18px' }} />} primary small onClick={() => setSelectedStep(selectedStep + 1)}>{translate('Suivant')}</Button>
                                         </div>
                                     </div>
@@ -4232,7 +4415,7 @@ const Supervision = ({ me }) => {
                                         {selectedPlanificationType === INDICATOR && RenderSupervisionPlanificationIndicatorContent()}
                                         {selectedPlanificationType === INDICATOR && selectedIndicators.length > 0 && RenderEquipePlanificationContent()}
                                         {selectedPlanificationType === ORGANISATION_UNIT && RenderSupervisionPlanificationOrganisationUnitContent()}
-                                        {selectedProgram && selectedPlanificationType === ORGANISATION_UNIT && RenderEquipePlanificationContent()}
+                                        {selectedProgram && (selectedPlanificationType === ORGANISATION_UNIT || selectedPlanificationType === RANDOM) && RenderEquipePlanificationContent()}
                                     </Col>
                                 )
                             }
@@ -4249,7 +4432,7 @@ const Supervision = ({ me }) => {
                                 selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
                                 selectedPlanificationType === INDICATOR &&
                                 selectedIndicators.length > 0 &&
-                                selectedOrganisationUnitInd &&
+                                selectedOrganisationUnitSingle &&
                                 selectedOrganisationUnitGroup &&
                                 selectedPeriod &&
                                 analyticIndicatorResults.length > 0 &&
@@ -4259,7 +4442,25 @@ const Supervision = ({ me }) => {
                             }
 
                             {
+                                selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
+                                selectedPlanificationType === RANDOM &&
+                                selectedOrganisationUnitSingle &&
+                                selectedOrganisationUnitGroups.length > 0 &&
+                                randomResults.length > 0 &&
+                                (
+                                    <Col md={24}>{RenderRandomResults()} </Col>
+                                )
+                            }
+
+                            {
                                 selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT && selectedPlanificationType === INDICATOR && selectedIndicators.length > 0 && selectedOrganisationUnits.length > 0 && (
+                                    <Col md={24}>
+                                        {RenderOrganisationUnitForm(8)}
+                                    </Col>
+                                )
+                            }
+                            {
+                                selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT && selectedPlanificationType === RANDOM && selectedOrganisationUnits.length > 0 && (
                                     <Col md={24}>
                                         {RenderOrganisationUnitForm(8)}
                                     </Col>

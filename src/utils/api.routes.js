@@ -4,7 +4,7 @@ export const APP_NAME = "supervision"
 
 export const API_BASE_ROUTE = FULL_ROUTE.substring(0, FULL_ROUTE.indexOf('/apps/'.concat(APP_NAME).concat('/')))
 export const SERVER_URL = FULL_ROUTE.substring(0, FULL_ROUTE.indexOf('/api/apps/'.concat(APP_NAME)))
-export const ORGANISATION_UNITS_ROUTE = API_BASE_ROUTE.concat('/organisationUnits.json?paging=false&fields=id,name,displayName,parent[id,displayName],level')
+export const ORGANISATION_UNITS_ROUTE = API_BASE_ROUTE.concat('/organisationUnits.json?paging=false&fields=id,name,displayName,parent[id,displayName],level,path')
 export const ME_ROUTE = API_BASE_ROUTE.concat('/me.json?fields=id,displayName')
 export const USERS_ROUTE = API_BASE_ROUTE.concat('/users.json?fields=id,displayName,name,organisationUnits[id,path,name,displayName]&paging=false')
 export const SYSTEM_INFOS_ROUTE = API_BASE_ROUTE.concat('/system/info.json')
