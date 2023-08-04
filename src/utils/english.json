@@ -201,5 +201,8 @@
     "Recherche_Aleatoire": "Random search",
     "Nombres_Unites_Organisations": "Organiation unit number",
     "RDQA_Case": "Dynamic configuration of the indicators to be checked as in the case of RDQA ?",
-    "Nombre_De_Structure_Trop_Grand": "Number of organization units to retrieve compared to your selection, is greater than the result found !"
+    "Nombre_De_Structure_Trop_Grand": "The Organisation units number that you try to retrieve, is greater than the result found !",
+
+    "Appliquer":"Apply"
+
 }

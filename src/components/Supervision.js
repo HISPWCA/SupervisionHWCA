@@ -139,7 +139,7 @@ const Supervision = ({ me }) => {
     const [inputDataSourceDisplayName, setInputDataSourceDisplayName] = useState('')
     const [inputDataSourceID, setInputDataSourceID] = useState(null)
     const [inputEquipeName, setInputEquipeName] = useState('')
-    const [inputNbrOrgUnit, setInputNbrOrgUnit] = useState(false)
+    const [inputNbrOrgUnit, setInputNbrOrgUnit] = useState(0)
 
     const [loadingDataStoreSupervisionConfigs, setLoadingDataStoreSupervisionConfigs] = useState(false)
     const [loadingDataStoreSupervisions, setLoadingDataStoreSupervisions] = useState(false)
@@ -796,7 +796,11 @@ const Supervision = ({ me }) => {
         setSelectedOrganisationUnitGroup(null)
         setSelectedOrganisationUnitGroupSet(null)
         setSelectedElementForPerformances([])
-
+        
+        setSelectedOrganisationUnitSingle(null)
+        setSelectedOrganisationUnitGroups([])
+        setInputNbrOrgUnit(0)
+        setRandomResults([])
 
         if (value === INDICATOR && organisationUnitGroupSets.length === 0) {
             loadOrganisationUnitsGroupSets()
@@ -1715,6 +1719,8 @@ const Supervision = ({ me }) => {
         setAnalyticIndicatorResults([])
         setRandomResults([])
         setAnalyticErrorMessage(null)
+        setSelectedOrganisationUnitGroups([])
+        setInputNbrOrgUnit(0)
     }
 
     const handleSupervisionPlanificationSaveBtn = async () => {
@@ -3933,17 +3939,17 @@ const Supervision = ({ me }) => {
         <div style={{ marginTop: '10px' }}>
             <Card size='small' className='my-shadow'>
                 <div>
-                    <div>
-                        {
-                            randomResults.length < parseInt(inputNbrOrgUnit) && (
-                                <div style={{ marginTop: '20px' }}>
-                                    <MyNoticeBox message={translate('Nombre_De_Structure_Trop_Grand')} title={translate('Recherche')} type={NOTICE_BOX_WARNING} show={true} />
-                                </div>
-                            )
-                        }
+                    {
+                        randomResults.length < parseInt(inputNbrOrgUnit) && (
+                            <div style={{ marginTop: '20px' }}>
+                                <MyNoticeBox message={translate('Nombre_De_Structure_Trop_Grand')} type={NOTICE_BOX_WARNING} show={true} />
+                            </div>
+                        )
+                    }
+                    <div style={{ marginTop: '10px' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <thead>
-                                <tr style={{ backgroundColor: '#fff' }}>
+                                <tr style={{ background: "#CCC" }}>
                                     <th style={{ border: '1px solid #ccc', padding: '5px', textAlign: 'center' }}>{translate('Actions')}</th>
                                     <th style={{ border: '1px solid #ccc', padding: '5px', textAlign: 'center' }}>{translate('Unite_Organisation')}</th>
                                 </tr>

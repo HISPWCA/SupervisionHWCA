@@ -196,10 +196,11 @@
     "Group_Element_Donnee": "Groupe d'élément de données",
     "Element_Donne_A_Partie_De_Liste": "Choisir les éléments de données à partie d'une liste d'élement de donnée ?",
     "Choisir_Element_Donne_De_Group": "Choisir les éléments de données à partir d'un groupe ?",
+    "Aleatoire": "Aléatoire",
+    "Recherche_Aleatoire": "Recherche aléatoire",
+    "Nombres_Unites_Organisations": "Nombres d'unités d'organisations",
+    "RDQA_Case": "Configuration dynamique des indicateurs à vérifier comme dans le cas d'RDQA ?",
+    "Nombre_De_Structure_Trop_Grand": "Le nombres d'unité d'organisations que vous éssayez de recupérer, est plus grand que le résultat trouvé !",
 
-    "Aleatoire":"Aléatoire",
-    "Recherche_Aleatoire":"Recherche aléatoire",
-    "Nombres_Unites_Organisations":"Nombres d'unités d'organisations",
-    "RDQA_Case":"Configuration dynamique des indicateurs à vérifier comme dans le cas d'RDQA ?",
-    "Nombre_De_Structure_Trop_Grand":"Nombres de d'unité d'organisations a recupérer par rapport à votre sélection, est plus grand que le résultat trouvé !"
+"Appliquer":"Appliquer"
 }

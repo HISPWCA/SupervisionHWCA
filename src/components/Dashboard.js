@@ -989,7 +989,9 @@ export const Dashboard = ({ me }) => {
 
                     <Col sm={24} md={1}>
                         <div style={{ marginTop: '20px' }}>
-                            <Button onClick={handleSearch} loading={loadingTeiList} primary icon={<AiOutlineSearch style={{ fontSize: '20px' }} />} />
+                            <Button onClick={handleSearch} loading={loadingTeiList} primary icon={<AiOutlineSearch style={{ fontSize: '20px' }} />}>
+                                {translate('Appliquer')}
+                            </Button>
                         </div>
                     </Col>
 
