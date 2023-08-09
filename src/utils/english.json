@@ -202,7 +202,11 @@
     "Nombres_Unites_Organisations": "Organiation unit number",
     "RDQA_Case": "Dynamic configuration of the indicators to be checked as in the case of RDQA ?",
     "Nombre_De_Structure_Trop_Grand": "The Organisation units number that you try to retrieve, is greater than the result found !",
+    "Appliquer": "Apply",
+    "Confirmation": "Confirmation",
 
-    "Appliquer":"Apply"
+    "Confirmation_Planification_Message":"Are you sure you have completed all the planification forms ?",
+    "Veuillez_Remplire_Champ_Obligatoire":"Please complete all required fields !"
+
 
 }

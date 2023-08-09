@@ -796,7 +796,7 @@ const Supervision = ({ me }) => {
         setSelectedOrganisationUnitGroup(null)
         setSelectedOrganisationUnitGroupSet(null)
         setSelectedElementForPerformances([])
-        
+
         setSelectedOrganisationUnitSingle(null)
         setSelectedOrganisationUnitGroups([])
         setInputNbrOrgUnit(0)
@@ -912,7 +912,7 @@ const Supervision = ({ me }) => {
             const enrollment_id = createdEnrollment?.response?.importSummaries[0]?.reference
 
             if (!enrollment_id)
-                throw new Error(translate('Erreur_Creation_Enrollment'))
+                throw new Error(createdEnrollment?.response?.importSummaries[0]?.description || translate('Erreur_Creation_Enrollment'))
 
             const availableProgramStages = []
             const newEventsList = []
@@ -1723,8 +1723,25 @@ const Supervision = ({ me }) => {
         setInputNbrOrgUnit(0)
     }
 
+    const validateForms = async inputFields => {
+        inputFields.forEach(element => {
+            if (!element.period)
+                throw new Error(translate('Veuillez_Remplire_Champ_Obligatoire'))
+
+            if (selectedProgram?.fieldConfig?.supervisor?.dataElements?.length > 0) {
+                if ((!element.supervisors || element.supervisors?.length === 0) && (!element.otherSupervisors || element.otherSupervisors?.length === 0))
+                    throw new Error(translate('Veuillez_Remplire_Champ_Obligatoire'))
+
+            }
+        })
+    }
+
+
     const handleSupervisionPlanificationSaveBtn = async () => {
         try {
+
+            await validateForms(inputFields)
+
             setLoadingSupervisionPlanification(true)
 
             if (selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT && selectedProgram.generationType === TYPE_GENERATION_AS_TEI)
@@ -1752,6 +1769,7 @@ const Supervision = ({ me }) => {
             setNotification({ show: true, type: NOTIFICATION_CRITICAL, message: err.response?.data?.message || err.message })
         }
     }
+
     const handleSelectSupervisionProgramConfigForTracker = (value) => {
         if (value) {
             const supFound = dataStoreSupervisionConfigs.find(d => d.program?.id === value)
@@ -1910,9 +1928,28 @@ const Supervision = ({ me }) => {
                         {
                             isEditionMode && inputFields.length > 0 && (
                                 <div style={{ marginTop: '15px' }}>
-                                    <Button icon={<FiSave style={{ color: '#fff', fontSize: '18px' }} />} onClick={handleSupervisionPlanificationSaveBtn} primary disabled={loadingSupervisionPlanification} loading={loadingSupervisionPlanification}>
-                                        {translate('Planifier_Supervision')}
-                                    </Button>
+                                    {
+                                        selectedPlanificationType === ORGANISATION_UNIT && (
+                                            <Popconfirm
+                                                title={translate('Confirmation')}
+                                                description={translate('Confirmation_Planification_Message')}
+                                                onConfirm={handleSupervisionPlanificationSaveBtn}
+                                                okButtonProps={{ loading: loadingSupervisionPlanification }}
+                                            >
+                                                <Button icon={<FiSave style={{ color: '#fff', fontSize: '18px' }} />} primary disabled={loadingSupervisionPlanification} loading={loadingSupervisionPlanification}>
+                                                    {translate('Planifier_Supervision')}
+                                                </Button>
+                                            </Popconfirm>
+                                        )
+                                    }
+
+                                    {
+                                        selectedPlanificationType !== ORGANISATION_UNIT && (
+                                            <Button icon={<FiSave style={{ color: '#fff', fontSize: '18px' }} />} onClick={handleSupervisionPlanificationSaveBtn} primary disabled={loadingSupervisionPlanification} loading={loadingSupervisionPlanification}>
+                                                {translate('Planifier_Supervision')}
+                                            </Button>
+                                        )
+                                    }
                                 </div>
                             )
                         }
@@ -2752,24 +2789,6 @@ const Supervision = ({ me }) => {
         setInputFields(inputFields.filter(o => o.organisationUnit?.id !== org.id))
     }
 
-    // const RenderEntryInputConfiguration = () => (
-    //     <div style={{ marginBottom: '20px' }}>
-    //         <Card bodyStyle={{ padding: '0px' }} className="my-shadow" size='small'>
-    //             <div style={{ padding: '10px', borderBottom: '1px solid #ccc' }}>
-    //                 <div>
-    //                     {translate('Configuration_Des_Champs_De_Saisie')}
-
-    //                 </div>
-    //                 <div style={{ marginTop: '10px', color: '#00000080', fontSize: '13px' }}>
-    //                     {translate('Configuration_Element_De_Donner')}
-    //                 </div>
-    //             </div>
-    //             <div style={{ padding: '10px' }}>
-
-    //             </div>
-    //         </Card>
-    //     </div>
-    // )
 
     const RenderOrganisationUnitForm = (colMd = 12) => (
         <div>
@@ -2814,7 +2833,7 @@ const Supervision = ({ me }) => {
                                     <Row gutter={[10, 10]}>
                                         <Col sm={24} md={24}>
                                             <div>
-                                                <div style={{ marginBottom: '5px' }}>{translate('Periode')}</div>
+                                                <div style={{ marginBottom: '5px' }}>{<span>{translate('Periode')} (<span style={{ color: RED }}> * </span>)</span>}</div>
                                                 <DatePicker
                                                     style={{ width: '100%' }}
                                                     placeholder={translate('Periode')}
@@ -2836,64 +2855,72 @@ const Supervision = ({ me }) => {
                                                 </div>
                                             </Col>
                                         }
-
-                                        <Col sm={24} md={24}>
-                                            <div>
-                                                <div style={{ marginBottom: '5px' }}>{translate('Equipes')}</div>
-                                                <Select
-                                                    placeholder={translate('Equipes')}
-                                                    style={{ width: '100%' }}
-                                                    value={inputFields[index]?.equipe?.name}
-                                                    onChange={value => handleInputEquipe(value, index)}
-                                                    optionFilterProp='label'
-                                                    showSearch
-                                                    options={equipeList.map(eq => ({ label: eq.name, value: eq.name }))}
-                                                    allowClear
-                                                />
-                                            </div>
-                                        </Col>
-
-                                        <Col sm={24} md={24}>
-                                            <div>
-                                                <div style={{ marginBottom: '5px' }}>{translate('Superviseurs')}</div>
-                                                <Select
-                                                    placeholder={translate('Superviseurs')}
-                                                    style={{ width: '100%' }}
-                                                    loading={loadingUsers}
-                                                    disabled={loadingUsers}
-                                                    value={inputFields[index]?.supervisors?.map(sup => sup.id)}
-                                                    onChange={(values) => handleInputSupervisors(values, index)}
-                                                    mode='multiple'
-                                                    optionFilterProp='label'
-                                                    showSearch
-                                                    options={users.map(user => ({ label: user.displayName, value: user.id }))}
-                                                    allowClear
-                                                />
-                                            </div>
-                                        </Col>
-                                        <Col md={24}>
-                                            <div>
-                                                <div style={{ marginBottom: '5px' }}>{translate('Autre_Superviseurs')}</div>
-                                                <Row gutter={[10, 10]}>
-                                                    <Col md={19} sm={24}>
-                                                        <Input
-                                                            placeholder={translate('Autre_Superviseurs')}
-                                                            value={inputFields[index]?.inputOtherSupervisor}
-                                                            onChange={event => handleInputOtherSupervisor(event, index)}
+                                        {
+                                            selectedProgram?.fieldConfig?.supervisor?.dataElements?.length > 0 && (
+                                                <Col sm={24} md={24}>
+                                                    <div>
+                                                        <div style={{ marginBottom: '5px' }}>{translate('Equipes')}</div>
+                                                        <Select
+                                                            placeholder={translate('Equipes')}
+                                                            style={{ width: '100%' }}
+                                                            value={inputFields[index]?.equipe?.name}
+                                                            onChange={value => handleInputEquipe(value, index)}
+                                                            optionFilterProp='label'
+                                                            showSearch
+                                                            options={equipeList.map(eq => ({ label: eq.name, value: eq.name }))}
+                                                            allowClear
                                                         />
-                                                    </Col>
-                                                    <Col flex='auto' style={{ textAlign: 'right' }}>
-                                                        <Button
-                                                            primary
-                                                            onClick={() => handleInputAddOtherSupervisors(index)}
-                                                        // disabled={
-                                                        //     inputFields[index]?.inputOtherSupervisor?.trim() && !inputFields[index]?.otherSupervisorList?.includes(inputFields[index]?.inputOtherSupervisor?.trim()) ? false : true
-                                                        // }
-                                                        >+ {translate('Ajouter')} </Button>
-                                                    </Col>
-                                                </Row>
-                                            </div>
-                                        </Col>
+                                                    </div>
+                                                </Col>
+                                            )
+                                        }
+
+                                        {
+                                            selectedProgram?.fieldConfig?.supervisor?.dataElements?.length > 0 && (
+                                                <Col sm={24} md={24}>
+                                                    <div>
+                                                        <div style={{ marginBottom: '5px' }}>{<span>{translate('Superviseurs')} (<span style={{ color: RED }}> * </span>)</span>}</div>
+                                                        <Select
+                                                            placeholder={translate('Superviseurs')}
+                                                            style={{ width: '100%' }}
+                                                            loading={loadingUsers}
+                                                            disabled={loadingUsers}
+                                                            value={inputFields[index]?.supervisors?.map(sup => sup.id)}
+                                                            onChange={(values) => handleInputSupervisors(values, index)}
+                                                            mode='multiple'
+                                                            optionFilterProp='label'
+                                                            showSearch
+                                                            options={users.map(user => ({ label: user.displayName, value: user.id }))}
+                                                            allowClear
+                                                        />
+                                                    </div>
+                                                </Col>
+                                            )
+                                        }
+                                        {
+                                            selectedProgram?.fieldConfig?.supervisor?.dataElements?.length > 0 && (
+                                                <Col md={24}>
+                                                    <div>
+                                                        <div style={{ marginBottom: '5px' }}>{translate('Autre_Superviseurs')}</div>
+                                                        <Row gutter={[10, 10]}>
+                                                            <Col md={19} sm={24}>
+                                                                <Input
+                                                                    placeholder={translate('Autre_Superviseurs')}
+                                                                    value={inputFields[index]?.inputOtherSupervisor}
+                                                                    onChange={event => handleInputOtherSupervisor(event, index)}
+                                                                />
+                                                            </Col>
+                                                            <Col flex='auto' style={{ textAlign: 'right' }}>
+                                                                <Button
+                                                                    primary
+                                                                    onClick={() => handleInputAddOtherSupervisors(index)}
+                                                                >+ {translate('Ajouter')} </Button>
+                                                            </Col>
+                                                        </Row>
+                                                    </div>
+                                                </Col>
+                                            )
+                                        }
 
                                         {
                                             inputFields[index]?.otherSupervisors?.length > 0 && (
@@ -3003,48 +3030,57 @@ const Supervision = ({ me }) => {
                                                 </div>
                                             </Col>
                                         }
+                                        {
+                                            selectedProgram?.fieldConfig?.supervisor?.dataElements?.length > 0 && (
 
-                                        <Col sm={24} md={24}>
-                                            <div>
-                                                <div style={{ marginBottom: '5px' }}>{translate('Superviseurs')}</div>
-                                                <Select
-                                                    placeholder={translate('Superviseurs')}
-                                                    style={{ width: '100%' }}
-                                                    loading={loadingUsers}
-                                                    disabled={loadingUsers}
-                                                    value={inputFields[index]?.supervisors?.map(sup => sup.id)}
-                                                    onChange={(values) => handleInputSupervisors(values, index)}
-                                                    mode='multiple'
-                                                    optionFilterProp='label'
-                                                    showSearch
-                                                    allowClear
-                                                    options={users.map(user => ({ label: user.displayName, value: user.id }))}
-                                                />
-                                            </div>
-                                        </Col>
-                                        <Col md={24}>
-                                            <div>
-                                                <div style={{ marginBottom: '5px' }}>{translate('Autre_Superviseurs')}</div>
-                                                <Row gutter={[10, 10]}>
-                                                    <Col md={18} sm={24}>
-                                                        <Input
-                                                            placeholder={translate('Autre_Superviseurs')}
-                                                            value={inputFields[index]?.inputOtherSupervisor}
-                                                            onChange={event => handleInputOtherSupervisor(event, index)}
+                                                <Col sm={24} md={24}>
+                                                    <div>
+                                                        <div style={{ marginBottom: '5px' }}>{translate('Superviseurs')}</div>
+                                                        <Select
+                                                            placeholder={translate('Superviseurs')}
+                                                            style={{ width: '100%' }}
+                                                            loading={loadingUsers}
+                                                            disabled={loadingUsers}
+                                                            value={inputFields[index]?.supervisors?.map(sup => sup.id)}
+                                                            onChange={(values) => handleInputSupervisors(values, index)}
+                                                            mode='multiple'
+                                                            optionFilterProp='label'
+                                                            showSearch
+                                                            allowClear
+                                                            options={users.map(user => ({ label: user.displayName, value: user.id }))}
                                                         />
-                                                    </Col>
-                                                    <Col flex='auto' style={{ textAlign: 'right' }}>
-                                                        <Button
-                                                            primary
-                                                            onClick={() => handleInputAddOtherSupervisors(index)}
-                                                            disabled={
-                                                                inputFields[index]?.inputOtherSupervisor?.trim() && !inputFields[index]?.otherSupervisorList?.includes(inputFields[index]?.inputOtherSupervisor?.trim()) ? false : true
-                                                            }
-                                                        >+ {translate('Ajouter')} </Button>
-                                                    </Col>
-                                                </Row>
-                                            </div>
-                                        </Col>
+                                                    </div>
+                                                </Col>
+                                            )
+                                        }
+                                        {
+                                            selectedProgram?.fieldConfig?.supervisor?.dataElements?.length > 0 && (
+
+                                                <Col md={24}>
+                                                    <div>
+                                                        <div style={{ marginBottom: '5px' }}>{translate('Autre_Superviseurs')}</div>
+                                                        <Row gutter={[10, 10]}>
+                                                            <Col md={18} sm={24}>
+                                                                <Input
+                                                                    placeholder={translate('Autre_Superviseurs')}
+                                                                    value={inputFields[index]?.inputOtherSupervisor}
+                                                                    onChange={event => handleInputOtherSupervisor(event, index)}
+                                                                />
+                                                            </Col>
+                                                            <Col flex='auto' style={{ textAlign: 'right' }}>
+                                                                <Button
+                                                                    primary
+                                                                    onClick={() => handleInputAddOtherSupervisors(index)}
+                                                                    disabled={
+                                                                        inputFields[index]?.inputOtherSupervisor?.trim() && !inputFields[index]?.otherSupervisorList?.includes(inputFields[index]?.inputOtherSupervisor?.trim()) ? false : true
+                                                                    }
+                                                                >+ {translate('Ajouter')} </Button>
+                                                            </Col>
+                                                        </Row>
+                                                    </div>
+                                                </Col>
+                                            )
+                                        }
 
                                         {
                                             inputFields[index]?.otherSupervisors?.length > 0 && (
@@ -3222,7 +3258,6 @@ const Supervision = ({ me }) => {
             const route = `${ORGANISATION_UNITS_ROUTE}&filter=path:like:${selectedOrganisationUnitSingle.id}&filter=organisationUnitGroups.id:in:[${selectedOrganisationUnitGroups.map(ou => ou.id).join(',')}]`
             const response = await axios.get(route)
             const orgUnits = response.data.organisationUnits
-            console.log(shuffle(orgUnits))
 
             setRandomResults(shuffle(orgUnits))
             setLoadingAnalyticIndicatorResults(false)

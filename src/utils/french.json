@@ -201,6 +201,8 @@
     "Nombres_Unites_Organisations": "Nombres d'unités d'organisations",
     "RDQA_Case": "Configuration dynamique des indicateurs à vérifier comme dans le cas d'RDQA ?",
     "Nombre_De_Structure_Trop_Grand": "Le nombres d'unité d'organisations que vous éssayez de recupérer, est plus grand que le résultat trouvé !",
-
-"Appliquer":"Appliquer"
+    "Appliquer": "Appliquer",
+    "Confirmation": "Confirmation",
+    "Confirmation_Planification_Message": "Etes-vous sûre d'avoir rempli tous les formulaires de planification ?",
+    "Veuillez_Remplire_Champ_Obligatoire":"Veuillez remplir tous les champs obligatoires s'il vous plait !"
 }
