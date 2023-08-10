@@ -9,7 +9,7 @@ import { CANCELED, DESCENDANTS, NOTICE_BOX_DEFAULT, NOTIFICATION_CRITICAL, PENDI
 import MapView from './MapView'
 import { loadDataStore } from '../utils/functions'
 import { IoMdOpen } from 'react-icons/io'
-import { BLACK, BLUE, GRAY_DARK, GREEN, JAUNE, ORANGE, RED, WHITE } from '../utils/couleurs'
+import { BLACK, BLUE, GRAY_DARK, GREEN, ORANGE, RED, WHITE } from '../utils/couleurs'
 import { AiOutlineSearch } from 'react-icons/ai'
 import { MyNoticeBox } from './MyNoticeBox'
 import MyNotification from './MyNotification'
@@ -31,17 +31,14 @@ dayjs.locale('fr-FR')
 
 const localizer = dayjsLocalizer(dayjs)
 
-
 export const getDefaultStatusSupervisionIfStatusIsNull = _ => SCHEDULED.value
-
 export const getDefaultStatusPaymentIfStatusIsNull = _ => NA.value
-
 export const Dashboard = ({ me }) => {
 
     const [organisationUnits, setOrganisationUnits] = useState([])
     const [users, setUsers] = useState([])
     const [dataStoreSupervisionsConfigs, setDataStoreSupervisionsConfigs] = useState([])
-    const [dataStoreSupervisionPlanifications, setDataStoreSupervisionPlanifications] = useState([])
+    const [_, setDataStoreSupervisionPlanifications] = useState([])
     const [teiList, setTeiList] = useState([])
     const [noticeBox, setNoticeBox] = useState({ show: false, message: null, title: null, type: NOTICE_BOX_DEFAULT })
     const [notification, setNotification] = useState({ show: false, message: null, type: null })
@@ -188,7 +185,7 @@ export const Dashboard = ({ me }) => {
                     setSelectedOrganisationUnit(currentOrgUnit)
                     setSelectedPeriod(currentPeriod)
                     setSelectedPlanification(currentPlanification)
-                    loadTeisPlanifications(currentProgram.program.id, currentOrgUnit?.id, DESCENDANTS)
+                    loadTeisPlanifications(currentProgram.program.id, currentOrgUnit?.id, null, DESCENDANTS)
                     loadOptions(currentProgram.statusSupervision?.dataElement?.id, setStatusSupervisionOptions)
                     loadOptions(currentProgram.statusPayment?.dataElement?.id, setStatusPaymentOptions)
                 }
@@ -202,14 +199,14 @@ export const Dashboard = ({ me }) => {
         }
     }
 
-    const loadTeisPlanifications = async (program_id, orgUnit_id, ouMode = DESCENDANTS) => {
+    const loadTeisPlanifications = async (program_id, orgUnit_id, period, ouMode = DESCENDANTS) => {
         try {
             setLoadingTeiList(true)
             const response = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}.json?program=${program_id}&ou=${orgUnit_id}&ouMode=${ouMode}&order=created:DESC&fields=trackedEntityInstance,created,program,orgUnit,enrollments[*],attributes`)
             const trackedEntityInstances = response.data.trackedEntityInstances
             setTeiList(trackedEntityInstances)
             setLoadingTeiList(false)
-            setCalendarDate(selectedPeriod)
+            setCalendarDate(period ? period : selectedPeriod)
         } catch (err) {
             setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
             setLoadingTeiList(false)
@@ -290,14 +287,12 @@ export const Dashboard = ({ me }) => {
     }
 
     const handleSelectedPeriod = (event) => {
-        setSelectedPeriod(dayjs((event)))
+        setSelectedPeriod(dayjs(event))
     }
 
     const handleSelectSupervisor = values => setSelectedSupervisors(values.map(sup => users.find(u => u.id === sup)))
 
     const handleSelectPlanificationUser = value => setSelectedPlanificationUser(users.find(u => u.id === value))
-
-
 
     const filterAndGetPlanfications = () => teiList.reduce((prev, current) => {
         if (selectedProgram.generationType === TYPE_GENERATION_AS_TEI) {
@@ -578,6 +573,14 @@ export const Dashboard = ({ me }) => {
                         endAccessor="end"
                         style={{ height: '445px' }}
                         date={dayjs(calendarDate).format('YYYY-MM-DD')}
+                        onNavigate={(newDate, view, action) => {
+                            setCalendarDate(dayjs(newDate))
+                            setSelectedPeriod(dayjs(newDate))
+
+                            if (newDate && selectedProgram?.program?.id && selectedOrganisationUnit?.id) {
+                                loadTeisPlanifications(selectedProgram.program?.id, selectedOrganisationUnit.id, newDate)
+                            }
+                        }}
                         selectable
                     />
                 </div>
@@ -948,10 +951,6 @@ export const Dashboard = ({ me }) => {
                                     value: PLANIFICATION_PAR_TOUS,
                                     label: translate('Tous'),
                                 },
-                                // {
-                                //     value: PLANIFICATION_PAR_UN_USER,
-                                //     label: 'Un utilisateur',
-                                // },
                             ]}
                         />
                     </Col>
