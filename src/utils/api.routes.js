@@ -1,6 +1,6 @@
 const FULL_ROUTE = window.location.href
 
-export const APP_NAME = "supervision"
+export const APP_NAME = "Supervision"
 
 export const API_BASE_ROUTE = FULL_ROUTE.substring(0, FULL_ROUTE.indexOf('/apps/'.concat(APP_NAME).concat('/')))
 export const SERVER_URL = FULL_ROUTE.substring(0, FULL_ROUTE.indexOf('/api/apps/'.concat(APP_NAME)))

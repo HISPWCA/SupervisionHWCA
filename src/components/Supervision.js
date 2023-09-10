@@ -1058,7 +1058,7 @@ const Supervision = ({ me }) => {
 
     const generateEventsAsNewSupervision = async (payload) => {
         try {
-            const existingTEI_List_response = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}?ou=${payload.orgUnit}&order=created:DESC&program=${selectedProgram?.program?.id}&fields=*`)
+            const existingTEI_List_response = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}?ou=${payload.orgUnit}&order=created:DESC&program=${selectedProgram?.program?.id}&fields=*&ouMode=SELECTED`)
             const existingTEI_List = existingTEI_List_response.data.trackedEntityInstances
 
             if (existingTEI_List.length === 0) {
@@ -1209,13 +1209,14 @@ const Supervision = ({ me }) => {
                 return currentTEIData
             }
         } catch (err) {
+            console.log("Err:", err)
             throw err
         }
     }
 
     const generateEnrollmentsAsNewSupervision = async (payload) => {
         try {
-            const existingTEI_List_response = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}?ou=${payload.orgUnit}&order=created:DESC&program=${selectedProgram?.program?.id}&fields=*`)
+            const existingTEI_List_response = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}?ou=${payload.orgUnit}&order=created:DESC&program=${selectedProgram?.program?.id}&fields=*&ouMode=SELECTED`)
             const existingTEI_List = existingTEI_List_response.data.trackedEntityInstances
 
             if (existingTEI_List.length === 0) {
