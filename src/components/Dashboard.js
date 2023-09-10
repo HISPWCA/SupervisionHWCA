@@ -366,7 +366,7 @@ export const Dashboard = ({ me }) => {
                         enrollment: currentEnrollment?.enrollment,
                         program: currentEnrollment?.program,
                         orgUnit: currentEnrollment?.orgUnit,
-                        storedBy: currentEnrollment?.storedBy,
+                        storedBy: ev?.storedBy,
                         libelle: currentEnrollment?.orgUnitName,
                         statusSupervision: dayjs(ev.eventDate).isAfter(dayjs()) ? getDefaultStatusSupervisionIfStatusIsNull() : currentEnrollment?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
                         statusPayment: currentEnrollment?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statusPayment?.dataElement?.id)?.value || getDefaultStatusPaymentIfStatusIsNull()
@@ -378,6 +378,8 @@ export const Dashboard = ({ me }) => {
         return prev
     }, [])
         .filter(planification => {
+            console.log("me : ", me.username)
+            console.log("stored by : ", planification.storedBy)
             if (selectedPlanification === PLANIFICATION_PAR_MOI)
                 return me?.username?.toLowerCase() === planification.storedBy?.toLowerCase()
 
