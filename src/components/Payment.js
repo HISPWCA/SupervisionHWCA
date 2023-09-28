@@ -75,7 +75,7 @@ const Payment = ({ me }) => {
             if (!selectedSupervisionsConfigProgram?.attributeName?.id)
                 throw new Error(translate('Attribute_Nom'))
 
-            const TEI_URL = `${TRACKED_ENTITY_INSTANCES_ROUTE}.json?program=${selectedSupervisionsConfigProgram?.program?.id}&ou=${selectedOrganisationUnit?.id}&ouMode=DESCENDANTS&order=created:desc&fields=*,enrollments[*]&paging=false`
+            const TEI_URL = `${TRACKED_ENTITY_INSTANCES_ROUTE}.json?program=${selectedSupervisionsConfigProgram?.program?.id}&ou=${selectedOrganisationUnit?.id}&ouMode=DESCENDANTS&order=created:desc&fields=*,enrollments[*]&pageSize=10000`
             const teiResponse = await axios.get(TEI_URL)
             const trackedEntityInstances = teiResponse.data.trackedEntityInstances
 

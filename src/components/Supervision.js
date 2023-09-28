@@ -399,7 +399,7 @@ const Supervision = ({ me }) => {
     const loadTeisPlanifications = async (program_id, orgUnit_id, ouMode = DESCENDANTS) => {
         try {
             setLoadingAllSupervisionsFromTracker(true)
-            const response = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}.json?program=${program_id}&ou=${orgUnit_id}&ouMode=${ouMode}&order=created:DESC&fields=trackedEntityInstance,created,program,orgUnit,enrollments[*],attributes`)
+            const response = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}.json?program=${program_id}&ou=${orgUnit_id}&ouMode=${ouMode}&order=created:DESC&fields=trackedEntityInstance,created,program,orgUnit,enrollments[*],attributes&pageSize=10000`)
             setAllSupervisionsFromTracker(response.data.trackedEntityInstances)
             setLoadingAllSupervisionsFromTracker(false)
         } catch (err) {
@@ -2190,8 +2190,8 @@ const Supervision = ({ me }) => {
                                 onChange={handleSelectSuperviseurs}
                                 mode='multiple'
                                 optionFilterProp='label'
-                                allowClear
                                 showSearch
+                                allowClear
                                 options={users.map(user => ({ label: user.displayName, value: user.id }))}
                             />
                         </div>
@@ -4006,7 +4006,7 @@ const Supervision = ({ me }) => {
                 setLoadingTeiList(true)
                 setEmpty(false)
 
-                const route = `${TRACKED_ENTITY_INSTANCES_ROUTE}.json?ou=${orgUnitId}&ouMode=DESCENDANTS&program=${selectedProgram.program?.id}&fields=trackedEntityInstance,attributes,orgUnit,trackedEntityType,enrollments=[enrollment,orgUnit,orgUnitName,status,program,enrollmentDate,trackedEntityInstance]&order=created:DESC&paging=false`
+                const route = `${TRACKED_ENTITY_INSTANCES_ROUTE}.json?ou=${orgUnitId}&ouMode=DESCENDANTS&program=${selectedProgram.program?.id}&fields=trackedEntityInstance,attributes,orgUnit,trackedEntityType,enrollments=[enrollment,orgUnit,orgUnitName,status,program,enrollmentDate,trackedEntityInstance]&order=created:DESC&pageSize=10000`
                 const response = await axios.get(route)
                 setTeisList(response.data.trackedEntityInstances)
                 if (!response.data.trackedEntityInstances || response.data.trackedEntityInstances?.length === 0) {
@@ -4071,7 +4071,7 @@ const Supervision = ({ me }) => {
             const responseLevels = await axios.get(routeLevel)
             const postLevel = responseLevels.data.organisationUnitLevels[0]
 
-            const routeTeis = `${TRACKED_ENTITY_INSTANCES_ROUTE}.json?ou=${selectedOrganisationUnitSingle?.id}&ouMode=DESCENDANTS&program=${selectedProgram.program?.id}&fields=trackedEntityInstance,attributes,orgUnit,trackedEntityType,enrollments=[enrollment,orgUnit,orgUnitName,status,program,enrollmentDate,trackedEntityInstance]&order=created:DESC`
+            const routeTeis = `${TRACKED_ENTITY_INSTANCES_ROUTE}.json?ou=${selectedOrganisationUnitSingle?.id}&ouMode=DESCENDANTS&program=${selectedProgram.program?.id}&fields=trackedEntityInstance,attributes,orgUnit,trackedEntityType,enrollments=[enrollment,orgUnit,orgUnitName,status,program,enrollmentDate,trackedEntityInstance]&order=created:DESC&pageSize=10000`
             const teiResponse = await axios.get(routeTeis)
             const teis = teiResponse.data.trackedEntityInstances
 
