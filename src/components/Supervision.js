@@ -629,8 +629,9 @@ const Supervision = ({ me }) => {
     }
 
     const getTeamLead = (dataStoreList = [], eventId) => dataStoreList.reduce((prev, curr) => {
-        if (eventId === curr.tei_event?.event) {
-            prev = curr.equipe?.teamLead || ""
+        const found_sup = curr.supervisions?.find(sup => eventId === sup.tei_event?.event)
+        if (found_sup) {
+            prev = found_sup.equipe?.teamLead || ""
         }
         return prev
     }, "")
