@@ -378,8 +378,6 @@ export const Dashboard = ({ me }) => {
         return prev
     }, [])
         .filter(planification => {
-            console.log("me : ", me.username)
-            console.log("stored by : ", planification.storedBy)
             if (selectedPlanification === PLANIFICATION_PAR_MOI)
                 return me?.username?.toLowerCase() === planification.storedBy?.toLowerCase()
 

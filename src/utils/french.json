@@ -204,5 +204,9 @@
     "Appliquer": "Appliquer",
     "Confirmation": "Confirmation",
     "Confirmation_Planification_Message": "Etes-vous sûre d'avoir rempli tous les formulaires de planification ?",
-    "Veuillez_Remplire_Champ_Obligatoire":"Veuillez remplir tous les champs obligatoires s'il vous plait !"
+    "Veuillez_Remplire_Champ_Obligatoire": "Veuillez remplir tous les champs obligatoires s'il vous plait !",
+    "Team_Lead": "Chef d'équipe",
+    "Who_Is_The_Team_Lead": "Qui est le chef d'équipe ? ",
+    "Please_Select_One_Supervisor_Or_Other_Supervisor": "Veuillez sélectionner ou ajouter un superviseur !",
+    "Please_Select_Team_Lead": "Veuillez selectionner le chef d'équipe"
 }

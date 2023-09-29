@@ -204,9 +204,10 @@
     "Nombre_De_Structure_Trop_Grand": "The Organisation units number that you try to retrieve, is greater than the result found !",
     "Appliquer": "Apply",
     "Confirmation": "Confirmation",
-
-    "Confirmation_Planification_Message":"Are you sure you have completed all the planification forms ?",
-    "Veuillez_Remplire_Champ_Obligatoire":"Please complete all required fields !"
-
-
+    "Confirmation_Planification_Message": "Are you sure you have completed all the planification forms ?",
+    "Veuillez_Remplire_Champ_Obligatoire": "Please complete all required fields !",
+    "Team_Lead": "Team Lead",
+    "Who_Is_The_Team_Lead": "Who is the team lead ? ",
+    "Please_Select_One_Supervisor_Or_Other_Supervisor": "Please select on supervisor or other supervisor !",
+    "Please_Select_Team_Lead": "Please select team lead !"
 }

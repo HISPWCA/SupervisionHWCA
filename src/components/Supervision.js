@@ -86,8 +86,6 @@ const Supervision = ({ me }) => {
     const [programStages, setProgramStages] = useState([])
     const [isNewMappingMode, setIsNewMappingMode] = useState(false)
     const [mappingConfigs, setMappingConfigs] = useState([])
-    const [visibleAnalyticComponentModal, setVisibleAnalyticComponentModal] = useState(false)
-    const [visibleAnalyticComponentPerformanceModal, setVisibleAnalyticComponentPerformanceModal] = useState(false)
     const [analyticIndicatorResults, setAnalyticIndicatorResults] = useState([])
     const [randomResults, setRandomResults] = useState([])
     const [_, setAnalyticErrorMessage] = useState(null)
@@ -100,9 +98,13 @@ const Supervision = ({ me }) => {
     const [favoritPerformanceList, setFavoritPerformanceList] = useState([])
     const [dataElementGroups, setDataElementGroups] = useState([])
 
+    const [visibleTeamLeadContent, setVisibleTeamLeadContent] = useState(false)
+    const [visibleAnalyticComponentModal, setVisibleAnalyticComponentModal] = useState(false)
+    const [visibleAnalyticComponentPerformanceModal, setVisibleAnalyticComponentPerformanceModal] = useState(false)
     const [visibleAddEquipeModal, setVisibleAddEquipeModal] = useState(false)
     const [visibleAddFavoritPerformanceModal, setVisibleAddFavoritPerformanceModal] = useState(false)
 
+    const [selectedTeamLead, setSelectedTeamLead] = useState(null)
     const [selectedStep, setSelectedStep] = useState(0)
     const [selectedSupervisionType, setSelectedSupervisionType] = useState(null)
     const [selectedProgram, setSelectedProgram] = useState(null)
@@ -192,6 +194,17 @@ const Supervision = ({ me }) => {
                 header: `${translate('Unite_Organisation')}`,
             },
             {
+                accessorKey: 'teamLead', //access nested data with dot notation
+                header: `${translate('Team_Lead')}`,
+                cell: ({ cell, row }) => <>
+                    {
+                        cell.getValue()?.trim()?.length > 0 && (
+                            <span key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '6px', marginTop: '2px' }}> {cell.getValue()}</span>
+                        )
+                    }
+                </>
+            },
+            {
                 accessorKey: 'superviseurs',
                 header: `${translate('Superviseurs')}`,
                 Cell: ({ cell, row }) => cell.getValue()?.trim()?.length > 0 && cell.getValue()?.trim()?.split(',')?.length > 0 ? (
@@ -225,7 +238,6 @@ const Supervision = ({ me }) => {
                                 cell.getValue()?.split(',')?.map((sup, index) => (
                                     <div key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '6px', marginTop: '5px' }}> {sup}</div>
                                 ))
-
                         }
                     </div>
                 ) : <></>
@@ -275,6 +287,17 @@ const Supervision = ({ me }) => {
                 {
                     accessorKey: 'libelle', //access nested data with dot notation
                     header: `${translate('Unite_Organisation')}`,
+                },
+                {
+                    accessorKey: 'teamLead', //access nested data with dot notation
+                    header: `${translate('Team_Lead')}`,
+                    cell: ({ cell, row }) => <>
+                        {
+                            cell.getValue()?.trim()?.length > 0 && (
+                                <span key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '6px', marginTop: '2px' }}> {cell.getValue()}</span>
+                            )
+                        }
+                    </>
                 },
                 {
                     accessorKey: 'superviseurs',
@@ -605,6 +628,9 @@ const Supervision = ({ me }) => {
 
     }
 
+    const getTeamLead = () => {
+
+    }
 
     const filterAndGetPlanfications = () => allSupervisionsFromTracker.reduce((prev, current) => {
         if (selectedSupervisionsConfigProgram.generationType === TYPE_GENERATION_AS_TEI) {
@@ -635,6 +661,7 @@ const Supervision = ({ me }) => {
                         trackedEntityInstance,
                         agent: `${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeFirstName?.id)?.value || ''}`,
                         montant: calculateMontant(trackedEntityInstance, eventDate, current.orgUnit, program),
+                        teamLead: "",
                         period: eventDate,
                         superviseurs: superviseurs,
                         enrollment: current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.enrollment,
@@ -663,6 +690,7 @@ const Supervision = ({ me }) => {
                         trackedEntityInstance: en.trackedEntityInstance,
                         agent: `${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeFirstName?.id)?.value || ''}`,
                         period: en?.events[0]?.eventDate,
+                        teamLead: "",
                         superviseurs: selectedSupervisionsConfigProgram?.fieldConfig?.supervisor?.dataElements?.reduce((prevEl, curr) => {
                             const foundedDataValue = en?.events[0]?.dataValues?.find(el => el.dataElement === curr.id)
                             if (foundedDataValue && foundedDataValue.value && foundedDataValue.value?.trim()?.length > 0)
@@ -704,6 +732,7 @@ const Supervision = ({ me }) => {
                         orgUnit: currentEnrollment?.orgUnit,
                         storedBy: currentEnrollment?.storedBy,
                         libelle: currentEnrollment?.orgUnitName,
+                        teamLead: "",
                         superviseurs: selectedSupervisionsConfigProgram?.fieldConfig?.supervisor?.dataElements?.reduce((prevEl, curr) => {
                             const foundedDataValue = ev?.dataValues?.find(el => el.dataElement === curr.id)
                             if (foundedDataValue && foundedDataValue.value && foundedDataValue.value?.trim()?.length > 0)
@@ -720,6 +749,8 @@ const Supervision = ({ me }) => {
 
         return prev
     }, [])
+        .sort((a, b) => parseInt(dayjs(b.period).valueOf()) - parseInt(dayjs(a.period).valueOf()))
+
 
     const handleSaveNewMappingConfig = async () => {
         try {
@@ -2112,6 +2143,8 @@ const Supervision = ({ me }) => {
                 setInputEquipeAutreSuperviseur('')
                 setSelectedEquipeAutreSuperviseurs([])
                 setSelectedEquipeSuperviseurs([])
+                setVisibleTeamLeadContent(false)
+                setSelectedTeamLead(null)
                 setNotification({ show: true, message: translate('Suppression_Effectuee'), type: NOTIFICATION_SUCCESS })
             }
         } catch (err) {
@@ -2125,28 +2158,36 @@ const Supervision = ({ me }) => {
         setSelectedEquipeAutreSuperviseurs([])
         setSelectedEquipeSuperviseurs([])
         setVisibleAddEquipeModal(false)
+        setVisibleTeamLeadContent(false)
+        setSelectedTeamLead(null)
     }
 
     const handleAddNewEquipeSave = () => {
         try {
-            if (selectedEquipeSuperviseurs.length > 0) {
+            if (selectedEquipeAutreSuperviseurs.length === 0 && selectedEquipeSuperviseurs.length === 0)
+                throw new Error(translate("Please_Select_One_Supervisor_Or_Other_Supervisor"))
 
-                if (equipeList.map(e => e.name).includes(inputEquipeName))
-                    throw new Error(translate('Equipe_Deja_Ajouter'))
+            if (!selectedTeamLead || selectedTeamLead.trim()?.length === 0)
+                throw new Error(translate("Please_Select_Team_Lead"))
 
-                const equipePayload = {
-                    name: inputEquipeName,
-                    superviseurs: selectedEquipeSuperviseurs,
-                    autreSuperviseurs: selectedEquipeAutreSuperviseurs
-                }
-                setEquipeList([equipePayload, ...equipeList])
-                setInputEquipeAutreSuperviseur('')
-                setSelectedEquipeAutreSuperviseurs([])
-                setSelectedEquipeSuperviseurs([])
-                setInputEquipeName('')
-                setVisibleAddEquipeModal(false)
-                setNotification({ show: true, message: translate('Equipe_Ajouter'), type: NOTIFICATION_SUCCESS })
+            if (equipeList.map(e => e.name).includes(inputEquipeName))
+                throw new Error(translate('Equipe_Deja_Ajouter'))
+
+            const equipePayload = {
+                name: inputEquipeName,
+                teamLead: selectedTeamLead,
+                superviseurs: selectedEquipeSuperviseurs,
+                autreSuperviseurs: selectedEquipeAutreSuperviseurs
             }
+            setEquipeList([equipePayload, ...equipeList])
+            setInputEquipeAutreSuperviseur('')
+            setSelectedEquipeAutreSuperviseurs([])
+            setSelectedEquipeSuperviseurs([])
+            setInputEquipeName('')
+            setVisibleAddEquipeModal(false)
+            setVisibleTeamLeadContent(false)
+            setSelectedTeamLead(null)
+            setNotification({ show: true, message: translate('Equipe_Ajouter'), type: NOTIFICATION_SUCCESS })
         } catch (err) {
             setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
         }
@@ -2169,82 +2210,107 @@ const Supervision = ({ me }) => {
                 </ModalTitle>
                 <ModalContent>
                     <div style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '5px' }}>
-                        <div>
-                            <div style={{ marginBottom: '5px' }}>{translate('Nom_De_Equipe')}</div>
-                            <Input
-                                placeholder={translate('Nom_De_Equipe')}
-                                style={{ width: '100%' }}
-                                value={inputEquipeName}
-                                onChange={event => setInputEquipeName(event.target.value)}
-                            />
-                        </div>
-
-                        <div style={{ marginTop: '10px' }}>
-                            <div style={{ marginBottom: '5px' }}>{translate('Superviseurs')}</div>
-                            <Select
-                                placeholder={translate('Superviseurs')}
-                                style={{ width: '100%' }}
-                                loading={loadingUsers}
-                                disabled={loadingUsers}
-                                value={selectedEquipeSuperviseurs.map(sup => sup.id)}
-                                onChange={handleSelectSuperviseurs}
-                                mode='multiple'
-                                optionFilterProp='label'
-                                showSearch
-                                allowClear
-                                options={users.map(user => ({ label: user.displayName, value: user.id }))}
-                            />
-                        </div>
-                        <div style={{ marginTop: '10px' }}>
-                            <div style={{ marginBottom: '5px' }}>{translate('Autre_Superviseurs')}</div>
-                            <Row gutter={[10, 10]}>
-                                <Col md={19} sm={24}>
-                                    <Input
-                                        placeholder={translate('Autre_Superviseurs')}
-                                        value={inputEquipeAutreSuperviseur}
-                                        style={{ width: '100%' }}
-                                        onChange={event => setInputEquipeAutreSuperviseur(event.target.value)}
-                                    />
-                                </Col>
-                                <Col flex='auto' style={{ textAlign: 'right' }}>
-                                    <Button
-                                        primary
-                                        onClick={handleAddEquipeAutreSuperviseurs}
-                                        disabled={!inputEquipeAutreSuperviseur?.trim() || selectedEquipeAutreSuperviseurs.map(e => e.displayName?.trim()).includes(inputEquipeAutreSuperviseur?.trim())}
-                                    >+ {translate('Ajouter')} </Button>
-                                </Col>
-                            </Row>
-                        </div>
                         {
-                            selectedEquipeAutreSuperviseurs.length > 0 && (
-                                <div style={{ marginTop: '20px' }}>
-                                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                        {
-                                            selectedEquipeAutreSuperviseurs.map(item => (
-                                                <tr>
-                                                    <td style={{ padding: '5px', border: '1px solid #ccc' }}>
-                                                        <div>{item}</div>
-                                                    </td>
-                                                    <td style={{ padding: '5px', border: '1px solid #ccc', width: '50px' }}>
-                                                        <div>
-                                                            <Popconfirm
-                                                                title={translate('Suppression')}
-                                                                description={translate('Confirmation_Suppression_Superviseur')}
-                                                                icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
-                                                                onConfirm={() => {
-                                                                    setInputEquipeAutreSuperviseur('')
-                                                                    setSelectedEquipeAutreSuperviseurs(selectedEquipeAutreSuperviseurs.filter(e => e !== item))
-                                                                }}
-                                                            >
-                                                                <RiDeleteBinLine style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }} />
-                                                            </Popconfirm>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        }
-                                    </table>
-                                </div>
+                            visibleTeamLeadContent ? (
+                                <>
+                                    <div>
+                                        <div style={{ marginBottom: '5px' }}>{translate('Who_Is_The_Team_Lead')}</div>
+                                        <Select
+                                            placeholder={translate('Team_Lead')}
+                                            style={{ width: '100%' }}
+                                            value={selectedTeamLead}
+                                            onChange={(value) => setSelectedTeamLead(value)}
+                                            optionFilterProp='label'
+                                            showSearch
+                                            allowClear
+                                            options={[
+                                                ...selectedEquipeSuperviseurs,
+                                                ...selectedEquipeAutreSuperviseurs,
+                                            ].map(user => user.id && user.id.length > 0 ? { label: user.displayName, value: user.displayName } : { label: user, value: user })}
+                                        />
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div>
+                                        <div style={{ marginBottom: '5px' }}>{translate('Nom_De_Equipe')}</div>
+                                        <Input
+                                            placeholder={translate('Nom_De_Equipe')}
+                                            style={{ width: '100%' }}
+                                            value={inputEquipeName}
+                                            onChange={event => setInputEquipeName(event.target.value)}
+                                        />
+                                    </div>
+
+                                    <div style={{ marginTop: '10px' }}>
+                                        <div style={{ marginBottom: '5px' }}>{translate('Superviseurs')}</div>
+                                        <Select
+                                            placeholder={translate('Superviseurs')}
+                                            style={{ width: '100%' }}
+                                            loading={loadingUsers}
+                                            disabled={loadingUsers}
+                                            value={selectedEquipeSuperviseurs.map(sup => sup.id)}
+                                            onChange={handleSelectSuperviseurs}
+                                            mode='multiple'
+                                            optionFilterProp='label'
+                                            showSearch
+                                            allowClear
+                                            options={users.map(user => ({ label: user.displayName, value: user.id }))}
+                                        />
+                                    </div>
+                                    <div style={{ marginTop: '10px' }}>
+                                        <div style={{ marginBottom: '5px' }}>{translate('Autre_Superviseurs')}</div>
+                                        <Row gutter={[10, 10]}>
+                                            <Col md={19} sm={24}>
+                                                <Input
+                                                    placeholder={translate('Autre_Superviseurs')}
+                                                    value={inputEquipeAutreSuperviseur}
+                                                    style={{ width: '100%' }}
+                                                    onChange={event => setInputEquipeAutreSuperviseur(event.target.value)}
+                                                />
+                                            </Col>
+                                            <Col flex='auto' style={{ textAlign: 'right' }}>
+                                                <Button
+                                                    primary
+                                                    onClick={handleAddEquipeAutreSuperviseurs}
+                                                    disabled={!inputEquipeAutreSuperviseur?.trim() || selectedEquipeAutreSuperviseurs.map(e => e.displayName?.trim()).includes(inputEquipeAutreSuperviseur?.trim())}
+                                                >+ {translate('Ajouter')} </Button>
+                                            </Col>
+                                        </Row>
+                                    </div>
+                                    {
+                                        selectedEquipeAutreSuperviseurs.length > 0 && (
+                                            <div style={{ marginTop: '20px' }}>
+                                                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                                    {
+                                                        selectedEquipeAutreSuperviseurs.map(item => (
+                                                            <tr>
+                                                                <td style={{ padding: '5px', border: '1px solid #ccc' }}>
+                                                                    <div>{item}</div>
+                                                                </td>
+                                                                <td style={{ padding: '5px', border: '1px solid #ccc', width: '50px' }}>
+                                                                    <div>
+                                                                        <Popconfirm
+                                                                            title={translate('Suppression')}
+                                                                            description={translate('Confirmation_Suppression_Superviseur')}
+                                                                            icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+                                                                            onConfirm={() => {
+                                                                                setInputEquipeAutreSuperviseur('')
+                                                                                setSelectedEquipeAutreSuperviseurs(selectedEquipeAutreSuperviseurs.filter(e => e !== item))
+                                                                            }}
+                                                                        >
+                                                                            <RiDeleteBinLine style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }} />
+                                                                        </Popconfirm>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        ))
+                                                    }
+                                                </table>
+                                            </div>
+                                        )
+                                    }
+                                </>
                             )
                         }
                     </div>
@@ -2254,13 +2320,25 @@ const Supervision = ({ me }) => {
                         <Button destructive onClick={() => handleAddNewEquipeClose()} icon={<CgCloseO style={{ fontSize: "18px" }} />}>
                             {translate('Annuler')}
                         </Button>
-                        <Button
-                            primary
-                            disabled={inputEquipeName?.trim()?.length > 0 ? false : true}
-                            onClick={() => handleAddNewEquipeSave()}
-                            icon={<FiSave style={{ fontSize: "18px" }} />}>
-                            {translate('Enregistrer')}
-                        </Button>
+                        {
+                            visibleTeamLeadContent ? (
+                                <Button
+                                    primary
+                                    disabled={selectedTeamLead?.trim()?.length > 0 ? false : true}
+                                    onClick={() => handleAddNewEquipeSave()}
+                                    icon={<FiSave style={{ fontSize: "18px" }} />}>
+                                    {translate('Enregistrer')}
+                                </Button>
+                            ) : (
+                                <Button
+                                    primary
+                                    disabled={inputEquipeName?.trim()?.length > 0 ? false : true}
+                                    onClick={() => setVisibleTeamLeadContent(true)}
+                                    icon={<FiSave style={{ fontSize: "18px" }} />}>
+                                    {translate('Enregistrer')}
+                                </Button>
+                            )
+                        }
                     </ButtonStrip>
                 </ModalActions>
             </Modal>
@@ -2375,6 +2453,7 @@ const Supervision = ({ me }) => {
                         <thead>
                             <tr>
                                 <th style={{ padding: '5px', border: '1px solid #ccc' }}>{translate('Nom')}</th>
+                                <th style={{ padding: '5px', border: '1px solid #ccc' }}>{translate('Team_Lead')}</th>
                                 <th style={{ padding: '5px', border: '1px solid #ccc' }}>{translate('Superviseurs')}</th>
                                 <th style={{ padding: '5px', border: '1px solid #ccc' }}>{translate('Actions')}</th>
                             </tr>
@@ -2393,6 +2472,11 @@ const Supervision = ({ me }) => {
                                 equipeList.map((eq, index) => (
                                     <tr key={index}>
                                         <td style={{ padding: '5px', border: '1px solid #ccc', width: '100px' }}> {eq.name}</td>
+                                        <td style={{ padding: '5px', border: '1px solid #ccc', width: '100px' }}>
+                                            <span style={{ background: '#0a939640', padding: '5px', borderRadius: '8px', fontSize: '12px', marginRight: '2px', marginTop: '2px' }}>
+                                                {eq.teamLead}
+                                            </span>
+                                        </td>
                                         <td style={{ padding: '5px', border: '1px solid #ccc' }}>
                                             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
                                                 {
@@ -4129,8 +4213,6 @@ const Supervision = ({ me }) => {
             setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
         }
     }
-
-
 
     const RenderAgentConfigList = () => (
         <>
