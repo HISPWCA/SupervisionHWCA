@@ -628,9 +628,12 @@ const Supervision = ({ me }) => {
 
     }
 
-    const getTeamLead = () => {
-
-    }
+    const getTeamLead = (dataStoreList = [], eventId) => dataStoreList.reduce((prev, curr) => {
+        if (eventId === curr.tei_event?.event) {
+            prev = curr.equipe?.teamLead || ""
+        }
+        return prev
+    }, "")
 
     const filterAndGetPlanfications = () => allSupervisionsFromTracker.reduce((prev, current) => {
         if (selectedSupervisionsConfigProgram.generationType === TYPE_GENERATION_AS_TEI) {
@@ -638,7 +641,9 @@ const Supervision = ({ me }) => {
                 selectedPeriodSupervisionConfig && dayjs(current.created).format('YYYYMM') === dayjs(selectedPeriodSupervisionConfig).format('YYYYMM') &&
                 current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)
             ) {
-                const eventDate = current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events[0]?.eventDate
+                const found_event = current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events[0]
+                const eventDate = found_event?.eventDate
+                const eventId = found_event?.event
                 const trackedEntityInstance = current.trackedEntityInstance
                 const program = current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.program
 
@@ -661,7 +666,7 @@ const Supervision = ({ me }) => {
                         trackedEntityInstance,
                         agent: `${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeFirstName?.id)?.value || ''}`,
                         montant: calculateMontant(trackedEntityInstance, eventDate, current.orgUnit, program),
-                        teamLead: "",
+                        teamLead: getTeamLead(dataStoreSupervisions, eventId),
                         period: eventDate,
                         superviseurs: superviseurs,
                         enrollment: current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.enrollment,
@@ -690,7 +695,7 @@ const Supervision = ({ me }) => {
                         trackedEntityInstance: en.trackedEntityInstance,
                         agent: `${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeFirstName?.id)?.value || ''}`,
                         period: en?.events[0]?.eventDate,
-                        teamLead: "",
+                        teamLead: getTeamLead(dataStoreSupervisions, en?.events[0]?.event),
                         superviseurs: selectedSupervisionsConfigProgram?.fieldConfig?.supervisor?.dataElements?.reduce((prevEl, curr) => {
                             const foundedDataValue = en?.events[0]?.dataValues?.find(el => el.dataElement === curr.id)
                             if (foundedDataValue && foundedDataValue.value && foundedDataValue.value?.trim()?.length > 0)
@@ -726,6 +731,7 @@ const Supervision = ({ me }) => {
                         trackedEntityInstance: currentEnrollment?.trackedEntityInstance,
                         agent: `${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeFirstName?.id)?.value || ''}`,
                         period: ev.eventDate,
+                        teamLead: getTeamLead(dataStoreSupervisions, ev.event),
                         montant: calculateMontant(currentEnrollment?.trackedEntityInstance, ev.eventDate, currentEnrollment?.orgUnit, currentEnrollment?.program),
                         enrollment: currentEnrollment?.enrollment,
                         program: currentEnrollment?.program,
@@ -1079,7 +1085,7 @@ const Supervision = ({ me }) => {
 
             await createEvents({ events: newEventsList })
 
-            const currentTEI = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}/${tei_id}?fields=*`)
+            const currentTEI = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}/${tei_id}?fields=*,enrollments`)
             return currentTEI.data
 
         } catch (err) {
@@ -1235,7 +1241,7 @@ const Supervision = ({ me }) => {
 
                 await createEvents({ events: newEventsList })
 
-                const currentTEI = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}/${current_tei.trackedEntityInstance}?program=${selectedProgram.program?.id}`)
+                const currentTEI = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}/${current_tei.trackedEntityInstance}?program=${selectedProgram.program?.id}&fields=*,enrollments`)
                 const currentTEIData = currentTEI.data
                 return currentTEIData
             }
@@ -1401,7 +1407,7 @@ const Supervision = ({ me }) => {
 
                 await createEvents({ events: newEventsList })
 
-                const currentTEI = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}/${current_tei.trackedEntityInstance}?program=${selectedProgram.program?.id}`)
+                const currentTEI = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}/${current_tei.trackedEntityInstance}?program=${selectedProgram.program?.id}&fields=*,enrollments`)
                 const currentTEIData = currentTEI.data
                 return currentTEIData
             }
@@ -1414,10 +1420,52 @@ const Supervision = ({ me }) => {
 
     const handleSelectOrgUnitGroup = (values) => setSelectedOrganisationUnitGroups(values.map(val => organisationUnitGroups.find(orgGp => orgGp.id === val)))
 
-    const savePanificationToDataStore = async (payload) => {
+    const savePanificationToDataStore = async (payloadList) => {
         try {
-            if (payload) {
-                await saveDataToDataStore(process.env.REACT_APP_SUPERVISIONS_KEY, payload)
+
+            if (payloadList) {
+                const newPayload = payloadList.map(payload => (
+                    {
+                        id: payload.id,
+                        program: payload.program,
+                        dataSources: payload.dataSources,
+                        supervisions: payload.supervisions?.map(sup => ({
+                            id: sup.id,
+                            organisationUnit: sup.organisationUnit,
+                            program: sup.program,
+                            payment: sup.payment,
+                            period: sup.period,
+                            equipe: { ...sup.equipe, superviseurs: sup.equipe?.superviseurs?.map(equipSup => ({ id: equipSup.id, name: equipSup.name })) || [] },
+                            tei_event: sup.tei?.enrollments?.reduce((prev, curr) => {
+                                if (curr.orgUnit === sup.tei.orgUnit && curr.program === sup.program?.id) {
+                                    const corresponding_event = curr.events?.find(ev => (dayjs(ev.eventDate).format('YYYY-MM-DD') === dayjs(sup.period).format('YYYY-MM-DD')) || dayjs(ev.dueDate).format('YYYY-MM-DD') === dayjs(sup.period).format('YYYY-MM-DD'))
+
+                                    if (corresponding_event) {
+                                        prev = {
+                                            ...prev,
+                                            event: corresponding_event.event,
+                                            orgUnit: corresponding_event.orgUnit,
+                                            enrollment: corresponding_event.enrollment,
+                                            program: corresponding_event.program,
+                                            programStage: corresponding_event.programStage,
+                                            trackedEntityInstance: corresponding_event.trackedEntityInstance,
+                                            orgUnitName: corresponding_event.orgUnitName,
+                                            created: corresponding_event.created,
+                                            dueDate: corresponding_event.dueDate,
+                                            eventDate: corresponding_event.eventDate,
+                                            storedBy: corresponding_event.storedBy,
+                                            status: corresponding_event.status,
+                                        }
+                                    }
+                                }
+                                return prev
+                            }, {})
+
+                        })) || []
+                    }
+                ))
+
+                await saveDataToDataStore(process.env.REACT_APP_SUPERVISIONS_KEY, newPayload)
             }
         } catch (err) {
             throw err
@@ -1669,7 +1717,7 @@ const Supervision = ({ me }) => {
 
             await createEvents({ events: newEventsList })
 
-            const currentTEI = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}/${existing_tei.enrollments[0].trackedEntityInstance}?fields=*`)
+            const currentTEI = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}/${existing_tei.enrollments[0].trackedEntityInstance}?fields=*,enrollments`)
             return currentTEI.data
 
         } catch (err) {
