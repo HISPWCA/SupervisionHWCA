@@ -122,7 +122,7 @@ export const Body = () => {
             }
 
             {
-                isAuthorised() && (
+                me.authorities?.includes("ALL") && (
                     <div className={`menu-item ${renderPage === PAGE_SUPERVISIONS ? 'active' : ''}`} onClick={_ => handleClickMenu(PAGE_SUPERVISIONS)}>
                         <span><MdOutlineEditNote style={{ fontSize: '22px' }} /></span>
                         <span style={{ marginLeft: '10px' }}>{translate('Planifications')}</span>

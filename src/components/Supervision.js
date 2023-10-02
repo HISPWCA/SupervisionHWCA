@@ -187,7 +187,6 @@ const Supervision = ({ me }) => {
 
 
     const columns = () => {
-
         return selectedSupervisionsConfigProgram?.planificationType === ORGANISATION_UNIT ? [
             {
                 accessorKey: 'libelle', //access nested data with dot notation
@@ -196,13 +195,15 @@ const Supervision = ({ me }) => {
             {
                 accessorKey: 'teamLead', //access nested data with dot notation
                 header: `${translate('Team_Lead')}`,
-                cell: ({ cell, row }) => <>
-                    {
-                        cell.getValue()?.trim()?.length > 0 && (
-                            <span key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '6px', marginTop: '2px' }}> {cell.getValue()}</span>
-                        )
-                    }
-                </>
+                cell: ({ cell, row }) => (
+                    <>
+                        {
+                            cell.getValue()?.trim()?.length > 0 && (
+                                <span key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '6px', marginTop: '2px' }}> {cell.getValue()}</span>
+                            )
+                        }
+                    </>
+                )
             },
             {
                 accessorKey: 'superviseurs',
@@ -291,13 +292,15 @@ const Supervision = ({ me }) => {
                 {
                     accessorKey: 'teamLead', //access nested data with dot notation
                     header: `${translate('Team_Lead')}`,
-                    cell: ({ cell, row }) => <>
-                        {
-                            cell.getValue()?.trim()?.length > 0 && (
-                                <span key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '6px', marginTop: '2px' }}> {cell.getValue()}</span>
-                            )
-                        }
-                    </>
+                    cell: ({ cell, row }) => (
+                        <>
+                            {
+                                cell.getValue()?.trim()?.length > 0 && (
+                                    <span key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '6px', marginTop: '2px' }}> {cell.getValue()}</span>
+                                )
+                            }
+                        </>
+                    )
                 },
                 {
                     accessorKey: 'superviseurs',
@@ -629,6 +632,7 @@ const Supervision = ({ me }) => {
     }
 
     const getTeamLead = (dataStoreList = [], eventId) => dataStoreList.reduce((prev, curr) => {
+
         const found_sup = curr.supervisions?.find(sup => eventId === sup.tei_event?.event)
         if (found_sup) {
             prev = found_sup.equipe?.teamLead || ""
@@ -739,7 +743,6 @@ const Supervision = ({ me }) => {
                         orgUnit: currentEnrollment?.orgUnit,
                         storedBy: currentEnrollment?.storedBy,
                         libelle: currentEnrollment?.orgUnitName,
-                        teamLead: "",
                         superviseurs: selectedSupervisionsConfigProgram?.fieldConfig?.supervisor?.dataElements?.reduce((prevEl, curr) => {
                             const foundedDataValue = ev?.dataValues?.find(el => el.dataElement === curr.id)
                             if (foundedDataValue && foundedDataValue.value && foundedDataValue.value?.trim()?.length > 0)
@@ -858,7 +861,6 @@ const Supervision = ({ me }) => {
         setSelectedDataElement(null)
         setSelectedAgents([])
         setSelectedOrganisationUnitSingle(null)
-
 
         loadProgramStages(sup.program?.id)
         setSelectedProgram(sup)
