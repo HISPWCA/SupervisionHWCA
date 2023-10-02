@@ -199,7 +199,7 @@ const Supervision = ({ me }) => {
                     <>
                         {
                             cell.getValue()?.trim()?.length > 0 && (
-                                <span style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '4px', fontWeight: 'bold', marginTop: '2px' }}> {cell.getValue()}</span>
+                                <span style={{ background: '#0A939640', fontSize: '12px', padding: '5px', marginRight: '5px', fontWeight: 'bold', borderRadius: '6px', marginTop: '2px' }}> {cell.getValue()}</span>
                             )
                         }
                     </>
@@ -296,7 +296,7 @@ const Supervision = ({ me }) => {
                         <>
                             {
                                 cell.getValue()?.trim()?.length > 0 && (
-                                    <span style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '4px', fontWeight: 'bold', marginTop: '2px' }}> {cell.getValue()}</span>
+                                    <span style={{ background: '#0A939640', fontSize: '12px', padding: '5px', marginRight: '5px', fontWeight: 'bold', borderRadius: '6px', marginTop: '2px' }}> {cell.getValue()}</span>
                                 )
                             }
                         </>
