@@ -199,7 +199,7 @@ const Supervision = ({ me }) => {
                     <>
                         {
                             cell.getValue()?.trim()?.length > 0 && (
-                                <span key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '6px', marginTop: '2px' }}> {cell.getValue()}</span>
+                                <span style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '4px', fontWeight: 'bold', marginTop: '2px' }}> {cell.getValue()}</span>
                             )
                         }
                     </>
@@ -292,11 +292,11 @@ const Supervision = ({ me }) => {
                 {
                     accessorKey: 'teamLead', //access nested data with dot notation
                     header: `${translate('Team_Lead')}`,
-                    cell: ({ cell, row }) => (
+                    Cell: ({ cell, row }) => (
                         <>
                             {
                                 cell.getValue()?.trim()?.length > 0 && (
-                                    <span key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '6px', marginTop: '2px' }}> {cell.getValue()}</span>
+                                    <span style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '4px', fontWeight: 'bold', marginTop: '2px' }}> {cell.getValue()}</span>
                                 )
                             }
                         </>
@@ -334,6 +334,7 @@ const Supervision = ({ me }) => {
 
                             }
                         </div>
+
                     ) : <></>
                 },
                 {
