@@ -195,7 +195,7 @@ const Supervision = ({ me }) => {
             {
                 accessorKey: 'teamLead', //access nested data with dot notation
                 header: `${translate('Team_Lead')}`,
-                cell: ({ cell, row }) => (
+                Cell: ({ cell, row }) => (
                     <>
                         {
                             cell.getValue()?.trim()?.length > 0 && (
