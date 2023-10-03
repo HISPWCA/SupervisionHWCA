@@ -576,6 +576,7 @@ export const Dashboard = ({ me }) => {
         return '0%'
     }
 
+
     const getFiveLastPlanifications = () => filterAndGetPlanfications().slice(0, 5).map((planification) => ({
         ...planification,
         key: planification.trackedEntityInstance,
@@ -784,16 +785,6 @@ export const Dashboard = ({ me }) => {
                 </>
             )
         },
-        // {
-        //     title: translate('Status_Paiement'), key: 'statusPayment', dataIndex: 'statusPayment', width: '150px',
-        //     render: value => (
-        //         <>
-        //             <span className='text-truncate-one' title={getStatusNameAndColorForPayment(value)?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColorForPayment(value)?.color?.background, color: getStatusNameAndColorForPayment(value)?.color?.text, padding: '3px', fontSize: '12px', borderRadius: '5px' }}>
-        //                 {getStatusNameAndColorForPayment(value)?.name}
-        //             </span>
-        //         </>
-        //     )
-        // },
         {
             title: translate('Actions'), key: 'action', width: '50px', dataIndex: 'tei', render: tei => (
                 <div style={{ textAlign: 'center', }}>
