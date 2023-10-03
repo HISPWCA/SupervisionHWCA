@@ -5,7 +5,7 @@ import ReactEchart from 'echarts-for-react'
 import axios from 'axios';
 import { DATA_ELEMENT_OPTION_SETS, ORGANISATION_UNITS_ROUTE, SERVER_URL, TRACKED_ENTITY_INSTANCES_ROUTE, USERS_ROUTE } from '../utils/api.routes'
 import OrganisationUnitsTree from './OrganisationUnitsTree'
-import { CANCELED, DESCENDANTS, NOTICE_BOX_DEFAULT, NOTIFICATION_CRITICAL, PENDING_VALIDATION, PLANIFICATION_PAR_MOI, PLANIFICATION_PAR_TOUS, PLANIFICATION_PAR_UN_USER, COMPLETED, SCHEDULED, TYPE_GENERATION_AS_ENROLMENT, TYPE_GENERATION_AS_EVENT, TYPE_GENERATION_AS_TEI, NA, PAYMENT_DONE, PENDING_PAYMENT, AGENT } from '../utils/constants'
+import { CANCELED, DESCENDANTS, NOTICE_BOX_DEFAULT, NOTIFICATION_CRITICAL, PENDING_VALIDATION, PLANIFICATION_PAR_MOI, PLANIFICATION_PAR_TOUS, PLANIFICATION_PAR_UN_USER, COMPLETED, SCHEDULED, TYPE_GENERATION_AS_ENROLMENT, TYPE_GENERATION_AS_EVENT, TYPE_GENERATION_AS_TEI, NA, PAYMENT_DONE, PENDING_PAYMENT, AGENT, MES_PLANIFICATIONS } from '../utils/constants'
 import MapView from './MapView'
 import { loadDataStore } from '../utils/functions'
 import { IoMdOpen } from 'react-icons/io'
@@ -47,7 +47,7 @@ export const Dashboard = ({ me }) => {
     const [statusPaymentOptions, setStatusPaymentOptions] = useState([])
 
     const [selectedOrganisationUnit, setSelectedOrganisationUnit] = useState(null)
-    const [selectedPlanification, setSelectedPlanification] = useState(PLANIFICATION_PAR_MOI)
+    const [selectedPlanification, setSelectedPlanification] = useState(MES_PLANIFICATIONS)
     const [selectedPeriod, setSelectedPeriod] = useState(dayjs(new Date()))
     const [selectedPlanificationUser, setSelectedPlanificationUser] = useState(null)
     const [selectedSupervisors, setSelectedSupervisors] = useState([])
@@ -178,7 +178,7 @@ export const Dashboard = ({ me }) => {
                 const currentProgram = progs[0]
                 const currentOrgUnit = orgUnits.find(ou => ou.id === me?.organisationUnits?.[0]?.id)
                 const currentPeriod = dayjs()
-                const currentPlanification = PLANIFICATION_PAR_MOI
+                const currentPlanification = MES_PLANIFICATIONS
 
                 if (currentProgram) {
                     setSelectedProgram(currentProgram)
@@ -303,11 +303,25 @@ export const Dashboard = ({ me }) => {
             ) {
                 const eventDate = current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.events[0]?.eventDate
 
+                const superviseursEvents = selectedProgram?.fieldConfig?.supervisor?.dataElements?.reduce((prevEl, curr) => {
+                    const foundedDataValue = current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.events[0]?.dataValues?.find(el => el.dataElement === curr.id)
+                    if (foundedDataValue)
+                        prevEl.push(foundedDataValue)
+                    return prevEl
+                }, []) || []
+
+                const superviseurs = superviseursEvents.reduce((prevEl, curr) => {
+                    if (curr.value && curr.value?.trim()?.length > 0)
+                        prevEl.push(curr.value)
+                    return prevEl
+                }, [])
+
                 return [
                     ...prev,
                     {
                         trackedEntityInstance: current.trackedEntityInstance,
                         period: eventDate,
+                        superviseurs: superviseurs,
                         agent: `${current.attributes?.find(att => att.attribute === selectedProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedProgram?.attributeFirstName?.id)?.value || ''}`,
                         enrollment: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.enrollment,
                         program: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.program,
@@ -337,6 +351,12 @@ export const Dashboard = ({ me }) => {
                         period: en?.events[0]?.eventDate,
                         enrollment: en.enrollment,
                         program: en.program,
+                        superviseurs: selectedProgram?.fieldConfig?.supervisor?.dataElements?.reduce((prevEl, curr) => {
+                            const foundedDataValue = en?.events[0]?.dataValues?.find(el => el.dataElement === curr.id)
+                            if (foundedDataValue && foundedDataValue.value && foundedDataValue.value?.trim()?.length > 0)
+                                prevEl.push(foundedDataValue.value)
+                            return prevEl
+                        }, []),
                         orgUnit: current.orgUnit,
                         storedBy: en.storedBy,
                         libelle: en.orgUnitName,
@@ -367,6 +387,13 @@ export const Dashboard = ({ me }) => {
                         program: currentEnrollment?.program,
                         orgUnit: currentEnrollment?.orgUnit,
                         storedBy: ev?.storedBy,
+                        superviseurs: selectedProgram?.fieldConfig?.supervisor?.dataElements?.reduce((prevEl, curr) => {
+                            const foundedDataValue = ev?.dataValues?.find(el => el.dataElement === curr.id)
+                            if (foundedDataValue && foundedDataValue.value && foundedDataValue.value?.trim()?.length > 0)
+                                prevEl.push(foundedDataValue.value)
+
+                            return prevEl
+                        }, []),
                         libelle: currentEnrollment?.orgUnitName,
                         statusSupervision: dayjs(ev.eventDate).isAfter(dayjs()) ? getDefaultStatusSupervisionIfStatusIsNull() : currentEnrollment?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
                         statusPayment: currentEnrollment?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statusPayment?.dataElement?.id)?.value || getDefaultStatusPaymentIfStatusIsNull()
@@ -378,6 +405,10 @@ export const Dashboard = ({ me }) => {
         return prev
     }, [])
         .filter(planification => {
+
+            if (selectedPlanification === MES_PLANIFICATIONS)
+                return planification.superviseurs?.includes(me?.displayName)
+
             if (selectedPlanification === PLANIFICATION_PAR_MOI)
                 return me?.username?.toLowerCase() === planification.storedBy?.toLowerCase()
 
@@ -944,8 +975,12 @@ export const Dashboard = ({ me }) => {
                             style={{ width: '100%' }}
                             options={[
                                 {
+                                    value: MES_PLANIFICATIONS,
+                                    label: translate('My_Planifications'),
+                                },
+                                {
                                     value: PLANIFICATION_PAR_MOI,
-                                    label: translate('Moi'),
+                                    label: translate('Planned_By_Me'),
                                 },
                                 {
                                     value: PLANIFICATION_PAR_TOUS,

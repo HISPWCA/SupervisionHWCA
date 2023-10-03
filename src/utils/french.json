@@ -208,5 +208,7 @@
     "Team_Lead": "Chef d'équipe",
     "Who_Is_The_Team_Lead": "Qui est le chef d'équipe ? ",
     "Please_Select_One_Supervisor_Or_Other_Supervisor": "Veuillez sélectionner ou ajouter un superviseur !",
-    "Please_Select_Team_Lead": "Veuillez selectionner le chef d'équipe"
+    "Please_Select_Team_Lead": "Veuillez selectionner le chef d'équipe",
+    "Planned_By_Me": "Planifié par moi",
+    "My_Planifications": "Mes planifications"
 }

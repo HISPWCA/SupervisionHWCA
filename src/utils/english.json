@@ -209,5 +209,7 @@
     "Team_Lead": "Team Lead",
     "Who_Is_The_Team_Lead": "Who is the team lead ? ",
     "Please_Select_One_Supervisor_Or_Other_Supervisor": "Please select on supervisor or other supervisor !",
-    "Please_Select_Team_Lead": "Please select team lead !"
+    "Please_Select_Team_Lead": "Please select team lead !",
+    "Planned_By_Me": "Planned by me",
+    "My_Planifications": "My Planifications"
 }
