@@ -66,7 +66,7 @@ export const Body = () => {
     const loadMe = async () => {
         try {
             setLoadingMe(true)
-            const meResponse = await axios.get(`${ME_ROUTE},username,organisationUnits[id,displayName],authorities`)
+            const meResponse = await axios.get(`${ME_ROUTE},username,organisationUnits[id,displayName],authorities,userGroups`)
             setMe(meResponse.data)
             setLoadingMe(false)
         }
@@ -121,14 +121,14 @@ export const Body = () => {
                 )
             }
 
-            {
-                me.authorities?.includes("ALL") && (
-                    <div className={`menu-item ${renderPage === PAGE_SUPERVISIONS ? 'active' : ''}`} onClick={_ => handleClickMenu(PAGE_SUPERVISIONS)}>
-                        <span><MdOutlineEditNote style={{ fontSize: '22px' }} /></span>
-                        <span style={{ marginLeft: '10px' }}>{translate('Planifications')}</span>
-                    </div>
-                )
-            }
+            {/* {
+                me.authorities?.includes("ALL") && ( */}
+            <div className={`menu-item ${renderPage === PAGE_SUPERVISIONS ? 'active' : ''}`} onClick={_ => handleClickMenu(PAGE_SUPERVISIONS)}>
+                <span><MdOutlineEditNote style={{ fontSize: '22px' }} /></span>
+                <span style={{ marginLeft: '10px' }}>{translate('Planifications')}</span>
+            </div>
+            {/* )
+            } */}
 
             {
                 isAuthorised() && (

@@ -827,7 +827,6 @@ export const Dashboard = ({ me }) => {
             }
         ]
 
-
     const RenderCharts = () => (
         <Col md={12} sm={24}>
             <Row gutter={[8, 8]}>
