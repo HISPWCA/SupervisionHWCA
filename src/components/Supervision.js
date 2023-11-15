@@ -104,6 +104,7 @@ const Supervision = ({ me }) => {
     const [visibleAnalyticComponentPerformanceModal, setVisibleAnalyticComponentPerformanceModal] = useState(false)
     const [visibleAddEquipeModal, setVisibleAddEquipeModal] = useState(false)
     const [visibleAddFavoritPerformanceModal, setVisibleAddFavoritPerformanceModal] = useState(false)
+    const [visibleAddFavoritBackgroundInformationModal, setVisibleAddFavoritBackgroundInformationModal] = useState(false)
 
     const [selectedBackgroundInformationTypeConfiguration, setSelectedBackgroundInformationTypeConfiguration] = useState(DIRECTE)
     const [selectedBackgroundInformationFavorit, setSelectedBackgroundInformationFavorit] = useState(null)
@@ -137,6 +138,7 @@ const Supervision = ({ me }) => {
     const [selectedDataElementGroup, setSelectedDataElementGroup] = useState(null)
 
     const [inputFavorisName, setInputFavoritName] = useState('')
+    const [inputFavorisNameForBackgroundInforation, setInputFavoritNameForBackgroundInforation] = useState('')
     const [inputEquipeAutreSuperviseur, setInputEquipeAutreSuperviseur] = useState('')
     const [inputMeilleur, setInputMeilleur] = useState(0)
     const [inputMauvais, setInputMauvais] = useState(0)
@@ -148,6 +150,7 @@ const Supervision = ({ me }) => {
     const [inputNbrOrgUnit, setInputNbrOrgUnit] = useState(0)
 
     const [loadingDataStoreSupervisionConfigs, setLoadingDataStoreSupervisionConfigs] = useState(false)
+    const [loadingSaveFavoritBackgroundInformations, setLoadingSaveFavoritBackgroundInformations] = useState(false)
     const [loadingDataStoreSupervisions, setLoadingDataStoreSupervisions] = useState(false)
     const [loadingDataStoreIndicatorConfigs, setLoadingDataStoreIndicatorConfigs] = useState(false)
     const [loadingOrganisationUnits, setLoadingOrganisationUnits] = useState(false)
@@ -162,6 +165,7 @@ const Supervision = ({ me }) => {
     const [loadingOrgUnitsSupervisionsFromTracker, setLoadingOrgUnitsSupervisionsFromTracker] = useState(false)
     const [loadingOrganisationUnitGroups, setLoadingOrganisationUnitGroups] = useState(false)
     const [loadingPerformanceFavoritsConfigs, setLoadingPerformanceFavoritsConfigs] = useState(false)
+    const [loadingBackgroundInformationFavoritsConfigs, setLoadingBackgroundInformationFavoritsConfigs] = useState(false)
     const [loadingDataElementGroups, setLoadingDataElementGroups] = useState(false)
 
     const periodTypesOptions = () => {
@@ -203,7 +207,7 @@ const Supervision = ({ me }) => {
                     <>
                         {
                             cell.getValue()?.trim()?.length > 0 && (
-                                <span style={{ background: '#0A939640', fontSize: '12px', padding: '5px', marginRight: '5px', fontWeight: 'bold', borderRadius: '6px', marginTop: '2px' }}> {cell.getValue()}</span>
+                                <span style={{ background: '#FFF4B0', fontSize: '12px', padding: '6px', marginRight: '5px', fontWeight: 'bold', borderRadius: '6px', marginTop: '2px', border: '1px solid #ccc' }}> {cell.getValue()}</span>
                             )
                         }
                     </>
@@ -222,7 +226,7 @@ const Supervision = ({ me }) => {
                                             <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                                                 {
                                                     cell.getValue()?.split(',')?.map((sup, index) => (
-                                                        <div key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '6px', marginTop: '5px' }}> {sup}</div>
+                                                        <div key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', border: '1px solid #ccc', marginRight: '5px', borderRadius: '6px', marginTop: '5px' }}> {sup}</div>
                                                     ))
                                                 }
                                             </div>
@@ -232,7 +236,7 @@ const Supervision = ({ me }) => {
 
                                             {
                                                 cell.getValue()?.split(',')?.map((sup, index) => index < 3 && (
-                                                    <div key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', cursor: 'pointer', marginRight: '5px', borderRadius: '6px', marginTop: '5px' }}> {sup}</div>
+                                                    <div key={index} style={{ background: '#0A939640', fontSize: '12px', border: '1px solid #ccc', padding: '4px', cursor: 'pointer', marginRight: '5px', borderRadius: '6px', marginTop: '5px' }}> {sup}</div>
                                                 ))
                                             }
                                             <div style={{ cursor: 'pointer', marginLeft: '5px' }}>...</div>
@@ -241,7 +245,7 @@ const Supervision = ({ me }) => {
                                 )
                                 :
                                 cell.getValue()?.split(',')?.map((sup, index) => (
-                                    <div key={index} style={{ background: '#0A939640', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '6px', marginTop: '5px' }}> {sup}</div>
+                                    <div key={index} style={{ background: '#0A939640',  border: '1px solid #ccc', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '6px', marginTop: '5px' }}> {sup}</div>
                                 ))
                         }
                     </div>
@@ -533,7 +537,7 @@ const Supervision = ({ me }) => {
     const loadDataStorePerformanceFavoritsConfigs = async () => {
         try {
             setLoadingPerformanceFavoritsConfigs(true)
-            const response = await loadDataStore(process.env.REACT_APP_PERFORMANCE_FAVORITS_KEY, null, null, null)
+            const response = await loadDataStore(process.env.REACT_APP_PERFORMANCE_FAVORITS_KEY, null, null, [])
 
             setFavoritPerformanceList(response)
             setSelectedFavoritForPerformance(null)
@@ -541,6 +545,20 @@ const Supervision = ({ me }) => {
         }
         catch (err) {
             setLoadingPerformanceFavoritsConfigs(false)
+        }
+    }
+
+    const loadDataStoreBackgroundInformationFavoritsConfigs = async () => {
+        try {
+            setLoadingBackgroundInformationFavoritsConfigs(true)
+            const response = await loadDataStore(process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY, null, null, [])
+
+            setFavoritBackgroundInformationList(response)
+            setSelectedBackgroundInformationFavorit(null)
+            setLoadingBackgroundInformationFavoritsConfigs(false)
+        }
+        catch (err) {
+            setLoadingBackgroundInformationFavoritsConfigs(false)
         }
     }
 
@@ -855,8 +873,6 @@ const Supervision = ({ me }) => {
         setSelectedPlanificationType(value)
     }
 
-
-
     const handleClickFloatingBtn = () => {
         setEditionMode(!isEditionMode)
     }
@@ -867,7 +883,7 @@ const Supervision = ({ me }) => {
         setSelectedAgents([])
         setSelectedOrganisationUnitSingle(null)
         setSelectedBackgroundInformationFavorit(null)
-        setSelectedBackgroundInformationTypeConfiguration(null)
+        setSelectedBackgroundInformationTypeConfiguration(DIRECTE)
         setMappingConfigs([])
 
         loadProgramStages(sup.program?.id)
@@ -2409,17 +2425,21 @@ const Supervision = ({ me }) => {
         setVisibleAddFavoritPerformanceModal(false)
     }
 
+
+
     const handleAddFavoritPerformanceSave = () => {
         try {
             if (!inputFavorisName || inputFavorisName?.trim()?.length === 0)
                 throw new Error(translate('Nom_Obligatoire'))
 
-            if (!selectedFavoritForPerformance && selectedSelectionTypeForPerformance === DIRECTE && favoritPerformanceList.map(f => f.nom).includes(inputFavorisName))
+            if (!selectedFavoritForPerformance && selectedSelectionTypeForPerformance === DIRECTE && favoritPerformanceList.map(f => f.name).includes(inputFavorisName))
                 throw new Error(translate('Favorit_Exist_Deja'))
 
             let payload = {
                 name: inputFavorisName,
-                indicators: selectedIndicators
+                indicators: selectedIndicators,
+                createdAt: dayjs(),
+                updatedAt: dayjs(),
             }
 
             let performanceList = []
@@ -2429,7 +2449,8 @@ const Supervision = ({ me }) => {
                     if (ind.id === selectedFavoritForPerformance?.id) {
                         return {
                             ...ind,
-                            ...payload
+                            ...payload,
+                            updatedAt: dayjs(),
                         }
                     }
                     return ind
@@ -2453,7 +2474,7 @@ const Supervision = ({ me }) => {
 
     const RenderAddFavoritPerformanceModal = () => visibleAddFavoritPerformanceModal && (
         <>
-            <Modal onClose={() => handleAddNewEquipeClose()} dense small>
+            <Modal onClose={handleCloseAddFavoritForPerformance} dense small>
                 <ModalTitle>
                     <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
                         {translate('Enregistrement_Favorit')}
@@ -2461,10 +2482,10 @@ const Supervision = ({ me }) => {
 
                 </ModalTitle>
                 <ModalContent>
-                    <div style={{ marginTop: '10px', padding: '10px', border: '1px solid #ccc', background: "#eee", color: '#00000090', fontSize: '13px' }}>
+                    <div style={{ marginTop: '10px', padding: '10px', border: '1px solid #ccc', background: "#CAF0F8", color: '#00000090', fontSize: '13px' }}>
                         {translate('Nom_Claire_Favorit')}
                     </div>
-                    <div style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '5px', marginTop: '10px' }}>
+                    <div style={{ padding: '10px', border: '1px solid #ccc', borderRadius: '5px', marginTop: '10px' }}>
                         <div>
                             <div style={{ marginBottom: '5px' }}>{translate('Nom')}</div>
                             <Input
@@ -2486,6 +2507,116 @@ const Supervision = ({ me }) => {
                             primary
                             disabled={inputFavorisName?.trim()?.length > 0 ? false : true}
                             onClick={handleAddFavoritPerformanceSave}
+                            icon={<FiSave style={{ fontSize: "18px" }} />}>
+                            {translate('Enregistrer')}
+                        </Button>
+                    </ButtonStrip>
+                </ModalActions>
+            </Modal>
+        </>
+    )
+
+    const handleCloseAddFavoritForBackgroundInformation = () => {
+        setInputFavoritNameForBackgroundInforation('')
+        setVisibleAddFavoritBackgroundInformationModal(false)
+    }
+
+    const handleAddFavoritBackgroundInformationSave = async () => {
+        try {
+            setLoadingSaveFavoritBackgroundInformations(true)
+
+            let backgroundInformationConfigList = []
+            const backgroundInfoList = await loadDataStore(process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY, null, null, [])
+
+            if (!inputFavorisNameForBackgroundInforation || inputFavorisNameForBackgroundInforation?.trim()?.length === 0)
+                throw new Error(translate('Nom_Obligatoire'))
+
+            if (
+                !selectedBackgroundInformationFavorit &&
+                selectedBackgroundInformationTypeConfiguration === DIRECTE &&
+                favoritBackgroundInformationList.map(f => f.name?.trim()).includes(inputFavorisNameForBackgroundInforation?.trim())
+            ) {
+                throw new Error(translate('Favorit_Exist_Deja'))
+            }
+
+            let payload = {
+                name: inputFavorisNameForBackgroundInforation,
+                configs: mappingConfigs,
+                program: selectedProgram?.program,
+                createdAt: dayjs(),
+                updatedAt: dayjs()
+            }
+
+            if (selectedBackgroundInformationTypeConfiguration === FAVORIS && selectedBackgroundInformationFavorit && backgroundInfoList) {
+                backgroundInformationConfigList = backgroundInfoList.map(favo => {
+                    if (favo.id === selectedBackgroundInformationFavorit?.id) {
+                        return {
+                            ...favo,
+                            ...payload,
+                            updatedAt: dayjs()
+                        }
+                    }
+                    return favo
+                })
+
+            } else {
+                payload.id = uuid()
+                backgroundInformationConfigList = [payload, ...backgroundInfoList]
+            }
+
+            saveDataToDataStore(process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY, backgroundInformationConfigList)
+            setFavoritBackgroundInformationList(backgroundInformationConfigList)
+
+            setVisibleAddFavoritBackgroundInformationModal(false)
+            setNotification({ show: true, message: translate('Favorit_Enregistrer_Avec_Succes'), type: NOTIFICATION_SUCCESS })
+            setLoadingSaveFavoritBackgroundInformations(false)
+
+            if (selectedBackgroundInformationTypeConfiguration === DIRECTE) {
+                setInputFavoritNameForBackgroundInforation('')
+            }
+        } catch (err) {
+            setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
+            setLoadingSaveFavoritBackgroundInformations(false)
+            setVisibleAddFavoritBackgroundInformationModal(false)
+        }
+    }
+
+
+    const RenderAddFavoritBackgroundInformationModal = () => visibleAddFavoritBackgroundInformationModal && (
+        <>
+            <Modal onClose={handleCloseAddFavoritForBackgroundInformation} dense small>
+                <ModalTitle>
+                    <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
+                        {translate('Enregistrement_Favorit')}
+                    </div>
+                </ModalTitle>
+                <ModalContent>
+                    <div style={{ marginTop: '10px', padding: '10px', border: '1px solid #ccc', background: "#CAF0F8", color: '#00000090', fontSize: '13px' }}>
+                        {translate('Nom_Claire_Favorit')}
+                    </div>
+                    <div style={{ padding: '10px', border: '1px solid #ccc', borderRadius: '5px', marginTop: '10px' }}>
+                        <div>
+                            <div style={{ marginBottom: '5px' }}>{translate('Nom')}</div>
+                            <Input
+                                placeholder={translate('Nom')}
+                                style={{ width: '100%' }}
+                                value={inputFavorisNameForBackgroundInforation}
+                                onChange={event => setInputFavoritNameForBackgroundInforation(event.target.value)}
+                            />
+                        </div>
+                    </div>
+                </ModalContent>
+                <ModalActions>
+                    <ButtonStrip end>
+                        <Button destructive onClick={handleCloseAddFavoritForBackgroundInformation} icon={<CgCloseO style={{ fontSize: "18px" }} />} small>
+                            {translate('Annuler')}
+                        </Button>
+                        <Button
+                            small
+                            primary
+                            loading={loadingSaveFavoritBackgroundInformations}
+                            disabled={inputFavorisNameForBackgroundInforation?.trim()?.length > 0 ? false : true}
+                            onClick={handleAddFavoritBackgroundInformationSave}
                             icon={<FiSave style={{ fontSize: "18px" }} />}>
                             {translate('Enregistrer')}
                         </Button>
@@ -2698,7 +2829,7 @@ const Supervision = ({ me }) => {
                                             <div style={{ marginLeft: '10px' }}>
                                                 <Popover trigger="hover" content={<>{translate('Enregistrer_Comme_Favorites')}</>}>
                                                     <Button disabled={selectedIndicators.length > 0 ? false : true} small onClick={handleSaveAsFavorites} icon={<MdStars style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }} />}>
-                                                        {translate('Enregistrer')}
+                                                        {translate('Enregistrer_Comme_Favorites')}
                                                     </Button>
                                                 </Popover>
                                             </div>
@@ -3597,7 +3728,7 @@ const Supervision = ({ me }) => {
     )
 
     const handleSaveAsFavoritesForBackgroundInformations = () => {
-
+        setVisibleAddFavoritBackgroundInformationModal(true)
     }
 
     const RenderDataElementConfigList = () => (
@@ -3605,22 +3736,30 @@ const Supervision = ({ me }) => {
             {
                 mappingConfigs.length > 0 && (
                     <div className='my-shadow' style={{ padding: '10px', background: '#FFF', marginBottom: '2px', borderRadius: '8px', marginTop: '10px' }}>
-
                         <div style={{ display: 'flex', justifyContent: "space-between", alignItems: 'center' }}>
-                            <div style={{ marginBottom: '10px', fontWeight: 'bold', fontSize: '16px' }}>{translate('Liste_Configuration_Element_De_Donnees')}</div>
+                            <div style={{ fontWeight: 'bold', fontSize: '16px' }}>{translate('Liste_Configuration_Element_De_Donnees')}</div>
                             <div>
                                 {
-                                    mappingConfigs.length > 0 && selectedBackgroundInformationTypeConfiguration === DIRECTE && (
-                                        <Popover trigger="hover" content={<>{translate('Enregistrer_Comme_Favorites')}</>}>
-                                            <Button disabled={mappingConfigs.length > 0 ? false : true} small onClick={handleSaveAsFavoritesForBackgroundInformations} icon={<MdStars style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }} />}>
-                                                {translate('Enregistrer')}
-                                            </Button>
-                                        </Popover>
+                                    mappingConfigs.length > 0 && (
+                                        <Button
+                                            loading={loadingSaveFavoritBackgroundInformations}
+                                            disabled={mappingConfigs.length > 0 ? false : true}
+                                            // small
+                                            onClick={handleSaveAsFavoritesForBackgroundInformations}
+                                            icon={<MdStars style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }} />}
+                                        >
+                                            {
+                                                selectedBackgroundInformationTypeConfiguration === DIRECTE ?
+                                                    translate('Enregistrer_Comme_Favorites') :
+                                                    translate('Mise_A_Jour')
+                                            }
+                                        </Button>
                                     )
                                 }
                             </div>
                         </div>
 
+                        <hr style={{ margin: '10px auto' }} />
 
                         <Table
                             dataSource={
@@ -3644,11 +3783,11 @@ const Supervision = ({ me }) => {
                                         dataIndex: 'programStageName'
                                     },
                                     {
-                                        title: translate('Element_De_Donnee'),
+                                        title: translate('Form_Field'),
                                         dataIndex: 'dataElementName'
                                     },
                                     {
-                                        title: translate('Indicateur'),
+                                        title: translate('Source_De_Donnée'),
                                         dataIndex: 'indicatorName'
                                     },
                                     {
@@ -3822,15 +3961,25 @@ const Supervision = ({ me }) => {
     }
 
     const handleChangeSelectionTypeConfigurationForBackgroundInformation = ({ value }) => {
-        console.log("value: ", value)
+        setSelectedProgramStage(null)
+        setMappingConfigs([])
+        setSelectedBackgroundInformationFavorit(null)
+
         setSelectedBackgroundInformationTypeConfiguration(value)
     }
 
-    const handleSelectBackgroundInformationFavorit = (value) => setSelectedBackgroundInformationFavorit(favoritBackgroundInformationList.find(b => b.id === value))
+    const handleSelectBackgroundInformationFavorit = (value) => {
+        const currentFav = favoritBackgroundInformationList.find(b => b.id === value)
+        if (currentFav) {
+            setSelectedBackgroundInformationFavorit(currentFav)
+            setInputFavoritNameForBackgroundInforation(currentFav.name)
+            setMappingConfigs(currentFav.configs)
+        }
+    }
 
     const RenderDataElementConfigContent = () => (
-        <>
-            <Card className='my-shadow my-scrollable' bodyStyle={{ padding: '0px', marginTop: '10px', maxHeight: '500px' }} size="small">
+        <div style={{ marginTop: '10px' }}>
+            <Card className='my-shadow my-scrollable' bodyStyle={{ padding: '0px' }} size="small">
                 <div style={{ fontWeight: 'bold', padding: '10px', borderBottom: '1px solid #ccc' }}>{translate('Configurations_Globales')}</div>
                 <div style={{ padding: '10px' }}>
                     <Row gutter={[10, 10]}>
@@ -3863,13 +4012,14 @@ const Supervision = ({ me }) => {
                         {
                             selectedBackgroundInformationTypeConfiguration === FAVORIS && (
                                 <Col md={24}>
-                                    <div style={{ marginTop: '10px' }}>
+                                    <div>
                                         <div style={{ marginBottom: '5px' }}>{translate('Select_Favorit')}</div>
                                         <Select
-                                            options={favoritBackgroundInformationList.map(favorit => ({ label: favorit.displayName, value: favorit.id }))}
+                                            options={favoritBackgroundInformationList.filter(f => f.program?.id === selectedProgram?.program?.id).map(favorit => ({ label: favorit.name, value: favorit.id }))}
                                             placeholder={translate('Select_Favorit')}
                                             style={{ width: '100%' }}
                                             optionFilterProp='label'
+                                            loading={loadingBackgroundInformationFavoritsConfigs}
                                             value={selectedBackgroundInformationFavorit?.id}
                                             onChange={handleSelectBackgroundInformationFavorit}
                                             showSearch
@@ -3884,19 +4034,30 @@ const Supervision = ({ me }) => {
 
                                 <Col md={24}>
                                     <div style={{ marginTop: '10px' }}>
-                                        <div style={{ marginBottom: '5px' }}>{translate('Programmes_Stage')}</div>
-                                        <Select
-                                            options={programStages.map(program => ({ label: program.displayName, value: program.id }))}
-                                            placeholder={translate('Programmes_Stage')}
-                                            style={{ width: '100%' }}
-                                            optionFilterProp='label'
-                                            value={selectedProgramStage?.id}
-                                            onChange={handleSelectProgramStage}
-                                            showSearch
-                                            loading={loadingProgramStages}
-                                            disabled={loadingProgramStages}
-                                        />
+                                        <Button small icon={isNewMappingMode && <ImCancelCircle style={{ color: '#fff', fontSize: '18px' }} />} primary={!isNewMappingMode ? true : false} destructive={isNewMappingMode ? true : false} onClick={handleAddNewMappingConfig}>
+                                            {!isNewMappingMode && <span>+ {translate('Ajouter_Nouveau_Mapping')}</span>}
+                                            {isNewMappingMode && <span>{translate('Annuler_Le_Mapping')}</span>}
+                                        </Button>
                                     </div>
+                                    {
+                                        isNewMappingMode && (
+
+                                            <div style={{ marginTop: '10px' }}>
+                                                <div style={{ marginBottom: '5px' }}>{translate('Programmes_Stage')}</div>
+                                                <Select
+                                                    options={programStages.map(program => ({ label: program.displayName, value: program.id }))}
+                                                    placeholder={translate('Programmes_Stage')}
+                                                    style={{ width: '100%' }}
+                                                    optionFilterProp='label'
+                                                    value={selectedProgramStage?.id}
+                                                    onChange={handleSelectProgramStage}
+                                                    showSearch
+                                                    loading={loadingProgramStages}
+                                                    disabled={loadingProgramStages}
+                                                />
+                                            </div>
+                                        )
+                                    }
                                 </Col>
                             )
                         }
@@ -3905,7 +4066,7 @@ const Supervision = ({ me }) => {
                             selectedBackgroundInformationTypeConfiguration === DIRECTE && (
 
                                 <Col md={24}>
-                                    <div style={{ marginTop: '10px' }}>
+                                    <div>
                                         <div style={{ marginBottom: '5px' }}>{translate('Programmes_Stage')}</div>
                                         <Select
                                             options={programStages.map(program => ({ label: program.displayName, value: program.id }))}
@@ -3919,15 +4080,7 @@ const Supervision = ({ me }) => {
                                             disabled={loadingProgramStages}
                                         />
                                     </div>
-                                </Col>
-                            )
-                        }
-
-                        {
-                            selectedProgramStage && (
-                                <Col md={24} xs={24}>
                                     <Divider style={{ margin: '10px auto' }} />
-
                                     {
                                         selectedProgramStage && (
                                             <Button small icon={isNewMappingMode && <ImCancelCircle style={{ color: '#fff', fontSize: '18px' }} />} primary={!isNewMappingMode ? true : false} destructive={isNewMappingMode ? true : false} onClick={handleAddNewMappingConfig}>
@@ -3936,7 +4089,13 @@ const Supervision = ({ me }) => {
                                             </Button>
                                         )
                                     }
+                                </Col>
+                            )
+                        }
 
+                        {
+                            selectedProgramStage && (
+                                <Col md={24} xs={24}>
                                     {
                                         isNewMappingMode && (
                                             <div style={{ marginTop: '20px' }}>
@@ -3988,7 +4147,7 @@ const Supervision = ({ me }) => {
                                                             selectedProgramStage && (
                                                                 <Col md={12} xs={24}>
                                                                     <div>
-                                                                        <div style={{ marginBottom: '5px' }}>{translate('Elements_De_Donnees')}</div>
+                                                                        <div style={{ marginBottom: '5px' }}>{translate('Form_Field')}</div>
                                                                         <Select
                                                                             options={
                                                                                 selectedProgramStage?.programStageDataElements
@@ -3997,7 +4156,7 @@ const Supervision = ({ me }) => {
                                                                                     )
                                                                                     ?.map(progStageDE => ({ label: progStageDE.dataElement?.displayName, value: progStageDE.dataElement?.id })) || []
                                                                             }
-                                                                            placeholder={translate('Elements_De_Donnees')}
+                                                                            placeholder={translate('Form_Field')}
                                                                             style={{ width: '100%' }}
                                                                             onChange={handleSelectDataElement}
                                                                             value={selectedDataElement?.id}
@@ -4023,7 +4182,7 @@ const Supervision = ({ me }) => {
                                                             </div>
                                                         </Col>
                                                         <Col md={2} xs={24}>
-                                                            <div style={{ marginTop: '22px' }}>
+                                                            <div style={{ marginTop: '28px' }}>
                                                                 <Button small primary icon={<TbSelect style={{ fontSize: '18px', color: '#fff', }} />} onClick={() => setVisibleAnalyticComponentModal(true)}></Button>
                                                             </div>
                                                         </Col>
@@ -4043,7 +4202,7 @@ const Supervision = ({ me }) => {
                     </Row>
                 </div>
             </Card>
-        </>
+        </div>
     )
 
     const handleSelectCheckbox = (orgUnit) => {
@@ -4822,6 +4981,7 @@ const Supervision = ({ me }) => {
             loadOrganisationUnitGroups()
             loadDataStoreSupervisions()
             loadDataStorePerformanceFavoritsConfigs()
+            loadDataStoreBackgroundInformationFavoritsConfigs()
             loadDataStoreIndicators()
             loadDataElementGroups()
             loadUsers(me?.organisationUnits?.[0]?.id)
@@ -4857,6 +5017,7 @@ const Supervision = ({ me }) => {
             {RenderAddEquipeModal()}
             {RenderAnalyticComponenPerformancetModal()}
             {RenderAddFavoritPerformanceModal()}
+            {RenderAddFavoritBackgroundInformationModal()}
             {RenderAnalyticComponentModal()}
             {RenderNoticeBox()}
             <MyNotification notification={notification} setNotification={setNotification} />

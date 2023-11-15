@@ -210,5 +210,8 @@
     "Please_Select_One_Supervisor_Or_Other_Supervisor": "Veuillez sélectionner ou ajouter un superviseur !",
     "Please_Select_Team_Lead": "Veuillez selectionner le chef d'équipe",
     "Planned_By_Me": "Planifié par moi",
-    "My_Planifications": "Mes planifications"
+    "My_Planifications": "Mes planifications",
+    "Create_New_Configuration":"Créer une nouvelle configuration",
+    "Select_Favorit":"Sélectionner la favoris",
+    "Form_Field":"Formulaire"
 }

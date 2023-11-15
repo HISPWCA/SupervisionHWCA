@@ -181,7 +181,7 @@
     "Confirmation_De_Suppression_De_Equipe": "Do you really want to delete this team ? ",
     "Equipes": "Teams",
     "Selectionnez_Indicateurs_De_Performance": "Select indicators: ",
-    "Venant_Des_Favoris": "Comming from favorites ?",
+    "Venant_Des_Favoris": "Favorites ?",
     "Element_De_Performance_Obligatoire": "Please select the performance element !",
     "Indicateurs_Selectionnes": "Indicators selected",
     "Enregistrer_Comme_Favorites": "Save as favorites",
@@ -215,5 +215,6 @@
 
 
     "Create_New_Configuration":"Create new configuration",
-    "Select_Favorit":"Select Favorit"
+    "Select_Favorit":"Select Favorite",
+    "Form_Field":"Form field"
 }

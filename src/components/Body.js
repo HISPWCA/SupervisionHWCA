@@ -35,6 +35,7 @@ export const Body = () => {
             await loadDataStore(process.env.REACT_APP_SUPERVISIONS_KEY, null, null, [])
             await loadDataStore(process.env.REACT_APP_ANALYSES_CONFIG_KEY, null, null, [])
             await loadDataStore(process.env.REACT_APP_PERFORMANCE_FAVORITS_KEY, null, null, [])
+            await loadDataStore(process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY, null, null, [])
             await loadMe()
             setDataStoreInitialized(true)
             setLoadingDataStoreInitialization(false)
@@ -105,7 +106,7 @@ export const Body = () => {
     }
 
     const RenderMenu = () => (
-        <div style={{ borderRight: `1px solid ${BORDER_COLOR}`, width: '250px', height: '100%', padding: '2px 0px' }}>
+        <div style={{ borderRight: `1px solid ${BORDER_COLOR}`, width: '250px', height: '100%', padding: '2px 0px', position: 'relative' }}>
 
             <div className={`menu-item ${renderPage === PAGE_DASHBOARD ? 'active' : ''}`} onClick={_ => handleClickMenu(PAGE_DASHBOARD)}>
                 <span><RxDashboard style={{ fontSize: '22px' }} /></span>
@@ -138,6 +139,11 @@ export const Body = () => {
                     </div>
                 )
             }
+
+            <div style={{ fontSize: '10px', position: 'absolute', bottom: '0px', textAlign: 'center', color: '#00000080', marginBottom: '10px', width: '100%' }}>
+                <span style={{ marginRight: '10px' }}>HWCA</span>
+                ( Version : {process.env.REACT_APP_VERSION} )
+            </div>
         </div>
     )
 
