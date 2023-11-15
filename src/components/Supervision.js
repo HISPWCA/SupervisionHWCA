@@ -97,12 +97,16 @@ const Supervision = ({ me }) => {
     const [equipeList, setEquipeList] = useState([])
     const [favoritPerformanceList, setFavoritPerformanceList] = useState([])
     const [dataElementGroups, setDataElementGroups] = useState([])
+    const [favoritBackgroundInformationList, setFavoritBackgroundInformationList] = useState([])
 
     const [visibleTeamLeadContent, setVisibleTeamLeadContent] = useState(false)
     const [visibleAnalyticComponentModal, setVisibleAnalyticComponentModal] = useState(false)
     const [visibleAnalyticComponentPerformanceModal, setVisibleAnalyticComponentPerformanceModal] = useState(false)
     const [visibleAddEquipeModal, setVisibleAddEquipeModal] = useState(false)
     const [visibleAddFavoritPerformanceModal, setVisibleAddFavoritPerformanceModal] = useState(false)
+
+    const [selectedBackgroundInformationTypeConfiguration, setSelectedBackgroundInformationTypeConfiguration] = useState(DIRECTE)
+    const [selectedBackgroundInformationFavorit, setSelectedBackgroundInformationFavorit] = useState(null)
 
     const [selectedTeamLead, setSelectedTeamLead] = useState(null)
     const [selectedStep, setSelectedStep] = useState(0)
@@ -862,6 +866,9 @@ const Supervision = ({ me }) => {
         setSelectedDataElement(null)
         setSelectedAgents([])
         setSelectedOrganisationUnitSingle(null)
+        setSelectedBackgroundInformationFavorit(null)
+        setSelectedBackgroundInformationTypeConfiguration(null)
+        setMappingConfigs([])
 
         loadProgramStages(sup.program?.id)
         setSelectedProgram(sup)
@@ -2593,41 +2600,6 @@ const Supervision = ({ me }) => {
         setSelectedSelectionTypeForPerformance(value)
     }
 
-    // const handleClickAddIndicatorForPerformance = () => {
-    //     try {
-    //         if (!inputIndicatorNameForPerformance || inputIndicatorNameForPerformance?.trim()?.length === 0 || !inputIndicatorIdForPerformance)
-    //             throw new Error(translate('Element_De_Performance_Obligatoire'))
-
-    //         if (selectedIndicatorsConfiguratedForPerformances.map(ind => ind.indicator?.id).includes(inputIndicatorIdForPerformance))
-    //             throw new Error(translate('Indicateur_Deja_Configurer'))
-
-    //         const paylaod = {
-    //             id: uuid(),
-    //             nom: inputIndicatorNameForPerformance,
-    //             indicator: { displayName: inputIndicatorNameForPerformance, id: inputIndicatorIdForPerformance },
-    //             weight: inputWeightForPerformance,
-    //             bestPositive: inputIndicatorBestPositiveForPerormance
-    //         }
-
-    //         setSelectedIndicatorsConfiguratedForPerformances([...selectedIndicatorsConfiguratedForPerformances, paylaod])
-    //         setSelectedIndicators([...selectedIndicators, paylaod])
-
-    //         setNotification({ show: true, message: translate('Configuration_Ajoutee'), type: NOTIFICATION_SUCCESS })
-    //         setInputWeightForPerformance(0)
-    //         setInputIndicatorNameForPerformance('')
-    //         setInputIndicatorIdForPerformance(null)
-    //         setSelectedElementForPerformances([])
-
-    //     } catch (err) {
-    //         setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
-    //     }
-    // }
-
-
-    // const handleSelectIndicatorsForPerformance = (values) => {
-    //     setSelectedIndicators(values.map(val => selectedIndicatorsConfiguratedForPerformances.find(dsInd => dsInd.indicator?.id === val)))
-    // }
-
     const handleSaveAsFavorites = () => {
         setVisibleAddFavoritPerformanceModal(true)
     }
@@ -3624,12 +3596,32 @@ const Supervision = ({ me }) => {
         </>
     )
 
+    const handleSaveAsFavoritesForBackgroundInformations = () => {
+
+    }
+
     const RenderDataElementConfigList = () => (
         <>
             {
                 mappingConfigs.length > 0 && (
                     <div className='my-shadow' style={{ padding: '10px', background: '#FFF', marginBottom: '2px', borderRadius: '8px', marginTop: '10px' }}>
-                        <div style={{ marginBottom: '10px', fontWeight: 'bold', fontSize: '16px' }}>{translate('Liste_Configuration_Element_De_Donnees')}</div>
+
+                        <div style={{ display: 'flex', justifyContent: "space-between", alignItems: 'center' }}>
+                            <div style={{ marginBottom: '10px', fontWeight: 'bold', fontSize: '16px' }}>{translate('Liste_Configuration_Element_De_Donnees')}</div>
+                            <div>
+                                {
+                                    mappingConfigs.length > 0 && selectedBackgroundInformationTypeConfiguration === DIRECTE && (
+                                        <Popover trigger="hover" content={<>{translate('Enregistrer_Comme_Favorites')}</>}>
+                                            <Button disabled={mappingConfigs.length > 0 ? false : true} small onClick={handleSaveAsFavoritesForBackgroundInformations} icon={<MdStars style={{ color: 'red', fontSize: '20px', cursor: 'pointer' }} />}>
+                                                {translate('Enregistrer')}
+                                            </Button>
+                                        </Popover>
+                                    )
+                                }
+                            </div>
+                        </div>
+
+
                         <Table
                             dataSource={
                                 mappingConfigs.map(mapConf => ({
@@ -3829,149 +3821,230 @@ const Supervision = ({ me }) => {
             setSelectedDataElementGroup(null)
     }
 
+    const handleChangeSelectionTypeConfigurationForBackgroundInformation = ({ value }) => {
+        console.log("value: ", value)
+        setSelectedBackgroundInformationTypeConfiguration(value)
+    }
 
-    const RenderDataElementConfigContent = () => <>
-        <div className='my-shadow' style={{ padding: '20px', background: '#FFF', marginBottom: '2px', borderRadius: '8px', marginTop: '10px' }}>
-            <Row gutter={[10, 10]}>
-                <Col md={24}>
-                    <div style={{ fontWeight: 'bold' }}>{translate('Configurations_Globales')}</div>
-                </Col>
-                <Col md={24}>
-                    <div style={{ marginTop: '10px' }}>
-                        <div style={{ marginBottom: '5px' }}>{translate('Programmes_Stage')}</div>
-                        <Select
-                            options={programStages.map(program => ({ label: program.displayName, value: program.id }))}
-                            placeholder={translate('Programmes_Stage')}
-                            style={{ width: '100%' }}
-                            optionFilterProp='label'
-                            value={selectedProgramStage?.id}
-                            onChange={handleSelectProgramStage}
-                            showSearch
-                            loading={loadingProgramStages}
-                            disabled={loadingProgramStages}
-                        />
-                    </div>
-                </Col>
-                {
-                    selectedProgramStage && (
-                        <Col md={24} xs={24}>
-                            <Divider style={{ margin: '10px auto' }} />
+    const handleSelectBackgroundInformationFavorit = (value) => setSelectedBackgroundInformationFavorit(favoritBackgroundInformationList.find(b => b.id === value))
 
-                            {
-                                selectedProgramStage && (
-                                    <Button small icon={isNewMappingMode && <ImCancelCircle style={{ color: '#fff', fontSize: '18px' }} />} primary={!isNewMappingMode ? true : false} destructive={isNewMappingMode ? true : false} onClick={handleAddNewMappingConfig}>
-                                        {!isNewMappingMode && <span>+ {translate('Ajouter_Nouveau_Mapping')}</span>}
-                                        {isNewMappingMode && <span>{translate('Annuler_Le_Mapping')}</span>}
-                                    </Button>
-                                )
-                            }
+    const RenderDataElementConfigContent = () => (
+        <>
+            <Card className='my-shadow my-scrollable' bodyStyle={{ padding: '0px', marginTop: '10px', maxHeight: '500px' }} size="small">
+                <div style={{ fontWeight: 'bold', padding: '10px', borderBottom: '1px solid #ccc' }}>{translate('Configurations_Globales')}</div>
+                <div style={{ padding: '10px' }}>
+                    <Row gutter={[10, 10]}>
+                        <Col md={24}>
+                            <div style={{ marginTop: '10px' }}>
+                                <div>
+                                    <Radio
+                                        label={translate("Venant_Des_Favoris")}
+                                        className="cursor-pointer"
+                                        onChange={handleChangeSelectionTypeConfigurationForBackgroundInformation}
+                                        value={FAVORIS}
+                                        checked={selectedBackgroundInformationTypeConfiguration === FAVORIS}
+                                    />
+                                </div>
+                                <div>
+                                    <Radio
+                                        label={translate("Create_New_Configuration") + ' ? '}
+                                        className="cursor-pointer"
+                                        onChange={handleChangeSelectionTypeConfigurationForBackgroundInformation}
+                                        value={DIRECTE}
+                                        checked={selectedBackgroundInformationTypeConfiguration === DIRECTE}
+                                    />
+                                </div>
+                            </div>
+                        </Col>
+                        <Col md={24}>
+                            <hr style={{ margin: '10px auto', color: '#ccc' }} />
+                        </Col>
 
-                            {
-                                isNewMappingMode && (
-                                    <div style={{ marginTop: '20px' }}>
-                                        <div >
-                                            <div>
-                                                <Radio
-                                                    label={translate("Choisir_Element_Donne_De_Group")}
-                                                    className="cursor-pointer"
-                                                    onChange={handleSelectedDataElementFromWhere}
-                                                    value={ELEMENT_GROUP}
-                                                    checked={selectedDataElementFromWhere === ELEMENT_GROUP}
-                                                />
-                                            </div>
-                                            <div>
-                                                <Radio
-                                                    label={translate("Element_Donne_A_Partie_De_Liste")}
-                                                    className="cursor-pointer"
-                                                    onChange={handleSelectedDataElementFromWhere}
-                                                    value={ALL}
-                                                    checked={selectedDataElementFromWhere === ALL}
-                                                />
-                                            </div>
-                                        </div>
+                        {
+                            selectedBackgroundInformationTypeConfiguration === FAVORIS && (
+                                <Col md={24}>
+                                    <div style={{ marginTop: '10px' }}>
+                                        <div style={{ marginBottom: '5px' }}>{translate('Select_Favorit')}</div>
+                                        <Select
+                                            options={favoritBackgroundInformationList.map(favorit => ({ label: favorit.displayName, value: favorit.id }))}
+                                            placeholder={translate('Select_Favorit')}
+                                            style={{ width: '100%' }}
+                                            optionFilterProp='label'
+                                            value={selectedBackgroundInformationFavorit?.id}
+                                            onChange={handleSelectBackgroundInformationFavorit}
+                                            showSearch
+                                        />
+                                    </div>
+                                </Col>
+                            )
+                        }
 
-                                        <div style={{ marginTop: '20px' }}>
-                                            <Row gutter={[10, 10]}>
-                                                {
-                                                    selectedProgramStage && selectedDataElementFromWhere === ELEMENT_GROUP && (
-                                                        <Col md={24}>
-                                                            <div style={{ marginBottom: '5px' }}>{translate('Group_Element_Donnee')}</div>
-                                                            <Select
-                                                                options={dataElementGroups.map(elGroup => ({ label: elGroup.displayName, value: elGroup.id }))}
-                                                                placeholder={translate('Group_Element_Donnee')}
-                                                                style={{ width: '100%' }}
-                                                                optionFilterProp='label'
-                                                                value={selectedDataElementGroup?.id}
-                                                                onChange={handleSelectedDataElementGroup}
-                                                                showSearch
-                                                                loading={loadingDataElementGroups}
-                                                                disabled={loadingDataElementGroups}
-                                                                allowClear
-                                                            />
-                                                        </Col>
+                        {
+                            selectedBackgroundInformationTypeConfiguration === FAVORIS && selectedBackgroundInformationFavorit && (
 
-                                                    )
-                                                }
+                                <Col md={24}>
+                                    <div style={{ marginTop: '10px' }}>
+                                        <div style={{ marginBottom: '5px' }}>{translate('Programmes_Stage')}</div>
+                                        <Select
+                                            options={programStages.map(program => ({ label: program.displayName, value: program.id }))}
+                                            placeholder={translate('Programmes_Stage')}
+                                            style={{ width: '100%' }}
+                                            optionFilterProp='label'
+                                            value={selectedProgramStage?.id}
+                                            onChange={handleSelectProgramStage}
+                                            showSearch
+                                            loading={loadingProgramStages}
+                                            disabled={loadingProgramStages}
+                                        />
+                                    </div>
+                                </Col>
+                            )
+                        }
 
-                                                {
-                                                    selectedProgramStage && (
-                                                        <Col md={12} xs={24}>
+                        {
+                            selectedBackgroundInformationTypeConfiguration === DIRECTE && (
+
+                                <Col md={24}>
+                                    <div style={{ marginTop: '10px' }}>
+                                        <div style={{ marginBottom: '5px' }}>{translate('Programmes_Stage')}</div>
+                                        <Select
+                                            options={programStages.map(program => ({ label: program.displayName, value: program.id }))}
+                                            placeholder={translate('Programmes_Stage')}
+                                            style={{ width: '100%' }}
+                                            optionFilterProp='label'
+                                            value={selectedProgramStage?.id}
+                                            onChange={handleSelectProgramStage}
+                                            showSearch
+                                            loading={loadingProgramStages}
+                                            disabled={loadingProgramStages}
+                                        />
+                                    </div>
+                                </Col>
+                            )
+                        }
+
+                        {
+                            selectedProgramStage && (
+                                <Col md={24} xs={24}>
+                                    <Divider style={{ margin: '10px auto' }} />
+
+                                    {
+                                        selectedProgramStage && (
+                                            <Button small icon={isNewMappingMode && <ImCancelCircle style={{ color: '#fff', fontSize: '18px' }} />} primary={!isNewMappingMode ? true : false} destructive={isNewMappingMode ? true : false} onClick={handleAddNewMappingConfig}>
+                                                {!isNewMappingMode && <span>+ {translate('Ajouter_Nouveau_Mapping')}</span>}
+                                                {isNewMappingMode && <span>{translate('Annuler_Le_Mapping')}</span>}
+                                            </Button>
+                                        )
+                                    }
+
+                                    {
+                                        isNewMappingMode && (
+                                            <div style={{ marginTop: '20px' }}>
+                                                <div >
+                                                    <div>
+                                                        <Radio
+                                                            label={translate("Choisir_Element_Donne_De_Group")}
+                                                            className="cursor-pointer"
+                                                            onChange={handleSelectedDataElementFromWhere}
+                                                            value={ELEMENT_GROUP}
+                                                            checked={selectedDataElementFromWhere === ELEMENT_GROUP}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <Radio
+                                                            label={translate("Element_Donne_A_Partie_De_Liste")}
+                                                            className="cursor-pointer"
+                                                            onChange={handleSelectedDataElementFromWhere}
+                                                            value={ALL}
+                                                            checked={selectedDataElementFromWhere === ALL}
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div style={{ marginTop: '20px' }}>
+                                                    <Row gutter={[10, 10]}>
+                                                        {
+                                                            selectedProgramStage && selectedDataElementFromWhere === ELEMENT_GROUP && (
+                                                                <Col md={24}>
+                                                                    <div style={{ marginBottom: '5px' }}>{translate('Group_Element_Donnee')}</div>
+                                                                    <Select
+                                                                        options={dataElementGroups.map(elGroup => ({ label: elGroup.displayName, value: elGroup.id }))}
+                                                                        placeholder={translate('Group_Element_Donnee')}
+                                                                        style={{ width: '100%' }}
+                                                                        optionFilterProp='label'
+                                                                        value={selectedDataElementGroup?.id}
+                                                                        onChange={handleSelectedDataElementGroup}
+                                                                        showSearch
+                                                                        loading={loadingDataElementGroups}
+                                                                        disabled={loadingDataElementGroups}
+                                                                        allowClear
+                                                                    />
+                                                                </Col>
+
+                                                            )
+                                                        }
+
+                                                        {
+                                                            selectedProgramStage && (
+                                                                <Col md={12} xs={24}>
+                                                                    <div>
+                                                                        <div style={{ marginBottom: '5px' }}>{translate('Elements_De_Donnees')}</div>
+                                                                        <Select
+                                                                            options={
+                                                                                selectedProgramStage?.programStageDataElements
+                                                                                    ?.filter(progStageDE => selectedDataElementFromWhere === ELEMENT_GROUP &&
+                                                                                        selectedDataElementGroup ? progStageDE.dataElement?.dataElementGroups?.map(gp => gp.id)?.includes(selectedDataElementGroup?.id) : true
+                                                                                    )
+                                                                                    ?.map(progStageDE => ({ label: progStageDE.dataElement?.displayName, value: progStageDE.dataElement?.id })) || []
+                                                                            }
+                                                                            placeholder={translate('Elements_De_Donnees')}
+                                                                            style={{ width: '100%' }}
+                                                                            onChange={handleSelectDataElement}
+                                                                            value={selectedDataElement?.id}
+                                                                            optionFilterProp='label'
+                                                                            showSearch
+                                                                        />
+                                                                    </div>
+                                                                </Col>
+                                                            )
+                                                        }
+
+                                                        <Col md={10} xs={24}>
                                                             <div>
-                                                                <div style={{ marginBottom: '5px' }}>{translate('Elements_De_Donnees')}</div>
-                                                                <Select
-                                                                    options={
-                                                                        selectedProgramStage?.programStageDataElements
-                                                                            ?.filter(progStageDE => selectedDataElementFromWhere === ELEMENT_GROUP &&
-                                                                                selectedDataElementGroup ? progStageDE.dataElement?.dataElementGroups?.map(gp => gp.id)?.includes(selectedDataElementGroup?.id) : true
-                                                                            )
-                                                                            ?.map(progStageDE => ({ label: progStageDE.dataElement?.displayName, value: progStageDE.dataElement?.id })) || []
-                                                                    }
-                                                                    placeholder={translate('Elements_De_Donnees')}
+                                                                <div style={{ marginBottom: '5px' }}>{translate('Source_De_Donnee')}</div>
+                                                                <Input
+                                                                    placeholder={translate('Source_De_Donnee')}
                                                                     style={{ width: '100%' }}
-                                                                    onChange={handleSelectDataElement}
-                                                                    value={selectedDataElement?.id}
-                                                                    optionFilterProp='label'
-                                                                    showSearch
+                                                                    value={inputDataSourceDisplayName}
+                                                                    onChange={event => {
+                                                                        setInputDataSourceDisplayName(''.concat(event.target.value))
+                                                                    }}
                                                                 />
                                                             </div>
                                                         </Col>
-                                                    )
-                                                }
-
-                                                <Col md={10} xs={24}>
-                                                    <div>
-                                                        <div style={{ marginBottom: '5px' }}>{translate('Source_De_Donnee')}</div>
-                                                        <Input
-                                                            placeholder={translate('Source_De_Donnee')}
-                                                            style={{ width: '100%' }}
-                                                            value={inputDataSourceDisplayName}
-                                                            onChange={event => {
-                                                                setInputDataSourceDisplayName(''.concat(event.target.value))
-                                                            }}
-                                                        />
-                                                    </div>
-                                                </Col>
-                                                <Col md={2} xs={24}>
-                                                    <div style={{ marginTop: '22px' }}>
-                                                        <Button small primary icon={<TbSelect style={{ fontSize: '18px', color: '#fff', }} />} onClick={() => setVisibleAnalyticComponentModal(true)}></Button>
-                                                    </div>
-                                                </Col>
-                                                <Col md={24} xs={24}>
-                                                    <div style={{ marginTop: '18px' }}>
-                                                        <Button loading={loadingSaveDateElementMappingConfig} disabled={loadingSaveDateElementMappingConfig} primary onClick={handleSaveNewMappingConfig}>+ {translate('Ajouter')} </Button>
-                                                    </div>
-                                                </Col>
-                                            </Row>
-                                        </div>
-                                    </div>
-                                )
-                            }
-                        </Col>
-                    )
-                }
-            </Row>
-        </div>
-    </>
+                                                        <Col md={2} xs={24}>
+                                                            <div style={{ marginTop: '22px' }}>
+                                                                <Button small primary icon={<TbSelect style={{ fontSize: '18px', color: '#fff', }} />} onClick={() => setVisibleAnalyticComponentModal(true)}></Button>
+                                                            </div>
+                                                        </Col>
+                                                        <Col md={24} xs={24}>
+                                                            <div style={{ marginTop: '18px' }}>
+                                                                <Button loading={loadingSaveDateElementMappingConfig} disabled={loadingSaveDateElementMappingConfig} primary onClick={handleSaveNewMappingConfig}>+ {translate('Ajouter')} </Button>
+                                                            </div>
+                                                        </Col>
+                                                    </Row>
+                                                </div>
+                                            </div>
+                                        )
+                                    }
+                                </Col>
+                            )
+                        }
+                    </Row>
+                </div>
+            </Card>
+        </>
+    )
 
     const handleSelectCheckbox = (orgUnit) => {
         if (selectedOrganisationUnits.map(ou => ou.id).includes(orgUnit.id)) {

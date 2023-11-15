@@ -184,7 +184,7 @@
     "Venant_Des_Favoris": "Comming from favorites ?",
     "Element_De_Performance_Obligatoire": "Please select the performance element !",
     "Indicateurs_Selectionnes": "Indicators selected",
-    "Enregistrer_Comme_Favo,rites": "Save as favorites",
+    "Enregistrer_Comme_Favorites": "Save as favorites",
     "Favorit_Exist_Deja": "This favorite already exists !",
     "Selectionnez_La_Favorit": "Select the favorite",
     "Enregistrement_Favorit": "Favorite saved",
@@ -211,5 +211,9 @@
     "Please_Select_One_Supervisor_Or_Other_Supervisor": "Please select on supervisor or other supervisor !",
     "Please_Select_Team_Lead": "Please select team lead !",
     "Planned_By_Me": "Planned by me",
-    "My_Planifications": "My Planifications"
+    "My_Planifications": "My Planifications",
+
+
+    "Create_New_Configuration":"Create new configuration",
+    "Select_Favorit":"Select Favorit"
 }
