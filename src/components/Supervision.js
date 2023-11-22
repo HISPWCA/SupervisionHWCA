@@ -98,6 +98,7 @@ const Supervision = ({ me }) => {
     const [favoritPerformanceList, setFavoritPerformanceList] = useState([])
     const [dataElementGroups, setDataElementGroups] = useState([])
     const [favoritBackgroundInformationList, setFavoritBackgroundInformationList] = useState([])
+    const [originalProgramStages, setOriginalProgramStages] = useState([])
 
     const [visibleTeamLeadContent, setVisibleTeamLeadContent] = useState(false)
     const [visibleAnalyticComponentModal, setVisibleAnalyticComponentModal] = useState(false)
@@ -200,6 +201,7 @@ const Supervision = ({ me }) => {
                 accessorKey: 'libelle', //access nested data with dot notation
                 header: `${translate('Unite_Organisation')}`,
             },
+
             {
                 accessorKey: 'teamLead', //access nested data with dot notation
                 header: `${translate('Team_Lead')}`,
@@ -245,10 +247,17 @@ const Supervision = ({ me }) => {
                                 )
                                 :
                                 cell.getValue()?.split(',')?.map((sup, index) => (
-                                    <div key={index} style={{ background: '#0A939640',  border: '1px solid #ccc', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '6px', marginTop: '5px' }}> {sup}</div>
+                                    <div key={index} style={{ background: '#0A939640', border: '1px solid #ccc', fontSize: '12px', padding: '4px', marginRight: '5px', borderRadius: '6px', marginTop: '5px' }}> {sup}</div>
                                 ))
                         }
                     </div>
+                ) : <></>
+            },
+            {
+                accessorKey: 'programStageName',
+                header: `${translate('Programme_Stage')}`,
+                Cell: ({ cell, row }) => cell.getValue()?.trim()?.length > 0 && cell.getValue()?.trim()?.split(',')?.length > 0 ? (
+                    <span style={{ background: '#EEEEEE', fontSize: '12px', padding: '6px', marginRight: '5px', fontWeight: 'bold', borderRadius: '6px', marginTop: '2px', border: '1px solid #ccc' }}> {cell.getValue()}</span>
                 ) : <></>
             },
             {
@@ -343,6 +352,13 @@ const Supervision = ({ me }) => {
                             }
                         </div>
 
+                    ) : <></>
+                },
+                {
+                    accessorKey: 'programStageName',
+                    header: `${translate('Programme_Stage')}`,
+                    Cell: ({ cell, row }) => cell.getValue()?.trim()?.length > 0 && cell.getValue()?.trim()?.split(',')?.length > 0 ? (
+                        <span style={{ background: '#EEEEEE', fontSize: '12px', padding: '6px', marginRight: '5px', fontWeight: 'bold', borderRadius: '6px', marginTop: '2px', border: '1px solid #ccc' }}> {cell.getValue()}</span>
                     ) : <></>
                 },
                 {
@@ -454,6 +470,7 @@ const Supervision = ({ me }) => {
                     setSelectedSupervisionConfigProgram(currentProgram)
                     setSelectedPeriodSupervisionConfig(dayjs())
                     setSelectedOrgUnitSupervisionFromTracker(currentOrgUnit)
+                    loadProgramStages(currentProgram.program.id, setOriginalProgramStages)
                     await loadTeisPlanifications(currentProgram.program.id, currentOrgUnit?.id, DESCENDANTS)
                 }
             }
@@ -465,9 +482,9 @@ const Supervision = ({ me }) => {
         }
     }
 
-    const loadProgramStages = async (programID) => {
+    const loadProgramStages = async (programID, setState = null) => {
         try {
-            setLoadingProgramStages(true)
+            !setState && setLoadingProgramStages(true)
 
             let route = `${PROGRAMS_STAGE_ROUTE},program,programStageDataElements[dataElement[id,displayName,dataElementGroups]]`
             if (programID)
@@ -475,10 +492,11 @@ const Supervision = ({ me }) => {
 
             const response = await axios.get(route)
 
-            setProgramStages(response.data.programStages)
-            setLoadingProgramStages(false)
+            !setState && setProgramStages(response.data.programStages)
+            setState && setState(response.data.programStages)
+            !setState && setLoadingProgramStages(false)
         } catch (err) {
-            setLoadingProgramStages(false)
+            !setState && setLoadingProgramStages(false)
         }
     }
 
@@ -696,6 +714,8 @@ const Supervision = ({ me }) => {
                         montant: calculateMontant(trackedEntityInstance, eventDate, current.orgUnit, program),
                         teamLead: getTeamLead(dataStoreSupervisions, eventId),
                         period: eventDate,
+                        programStageID: found_event?.programStage,
+                        programStageName: originalProgramStages.find(orP => orP.id === found_event?.programStage)?.displayName || '',
                         superviseurs: superviseurs,
                         enrollment: current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.enrollment,
                         program: program,
@@ -723,6 +743,8 @@ const Supervision = ({ me }) => {
                         trackedEntityInstance: en.trackedEntityInstance,
                         agent: `${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeFirstName?.id)?.value || ''}`,
                         period: en?.events[0]?.eventDate,
+                        programStageID: en?.events[0]?.programStage,
+                        programStageName: originalProgramStages.find(orP => orP.id === en?.events[0]?.programStage)?.displayName || '',
                         teamLead: getTeamLead(dataStoreSupervisions, en?.events[0]?.event),
                         superviseurs: selectedSupervisionsConfigProgram?.fieldConfig?.supervisor?.dataElements?.reduce((prevEl, curr) => {
                             const foundedDataValue = en?.events[0]?.dataValues?.find(el => el.dataElement === curr.id)
@@ -759,6 +781,8 @@ const Supervision = ({ me }) => {
                         trackedEntityInstance: currentEnrollment?.trackedEntityInstance,
                         agent: `${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeFirstName?.id)?.value || ''}`,
                         period: ev.eventDate,
+                        programStageID: ev.programStage,
+                        programStageName: originalProgramStages.find(orP => orP.id === ev.programStage)?.displayName || '',
                         teamLead: getTeamLead(dataStoreSupervisions, ev.event),
                         montant: calculateMontant(currentEnrollment?.trackedEntityInstance, ev.eventDate, currentEnrollment?.orgUnit, currentEnrollment?.program),
                         enrollment: currentEnrollment?.enrollment,
