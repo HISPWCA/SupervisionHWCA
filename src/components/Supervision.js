@@ -98,7 +98,6 @@ const Supervision = ({ me }) => {
     const [favoritPerformanceList, setFavoritPerformanceList] = useState([])
     const [dataElementGroups, setDataElementGroups] = useState([])
     const [favoritBackgroundInformationList, setFavoritBackgroundInformationList] = useState([])
-    const [originalProgramStages, setOriginalProgramStages] = useState([])
 
     const [visibleTeamLeadContent, setVisibleTeamLeadContent] = useState(false)
     const [visibleAnalyticComponentModal, setVisibleAnalyticComponentModal] = useState(false)
@@ -254,13 +253,6 @@ const Supervision = ({ me }) => {
                 ) : <></>
             },
             {
-                accessorKey: 'programStageName',
-                header: `${translate('Programme_Stage')}`,
-                Cell: ({ cell, row }) => cell.getValue()?.trim()?.length > 0 && cell.getValue()?.trim()?.split(',')?.length > 0 ? (
-                    <span style={{ background: '#EEEEEE', fontSize: '12px', padding: '6px', marginRight: '5px', fontWeight: 'bold', borderRadius: '6px', marginTop: '2px', border: '1px solid #ccc' }}> {cell.getValue()}</span>
-                ) : <></>
-            },
-            {
                 accessorKey: 'period',
                 header: `${translate('Periode')}`
             },
@@ -272,7 +264,7 @@ const Supervision = ({ me }) => {
                 Cell: ({ cell, row }) => {
                     return (
                         <>
-                            <span title={getStatusNameAndColor(cell.getValue())?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColor(cell.getValue())?.color?.background, color: getStatusNameAndColor(cell.getValue())?.color?.text, padding: '4px', fontSize: '12px', borderRadius: '5px' }}>
+                            <span title={getStatusNameAndColor(cell.getValue())?.name} style={{ fontSize: '12px', padding: '6px', marginRight: '5px', fontWeight: 'bold', borderRadius: '6px', marginTop: '2px', border: '1px solid #ccc', background: getStatusNameAndColor(cell.getValue())?.color?.background, color: getStatusNameAndColor(cell.getValue())?.color?.text }}>
                                 {getStatusNameAndColor(cell.getValue())?.name}
                             </span>
                         </>
@@ -355,13 +347,6 @@ const Supervision = ({ me }) => {
                     ) : <></>
                 },
                 {
-                    accessorKey: 'programStageName',
-                    header: `${translate('Programme_Stage')}`,
-                    Cell: ({ cell, row }) => cell.getValue()?.trim()?.length > 0 && cell.getValue()?.trim()?.split(',')?.length > 0 ? (
-                        <span style={{ background: '#EEEEEE', fontSize: '12px', padding: '6px', marginRight: '5px', fontWeight: 'bold', borderRadius: '6px', marginTop: '2px', border: '1px solid #ccc' }}> {cell.getValue()}</span>
-                    ) : <></>
-                },
-                {
                     accessorKey: 'period',
                     header: `${translate('Periode')}`
                 },
@@ -371,7 +356,7 @@ const Supervision = ({ me }) => {
                     Cell: ({ cell, row }) => {
                         return (
                             <>
-                                <span title={getStatusNameAndColor(cell.getValue())?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColor(cell.getValue())?.color?.background, color: getStatusNameAndColor(cell.getValue())?.color?.text, padding: '4px', fontSize: '12px', borderRadius: '5px' }}>
+                                <span title={getStatusNameAndColor(cell.getValue())?.name} style={{ fontSize: '12px', padding: '6px', marginRight: '5px', fontWeight: 'bold', borderRadius: '6px', marginTop: '2px', border: '1px solid #ccc', background: getStatusNameAndColor(cell.getValue())?.color?.background, color: getStatusNameAndColor(cell.getValue())?.color?.text }}>
                                     {getStatusNameAndColor(cell.getValue())?.name}
                                 </span>
                             </>
@@ -470,7 +455,7 @@ const Supervision = ({ me }) => {
                     setSelectedSupervisionConfigProgram(currentProgram)
                     setSelectedPeriodSupervisionConfig(dayjs())
                     setSelectedOrgUnitSupervisionFromTracker(currentOrgUnit)
-                    loadProgramStages(currentProgram.program.id, setOriginalProgramStages)
+                    loadProgramStages(currentProgram.program.id)
                     await loadTeisPlanifications(currentProgram.program.id, currentOrgUnit?.id, DESCENDANTS)
                 }
             }
@@ -631,6 +616,7 @@ const Supervision = ({ me }) => {
 
 
     const getStatusNameAndColor = status => {
+
         if (status === NA.value) {
             return { name: translate(`${NA.name}`), color: { background: GRAY_DARK, text: WHITE } }
         }
@@ -687,6 +673,12 @@ const Supervision = ({ me }) => {
                 selectedPeriodSupervisionConfig && dayjs(current.created).format('YYYYMM') === dayjs(selectedPeriodSupervisionConfig).format('YYYYMM') &&
                 current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)
             ) {
+
+                if (current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events[0]?.programStage !== selectedSupervisionsConfigProgram?.statusSupervision?.programStage?.id) {
+                    return prev
+                }
+
+
                 const found_event = current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events[0]
                 const eventDate = found_event?.eventDate
                 const eventId = found_event?.event
@@ -715,14 +707,15 @@ const Supervision = ({ me }) => {
                         teamLead: getTeamLead(dataStoreSupervisions, eventId),
                         period: eventDate,
                         programStageID: found_event?.programStage,
-                        programStageName: originalProgramStages.find(orP => orP.id === found_event?.programStage)?.displayName || '',
                         superviseurs: superviseurs,
                         enrollment: current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.enrollment,
                         program: program,
                         orgUnit: current.orgUnit,
                         storedBy: current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.storedBy,
                         libelle: current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.orgUnitName,
-                        statusSupervision: dayjs(eventDate).isAfter(dayjs()) ? getDefaultStatusSupervisionIfStatusIsNull() : current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
+                        programStageId: rent.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events[0]?.programStage,
+                        // statusSupervision: dayjs(eventDate).isAfter(dayjs()) ? getDefaultStatusSupervisionIfStatusIsNull() : current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
+                        statusSupervision: current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
                         statusPayment: current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusPayment?.dataElement?.id)?.value || getDefaultStatusPaymentIfStatusIsNull()
                     }
                 ]
@@ -734,7 +727,10 @@ const Supervision = ({ me }) => {
                 const enrollmentsList = []
                 for (let en of current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)) {
                     if (dayjs(en.enrollmentDate).format('YYYYMM') === dayjs(selectedPeriodSupervisionConfig).format('YYYYMM')) {
-                        enrollmentsList.push(en)
+
+                        if (en?.events[0]?.programStage === selectedSupervisionsConfigProgram?.statusSupervision?.programStage?.id) {
+                            enrollmentsList.push(en)
+                        }
                     }
                 }
                 return [
@@ -744,7 +740,6 @@ const Supervision = ({ me }) => {
                         agent: `${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeFirstName?.id)?.value || ''}`,
                         period: en?.events[0]?.eventDate,
                         programStageID: en?.events[0]?.programStage,
-                        programStageName: originalProgramStages.find(orP => orP.id === en?.events[0]?.programStage)?.displayName || '',
                         teamLead: getTeamLead(dataStoreSupervisions, en?.events[0]?.event),
                         superviseurs: selectedSupervisionsConfigProgram?.fieldConfig?.supervisor?.dataElements?.reduce((prevEl, curr) => {
                             const foundedDataValue = en?.events[0]?.dataValues?.find(el => el.dataElement === curr.id)
@@ -758,7 +753,9 @@ const Supervision = ({ me }) => {
                         orgUnit: current.orgUnit,
                         storedBy: en.storedBy,
                         libelle: en.orgUnitName,
-                        statusSupervision: dayjs(en?.events[0]?.eventDate).isAfter(dayjs()) ? getDefaultStatusSupervisionIfStatusIsNull() : en?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
+                        programStageId: en?.events[0]?.programStage,
+                        // statusSupervision: dayjs(en?.events[0]?.eventDate).isAfter(dayjs()) ? getDefaultStatusSupervisionIfStatusIsNull() : en?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
+                        statusSupervision: en?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
                         statusPayment: en?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusPayment?.dataElement?.id)?.value || getDefaultStatusPaymentIfStatusIsNull()
                     }))
                 ]
@@ -771,7 +768,10 @@ const Supervision = ({ me }) => {
                 const currentEnrollment = current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]
                 for (let event of currentEnrollment?.events || []) {
                     if (dayjs(event.eventDate).format('YYYYMM') === dayjs(selectedPeriodSupervisionConfig).format('YYYYMM')) {
-                        eventList.push(event)
+
+                        if (event.programStage === selectedSupervisionsConfigProgram?.statusSupervision?.programStage?.id) {
+                            eventList.push(event)
+                        }
                     }
                 }
 
@@ -782,7 +782,6 @@ const Supervision = ({ me }) => {
                         agent: `${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeFirstName?.id)?.value || ''}`,
                         period: ev.eventDate,
                         programStageID: ev.programStage,
-                        programStageName: originalProgramStages.find(orP => orP.id === ev.programStage)?.displayName || '',
                         teamLead: getTeamLead(dataStoreSupervisions, ev.event),
                         montant: calculateMontant(currentEnrollment?.trackedEntityInstance, ev.eventDate, currentEnrollment?.orgUnit, currentEnrollment?.program),
                         enrollment: currentEnrollment?.enrollment,
@@ -797,8 +796,10 @@ const Supervision = ({ me }) => {
 
                             return prevEl
                         }, [])?.join(','),
-                        statusSupervision: dayjs(ev.eventDate).isAfter(dayjs()) ? getDefaultStatusSupervisionIfStatusIsNull() : currentEnrollment?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
-                        statusPayment: currentEnrollment?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusPayment?.dataElement?.id)?.value || getDefaultStatusPaymentIfStatusIsNull()
+                        programStageId: ev.programStage,
+                        // statusSupervision: dayjs(ev.eventDate).isAfter(dayjs()) ? getDefaultStatusSupervisionIfStatusIsNull() : currentEnrollment?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
+                        statusSupervision: ev.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
+                        statusPayment: ev.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusPayment?.dataElement?.id)?.value || getDefaultStatusPaymentIfStatusIsNull()
                     }))
                 ]
             }
@@ -1297,7 +1298,6 @@ const Supervision = ({ me }) => {
                 return currentTEIData
             }
         } catch (err) {
-            console.log("Err:", err)
             throw err
         }
     }
@@ -5038,6 +5038,7 @@ const Supervision = ({ me }) => {
                     </>
                 )
             }
+
             {RenderAddEquipeModal()}
             {RenderAnalyticComponenPerformancetModal()}
             {RenderAddFavoritPerformanceModal()}
