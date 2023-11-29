@@ -197,6 +197,23 @@ const Supervision = ({ me }) => {
     const handleCancelEvent = async (rowEvent) => {
         console.log("rpwEvent : ", rowEvent)
         try {
+            const newDataValues = rowEvent.dataValues?.map(dv => dv.dataElement).includes(selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id) ? rowEvent.dataValues.map(dvEl => {
+                if (selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id === dvEl) {
+                    return {
+                        ...dvEl,
+                        value: CANCELED.value,
+                    }
+                } else {
+                    return dvEl
+                }
+            }) :
+                [
+                    ...rowEvent.dataValues,
+                    {
+                        dataElement: selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id, value: CANCELED.value
+                    }
+                ]
+
             const payload = {
                 events: [
                     {
@@ -205,27 +222,19 @@ const Supervision = ({ me }) => {
                         program: rowEvent.program,
                         event: rowEvent.event,
                         programStage: rowEvent.programStageId,
-                        eventDate: rowEvent.period,
+                        eventDate: dayjs(rowEvent.period).format('YYYY-MM-DD'),
                         status: 'COMPLETED',
                         completedDate: dayjs().format('YYYY-MM-DD'),
-                        dataValues: rowEvent.map(dvEl => {
-                            if (selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id === dvEl) {
-                                return {
-                                    ...dvEl,
-                                    value: CANCELED.value,
-                                }
-                            } else {
-                                return dvEl
-                            }
-                        })
+                        dataValues: newDataValues
                     }
                 ]
             }
-            await axios.put(`${EVENTS_ROUTE}`, payload)
+            await axios.post(`${EVENTS_ROUTE}`, payload)
             loadTeisPlanifications(selectedSupervisionsConfigProgram?.program?.id, selectedOrgUnitSupervisionFromTracker?.id)
-            setNotification({ show: true, message: translate("Operation_Success"), type: NOTIFICATION_CRITICAL })
+            setNotification({ show: true, message: translate("Operation_Success"), type: NOTIFICATION_SUCCESS })
 
         } catch (err) {
+            console.log("error: ", err)
             return setNotification({ show: true, message: translate("Operation_Failed"), type: NOTIFICATION_CRITICAL })
         }
     }
@@ -268,7 +277,8 @@ const Supervision = ({ me }) => {
                                                 }
                                             </div>
                                         </div>
-                                    } title={translate('Superviseurs')} trigger="hover">
+                                    }
+                                        title={translate('Superviseurs')} trigger="hover">
                                         <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
 
                                             {
@@ -312,7 +322,7 @@ const Supervision = ({ me }) => {
                 size: 50,
                 Cell: ({ cell, row }) => {
                     return (
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
                             <a
                                 target='_blank'
                                 href={`${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${row.original.trackedEntityInstance}&program=${row.original.program}&ou=${row.original.orgUnit}`}
@@ -322,12 +332,12 @@ const Supervision = ({ me }) => {
                             </a>
                             <div style={{ marginLeft: '10px' }}>
                                 <Popconfirm
-                                    title={translate('Annuler')}
+                                    title={translate('Annuler_Planification')}
                                     description={translate('Confirmation_Annulation_Event')}
                                     icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
                                     onConfirm={() => handleCancelEvent(row.original)}
                                 >
-                                    <MdCancel title={translate('Annuler')} style={{ fontSize: '20px', color: RED, cursor: 'pointer' }} />
+                                    <MdCancel title={translate('Annuler_Planification')} style={{ fontSize: '20px', color: RED, cursor: 'pointer' }} />
                                 </Popconfirm>
                             </div>
                         </div>
@@ -751,7 +761,8 @@ const Supervision = ({ me }) => {
                         montant: calculateMontant(trackedEntityInstance, eventDate, current.orgUnit, program),
                         teamLead: getTeamLead(dataStoreSupervisions, eventId),
                         period: eventDate || dueDate,
-                        programStageID: found_event?.programStage,
+                        programStageId: found_event?.programStage,
+                        event: found_event.event,
                         dataValues: found_event.dataValues,
                         superviseurs: superviseurs,
                         enrollment: current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.enrollment,
@@ -759,10 +770,9 @@ const Supervision = ({ me }) => {
                         orgUnit: current.orgUnit,
                         storedBy: current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.storedBy,
                         libelle: current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.orgUnitName,
-                        programStageId: rent.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events[0]?.programStage,
                         // statusSupervision: dayjs(eventDate).isAfter(dayjs()) ? getDefaultStatusSupervisionIfStatusIsNull() : current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
-                        statusSupervision: current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
-                        statusPayment: current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusPayment?.dataElement?.id)?.value || getDefaultStatusPaymentIfStatusIsNull()
+                        statusSupervision: found_event?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
+                        statusPayment: found_event?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusPayment?.dataElement?.id)?.value || getDefaultStatusPaymentIfStatusIsNull()
                     }
                 ]
             }
@@ -785,7 +795,6 @@ const Supervision = ({ me }) => {
                         trackedEntityInstance: en.trackedEntityInstance,
                         agent: `${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeFirstName?.id)?.value || ''}`,
                         period: en?.events[0]?.eventDate || en?.events[0]?.dueDate,
-                        programStageID: en?.events[0]?.programStage,
                         teamLead: getTeamLead(dataStoreSupervisions, en?.events[0]?.event),
                         superviseurs: selectedSupervisionsConfigProgram?.fieldConfig?.supervisor?.dataElements?.reduce((prevEl, curr) => {
                             const foundedDataValue = en?.events[0]?.dataValues?.find(el => el.dataElement === curr.id)
@@ -801,6 +810,7 @@ const Supervision = ({ me }) => {
                         dataValues: en?.events[0]?.dataValues || [],
                         libelle: en.orgUnitName,
                         programStageId: en?.events[0]?.programStage,
+                        event: en?.events[0]?.event,
                         // statusSupervision: dayjs(en?.events[0]?.eventDate).isAfter(dayjs()) ? getDefaultStatusSupervisionIfStatusIsNull() : en?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
                         statusSupervision: en?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
                         statusPayment: en?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusPayment?.dataElement?.id)?.value || getDefaultStatusPaymentIfStatusIsNull()
@@ -828,7 +838,6 @@ const Supervision = ({ me }) => {
                         trackedEntityInstance: currentEnrollment?.trackedEntityInstance,
                         agent: `${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeFirstName?.id)?.value || ''}`,
                         period: ev.eventDate || ev.dueDate,
-                        programStageID: ev.programStage,
                         teamLead: getTeamLead(dataStoreSupervisions, ev.event),
                         montant: calculateMontant(currentEnrollment?.trackedEntityInstance, ev.eventDate, currentEnrollment?.orgUnit, currentEnrollment?.program),
                         enrollment: currentEnrollment?.enrollment,
@@ -836,6 +845,7 @@ const Supervision = ({ me }) => {
                         orgUnit: currentEnrollment?.orgUnit,
                         storedBy: currentEnrollment?.storedBy,
                         dataValues: ev.dataValues,
+                        event: ev.event,
                         libelle: currentEnrollment?.orgUnitName,
                         superviseurs: selectedSupervisionsConfigProgram?.fieldConfig?.supervisor?.dataElements?.reduce((prevEl, curr) => {
                             const foundedDataValue = ev?.dataValues?.find(el => el.dataElement === curr.id)

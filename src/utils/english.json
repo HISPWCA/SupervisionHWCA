@@ -216,6 +216,7 @@
     "Create_New_Configuration": "Create new configuration",
     "Select_Favorit": "Select Favorite",
     "Form_Field": "Form field",
-    "Operation_Failed":"Operation failed !",
-    "Operation_Success":"Operation success !"
+    "Operation_Failed": "Operation failed !",
+    "Operation_Success": "Operation success !",
+    "Annuler_Planification": "Cancel planification !"
 }

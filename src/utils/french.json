@@ -216,5 +216,6 @@
     "Select_Favorit": "Sélectionner la favoris",
     "Form_Field": "Formulaire",
     "Operation_Failed": "Echèc de l'opération !",
-    "Operation_Success": "Opération éffectuée avec succès !"
+    "Operation_Success": "Opération éffectuée avec succès !",
+    "Annuler_Planification":"Annuler la planification"
 }
