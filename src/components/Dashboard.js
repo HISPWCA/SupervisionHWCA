@@ -19,6 +19,7 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import timezone from 'dayjs/plugin/timezone'
 import translate from '../utils/translator';
+import { v1 as uuid } from 'uuid'
 
 const quarterOfYear = require('dayjs/plugin/quarterOfYear')
 const weekOfYear = require('dayjs/plugin/weekOfYear')
@@ -235,8 +236,6 @@ export const Dashboard = ({ me }) => {
             let supervisionList = []
             const eventList = []
 
-
-
             for (let planification of response) {
                 for (let sup of planification.supervisions) {
                     if (!supervisionList.map(s => s.id).includes(sup.id)) {
@@ -302,6 +301,7 @@ export const Dashboard = ({ me }) => {
                 current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)
             ) {
                 const eventDate = current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.events[0]?.eventDate
+                const dueDate = current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.events[0]?.dueDate
 
                 if (current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.events[0]?.programStage !== selectedProgram?.statusSupervision?.programStage?.id) {
                     return prev
@@ -324,7 +324,7 @@ export const Dashboard = ({ me }) => {
                     ...prev,
                     {
                         trackedEntityInstance: current.trackedEntityInstance,
-                        period: eventDate,
+                        period: eventDate || dueDate,
                         superviseurs: superviseurs,
                         agent: `${current.attributes?.find(att => att.attribute === selectedProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedProgram?.attributeFirstName?.id)?.value || ''}`,
                         enrollment: current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.enrollment,
@@ -356,7 +356,7 @@ export const Dashboard = ({ me }) => {
                     ...enrollmentsList.map(en => ({
                         trackedEntityInstance: en.trackedEntityInstance,
                         agent: `${current.attributes?.find(att => att.attribute === selectedProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedProgram?.attributeFirstName?.id)?.value || ''}`,
-                        period: en?.events[0]?.eventDate,
+                        period: en?.events[0]?.eventDate || en?.events[0]?.dueDate,
                         enrollment: en.enrollment,
                         program: en.program,
                         superviseurs: selectedProgram?.fieldConfig?.supervisor?.dataElements?.reduce((prevEl, curr) => {
@@ -394,7 +394,7 @@ export const Dashboard = ({ me }) => {
                     ...prev,
                     ...eventList.map(ev => ({
                         trackedEntityInstance: currentEnrollment?.trackedEntityInstance,
-                        period: ev.eventDate,
+                        period: ev.eventDate || ev.dueDate,
                         agent: `${current.attributes?.find(att => att.attribute === selectedProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedProgram?.attributeFirstName?.id)?.value || ''}`,
                         enrollment: currentEnrollment?.enrollment,
                         program: currentEnrollment?.program,
@@ -591,10 +591,9 @@ export const Dashboard = ({ me }) => {
         return '0%'
     }
 
-
-    const getFiveLastPlanifications = () => filterAndGetPlanfications().slice(0, filterAndGetPlanfications().length < 5 ? filterAndGetPlanfications().length : 5).map((planification) => ({
+    const getFiveLastPlanifications = () => filterAndGetPlanfications().slice(0, 5).map((planification) => ({
         ...planification,
-        key: planification.trackedEntityInstance,
+        key: uuid(),
         nom: planification.libelle,
         tei: planification
     }))
@@ -602,7 +601,8 @@ export const Dashboard = ({ me }) => {
     const getCalendarEvents = () =>
         filterAndGetPlanfications()
             .map((planification) => ({
-                id: planification.trackedEntityInstance,
+                // id: planification.trackedEntityInstance,
+                id: uuid(),
                 allDay: true,
                 title: <div style={{ fontWeight: 'bold', fontSize: '12px', borderRadius: '5px', backgroundColor: getStatusNameAndColor(planification.statusSupervision)?.color?.background, color: getStatusNameAndColor(planification.statusSupervision)?.color?.text, margin: '0px', padding: '3px' }}> {planification.libelle}</div>,
                 start: dayjs(planification.period).format('YYYY-MM-DD HH:mm:ss'),
@@ -771,7 +771,6 @@ export const Dashboard = ({ me }) => {
     const columns = () => selectedProgram?.planificationType === AGENT ? [
         {
             title: translate('Agent_0rg_Unit'),
-            key: 'agent',
             dataIndex: 'tei',
             render: tei => (
                 <>
@@ -789,9 +788,9 @@ export const Dashboard = ({ me }) => {
                 </>
             )
         },
-        { title: translate('Periode'), key: 'period', dataIndex: 'period', render: value => <div style={{ fontSize: '13px' }}>{dayjs(value).format('YYYY-MM-DD')} </div> },
+        { title: translate('Periode'), dataIndex: 'period', render: value => <div style={{ fontSize: '13px' }}>{dayjs(value).format('YYYY-MM-DD')} </div> },
         {
-            title: translate('Status_Supervision'), key: 'statusSupervision', dataIndex: 'statusSupervision', width: '150px',
+            title: translate('Status_Supervision'), dataIndex: 'statusSupervision', width: '150px',
             render: value => (
                 <>
                     <span className='text-truncate-one' title={getStatusNameAndColor(value)?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColor(value)?.color?.background, color: getStatusNameAndColor(value)?.color?.text, padding: '3px', fontSize: '12px', borderRadius: '5px' }}>
@@ -801,7 +800,7 @@ export const Dashboard = ({ me }) => {
             )
         },
         {
-            title: translate('Actions'), key: 'action', width: '50px', dataIndex: 'tei', render: tei => (
+            title: translate('Actions'), width: '50px', dataIndex: 'tei', render: tei => (
                 <div style={{ textAlign: 'center', }}>
                     <a
                         target='_blank'
@@ -815,10 +814,10 @@ export const Dashboard = ({ me }) => {
         }
     ] :
         [
-            { title: translate('Unite_Organisation'), key: 'nom', dataIndex: 'nom' },
+            { title: translate('Unite_Organisation'), dataIndex: 'nom' },
             { title: translate('Periode'), key: 'period', dataIndex: 'period', render: value => <div style={{ fontSize: '13px' }}>{dayjs(value).format('YYYY-MM-DD')} </div> },
             {
-                title: translate('Status_Supervision'), key: 'statusSupervision', dataIndex: 'statusSupervision', width: '150px',
+                title: translate('Status_Supervision'), dataIndex: 'statusSupervision', width: '150px',
                 render: value => (
                     <>
                         <span className='text-truncate-one' title={getStatusNameAndColor(value)?.name} style={{ fontWeight: 'bold', textAlign: 'center', background: getStatusNameAndColor(value)?.color?.background, color: getStatusNameAndColor(value)?.color?.text, padding: '3px', fontSize: '12px', borderRadius: '5px' }}>
@@ -828,7 +827,7 @@ export const Dashboard = ({ me }) => {
                 )
             },
             {
-                title: translate('Actions'), key: 'action', width: '50px', dataIndex: 'tei', render: tei => (
+                title: translate('Actions'), width: '50px', dataIndex: 'tei', render: tei => (
                     <div style={{ textAlign: 'center', }}>
                         <a
                             target='_blank'

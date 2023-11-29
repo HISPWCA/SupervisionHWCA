@@ -55,12 +55,12 @@ import { CgCloseO } from 'react-icons/cg'
 import { TbSelect } from 'react-icons/tb'
 import { DataDimension } from '@dhis2/analytics'
 import { IoMdOpen } from 'react-icons/io'
-import { MdStars } from 'react-icons/md'
+import { MdStars, MdCancel } from 'react-icons/md'
 import shuffle from 'shuffle-array'
 
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat'
-import { BLUE, GRAY_DARK, GREEN, ORANGE, RED, WHITE } from '../utils/couleurs'
+import { BLACK, BLUE, GRAY_DARK, GREEN, ORANGE, RED, WHITE } from '../utils/couleurs'
 import { getDefaultStatusPaymentIfStatusIsNull, getDefaultStatusSupervisionIfStatusIsNull } from './Dashboard'
 import translate from '../utils/translator'
 const quarterOfYear = require('dayjs/plugin/quarterOfYear')
@@ -194,6 +194,42 @@ const Supervision = ({ me }) => {
     }
 
 
+    const handleCancelEvent = async (rowEvent) => {
+        console.log("rpwEvent : ", rowEvent)
+        try {
+            const payload = {
+                events: [
+                    {
+                        trackedEntityInstance: rowEvent.trackedEntityInstance,
+                        orgUnit: rowEvent.orgUnit,
+                        program: rowEvent.program,
+                        event: rowEvent.event,
+                        programStage: rowEvent.programStageId,
+                        eventDate: rowEvent.period,
+                        status: 'COMPLETED',
+                        completedDate: dayjs().format('YYYY-MM-DD'),
+                        dataValues: rowEvent.map(dvEl => {
+                            if (selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id === dvEl) {
+                                return {
+                                    ...dvEl,
+                                    value: CANCELED.value,
+                                }
+                            } else {
+                                return dvEl
+                            }
+                        })
+                    }
+                ]
+            }
+            await axios.put(`${EVENTS_ROUTE}`, payload)
+            loadTeisPlanifications(selectedSupervisionsConfigProgram?.program?.id, selectedOrgUnitSupervisionFromTracker?.id)
+            setNotification({ show: true, message: translate("Operation_Success"), type: NOTIFICATION_CRITICAL })
+
+        } catch (err) {
+            return setNotification({ show: true, message: translate("Operation_Failed"), type: NOTIFICATION_CRITICAL })
+        }
+    }
+
     const columns = () => {
         return selectedSupervisionsConfigProgram?.planificationType === ORGANISATION_UNIT ? [
             {
@@ -264,7 +300,7 @@ const Supervision = ({ me }) => {
                 Cell: ({ cell, row }) => {
                     return (
                         <>
-                            <span title={getStatusNameAndColor(cell.getValue())?.name} style={{ fontSize: '12px', padding: '6px', marginRight: '5px', fontWeight: 'bold', borderRadius: '6px', marginTop: '2px', border: '1px solid #ccc', background: getStatusNameAndColor(cell.getValue())?.color?.background, color: getStatusNameAndColor(cell.getValue())?.color?.text }}>
+                            <span title={getStatusNameAndColor(cell.getValue())?.name} style={{ fontSize: '12px', padding: '6px', marginRight: '5px', fontWeight: 'bold', borderRadius: '6px', marginTop: '2px', border: '1px solid #000', background: getStatusNameAndColor(cell.getValue())?.color?.background, color: getStatusNameAndColor(cell.getValue())?.color?.text }}>
                                 {getStatusNameAndColor(cell.getValue())?.name}
                             </span>
                         </>
@@ -276,14 +312,24 @@ const Supervision = ({ me }) => {
                 size: 50,
                 Cell: ({ cell, row }) => {
                     return (
-                        <div style={{ textAlign: 'center', }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <a
                                 target='_blank'
                                 href={`${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${row.original.trackedEntityInstance}&program=${row.original.program}&ou=${row.original.orgUnit}`}
                                 style={{ cursor: 'pointer' }}
                             >
-                                <IoMdOpen title={translate('Ouvrir_Dans_Le_Tracker')} style={{ fontSize: '18px', color: BLUE, cursor: 'pointer' }} />
+                                <IoMdOpen title={translate('Ouvrir_Dans_Le_Tracker')} style={{ fontSize: '20px', color: BLUE, cursor: 'pointer' }} />
                             </a>
+                            <div style={{ marginLeft: '10px' }}>
+                                <Popconfirm
+                                    title={translate('Annuler')}
+                                    description={translate('Confirmation_Annulation_Event')}
+                                    icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+                                    onConfirm={() => handleCancelEvent(row.original)}
+                                >
+                                    <MdCancel title={translate('Annuler')} style={{ fontSize: '20px', color: RED, cursor: 'pointer' }} />
+                                </Popconfirm>
+                            </div>
                         </div>
                     )
                 }
@@ -356,7 +402,7 @@ const Supervision = ({ me }) => {
                     Cell: ({ cell, row }) => {
                         return (
                             <>
-                                <span title={getStatusNameAndColor(cell.getValue())?.name} style={{ fontSize: '12px', padding: '6px', marginRight: '5px', fontWeight: 'bold', borderRadius: '6px', marginTop: '2px', border: '1px solid #ccc', background: getStatusNameAndColor(cell.getValue())?.color?.background, color: getStatusNameAndColor(cell.getValue())?.color?.text }}>
+                                <span title={getStatusNameAndColor(cell.getValue())?.name} style={{ fontSize: '12px', padding: '6px', marginRight: '5px', fontWeight: 'bold', borderRadius: '6px', marginTop: '2px', border: '1px solid #000', background: getStatusNameAndColor(cell.getValue())?.color?.background, color: getStatusNameAndColor(cell.getValue())?.color?.text }}>
                                     {getStatusNameAndColor(cell.getValue())?.name}
                                 </span>
                             </>
@@ -659,7 +705,6 @@ const Supervision = ({ me }) => {
     }
 
     const getTeamLead = (dataStoreList = [], eventId) => dataStoreList.reduce((prev, curr) => {
-
         const found_sup = curr.supervisions?.find(sup => eventId === sup.tei_event?.event)
         if (found_sup) {
             prev = found_sup.equipe?.teamLead || ""
@@ -678,9 +723,9 @@ const Supervision = ({ me }) => {
                     return prev
                 }
 
-
                 const found_event = current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events[0]
                 const eventDate = found_event?.eventDate
+                const dueDate = found_event?.dueDate
                 const eventId = found_event?.event
                 const trackedEntityInstance = current.trackedEntityInstance
                 const program = current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.program
@@ -705,8 +750,9 @@ const Supervision = ({ me }) => {
                         agent: `${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeFirstName?.id)?.value || ''}`,
                         montant: calculateMontant(trackedEntityInstance, eventDate, current.orgUnit, program),
                         teamLead: getTeamLead(dataStoreSupervisions, eventId),
-                        period: eventDate,
+                        period: eventDate || dueDate,
                         programStageID: found_event?.programStage,
+                        dataValues: found_event.dataValues,
                         superviseurs: superviseurs,
                         enrollment: current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.enrollment,
                         program: program,
@@ -738,7 +784,7 @@ const Supervision = ({ me }) => {
                     ...enrollmentsList.map(en => ({
                         trackedEntityInstance: en.trackedEntityInstance,
                         agent: `${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeFirstName?.id)?.value || ''}`,
-                        period: en?.events[0]?.eventDate,
+                        period: en?.events[0]?.eventDate || en?.events[0]?.dueDate,
                         programStageID: en?.events[0]?.programStage,
                         teamLead: getTeamLead(dataStoreSupervisions, en?.events[0]?.event),
                         superviseurs: selectedSupervisionsConfigProgram?.fieldConfig?.supervisor?.dataElements?.reduce((prevEl, curr) => {
@@ -752,6 +798,7 @@ const Supervision = ({ me }) => {
                         program: en.program,
                         orgUnit: current.orgUnit,
                         storedBy: en.storedBy,
+                        dataValues: en?.events[0]?.dataValues || [],
                         libelle: en.orgUnitName,
                         programStageId: en?.events[0]?.programStage,
                         // statusSupervision: dayjs(en?.events[0]?.eventDate).isAfter(dayjs()) ? getDefaultStatusSupervisionIfStatusIsNull() : en?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
@@ -780,7 +827,7 @@ const Supervision = ({ me }) => {
                     ...eventList.map(ev => ({
                         trackedEntityInstance: currentEnrollment?.trackedEntityInstance,
                         agent: `${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeName?.id)?.value || ''} ${current.attributes?.find(att => att.attribute === selectedSupervisionsConfigProgram?.attributeFirstName?.id)?.value || ''}`,
-                        period: ev.eventDate,
+                        period: ev.eventDate || ev.dueDate,
                         programStageID: ev.programStage,
                         teamLead: getTeamLead(dataStoreSupervisions, ev.event),
                         montant: calculateMontant(currentEnrollment?.trackedEntityInstance, ev.eventDate, currentEnrollment?.orgUnit, currentEnrollment?.program),
@@ -788,6 +835,7 @@ const Supervision = ({ me }) => {
                         program: currentEnrollment?.program,
                         orgUnit: currentEnrollment?.orgUnit,
                         storedBy: currentEnrollment?.storedBy,
+                        dataValues: ev.dataValues,
                         libelle: currentEnrollment?.orgUnitName,
                         superviseurs: selectedSupervisionsConfigProgram?.fieldConfig?.supervisor?.dataElements?.reduce((prevEl, curr) => {
                             const foundedDataValue = ev?.dataValues?.find(el => el.dataElement === curr.id)
@@ -1487,7 +1535,7 @@ const Supervision = ({ me }) => {
                             payment: sup.payment,
                             period: sup.period,
                             equipe: { ...sup.equipe, superviseurs: sup.equipe?.superviseurs?.map(equipSup => ({ id: equipSup.id, name: equipSup.name })) || [] },
-                            tei_event: sup.tei?.enrollments?.reduce((prev, curr) => {
+                            tei_event: sup.tei?.enrollments ? sup.tei.enrollments.reduce((prev, curr) => {
                                 if (curr.orgUnit === sup.tei.orgUnit && curr.program === sup.program?.id) {
                                     const corresponding_event = curr.events?.find(ev => (dayjs(ev.eventDate).format('YYYY-MM-DD') === dayjs(sup.period).format('YYYY-MM-DD')) || dayjs(ev.dueDate).format('YYYY-MM-DD') === dayjs(sup.period).format('YYYY-MM-DD'))
 
@@ -1510,9 +1558,11 @@ const Supervision = ({ me }) => {
                                     }
                                 }
                                 return prev
-                            }, {})
+                            }, {}) :
+                                sup.tei_event
 
                         })) || []
+
                     }
                 ))
 
@@ -1533,7 +1583,7 @@ const Supervision = ({ me }) => {
         }
     }
 
-    const saveSupervisionAsTEIStrategy = async (inputFieldsList) => {
+    const saveSupervisionAsTEIStrategy = async (inputFieldsList, newDataStoreSupervisions) => {
         try {
             if (inputFieldsList.length > 0) {
 
@@ -1570,14 +1620,16 @@ const Supervision = ({ me }) => {
                     dataSources: mappingConfigs,
                     supervisions: supervisionsList,
                 }
-                await savePanificationToDataStore([...dataStoreSupervisions, planificationPayload])
+
+                const newDataStoreSupervisionsPayload = [...newDataStoreSupervisions, planificationPayload]
+                await savePanificationToDataStore(newDataStoreSupervisionsPayload)
             }
         } catch (err) {
             throw err
         }
     }
 
-    const saveSupervisionAsEventStrategy = async (inputFieldsList) => {
+    const saveSupervisionAsEventStrategy = async (inputFieldsList, newDataStoreSupervisions) => {
         try {
             if (inputFieldsList.length > 0) {
 
@@ -1619,7 +1671,9 @@ const Supervision = ({ me }) => {
                     dataSources: mappingConfigs,
                     supervisions: supervisionsList,
                 }
-                await savePanificationToDataStore([...dataStoreSupervisions, planificationPayload])
+
+                const newDataStoreSupervisionsPayload = [...newDataStoreSupervisions, planificationPayload]
+                await savePanificationToDataStore(newDataStoreSupervisionsPayload)
             }
         } catch (err) {
             throw err
@@ -1776,7 +1830,7 @@ const Supervision = ({ me }) => {
         }
     }
 
-    const saveSupervisionAsEnrollmentStrategy = async (inputFieldsList) => {
+    const saveSupervisionAsEnrollmentStrategy = async (inputFieldsList, newDataStoreSupervisions) => {
         try {
             if (inputFieldsList.length > 0) {
 
@@ -1813,7 +1867,9 @@ const Supervision = ({ me }) => {
                     dataSources: mappingConfigs,
                     supervisions: supervisionsList,
                 }
-                await savePanificationToDataStore([...dataStoreSupervisions, planificationPayload])
+
+                const newDataStoreSupervisionsPayload = [...newDataStoreSupervisions, planificationPayload]
+                await savePanificationToDataStore(newDataStoreSupervisionsPayload)
             }
         } catch (err) {
             throw err
@@ -1875,21 +1931,24 @@ const Supervision = ({ me }) => {
 
             setLoadingSupervisionPlanification(true)
 
+            const newDataStoreSupervisions = await loadDataStoreSupervisions()
+
             if (selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT && selectedProgram.generationType === TYPE_GENERATION_AS_TEI)
-                await saveSupervisionAsTEIStrategy(inputFields)
+                await saveSupervisionAsTEIStrategy(inputFields, newDataStoreSupervisions)
 
             if (selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT && selectedProgram.generationType === TYPE_GENERATION_AS_ENROLMENT)
-                await saveSupervisionAsEnrollmentStrategy(inputFields)
+                await saveSupervisionAsEnrollmentStrategy(inputFields, newDataStoreSupervisions)
 
             if (selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT && selectedProgram.generationType === TYPE_GENERATION_AS_EVENT)
-                await saveSupervisionAsEventStrategy(inputFields)
+                await saveSupervisionAsEventStrategy(inputFields, newDataStoreSupervisions)
 
             if (selectedSupervisionType === TYPE_SUPERVISION_AGENT && selectedProgram.generationType === TYPE_GENERATION_AS_EVENT)
-                await saveSupervisionAsEventStrategy(inputFields)
+                await saveSupervisionAsEventStrategy(inputFields, newDataStoreSupervisions)
 
             loadDataStoreSupervisionConfigs(organisationUnits)
             loadDataStorePerformanceFavoritsConfigs()
             loadDataStoreSupervisions()
+
             setLoadingSupervisionPlanification(false)
             setNotification({ show: true, message: translate('Planification_Effectuer'), type: NOTIFICATION_SUCCESS })
             setEditionMode(false)
@@ -5030,7 +5089,7 @@ const Supervision = ({ me }) => {
             {
                 !loadingDataStoreSupervisionConfigs && dataStoreSupervisionConfigs?.length > 0 && (
                     <>
-                        <div style={{ padding: '10px', height: '100%', marginBottom: '10px' }}>
+                        <div style={{ padding: '10px', marginBottom: '10px' }}>
                             {!isEditionMode && RenderSupervisionList()}
                             {isEditionMode && RenderSupervisionForm()}
                         </div>

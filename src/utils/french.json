@@ -55,6 +55,7 @@
     "Autre_Superviseurs": "Autre superviseurs",
     "Ajouter": "Ajouter",
     "Confirmation_Suppression_Superviseur": "Voulez-vous vraiment supprimer ce superviseur ? ",
+    "Confirmation_Annulation_Event": "Voulez-vous vraiment Annuler cette planification ?",
     "Criteres_De_Paiement": "Critères de paiement",
     "Unite_Organisation_Obligatoire": "L'unité d'organisation est obligatoire !",
     "Veuillez_Selectionner_Les_Indicateurs": "Veuillez sélectionner les indicateurs de recherches !",
@@ -211,7 +212,9 @@
     "Please_Select_Team_Lead": "Veuillez selectionner le chef d'équipe",
     "Planned_By_Me": "Planifié par moi",
     "My_Planifications": "Mes planifications",
-    "Create_New_Configuration":"Créer une nouvelle configuration",
-    "Select_Favorit":"Sélectionner la favoris",
-    "Form_Field":"Formulaire"
+    "Create_New_Configuration": "Créer une nouvelle configuration",
+    "Select_Favorit": "Sélectionner la favoris",
+    "Form_Field": "Formulaire",
+    "Operation_Failed": "Echèc de l'opération !",
+    "Operation_Success": "Opération éffectuée avec succès !"
 }

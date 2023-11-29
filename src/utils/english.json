@@ -56,6 +56,7 @@
     "Autre_Superviseurs": "Other supervisors",
     "Ajouter": "Add",
     "Confirmation_Suppression_Superviseur": "Do you really want to delete this supervisor?",
+    "Confirmation_Annulation_Event": "Do you really want to cancel this planification ?",
     "Criteres_De_Paiement": "Payment criteria",
     "Unite_Organisation_Obligatoire": "Organisation Unit is mandatory!",
     "Veuillez_Selectionner_Les_Indicateurs": "Please select search indicators!",
@@ -212,9 +213,9 @@
     "Please_Select_Team_Lead": "Please select team lead !",
     "Planned_By_Me": "Planned by me",
     "My_Planifications": "My Planifications",
-
-
-    "Create_New_Configuration":"Create new configuration",
-    "Select_Favorit":"Select Favorite",
-    "Form_Field":"Form field"
+    "Create_New_Configuration": "Create new configuration",
+    "Select_Favorit": "Select Favorite",
+    "Form_Field": "Form field",
+    "Operation_Failed":"Operation failed !",
+    "Operation_Success":"Operation success !"
 }
