@@ -95,6 +95,7 @@ export const Body = () => {
 
 
     const isAuthorised = () => {
+
         if (me) {
             if (me.authorities?.includes("ALL"))
                 return true
