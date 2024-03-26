@@ -87,8 +87,14 @@ const Setting = () => {
     useState(false);
   const [selectedOrganisationUnitGroup, setSelectedOrganisationUnitGroup] =
     useState(null);
+  const [
+    selectedProgramStageForConfiguration,
+    setSelectedProgramStageForConfiguration,
+  ] = useState(null);
 
-    const [programStageConfigurations, setProgramStageConfigurations] = useState([]);
+  const [programStageConfigurations, setProgramStageConfigurations] = useState(
+    []
+  );
 
   const [selectedIndicator, setSelectedIndicator] = useState(null);
   const [selectedIndicatorGroup, setSelectedIndicatorGroup] = useState(null);
@@ -431,12 +437,14 @@ const Setting = () => {
       setSelectedAttributesToDisplay([]);
       setAnalyseConfigs([]);
       setMappingConfigSupervisions([]);
+      setProgramStageConfigurations([]);
       setSelectedTEIProgram(null);
       setSelectedSupervisionGenerationType(TYPE_GENERATION_AS_TEI);
       setSelectedIndicatorType(PROGRAM_INDICATOR);
       setSelectedIndicatorGroup(null);
       setSelectedIndicator(null);
 
+      loadOrganisationUnitGroups();
       const responseSupervisionTracker = await loadDataStore(
         process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY,
         null,
@@ -971,6 +979,12 @@ const Setting = () => {
     setSelectedStatutSupervisionDataElement(null);
   };
 
+  const handleSelectProgramStageForConfiguration = (value) => {
+    setSelectedProgramStageForConfiguration(
+      programStages.find((pstage) => pstage.id === value)
+    );
+  };
+
   const handleSelectOrganisationUnitGroupProgramStage = (value) => {
     setSelectedOrganisationUnitGroup(
       organisationUnitGroups.find((orgUnitGroup) => orgUnitGroup.id === value)
@@ -1338,15 +1352,28 @@ const Setting = () => {
   );
 
   const handleAddProgramStageConfigurations = () => {
-    if(selectedProgramStage && selectedOrganisationUnitGroup){
-
-        if(!programStageConfigurations.map(p => p.programStage?.id).includes(selectedProgramStage.id) &&  programStageConfigurations.map(p => p.organisationUnitGroup?.id).includes(selectedOrganisationUnitGroup?.id)) ''
-
-    
-
-
+    if (
+      programStageConfigurations
+        .map((p) => p.programStage?.id)
+        .includes(selectedProgramStageForConfiguration?.id)
+    ) {
+      return setNotification({
+        show: true,
+        message: translate("Configuration_Deja_Ajouter"),
+        type: NOTIFICATION_CRITICAL,
+      });
     }
-    const payload =  setProgramStageConfigurations([...programStageConfigurations, {}]);
+
+    const newProgramStageConfigurations = [
+      ...programStageConfigurations,
+      {
+        programStage: selectedProgramStageForConfiguration,
+        organisationUnitGroup: selectedOrganisationUnitGroup,
+      },
+    ];
+    setProgramStageConfigurations(newProgramStageConfigurations);
+    setSelectedProgramStageForConfiguration(null);
+    setSelectedOrganisationUnitGroup(null);
   };
 
   const RenderProgramStageConfiguration = () => (
@@ -1361,7 +1388,7 @@ const Setting = () => {
           </div>
           <div style={{ margin: "10px 0px" }}>
             <Row gutter={[10, 10]}>
-            <Col md={11} sm={24}>
+              <Col md={12} sm={24}>
                 <div>
                   <div style={{ marginBottom: "5px" }}>
                     {translate("Programmes_Stage")}
@@ -1374,8 +1401,8 @@ const Setting = () => {
                     placeholder={translate("Programmes_Stage")}
                     style={{ width: "100%" }}
                     optionFilterProp="label"
-                    value={selectedStatutSupervisionProgramStage?.id}
-                    onChange={handleSelectStatutSupervisionProgramStage}
+                    value={selectedProgramStageForConfiguration?.id}
+                    onChange={handleSelectProgramStageForConfiguration}
                     showSearch
                     allowClear
                     loading={loadingProgramStages}
@@ -1384,7 +1411,7 @@ const Setting = () => {
                 </div>
               </Col>
 
-              <Col md={11} sm={24}>
+              <Col md={12} sm={24}>
                 <div>
                   <div style={{ marginBottom: "5px" }}>
                     {translate("Groupe_Unite_Organisation")}
@@ -1409,13 +1436,151 @@ const Setting = () => {
                 </div>
               </Col>
 
-              <Col md={2} sm={24}>
-                <div>
-                    <Button onClick={handleAddProgramStageConfigurations}>+ Add</Button>
+              <Col md={24}>
+                <div
+                  style={{ padding: "10px", borderBottom: "1px solid #ccc" }}
+                ></div>
+              </Col>
+
+              {
+                selectedProgramStageForConfiguration && selectedOrganisationUnitGroup && (
+                  <Col md={12}>
+                    <div>
+                      <div style={{ marginBottom: "5px" }}>Supervisor fields</div>
+                      <Select
+                        options={selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                          (progStageDE) => ({
+                            label: progStageDE.dataElement?.displayName,
+                            value: progStageDE.dataElement?.id,
+                          })
+                        )}
+                        placeholder={translate("Element_Donne")}
+                        style={{ width: "100%" }}
+                        mode="multiple"
+                        onChange={handleSelectDataElements}
+                        value={selectedDataElements?.map((s) => s.id)}
+                        optionFilterProp="label"
+                        showSearch
+                        allowClear
+                      />
+                    </div>
+                  </Col>
+                )
+              }
+
+
+              {
+                selectedProgramStageForConfiguration && selectedOrganisationUnitGroup && (
+                  <Col md={12}>
+                    <div>
+                      <div style={{ marginBottom: "5px" }}>
+                        Supervision Status fields
+                      </div>
+                      <Select
+                        options={selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                          (progStageDE) => ({
+                            label: progStageDE.dataElement?.displayName,
+                            value: progStageDE.dataElement?.id,
+                          })
+                        )}
+                        placeholder={translate("Elements_De_Donnees")}
+                        style={{ width: "100%" }}
+                        onChange={handleSelectStatutSupervisionDataElement}
+                        value={selectedStatutSupervisionDataElement?.id}
+                        optionFilterProp="label"
+                        showSearch
+                        allowClear
+                      />
+                    </div>
+                  </Col>
+                )
+              }
+
+
+              <Col md={4} sm={24}>
+                <div style={{ marginTop: "22px" }}>
+                  <Button
+                    disabled={
+                      selectedProgramStageForConfiguration &&
+                        selectedOrganisationUnitGroup
+                        ? false
+                        : true
+                    }
+                    primary
+                    onClick={handleAddProgramStageConfigurations}
+                  >
+                    + Add
+                  </Button>
                 </div>
               </Col>
             </Row>
           </div>
+          {console.log(programStageConfigurations)}
+
+          {programStageConfigurations.length > 0 && (
+            <div style={{ marginTop: "20px" }}>
+              <Table
+                dataSource={programStageConfigurations.map((p) => ({
+                  ...p,
+                  programStageName: p.programStage?.displayName,
+                  organisationUnitGroupName:
+                    p.organisationUnitGroup?.displayName,
+                  action: p,
+                }))}
+                columns={[
+                  {
+                    title: translate("Program_Stage"),
+                    dataIndex: "programStageName",
+                  },
+                  {
+                    title: translate("Groupe_Unite_Organisation"),
+                    dataIndex: "organisationUnitGroupName",
+                  },
+
+                  {
+                    title: translate("Actions"),
+                    dataIndex: "action",
+                    width: "80px",
+                    render: (value) => (
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <Popconfirm
+                          title={translate("Suppression_Configuration")}
+                          description={translate(
+                            "Confirmation_Suppression_Configuration"
+                          )}
+                          icon={
+                            <QuestionCircleOutlined style={{ color: "red" }} />
+                          }
+                          onConfirm={() => {
+                            setSelectedProgramStageForConfiguration(null);
+                            setSelectedOrganisationUnitGroup(null);
+                            setProgramStageConfigurations(
+                              programStageConfigurations.filter(
+                                (p) =>
+                                  p.programStage?.id !== value.programStage?.id
+                              )
+                            );
+                          }}
+                        >
+                          <div>
+                            <RiDeleteBinLine
+                              style={{
+                                color: "red",
+                                fontSize: "18px",
+                                cursor: "pointer",
+                              }}
+                            />
+                          </div>
+                        </Popconfirm>
+                      </div>
+                    ),
+                  },
+                ]}
+                size="small"
+                pagination={false}
+              />
+            </div>
+          )}
         </div>
       </Card>
     </div>
@@ -1710,8 +1875,8 @@ const Setting = () => {
               selectedPlanificationType === AGENT &&
               RenderStatusPaymentDataElementToUse()}
             {selectedTEIProgram && RenderProgramStageConfiguration()}
-            {selectedTEIProgram && RenderStatusSupervisionDataElementToUse()}
-            {selectedTEIProgram && RenderSupervisorFieldConfiguration()}
+            {/* {selectedTEIProgram && RenderStatusSupervisionDataElementToUse()} */}
+            {/* {selectedTEIProgram && RenderSupervisorFieldConfiguration()} */}
 
             <div
               style={{
@@ -2554,32 +2719,29 @@ const Setting = () => {
           <div style={{ marginBottom: "2px", position: "sticky", top: 30 }}>
             {0 > 1 && (
               <div
-                className={`setting-menu-item ${
-                  selectedTypeSupervisionPage === PAGE_CONFIG_INDICATORS
-                    ? "active"
-                    : ""
-                }`}
+                className={`setting-menu-item ${selectedTypeSupervisionPage === PAGE_CONFIG_INDICATORS
+                  ? "active"
+                  : ""
+                  }`}
                 onClick={() => handleClickConfigMenu(PAGE_CONFIG_INDICATORS)}
               >
                 {translate("Configuration_Des_Indicateurs")}
               </div>
             )}
             <div
-              className={`setting-menu-item ${
-                selectedTypeSupervisionPage === PAGE_CONFIG_SUPERVISION
-                  ? "active"
-                  : ""
-              }`}
+              className={`setting-menu-item ${selectedTypeSupervisionPage === PAGE_CONFIG_SUPERVISION
+                ? "active"
+                : ""
+                }`}
               onClick={() => handleClickConfigMenu(PAGE_CONFIG_SUPERVISION)}
             >
               {translate("Parametre_Supervision")}
             </div>
             <div
-              className={`setting-menu-item ${
-                selectedTypeSupervisionPage === PAGE_CONFIG_ANALYSE
-                  ? "active"
-                  : ""
-              }`}
+              className={`setting-menu-item ${selectedTypeSupervisionPage === PAGE_CONFIG_ANALYSE
+                ? "active"
+                : ""
+                }`}
               onClick={() => handleClickConfigMenu(PAGE_CONFIG_ANALYSE)}
             >
               {translate("Analyses")}

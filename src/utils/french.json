@@ -217,5 +217,7 @@
     "Form_Field": "Formulaire",
     "Operation_Failed": "Echèc de l'opération !",
     "Operation_Success": "Opération éffectuée avec succès !",
-    "Annuler_Planification":"Annuler la planification"
+    "Annuler_Planification":"Annuler la planification",
+    "Configuration_Deja_Ajouter": "Configuration déjà ajoutée"
+
 }

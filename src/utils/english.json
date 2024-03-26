@@ -179,6 +179,7 @@
     "Nom_De_Equipe": "Team name",
     "Equipe_Ajouter": "Team added !",
     "Equipe_Deja_Ajouter": "Team already added !",
+    "Configuration_Deja_Ajouter": "Configuration already added !",
     "Nouvelle_Equipe": "New Team",
     "Confirmation_De_Suppression_De_Equipe": "Do you really want to delete this team ? ",
     "Equipes": "Teams",
