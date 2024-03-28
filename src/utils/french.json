@@ -225,5 +225,9 @@
     "Please_Select_Supervisor_Fields": "Veuillez selectionner les champs superviseur",
     "Program_Stage_Configuration_Help": "Configurez pour chaque program stage, le groupe d'unités d'organisation, les champs du superviseur et le statut de supervision. Cette configuration aidera l'application à savoir dans quels champs elle peut prendre ou écrire des informations",
     "Add":"Ajouter",
-    "Specific_Stage":"Planifier pour une stade spécifique ? "
+    "Specific_Stage":"Planifier pour une stade spécifique ? ",
+    "Supervision_Planned_With_Success_On":"Supervision planifiée avec succès sur ",
+    "Supervision_Status_fields":"Champs status supervision",
+    "Supervisor_Fields":"Champs superviseur"
+
 }

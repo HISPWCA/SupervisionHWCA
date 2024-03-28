@@ -252,13 +252,13 @@ export const Dashboard = ({ me }) => {
             DESCENDANTS
           );
           loadOptions(
-            currentProgram.statusSupervision?.dataElement?.id,
+            currentProgram?.programStageConfigurations?.[0]?.statusSupervisionField?.id,
             setStatusSupervisionOptions
           );
-          loadOptions(
-            currentProgram.statusPayment?.dataElement?.id,
-            setStatusPaymentOptions
-          );
+          // loadOptions(
+          //   currentProgram.statusPayment?.dataElement?.id,
+          //   setStatusPaymentOptions
+          // );
         }
       }
       loadUsers(me?.organisationUnits?.[0]?.id);
@@ -635,7 +635,9 @@ export const Dashboard = ({ me }) => {
                   ev.dataValues?.find(
                     (dv) =>
                       dv.dataElement ===
-                      selectedProgram?.statusSupervision?.dataElement?.id
+                      selectedProgram?.programStageConfigurations?.find(
+                        (p) => p.programStage?.id === ev.programStage
+                      ).statusSupervisionField?.id
                   )?.value || getDefaultStatusSupervisionIfStatusIsNull(),
                 statusPayment:
                   ev.dataValues?.find(
@@ -969,6 +971,10 @@ export const Dashboard = ({ me }) => {
       <div style={{ marginTop: "10px" }}>
         <Card size="small" className="my-shadow">
           <Row gutter={[10, 10]}>
+            {console.log([
+              { id: null, displayName: SCHEDULED.name, code: SCHEDULED.value },
+              ...statusSupervisionOptions,
+            ])}
             {[
               { id: null, displayName: SCHEDULED.name, code: SCHEDULED.value },
               ...statusSupervisionOptions,
@@ -1055,10 +1061,9 @@ export const Dashboard = ({ me }) => {
                             fontSize: "13px",
                           }}
                         >
-                          {" "}
                           {calculatePourcentageOfSupervision(
                             statusPayload[option.code]?.value || 0
-                          )}{" "}
+                          )}
                         </span>
                       </div>
                     </div>
@@ -1443,7 +1448,6 @@ export const Dashboard = ({ me }) => {
           >
             {teiList.length === 0 && (
               <div style={{ fontWeight: "bold", color: `${BLACK}90` }}>
-                {" "}
                 {translate("Aucune_donnees_Disponibles")} !
               </div>
             )}
@@ -1526,12 +1530,14 @@ export const Dashboard = ({ me }) => {
       );
       setTeiList([]);
       setSelectedProgram(supFound);
+      // loadOptions(
+      //   supFound.statusPayment?.dataElement?.id,
+      //   setStatusPaymentOptions
+      // );
+
+      console.log("supFound : ", supFound)
       loadOptions(
-        supFound.statusPayment?.dataElement?.id,
-        setStatusPaymentOptions
-      );
-      loadOptions(
-        supFound.statusSupervision?.dataElement?.id,
+        supFound?.programStageConfigurations?.[0]?.statusSupervisionField?.id,
         setStatusSupervisionOptions
       );
     }

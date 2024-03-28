@@ -102,6 +102,7 @@ const Setting = () => {
     selectedStatusSupervisionDataElement,
     setSelectedStatusSupervisionDataElement,
   ] = useState(null);
+
   const [programStageConfigurations, setProgramStageConfigurations] = useState(
     []
   );
@@ -121,14 +122,15 @@ const Setting = () => {
   const [selectedAnalyseType, setSelectedAnalyseType] = useState(
     TYPE_ANALYSE_DATA_ELEMENT
   );
+
   const [selectedAnalyseIndicator, setSelectedAnalyseIndicator] =
     useState(null);
   const [selectedAnalyseDataElement, setSelectedAnalyseDataElement] =
     useState(null);
   const [selectedProgramStage, setSelectedProgramStage] = useState(null);
   const [
-    selectedStatutSupervisionProgramStage,
-    setSelectedStatutSupervisionProgramStage,
+    selectedSupervisionProgramStage,
+    setSelectedStatusSupervisionProgramStage,
   ] = useState(null);
   const [
     selectedStatutPaymentProgramStage,
@@ -293,7 +295,7 @@ const Setting = () => {
     setIndicatorGroups([]);
     setSelectedProgramStage(null);
     setSelectedDataElements([]);
-    setSelectedStatutSupervisionProgramStage(null);
+    setSelectedStatusSupervisionProgramStage(null);
     setSelectedStatutSupervisionDataElement(null);
     setSelectedStatutPaymentProgramStage(null);
     setSelectedStatutPaymentDataElement(null);
@@ -512,7 +514,7 @@ const Setting = () => {
         setSelectedTEIProgram(null);
         setSelectedProgramStage(null);
         setSelectedDataElements([]);
-        setSelectedStatutSupervisionProgramStage(null);
+        setSelectedStatusSupervisionProgramStage(null);
         setSelectedStatutSupervisionDataElement(null);
         setSelectedStatutPaymentProgramStage(null);
         setSelectedStatutPaymentDataElement(null);
@@ -669,13 +671,13 @@ const Setting = () => {
         }
 
         if (
-          selectedStatutSupervisionProgramStage &&
+          selectedSupervisionProgramStage &&
           selectedStatutSupervisionDataElement
         ) {
           payload.statusSupervision = {
             programStage: {
-              id: selectedStatutSupervisionProgramStage.id,
-              displayName: selectedStatutSupervisionProgramStage.displayName,
+              id: selectedSupervisionProgramStage.id,
+              displayName: selectedSupervisionProgramStage.displayName,
             },
             dataElement: selectedStatutSupervisionDataElement,
           };
@@ -719,7 +721,7 @@ const Setting = () => {
 
         setMappingConfigSupervisions(newList);
         setSelectedTEIProgram(null);
-        setSelectedStatutSupervisionProgramStage(null);
+        setSelectedStatusSupervisionProgramStage(null);
         setSelectedStatutSupervisionDataElement(null);
         setSelectedStatutPaymentProgramStage(null);
         setSelectedStatutPaymentDataElement(null);
@@ -984,25 +986,12 @@ const Setting = () => {
     );
   };
 
-  const handleSelectProgramStage = (value) => {
-    setSelectedProgramStage(
-      programStages.find((pstage) => pstage.id === value)
-    );
-    setSelectedDataElements([]);
-  };
-
   const handleSelectStatutSupervisionDataElement = (value) => {
-    setSelectedStatutSupervisionDataElement(
+    const statusDataElement =
       selectedProgramStageForConfiguration.programStageDataElements
         ?.map((p) => p.dataElement)
-        .find((dataElement) => dataElement.id === value)
-    );
-  };
-
-  const handleSelectStatutSupervisionProgramStage = (value) => {
-    setSelectedStatutSupervisionProgramStage(
-      programStages.find((pstage) => pstage.id === value)
-    );
+        .find((dataElement) => dataElement.id === value);
+    setSelectedStatusSupervisionDataElement(statusDataElement);
   };
 
   const handleSelectProgramStageForConfiguration = (value) => {
@@ -1010,7 +999,7 @@ const Setting = () => {
       programStages.find((pstage) => pstage.id === value)
     );
 
-    setSelectedStatutSupervisionProgramStage(null);
+    setSelectedStatusSupervisionProgramStage(null);
     setSelectedSupervisorDataElements([]);
   };
 
@@ -1034,74 +1023,6 @@ const Setting = () => {
     );
     setSelectedStatutPaymentDataElement(null);
   };
-
-  const RenderSupervisorFieldConfiguration = () => (
-    <div style={{ marginTop: "20px" }}>
-      <Card bodyStyle={{ padding: "0px" }} className="my-shadow" size="small">
-        <div style={{ padding: "10px", borderBottom: "1px solid #ccc" }}>
-          <div style={{ fontWeight: "bold" }}>
-            {translate("Configuration_Champ_Supervision")}
-          </div>
-          <div
-            style={{ marginTop: "10px", color: "#00000080", fontSize: "13px" }}
-          >
-            {translate("Aide_Configuration_Supervision")}
-          </div>
-        </div>
-        <div style={{ padding: "10px" }}>
-          <Row gutter={[10, 10]}>
-            <Col md={12}>
-              <div>
-                <div style={{ marginBottom: "5px" }}>
-                  {translate("Programmes_Stage")}
-                </div>
-                <Select
-                  options={programStages.map((programStage) => ({
-                    label: programStage.displayName,
-                    value: programStage.id,
-                  }))}
-                  placeholder={translate("Programmes_Stage")}
-                  style={{ width: "100%" }}
-                  optionFilterProp="label"
-                  value={selectedProgramStage?.id}
-                  onChange={handleSelectProgramStage}
-                  showSearch
-                  allowClear
-                  loading={loadingProgramStages}
-                  disabled={loadingProgramStages}
-                />
-              </div>
-            </Col>
-            {selectedProgramStage && (
-              <Col md={12} xs={24}>
-                <div>
-                  <div style={{ marginBottom: "5px" }}>
-                    {translate("Element_Donne")}
-                  </div>
-                  <Select
-                    options={selectedProgramStage?.programStageDataElements?.map(
-                      (progStageDE) => ({
-                        label: progStageDE.dataElement?.displayName,
-                        value: progStageDE.dataElement?.id,
-                      })
-                    )}
-                    placeholder={translate("Element_Donne")}
-                    style={{ width: "100%" }}
-                    mode="multiple"
-                    onChange={handleSelectDataElements}
-                    value={selectedDataElements?.map((s) => s.id)}
-                    optionFilterProp="label"
-                    showSearch
-                    allowClear
-                  />
-                </div>
-              </Col>
-            )}
-          </Row>
-        </div>
-      </Card>
-    </div>
-  );
 
   const RenderSupervisionConfiguration = () => (
     <>
@@ -1230,7 +1151,7 @@ const Setting = () => {
       setSelectedDataElements(
         prog?.fieldConfig?.supervisor?.dataElements || []
       );
-      setSelectedStatutSupervisionProgramStage(
+      setSelectedStatusSupervisionProgramStage(
         programStageList.find(
           (psg) => psg.id === prog.statusSupervision?.programStage?.id
         )
@@ -1382,7 +1303,6 @@ const Setting = () => {
   );
 
   const handleEditProgramStageConfigurations = (value) => {
-    console.log("Value : ", value);
     try {
       const foundProgramStage = programStages.find(
         (p) => p.id === value.programStage?.id
@@ -1452,10 +1372,6 @@ const Setting = () => {
             },
           ];
 
-      console.log(
-        "newProgramStageConfigurations: ",
-        newProgramStageConfigurations
-      );
       setProgramStageConfigurations(newProgramStageConfigurations);
       setSelectedProgramStageForConfiguration(null);
       setSelectedOrganisationUnitGroup(null);
@@ -1542,7 +1458,7 @@ const Setting = () => {
                   <Col md={12}>
                     <div>
                       <div style={{ marginBottom: "5px" }}>
-                        Supervisor fields
+                        {translate("Supervisor_Fields")}
                       </div>
                       <Select
                         options={selectedProgramStageForConfiguration?.programStageDataElements?.map(
@@ -1569,7 +1485,7 @@ const Setting = () => {
                   <Col md={12}>
                     <div>
                       <div style={{ marginBottom: "5px" }}>
-                        Supervision Status fields
+                        {translate("Supervision_Status_fields")}
                       </div>
                       <Select
                         options={selectedProgramStageForConfiguration?.programStageDataElements?.map(
@@ -1690,73 +1606,6 @@ const Setting = () => {
               />
             </div>
           )}
-        </div>
-      </Card>
-    </div>
-  );
-
-  const RenderStatusSupervisionDataElementToUse = () => (
-    <div style={{ marginTop: "20px" }}>
-      <Card className="my-shadow" size="small">
-        <div>
-          <div style={{ fontWeight: "bold" }}>
-            {translate("Configuration_Element")}
-          </div>
-          <div
-            style={{ marginTop: "10px", color: "#00000080", fontSize: "13px" }}
-          >
-            {translate("Aide_Config_Element")}
-          </div>
-          <div style={{ margin: "10px 0px" }}>
-            <Row gutter={[10, 10]}>
-              <Col md={12}>
-                <div>
-                  <div style={{ marginBottom: "5px" }}>
-                    {translate("Programmes_Stage")}
-                  </div>
-                  <Select
-                    options={programStages.map((programStage) => ({
-                      label: programStage.displayName,
-                      value: programStage.id,
-                    }))}
-                    placeholder={translate("Programmes_Stage")}
-                    style={{ width: "100%" }}
-                    optionFilterProp="label"
-                    value={selectedStatutSupervisionProgramStage?.id}
-                    onChange={handleSelectStatutSupervisionProgramStage}
-                    showSearch
-                    allowClear
-                    loading={loadingProgramStages}
-                    disabled={loadingProgramStages}
-                  />
-                </div>
-              </Col>
-              {selectedStatutSupervisionProgramStage && (
-                <Col md={12} xs={24}>
-                  <div>
-                    <div style={{ marginBottom: "5px" }}>
-                      {translate("Elements_De_Donnees")}
-                    </div>
-                    <Select
-                      options={selectedStatutSupervisionProgramStage?.programStageDataElements?.map(
-                        (progStageDE) => ({
-                          label: progStageDE.dataElement?.displayName,
-                          value: progStageDE.dataElement?.id,
-                        })
-                      )}
-                      placeholder={translate("Elements_De_Donnees")}
-                      style={{ width: "100%" }}
-                      onChange={handleSelectStatutSupervisionDataElement}
-                      value={selectedStatutSupervisionDataElement?.id}
-                      optionFilterProp="label"
-                      showSearch
-                      allowClear
-                    />
-                  </div>
-                </Col>
-              )}
-            </Row>
-          </div>
         </div>
       </Card>
     </div>
@@ -2005,7 +1854,7 @@ const Setting = () => {
                       setFieldEditingMode(false);
                       setSelectedTEIProgram(null);
                       setSelectedProgramStage(null);
-                      setSelectedStatutSupervisionProgramStage(null);
+                      setSelectedStatusSupervisionProgramStage(null);
                       setSelectedStatutSupervisionDataElement(null);
                       setSelectedStatutPaymentProgramStage(null);
                       setSelectedStatutPaymentDataElement(null);
@@ -2013,7 +1862,6 @@ const Setting = () => {
                       setSelectedAttributesToDisplay([]);
                       setProgramStageConfigurations([]);
                       setSelectedProgramStageForConfiguration(null);
-                      setSelectedStatutSupervisionDataElement(null);
                       setSelectedSupervisorDataElements([]);
                       setSelectedSupervisionGenerationType(
                         TYPE_GENERATION_AS_TEI
@@ -2929,7 +2777,6 @@ const Setting = () => {
 
   return (
     <>
-      {console.log("program stage configuraito, ", programStageConfigurations)}
       {RenderTopContent()}
       {RenderContent()}
       <MyNotification

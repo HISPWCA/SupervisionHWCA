@@ -1983,32 +1983,8 @@ const Supervision = ({ me }) => {
         if (!enrollment_id)
           throw new Error(translate("Erreur_Creation_Enrolement"));
 
-        const availableProgramStages = [];
         const newEventsList = [];
 
-        //  Récuperation dans une list les programmes stage
-        // for (let mapping of mappingConfigs) {
-        //   if (
-        //     !availableProgramStages.includes(mapping.programStage?.id) &&
-        //     payload.programStage?.id
-        //   ) {
-        //     availableProgramStages.push(mapping.programStage.id);
-        //   }
-        // }
-
-        // if (payload.fieldConfig?.supervisor?.programStage?.id) {
-        //   if (
-        //     !availableProgramStages.includes(
-        //       payload.fieldConfig?.supervisor?.programStage?.id
-        //     )
-        //   ) {
-        //     availableProgramStages.push(
-        //       payload.fieldConfig?.supervisor?.programStage?.id
-        //     );
-        //   }
-        // }
-
-        // for (let stage of availableProgramStages) {
         const eventPayload = {
           eventDate: payload.period
             ? dayjs(payload.period).format("YYYY-MM-DD")
@@ -2199,7 +2175,6 @@ const Supervision = ({ me }) => {
         return currentTEIData;
       }
     } catch (err) {
-      console.log(err);
       throw err;
     }
   };
@@ -2609,69 +2584,42 @@ const Supervision = ({ me }) => {
 
         for (let item of inputFieldsList) {
           for (let progStageConfig of selectedProgram?.programStageConfigurations) {
+            const found_organisationUnit = organisationUnits.find(
+              (ou) => ou.id === item.organisationUnit?.id
+            );
+
+            const is_ok =
+              (found_organisationUnit &&
+                progStageConfig?.programStage &&
+                found_organisationUnit.organisationUnitGroups
+                  ?.map((ouG) => ouG.id)
+                  .includes(progStageConfig?.organisationUnitGroup?.id)) ||
+              false;
+
             /*
              * Nous allons vérifier s'il y a un program stage selectionné. S'il en a , alors on vérifier si c'ette organisation unit appartient au group
              */
-            if (item.specificStage && item.programStageConfig) {
-              if (
-                progStageConfig?.programStage?.id ===
-                  item.programStageConfig.programStage?.id &&
-                organisationUnits
-                  .find((ou) => item.organisationUnit?.id === ou.id)
-                  ?.organisationUnitGroups?.map((ouG) => ouG.id)
-                  .includes(item.programStageConfig?.organisationUnitGroup?.id)
-              ) {
-                const payload = {
-                  ...item,
-                  orgUnit: item.organisationUnit?.id,
-                  period: item.period,
-                  program: item.program?.id,
-                  programStage: item.programStageConfig?.programStage,
-                  fieldConfig: item.fieldConfig,
-                };
-
-                let createdTEIObject = null;
-
-                if (selectedSupervisionType === TYPE_SUPERVISION_AGENT) {
-                  // createdTEIObject = await generateEventsForAgent(payload);
-                } else {
-                  createdTEIObject = await generateEventsAsNewSupervision(
-                    payload
-                  );
-                }
-
-                if (createdTEIObject) {
-                  supervisionsList.push({
-                    ...item,
-                    id: uuid(),
-                    planificationType: selectedPlanificationType,
-                    indicators: selectedIndicators,
-                    orgUnit: item.organisationUnit?.id,
-                    period: item.period,
-                    program: item.program,
-                    fieldConfig: item.fieldConfig,
-
-                    tei: createdTEIObject,
-                  });
-                }
-              }
-            } else {
+            if (is_ok) {
               const payload = {
                 ...item,
                 orgUnit: item.organisationUnit?.id,
                 period: item.period,
                 program: item.program?.id,
                 fieldConfig: item.fieldConfig,
+                programStage: progStageConfig.programStage,
+                programStageConfig: progStageConfig,
               };
+
               let createdTEIObject = null;
 
               if (selectedSupervisionType === TYPE_SUPERVISION_AGENT) {
-                createdTEIObject = await generateEventsForAgent(payload);
+                // createdTEIObject = await generateEventsForAgent(payload);
               } else {
                 createdTEIObject = await generateEventsAsNewSupervision(
                   payload
                 );
               }
+
               if (createdTEIObject) {
                 supervisionsList.push({
                   ...item,
@@ -2681,6 +2629,8 @@ const Supervision = ({ me }) => {
                   orgUnit: item.organisationUnit?.id,
                   period: item.period,
                   program: item.program,
+                  programStage: progStageConfig.programStage.id,
+                  programStageConfig: progStageConfig,
                   fieldConfig: item.fieldConfig,
                   tei: createdTEIObject,
                 });
@@ -2694,13 +2644,13 @@ const Supervision = ({ me }) => {
           program: selectedProgram,
           dataSources: mappingConfigs,
           supervisions: supervisionsList,
-        }
+        };
 
         const newDataStoreSupervisionsPayload = [
           ...newDataStoreSupervisions,
           planificationPayload,
-        ]
-      
+        ];
+
         await savePanificationToDataStore(newDataStoreSupervisionsPayload);
       }
     } catch (err) {
@@ -4332,7 +4282,6 @@ const Supervision = ({ me }) => {
             borderBottom: "1px solid #ccc",
           }}
         >
-          {" "}
           {translate("Planification_Sur_Org_Units")}{" "}
         </div>
         <div style={{ padding: "10px" }}>
@@ -4892,7 +4841,7 @@ const Supervision = ({ me }) => {
               </div>
               <div style={{ padding: "10px" }}>
                 <Row gutter={[10, 10]}>
-                  <Col sm={24} md={24}>
+                  {/* <Col sm={24} md={24}>
                     <div>
                       <div
                         style={{
@@ -4958,7 +4907,7 @@ const Supervision = ({ me }) => {
                         </>
                       )}
                     </div>
-                  </Col>
+                  </Col> */}
 
                   <Col sm={24} md={24}>
                     <div>
@@ -7443,8 +7392,8 @@ const Supervision = ({ me }) => {
           fieldConfig: selectedProgram.fieldConfig,
           generationType: selectedProgram.generationType,
           libelle: "",
-          specificStage: false,
-          programStageConfig: null,
+          // specificStage: false,
+          // programStageConfig: null,
           payment: null,
           period: null,
           equipe: null,
