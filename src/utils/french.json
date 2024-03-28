@@ -217,7 +217,13 @@
     "Form_Field": "Formulaire",
     "Operation_Failed": "Echèc de l'opération !",
     "Operation_Success": "Opération éffectuée avec succès !",
-    "Annuler_Planification":"Annuler la planification",
-    "Configuration_Deja_Ajouter": "Configuration déjà ajoutée"
-
+    "Annuler_Planification": "Annuler la planification",
+    "Configuration_Deja_Ajouter": "Configuration déjà ajoutée",
+    "Please_Select_Program_Stage": "Veuillez sélectionner le programme stage",
+    "Please_Select_Organisation_Unit_Group": "Veuillez sélectionner le group d'unité d'organisation",
+    "Please_Configure_The_Program_Stage": "Veuillez configurer le programme stage",
+    "Please_Select_Supervisor_Fields": "Veuillez selectionner les champs superviseur",
+    "Program_Stage_Configuration_Help": "Configurez pour chaque program stage, le groupe d'unités d'organisation, les champs du superviseur et le statut de supervision. Cette configuration aidera l'application à savoir dans quels champs elle peut prendre ou écrire des informations",
+    "Add":"Ajouter",
+    "Specific_Stage":"Planifier pour une stade spécifique ? "
 }

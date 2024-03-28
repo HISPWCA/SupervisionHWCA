@@ -220,5 +220,12 @@
     "Form_Field": "Form field",
     "Operation_Failed": "Operation failed !",
     "Operation_Success": "Operation success !",
-    "Annuler_Planification": "Cancel planification !"
+    "Annuler_Planification": "Cancel planification !",
+    "Please_Select_Program_Stage": "Please select program stage",
+    "Please_Select_Organisation_Unit_Group": "Please select organisation unit group",
+    "Please_Configure_The_Program_Stage": "Please configure the program stages",
+    "Please_Select_Supervisor_Fields": "Please select supervisor fields",
+    "Program_Stage_Configuration_Help": "Configure for each program stage , the organisatiion unit group , the supervisor fields and supervision status. This configuration will help the application to know in which fields they can take or write informations",
+    "Add":"Add",
+    "Specific_Stage":"Plan for a specific stage ? "
 }

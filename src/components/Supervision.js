@@ -398,7 +398,6 @@ const Supervision = ({ me }) => {
         type: NOTIFICATION_SUCCESS,
       });
     } catch (err) {
-      console.log("error: ", err);
       return setNotification({
         show: true,
         message: translate("Operation_Failed"),
@@ -1408,13 +1407,14 @@ const Supervision = ({ me }) => {
                 dayjs(event.eventDate).format("YYYYMM") ===
                 dayjs(selectedPeriodSupervisionConfig).format("YYYYMM")
               ) {
-                if (
-                  event.programStage ===
-                  selectedSupervisionsConfigProgram?.statusSupervision
-                    ?.programStage?.id
-                ) {
-                  eventList.push(event);
-                }
+                // if (
+                //   event.programStage ===
+                //   selectedSupervisionsConfigProgram?.statusSupervision
+                //     ?.programStage?.id
+                // ) {
+                //   eventList.push(event);
+                // }
+                eventList.push(event);
               }
             }
 
@@ -1455,8 +1455,9 @@ const Supervision = ({ me }) => {
                   event: ev.event,
                   libelle: currentEnrollment?.orgUnitName,
                   superviseurs:
-                    selectedSupervisionsConfigProgram?.fieldConfig?.supervisor?.dataElements
-                      ?.reduce((prevEl, curr) => {
+                    selectedSupervisionsConfigProgram?.programStageConfigurations
+                      ?.find((p) => p.programStage?.id === ev.programStage)
+                      .supervisorField?.reduce((prevEl, curr) => {
                         const foundedDataValue = ev?.dataValues?.find(
                           (el) => el.dataElement === curr.id
                         );
@@ -1471,13 +1472,13 @@ const Supervision = ({ me }) => {
                       }, [])
                       ?.join(","),
                   programStageId: ev.programStage,
-                  // statusSupervision: dayjs(ev.eventDate).isAfter(dayjs()) ? getDefaultStatusSupervisionIfStatusIsNull() : currentEnrollment?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
                   statusSupervision:
                     ev.dataValues?.find(
                       (dv) =>
                         dv.dataElement ===
-                        selectedSupervisionsConfigProgram?.statusSupervision
-                          ?.dataElement?.id
+                        selectedSupervisionsConfigProgram?.programStageConfigurations?.find(
+                          (p) => p.programStage?.id === ev.programStage
+                        ).statusSupervisionField?.id
                     )?.value || getDefaultStatusSupervisionIfStatusIsNull(),
                   statusPayment:
                     ev.dataValues?.find(
@@ -1745,208 +1746,210 @@ const Supervision = ({ me }) => {
             translate("Erreur_Creation_Enrollment")
         );
 
-      const availableProgramStages = [];
+      // const availableProgramStages = [];
       const newEventsList = [];
 
       //  Récuperation dans une list les programmes stage
-      for (let mapping of mappingConfigs) {
-        if (!availableProgramStages.includes(mapping.programStage?.id)) {
-          availableProgramStages.push(mapping.programStage.id);
-        }
+      // for (let mapping of mappingConfigs) {
+      //   if (
+      //     !availableProgramStages.includes(mapping.programStage?.id) &&
+      //     mapping.programStage?.id === payload?.programStage?.id
+      //   ) {
+      //     availableProgramStages.push(mapping.programStage.id);
+      //   }
+      // }
+
+      // if (payload.fieldConfig?.supervisor?.programStage?.id) {
+      //   if (
+      //     !availableProgramStages.includes(
+      //       payload.fieldConfig?.supervisor?.programStage?.id
+      //     )
+      //   ) {
+      //     availableProgramStages.push(
+      //       payload.fieldConfig?.supervisor?.programStage?.id
+      //     );
+      //   }
+      // }
+
+      // for (let stage of availableProgramStages) {
+      const eventPayload = {
+        eventDate: payload.period
+          ? dayjs(payload.period).format("YYYY-MM-DD")
+          : dayjs().format("YYYY-MM-DD"),
+        program: payload.program,
+        orgUnit: payload.orgUnit,
+        enrollment: enrollment_id,
+        programStage: payload.programStage?.id,
+        trackedEntityInstance: tei_id,
+        dataValues: [],
+      };
+
+      if (mappingConfigs?.length > 0) {
+        eventPayload.status = "ACTIVE";
+        eventPayload.eventDate = payload.period
+          ? dayjs(payload.period).format("YYYY-MM-DD")
+          : dayjs().format("YYYY-MM-DD");
+        eventPayload.dueDate = payload.period
+          ? dayjs(payload.period).format("YYYY-MM-DD")
+          : dayjs().format("YYYY-MM-DD");
+        eventPayload.dataValues = mappingConfigs
+          .filter((ev) => ev.programStage?.id === payload.programStage?.id)
+          .map((ev) => ({
+            dataElement: ev.dataElement?.id,
+            value: ev.indicator?.displayName,
+          }));
+      } else {
+        eventPayload.status = "SCHEDULE";
+        eventPayload.dueDate = payload.period
+          ? dayjs(payload.period).format("YYYY-MM-DD")
+          : dayjs().format("YYYY-MM-DD");
       }
 
-      if (payload.fieldConfig?.supervisor?.programStage?.id) {
+      // Ajoute des dataValues superviseurs
+      if (payload.programStageConfig?.supervisorField?.length > 0) {
+        const newDataValues = [];
+
+        /*
+         * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son INFÉRIEUR au nombres de superviseurs sélectionnés
+         */
+
+        const newSupervisorsList = [
+          ...payload.supervisors?.map((s) => s.displayName),
+          ...payload.otherSupervisors,
+        ];
+
         if (
-          !availableProgramStages.includes(
-            payload.fieldConfig?.supervisor?.programStage?.id
-          )
+          payload.programStageConfig?.supervisorField?.length <
+          newSupervisorsList?.length
         ) {
-          availableProgramStages.push(
-            payload.fieldConfig?.supervisor?.programStage?.id
+          const supervisorArrayCurrent = newSupervisorsList?.slice(
+            0,
+            payload.programStageConfig?.supervisorField?.length
           );
+          const supervisorArraylast = newSupervisorsList?.slice(
+            payload.programStageConfig?.supervisorField?.length
+          );
+
+          for (
+            let i = 0;
+            i < payload.programStageConfig?.supervisorField?.length;
+            i++
+          ) {
+            for (let j = 0; j < supervisorArrayCurrent.length; j++) {
+              if (i === j) {
+                const currentDE =
+                  payload.programStageConfig?.supervisorField[i];
+                const currentSUP = supervisorArrayCurrent[j];
+
+                if (
+                  currentDE &&
+                  currentSUP &&
+                  !newDataValues
+                    .map((dv) => dv.dataElement)
+                    .includes(currentDE.id)
+                ) {
+                  if (
+                    i ===
+                    payload.programStageConfig?.supervisorField?.length - 1
+                  ) {
+                    newDataValues.push({
+                      dataElement: currentDE.id,
+                      value: `${currentSUP},${supervisorArraylast?.join(",")}`,
+                    });
+                  } else {
+                    newDataValues.push({
+                      dataElement: currentDE.id,
+                      value: currentSUP,
+                    });
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        /*
+         * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son EGALE au nombres de superviseurs sélectionnés
+         */
+        if (
+          payload.programStageConfig?.supervisorField?.length ===
+          newSupervisorsList?.length
+        ) {
+          for (
+            let i = 0;
+            i < payload.programStageConfig?.supervisorField?.length;
+            i++
+          ) {
+            for (let j = 0; j < newSupervisorsList.length; j++) {
+              if (i === j) {
+                const currentDE =
+                  payload.programStageConfig?.supervisorField[i];
+                const currentSUP = newSupervisorsList[j];
+                if (
+                  currentDE &&
+                  currentSUP &&
+                  !newDataValues
+                    .map((dv) => dv.dataElement)
+                    .includes(currentDE.id)
+                ) {
+                  newDataValues.push({
+                    dataElement: currentDE.id,
+                    value: currentSUP,
+                  });
+                }
+              }
+            }
+          }
+        }
+
+        /*
+         * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son SUPERIEUR au nombres de superviseurs sélectionnés
+         */
+        if (
+          payload.programStageConfig?.supervisorField?.length >
+          newSupervisorsList?.length
+        ) {
+          for (
+            let i = 0;
+            i < payload.programStageConfig?.supervisorField?.length;
+            i++
+          ) {
+            for (let j = 0; j < newSupervisorsList?.length; j++) {
+              if (i === j) {
+                const currentDE =
+                  payload.programStageConfig?.supervisorField[i];
+                const currentSUP = newSupervisorsList[j];
+                if (
+                  currentDE &&
+                  currentSUP &&
+                  !newDataValues
+                    .map((dv) => dv.dataElement)
+                    .includes(currentDE.id)
+                ) {
+                  newDataValues.push({
+                    dataElement: currentDE.id,
+                    value: currentSUP,
+                  });
+                }
+              }
+            }
+          }
+        }
+
+        if (newDataValues.length > 0) {
+          eventPayload.dataValues = [
+            ...eventPayload.dataValues,
+            ...newDataValues,
+          ];
         }
       }
 
-      for (let stage of availableProgramStages) {
-        const eventPayload = {
-          eventDate: payload.period
-            ? dayjs(payload.period).format("YYYY-MM-DD")
-            : dayjs().format("YYYY-MM-DD"),
-          program: payload.program,
-          orgUnit: payload.orgUnit,
-          enrollment: enrollment_id,
-          programStage: stage,
-          trackedEntityInstance: tei_id,
-          dataValues: [],
-        };
-
-        if (mappingConfigs?.length > 0) {
-          eventPayload.status = "ACTIVE";
-          eventPayload.eventDate = payload.period
-            ? dayjs(payload.period).format("YYYY-MM-DD")
-            : dayjs().format("YYYY-MM-DD");
-          eventPayload.dueDate = payload.period
-            ? dayjs(payload.period).format("YYYY-MM-DD")
-            : dayjs().format("YYYY-MM-DD");
-          eventPayload.dataValues = mappingConfigs
-            .filter((ev) => ev.programStage?.id === stage)
-            .map((ev) => ({
-              dataElement: ev.dataElement?.id,
-              value: ev.indicator?.displayName,
-            }));
-        } else {
-          eventPayload.status = "SCHEDULE";
-          eventPayload.dueDate = payload.period
-            ? dayjs(payload.period).format("YYYY-MM-DD")
-            : dayjs().format("YYYY-MM-DD");
-        }
-
-        // Ajoute des dataValues superviseurs
-        if (
-          payload.fieldConfig?.supervisor?.programStage?.id === stage &&
-          payload.fieldConfig?.supervisor?.dataElements?.length > 0
-        ) {
-          const newDataValues = [];
-
-          /*
-           * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son INFÉRIEUR au nombres de superviseurs sélectionnés
-           */
-
-          const newSupervisorsList = [
-            ...payload.supervisors?.map((s) => s.displayName),
-            ...payload.otherSupervisors,
-          ];
-
-          if (
-            payload.fieldConfig?.supervisor?.dataElements?.length <
-            newSupervisorsList?.length
-          ) {
-            const supervisorArrayCurrent = newSupervisorsList?.slice(
-              0,
-              payload.fieldConfig?.supervisor?.dataElements?.length
-            );
-            const supervisorArraylast = newSupervisorsList?.slice(
-              payload.fieldConfig?.supervisor?.dataElements?.length
-            );
-
-            for (
-              let i = 0;
-              i < payload.fieldConfig?.supervisor?.dataElements?.length;
-              i++
-            ) {
-              for (let j = 0; j < supervisorArrayCurrent.length; j++) {
-                if (i === j) {
-                  const currentDE =
-                    payload.fieldConfig?.supervisor?.dataElements[i];
-                  const currentSUP = supervisorArrayCurrent[j];
-                  if (
-                    currentDE &&
-                    currentSUP &&
-                    !newDataValues
-                      .map((dv) => dv.dataElement)
-                      .includes(currentDE.id)
-                  ) {
-                    if (
-                      i ===
-                      payload.fieldConfig?.supervisor?.dataElements?.length - 1
-                    ) {
-                      newDataValues.push({
-                        dataElement: currentDE.id,
-                        value: `${currentSUP},${supervisorArraylast?.join(
-                          ","
-                        )}`,
-                      });
-                    } else {
-                      newDataValues.push({
-                        dataElement: currentDE.id,
-                        value: currentSUP,
-                      });
-                    }
-                  }
-                }
-              }
-            }
-          }
-
-          /*
-           * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son EGALE au nombres de superviseurs sélectionnés
-           */
-          if (
-            payload.fieldConfig?.supervisor?.dataElements?.length ===
-            newSupervisorsList?.length
-          ) {
-            for (
-              let i = 0;
-              i < payload.fieldConfig?.supervisor?.dataElements?.length;
-              i++
-            ) {
-              for (let j = 0; j < newSupervisorsList.length; j++) {
-                if (i === j) {
-                  const currentDE =
-                    payload.fieldConfig?.supervisor?.dataElements[i];
-                  const currentSUP = newSupervisorsList[j];
-                  if (
-                    currentDE &&
-                    currentSUP &&
-                    !newDataValues
-                      .map((dv) => dv.dataElement)
-                      .includes(currentDE.id)
-                  ) {
-                    newDataValues.push({
-                      dataElement: currentDE.id,
-                      value: currentSUP,
-                    });
-                  }
-                }
-              }
-            }
-          }
-
-          /*
-           * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son SUPERIEUR au nombres de superviseurs sélectionnés
-           */
-          if (
-            payload.fieldConfig?.supervisor?.dataElements?.length >
-            newSupervisorsList?.length
-          ) {
-            for (
-              let i = 0;
-              i < payload.fieldConfig?.supervisor?.dataElements?.length;
-              i++
-            ) {
-              for (let j = 0; j < newSupervisorsList?.length; j++) {
-                if (i === j) {
-                  const currentDE =
-                    payload.fieldConfig?.supervisor?.dataElements[i];
-                  const currentSUP = newSupervisorsList[j];
-                  if (
-                    currentDE &&
-                    currentSUP &&
-                    !newDataValues
-                      .map((dv) => dv.dataElement)
-                      .includes(currentDE.id)
-                  ) {
-                    newDataValues.push({
-                      dataElement: currentDE.id,
-                      value: currentSUP,
-                    });
-                  }
-                }
-              }
-            }
-          }
-
-          if (newDataValues.length > 0) {
-            eventPayload.dataValues = [
-              ...eventPayload.dataValues,
-              ...newDataValues,
-            ];
-          }
-        }
-
-        if (!newEventsList.map((ev) => ev.programStage).includes(stage)) {
-          newEventsList.push(eventPayload);
-        }
+      if (
+        !newEventsList
+          .map((ev) => ev.programStage)
+          .includes(payload.programStage?.id)
+      ) {
+        newEventsList.push(eventPayload);
       }
 
       await createEvents({ events: newEventsList });
@@ -1984,205 +1987,207 @@ const Supervision = ({ me }) => {
         const newEventsList = [];
 
         //  Récuperation dans une list les programmes stage
-        for (let mapping of mappingConfigs) {
-          if (!availableProgramStages.includes(mapping.programStage?.id)) {
-            availableProgramStages.push(mapping.programStage.id);
-          }
+        // for (let mapping of mappingConfigs) {
+        //   if (
+        //     !availableProgramStages.includes(mapping.programStage?.id) &&
+        //     payload.programStage?.id
+        //   ) {
+        //     availableProgramStages.push(mapping.programStage.id);
+        //   }
+        // }
+
+        // if (payload.fieldConfig?.supervisor?.programStage?.id) {
+        //   if (
+        //     !availableProgramStages.includes(
+        //       payload.fieldConfig?.supervisor?.programStage?.id
+        //     )
+        //   ) {
+        //     availableProgramStages.push(
+        //       payload.fieldConfig?.supervisor?.programStage?.id
+        //     );
+        //   }
+        // }
+
+        // for (let stage of availableProgramStages) {
+        const eventPayload = {
+          eventDate: payload.period
+            ? dayjs(payload.period).format("YYYY-MM-DD")
+            : dayjs().format("YYYY-MM-DD"),
+          program: payload.program,
+          orgUnit: payload.orgUnit,
+          enrollment: enrollment_id,
+          programStage: payload.programStage?.id,
+          trackedEntityInstance: current_tei.trackedEntityInstance,
+          dataValues: [],
+        };
+
+        if (mappingConfigs?.length > 0) {
+          eventPayload.status = "ACTIVE";
+          eventPayload.eventDate = payload.period
+            ? dayjs(payload.period).format("YYYY-MM-DD")
+            : dayjs().format("YYYY-MM-DD");
+          eventPayload.dueDate = payload.period
+            ? dayjs(payload.period).format("YYYY-MM-DD")
+            : dayjs().format("YYYY-MM-DD");
+          eventPayload.dataValues = mappingConfigs
+            .filter((ev) => ev.programStage?.id === payload.programStage?.id)
+            .map((ev) => ({
+              dataElement: ev.dataElement?.id,
+              value: ev.indicator?.displayName,
+            }));
+        } else {
+          eventPayload.status = "SCHEDULE";
+          eventPayload.dueDate = payload.period
+            ? dayjs(payload.period).format("YYYY-MM-DD")
+            : dayjs().format("YYYY-MM-DD");
         }
 
-        if (payload.fieldConfig?.supervisor?.programStage?.id) {
+        // Ajoute des dataValues superviseurs
+        if (payload.programStageConfig?.supervisorField?.length > 0) {
+          const newDataValues = [];
+
+          /*
+           * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son INFÉRIEUR au nombres de superviseurs sélectionnés
+           */
+
+          const newSupervisorsList = [
+            ...payload.supervisors?.map((s) => s.displayName),
+            ...payload.otherSupervisors,
+          ];
+
           if (
-            !availableProgramStages.includes(
-              payload.fieldConfig?.supervisor?.programStage?.id
-            )
+            payload.programStageConfig?.supervisorField?.length <
+            newSupervisorsList?.length
           ) {
-            availableProgramStages.push(
-              payload.fieldConfig?.supervisor?.programStage?.id
+            const supervisorArrayCurrent = newSupervisorsList?.slice(
+              0,
+              payload.programStageConfig?.supervisorField?.length
             );
+            const supervisorArraylast = newSupervisorsList?.slice(
+              payload.programStageConfig?.supervisorField?.length
+            );
+
+            for (
+              let i = 0;
+              i < payload.programStageConfig?.supervisorField?.length;
+              i++
+            ) {
+              for (let j = 0; j < supervisorArrayCurrent.length; j++) {
+                if (i === j) {
+                  const currentDE =
+                    payload.programStageConfig?.supervisorField[i];
+                  const currentSUP = supervisorArrayCurrent[j];
+                  if (
+                    currentDE &&
+                    currentSUP &&
+                    !newDataValues
+                      .map((dv) => dv.dataElement)
+                      .includes(currentDE.id)
+                  ) {
+                    if (
+                      i ===
+                      payload.programStageConfig?.supervisorField?.length - 1
+                    ) {
+                      newDataValues.push({
+                        dataElement: currentDE.id,
+                        value: `${currentSUP},${supervisorArraylast?.join(
+                          ","
+                        )}`,
+                      });
+                    } else {
+                      newDataValues.push({
+                        dataElement: currentDE.id,
+                        value: currentSUP,
+                      });
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          /*
+           * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son EGALE au nombres de superviseurs sélectionnés
+           */
+          if (
+            payload.programStageConfig?.supervisorField?.length ===
+            newSupervisorsList?.length
+          ) {
+            for (
+              let i = 0;
+              i < payload.programStageConfig?.supervisorField?.length;
+              i++
+            ) {
+              for (let j = 0; j < newSupervisorsList.length; j++) {
+                if (i === j) {
+                  const currentDE =
+                    payload.programStageConfig?.supervisorField[i];
+                  const currentSUP = newSupervisorsList[j];
+                  if (
+                    currentDE &&
+                    currentSUP &&
+                    !newDataValues
+                      .map((dv) => dv.dataElement)
+                      .includes(currentDE.id)
+                  ) {
+                    newDataValues.push({
+                      dataElement: currentDE.id,
+                      value: currentSUP,
+                    });
+                  }
+                }
+              }
+            }
+          }
+
+          /*
+           * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son SUPERIEUR au nombres de superviseurs sélectionnés
+           */
+          if (
+            payload.programStageConfig?.supervisorField?.length >
+            newSupervisorsList?.length
+          ) {
+            for (
+              let i = 0;
+              i < payload.programStageConfig?.supervisorField?.length;
+              i++
+            ) {
+              for (let j = 0; j < newSupervisorsList?.length; j++) {
+                if (i === j) {
+                  const currentDE =
+                    payload.programStageConfig?.supervisorField[i];
+                  const currentSUP = newSupervisorsList[j];
+                  if (
+                    currentDE &&
+                    currentSUP &&
+                    !newDataValues
+                      .map((dv) => dv.dataElement)
+                      .includes(currentDE.id)
+                  ) {
+                    newDataValues.push({
+                      dataElement: currentDE.id,
+                      value: currentSUP,
+                    });
+                  }
+                }
+              }
+            }
+          }
+
+          if (newDataValues.length > 0) {
+            eventPayload.dataValues = [
+              ...eventPayload.dataValues,
+              ...newDataValues,
+            ];
           }
         }
 
-        for (let stage of availableProgramStages) {
-          const eventPayload = {
-            eventDate: payload.period
-              ? dayjs(payload.period).format("YYYY-MM-DD")
-              : dayjs().format("YYYY-MM-DD"),
-            program: payload.program,
-            orgUnit: payload.orgUnit,
-            enrollment: enrollment_id,
-            programStage: stage,
-            trackedEntityInstance: current_tei.trackedEntityInstance,
-            dataValues: [],
-          };
-
-          if (mappingConfigs?.length > 0) {
-            eventPayload.status = "ACTIVE";
-            eventPayload.eventDate = payload.period
-              ? dayjs(payload.period).format("YYYY-MM-DD")
-              : dayjs().format("YYYY-MM-DD");
-            eventPayload.dueDate = payload.period
-              ? dayjs(payload.period).format("YYYY-MM-DD")
-              : dayjs().format("YYYY-MM-DD");
-            eventPayload.dataValues = mappingConfigs
-              .filter((ev) => ev.programStage?.id === stage)
-              .map((ev) => ({
-                dataElement: ev.dataElement?.id,
-                value: ev.indicator?.displayName,
-              }));
-          } else {
-            eventPayload.status = "SCHEDULE";
-            eventPayload.dueDate = payload.period
-              ? dayjs(payload.period).format("YYYY-MM-DD")
-              : dayjs().format("YYYY-MM-DD");
-          }
-
-          // Ajoute des dataValues superviseurs
-          if (
-            payload.fieldConfig?.supervisor?.programStage?.id === stage &&
-            payload.fieldConfig?.supervisor?.dataElements?.length > 0
-          ) {
-            const newDataValues = [];
-
-            /*
-             * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son INFÉRIEUR au nombres de superviseurs sélectionnés
-             */
-
-            const newSupervisorsList = [
-              ...payload.supervisors?.map((s) => s.displayName),
-              ...payload.otherSupervisors,
-            ];
-
-            if (
-              payload.fieldConfig?.supervisor?.dataElements?.length <
-              newSupervisorsList?.length
-            ) {
-              const supervisorArrayCurrent = newSupervisorsList?.slice(
-                0,
-                payload.fieldConfig?.supervisor?.dataElements?.length
-              );
-              const supervisorArraylast = newSupervisorsList?.slice(
-                payload.fieldConfig?.supervisor?.dataElements?.length
-              );
-
-              for (
-                let i = 0;
-                i < payload.fieldConfig?.supervisor?.dataElements?.length;
-                i++
-              ) {
-                for (let j = 0; j < supervisorArrayCurrent.length; j++) {
-                  if (i === j) {
-                    const currentDE =
-                      payload.fieldConfig?.supervisor?.dataElements[i];
-                    const currentSUP = supervisorArrayCurrent[j];
-                    if (
-                      currentDE &&
-                      currentSUP &&
-                      !newDataValues
-                        .map((dv) => dv.dataElement)
-                        .includes(currentDE.id)
-                    ) {
-                      if (
-                        i ===
-                        payload.fieldConfig?.supervisor?.dataElements?.length -
-                          1
-                      ) {
-                        newDataValues.push({
-                          dataElement: currentDE.id,
-                          value: `${currentSUP},${supervisorArraylast?.join(
-                            ","
-                          )}`,
-                        });
-                      } else {
-                        newDataValues.push({
-                          dataElement: currentDE.id,
-                          value: currentSUP,
-                        });
-                      }
-                    }
-                  }
-                }
-              }
-            }
-
-            /*
-             * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son EGALE au nombres de superviseurs sélectionnés
-             */
-            if (
-              payload.fieldConfig?.supervisor?.dataElements?.length ===
-              newSupervisorsList?.length
-            ) {
-              for (
-                let i = 0;
-                i < payload.fieldConfig?.supervisor?.dataElements?.length;
-                i++
-              ) {
-                for (let j = 0; j < newSupervisorsList.length; j++) {
-                  if (i === j) {
-                    const currentDE =
-                      payload.fieldConfig?.supervisor?.dataElements[i];
-                    const currentSUP = newSupervisorsList[j];
-                    if (
-                      currentDE &&
-                      currentSUP &&
-                      !newDataValues
-                        .map((dv) => dv.dataElement)
-                        .includes(currentDE.id)
-                    ) {
-                      newDataValues.push({
-                        dataElement: currentDE.id,
-                        value: currentSUP,
-                      });
-                    }
-                  }
-                }
-              }
-            }
-
-            /*
-             * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son SUPERIEUR au nombres de superviseurs sélectionnés
-             */
-            if (
-              payload.fieldConfig?.supervisor?.dataElements?.length >
-              newSupervisorsList?.length
-            ) {
-              for (
-                let i = 0;
-                i < payload.fieldConfig?.supervisor?.dataElements?.length;
-                i++
-              ) {
-                for (let j = 0; j < newSupervisorsList?.length; j++) {
-                  if (i === j) {
-                    const currentDE =
-                      payload.fieldConfig?.supervisor?.dataElements[i];
-                    const currentSUP = newSupervisorsList[j];
-                    if (
-                      currentDE &&
-                      currentSUP &&
-                      !newDataValues
-                        .map((dv) => dv.dataElement)
-                        .includes(currentDE.id)
-                    ) {
-                      newDataValues.push({
-                        dataElement: currentDE.id,
-                        value: currentSUP,
-                      });
-                    }
-                  }
-                }
-              }
-            }
-
-            if (newDataValues.length > 0) {
-              eventPayload.dataValues = [
-                ...eventPayload.dataValues,
-                ...newDataValues,
-              ];
-            }
-          }
-
-          if (!newEventsList.map((ev) => ev.programStage).includes(stage)) {
-            newEventsList.push(eventPayload);
-          }
+        if (
+          !newEventsList
+            .map((ev) => ev.programStage)
+            .includes(payload.programStage?.id)
+        ) {
+          newEventsList.push(eventPayload);
         }
 
         await createEvents({ events: newEventsList });
@@ -2194,6 +2199,7 @@ const Supervision = ({ me }) => {
         return currentTEIData;
       }
     } catch (err) {
+      console.log(err);
       throw err;
     }
   };
@@ -2281,10 +2287,7 @@ const Supervision = ({ me }) => {
           }
 
           // Ajoute des dataValues superviseurs
-          if (
-            payload.fieldConfig?.supervisor?.programStage?.id === stage &&
-            payload.fieldConfig?.supervisor?.dataElements?.length > 0
-          ) {
+          if (payload.programStageConfig?.supervisorField?.length > 0) {
             const newDataValues = [];
 
             /*
@@ -2297,26 +2300,26 @@ const Supervision = ({ me }) => {
             ];
 
             if (
-              payload.fieldConfig?.supervisor?.dataElements?.length <
+              payload.programStageConfig?.supervisorField?.length <
               newSupervisorsList?.length
             ) {
               const supervisorArrayCurrent = newSupervisorsList?.slice(
                 0,
-                payload.fieldConfig?.supervisor?.dataElements?.length
+                payload.programStageConfig?.supervisorField?.length
               );
               const supervisorArraylast = newSupervisorsList?.slice(
-                payload.fieldConfig?.supervisor?.dataElements?.length
+                payload.programStageConfig?.supervisorField?.length
               );
 
               for (
                 let i = 0;
-                i < payload.fieldConfig?.supervisor?.dataElements?.length;
+                i < payload.programStageConfig?.supervisorField?.length;
                 i++
               ) {
                 for (let j = 0; j < supervisorArrayCurrent.length; j++) {
                   if (i === j) {
                     const currentDE =
-                      payload.fieldConfig?.supervisor?.dataElements[i];
+                      payload.programStageConfig?.supervisorField[i];
                     const currentSUP = supervisorArrayCurrent[j];
                     if (
                       currentDE &&
@@ -2327,8 +2330,7 @@ const Supervision = ({ me }) => {
                     ) {
                       if (
                         i ===
-                        payload.fieldConfig?.supervisor?.dataElements?.length -
-                          1
+                        payload.programStageConfig?.supervisorField?.length - 1
                       ) {
                         newDataValues.push({
                           dataElement: currentDE.id,
@@ -2352,18 +2354,18 @@ const Supervision = ({ me }) => {
              * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son EGALE au nombres de superviseurs sélectionnés
              */
             if (
-              payload.fieldConfig?.supervisor?.dataElements?.length ===
+              payload.programStageConfig?.supervisorField?.length ===
               newSupervisorsList?.length
             ) {
               for (
                 let i = 0;
-                i < payload.fieldConfig?.supervisor?.dataElements?.length;
+                i < payload.programStageConfig?.supervisorField?.length;
                 i++
               ) {
                 for (let j = 0; j < newSupervisorsList.length; j++) {
                   if (i === j) {
                     const currentDE =
-                      payload.fieldConfig?.supervisor?.dataElements[i];
+                      payload.programStageConfig?.supervisorField[i];
                     const currentSUP = newSupervisorsList[j];
                     if (
                       currentDE &&
@@ -2386,18 +2388,18 @@ const Supervision = ({ me }) => {
              * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son SUPERIEUR au nombres de superviseurs sélectionnés
              */
             if (
-              payload.fieldConfig?.supervisor?.dataElements?.length >
+              payload.programStageConfig?.supervisorField?.length >
               newSupervisorsList?.length
             ) {
               for (
                 let i = 0;
-                i < payload.fieldConfig?.supervisor?.dataElements?.length;
+                i < payload.programStageConfig?.supervisorField?.length;
                 i++
               ) {
                 for (let j = 0; j < newSupervisorsList?.length; j++) {
                   if (i === j) {
                     const currentDE =
-                      payload.fieldConfig?.supervisor?.dataElements[i];
+                      payload.programStageConfig?.supervisorField[i];
                     const currentSUP = newSupervisorsList[j];
                     if (
                       currentDE &&
@@ -2424,7 +2426,11 @@ const Supervision = ({ me }) => {
             }
           }
 
-          if (!newEventsList.map((ev) => ev.programStage).includes(stage)) {
+          if (
+            !newEventsList
+              .map((ev) => ev.programStage)
+              .includes(payload.programStage?.id)
+          ) {
             newEventsList.push(eventPayload);
           }
         }
@@ -2602,32 +2608,84 @@ const Supervision = ({ me }) => {
         const supervisionsList = [];
 
         for (let item of inputFieldsList) {
-          const payload = {
-            ...item,
-            orgUnit: item.organisationUnit?.id,
-            period: item.period,
-            program: item.program?.id,
-            fieldConfig: item.fieldConfig,
-          };
-          let createdTEIObject = null;
+          for (let progStageConfig of selectedProgram?.programStageConfigurations) {
+            /*
+             * Nous allons vérifier s'il y a un program stage selectionné. S'il en a , alors on vérifier si c'ette organisation unit appartient au group
+             */
+            if (item.specificStage && item.programStageConfig) {
+              if (
+                progStageConfig?.programStage?.id ===
+                  item.programStageConfig.programStage?.id &&
+                organisationUnits
+                  .find((ou) => item.organisationUnit?.id === ou.id)
+                  ?.organisationUnitGroups?.map((ouG) => ouG.id)
+                  .includes(item.programStageConfig?.organisationUnitGroup?.id)
+              ) {
+                const payload = {
+                  ...item,
+                  orgUnit: item.organisationUnit?.id,
+                  period: item.period,
+                  program: item.program?.id,
+                  programStage: item.programStageConfig?.programStage,
+                  fieldConfig: item.fieldConfig,
+                };
 
-          if (selectedSupervisionType === TYPE_SUPERVISION_AGENT) {
-            createdTEIObject = await generateEventsForAgent(payload);
-          } else {
-            createdTEIObject = await generateEventsAsNewSupervision(payload);
-          }
-          if (createdTEIObject) {
-            supervisionsList.push({
-              ...item,
-              id: uuid(),
-              planificationType: selectedPlanificationType,
-              indicators: selectedIndicators,
-              orgUnit: item.organisationUnit?.id,
-              period: item.period,
-              program: item.program,
-              fieldConfig: item.fieldConfig,
-              tei: createdTEIObject,
-            });
+                let createdTEIObject = null;
+
+                if (selectedSupervisionType === TYPE_SUPERVISION_AGENT) {
+                  // createdTEIObject = await generateEventsForAgent(payload);
+                } else {
+                  createdTEIObject = await generateEventsAsNewSupervision(
+                    payload
+                  );
+                }
+
+                if (createdTEIObject) {
+                  supervisionsList.push({
+                    ...item,
+                    id: uuid(),
+                    planificationType: selectedPlanificationType,
+                    indicators: selectedIndicators,
+                    orgUnit: item.organisationUnit?.id,
+                    period: item.period,
+                    program: item.program,
+                    fieldConfig: item.fieldConfig,
+
+                    tei: createdTEIObject,
+                  });
+                }
+              }
+            } else {
+              const payload = {
+                ...item,
+                orgUnit: item.organisationUnit?.id,
+                period: item.period,
+                program: item.program?.id,
+                fieldConfig: item.fieldConfig,
+              };
+              let createdTEIObject = null;
+
+              if (selectedSupervisionType === TYPE_SUPERVISION_AGENT) {
+                createdTEIObject = await generateEventsForAgent(payload);
+              } else {
+                createdTEIObject = await generateEventsAsNewSupervision(
+                  payload
+                );
+              }
+              if (createdTEIObject) {
+                supervisionsList.push({
+                  ...item,
+                  id: uuid(),
+                  planificationType: selectedPlanificationType,
+                  indicators: selectedIndicators,
+                  orgUnit: item.organisationUnit?.id,
+                  period: item.period,
+                  program: item.program,
+                  fieldConfig: item.fieldConfig,
+                  tei: createdTEIObject,
+                });
+              }
+            }
           }
         }
 
@@ -2636,12 +2694,13 @@ const Supervision = ({ me }) => {
           program: selectedProgram,
           dataSources: mappingConfigs,
           supervisions: supervisionsList,
-        };
+        }
 
         const newDataStoreSupervisionsPayload = [
           ...newDataStoreSupervisions,
           planificationPayload,
-        ];
+        ]
+      
         await savePanificationToDataStore(newDataStoreSupervisionsPayload);
       }
     } catch (err) {
@@ -2718,7 +2777,7 @@ const Supervision = ({ me }) => {
         // Ajoute des dataValues superviseurs
         if (
           payload.fieldConfig?.supervisor?.programStage?.id === stage &&
-          payload.fieldConfig?.supervisor?.dataElements?.length > 0
+          payload.programStageConfig?.supervisorField?.length > 0
         ) {
           const newDataValues = [];
 
@@ -2732,26 +2791,26 @@ const Supervision = ({ me }) => {
           ];
 
           if (
-            payload.fieldConfig?.supervisor?.dataElements?.length <
+            payload.programStageConfig?.supervisorField?.length <
             newSupervisorsList?.length
           ) {
             const supervisorArrayCurrent = newSupervisorsList?.slice(
               0,
-              payload.fieldConfig?.supervisor?.dataElements?.length
+              payload.programStageConfig?.supervisorField?.length
             );
             const supervisorArraylast = newSupervisorsList?.slice(
-              payload.fieldConfig?.supervisor?.dataElements?.length
+              payload.programStageConfig?.supervisorField?.length
             );
 
             for (
               let i = 0;
-              i < payload.fieldConfig?.supervisor?.dataElements?.length;
+              i < payload.programStageConfig?.supervisorField?.length;
               i++
             ) {
               for (let j = 0; j < supervisorArrayCurrent.length; j++) {
                 if (i === j) {
                   const currentDE =
-                    payload.fieldConfig?.supervisor?.dataElements[i];
+                    payload.programStageConfig?.supervisorField[i];
                   const currentSUP = supervisorArrayCurrent[j];
                   if (
                     currentDE &&
@@ -2762,7 +2821,7 @@ const Supervision = ({ me }) => {
                   ) {
                     if (
                       i ===
-                      payload.fieldConfig?.supervisor?.dataElements?.length - 1
+                      payload.programStageConfig?.supervisorField?.length - 1
                     ) {
                       newDataValues.push({
                         dataElement: currentDE.id,
@@ -2786,18 +2845,18 @@ const Supervision = ({ me }) => {
            * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son EGALE au nombres de superviseurs sélectionnés
            */
           if (
-            payload.fieldConfig?.supervisor?.dataElements?.length ===
+            payload.programStageConfig?.supervisorField?.length ===
             newSupervisorsList?.length
           ) {
             for (
               let i = 0;
-              i < payload.fieldConfig?.supervisor?.dataElements?.length;
+              i < payload.programStageConfig?.supervisorField?.length;
               i++
             ) {
               for (let j = 0; j < newSupervisorsList.length; j++) {
                 if (i === j) {
                   const currentDE =
-                    payload.fieldConfig?.supervisor?.dataElements[i];
+                    payload.programStageConfig?.supervisorField[i];
                   const currentSUP = newSupervisorsList[j];
                   if (
                     currentDE &&
@@ -2820,18 +2879,18 @@ const Supervision = ({ me }) => {
            * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son SUPERIEUR au nombres de superviseurs sélectionnés
            */
           if (
-            payload.fieldConfig?.supervisor?.dataElements?.length >
+            payload.programStageConfig?.supervisorField?.length >
             newSupervisorsList?.length
           ) {
             for (
               let i = 0;
-              i < payload.fieldConfig?.supervisor?.dataElements?.length;
+              i < payload.programStageConfig?.supervisorField?.length;
               i++
             ) {
               for (let j = 0; j < newSupervisorsList?.length; j++) {
                 if (i === j) {
                   const currentDE =
-                    payload.fieldConfig?.supervisor?.dataElements[i];
+                    payload.programStageConfig?.supervisorField[i];
                   const currentSUP = newSupervisorsList[j];
                   if (
                     currentDE &&
@@ -2894,6 +2953,7 @@ const Supervision = ({ me }) => {
           const createdTEIObject = await generateEnrollmentsAsNewSupervision(
             payload
           );
+
           if (createdTEIObject) {
             supervisionsList.push({
               ...item,
@@ -2996,20 +3056,22 @@ const Supervision = ({ me }) => {
       if (
         selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
         selectedProgram.generationType === TYPE_GENERATION_AS_ENROLMENT
-      )
+      ) {
         await saveSupervisionAsEnrollmentStrategy(
           inputFields,
           newDataStoreSupervisions
         );
+      }
 
       if (
         selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
         selectedProgram.generationType === TYPE_GENERATION_AS_EVENT
-      )
+      ) {
         await saveSupervisionAsEventStrategy(
           inputFields,
           newDataStoreSupervisions
         );
+      }
 
       if (
         selectedSupervisionType === TYPE_SUPERVISION_AGENT &&
@@ -4631,6 +4693,34 @@ const Supervision = ({ me }) => {
     );
   };
 
+  const handleInputSpecificStage = (specificStage, index) => {
+    setInputFields(
+      inputFields.map((field, fieldIndex) => {
+        if (index === fieldIndex) {
+          return {
+            ...field,
+            specificStage,
+          };
+        }
+        return field;
+      })
+    );
+  };
+
+  const handleInputProgramStageConfig = (programStageConfig, index) => {
+    setInputFields(
+      inputFields.map((field, fieldIndex) => {
+        if (index === fieldIndex) {
+          return {
+            ...field,
+            programStageConfig,
+          };
+        }
+        return field;
+      })
+    );
+  };
+
   const handleInputLibelle = (event, index) => {
     setInputFields(
       inputFields.map((field, fieldIndex) => {
@@ -4804,6 +4894,74 @@ const Supervision = ({ me }) => {
                 <Row gutter={[10, 10]}>
                   <Col sm={24} md={24}>
                     <div>
+                      <div
+                        style={{
+                          marginBottom: "10px",
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Checkbox
+                          checked={inputFields[index]?.specificStage}
+                          onChange={() =>
+                            handleInputSpecificStage(
+                              !inputFields[index]?.specificStage,
+                              index
+                            )
+                          }
+                        />
+                        <span
+                          style={{ marginLeft: "5px", cursor: "pointer" }}
+                          onClick={() =>
+                            handleInputSpecificStage(
+                              !inputFields[index]?.specificStage,
+                              index
+                            )
+                          }
+                        >
+                          {translate("Specific_Stage")}
+                        </span>
+                      </div>
+
+                      {inputFields[index]?.specificStage && (
+                        <>
+                          <div style={{ marginBottom: "5px" }}>
+                            {translate("Programme_Stage")}
+                          </div>
+                          <Select
+                            placeholder={translate("Programme_Stage")}
+                            style={{ width: "100%" }}
+                            value={
+                              inputFields[index]?.programStageConfig
+                                ?.programStage?.id
+                            }
+                            onChange={(value) =>
+                              handleInputProgramStageConfig(
+                                selectedProgram?.programStageConfigurations?.find(
+                                  (p) => p.programStage?.id === value
+                                ),
+                                index
+                              )
+                            }
+                            optionFilterProp="label"
+                            showSearch
+                            options={
+                              selectedProgram?.programStageConfigurations?.map(
+                                (eq) => ({
+                                  label: eq.programStage?.name,
+                                  value: eq.programStage?.id,
+                                })
+                              ) || []
+                            }
+                            allowClear
+                          />
+                        </>
+                      )}
+                    </div>
+                  </Col>
+
+                  <Col sm={24} md={24}>
+                    <div>
                       <div style={{ marginBottom: "5px" }}>
                         {
                           <span>
@@ -4820,111 +4978,86 @@ const Supervision = ({ me }) => {
                       />
                     </div>
                   </Col>
-                  {0 > 1 && (
-                    <Col sm={24} md={12}>
-                      <div>
-                        <div style={{ marginBottom: "5px" }}>
-                          {translate("Libelle")}
-                        </div>
-                        <Input
-                          placeholder={translate("Libelle")}
-                          style={{ width: "100%" }}
-                          value={inputFields[index]?.libelle}
-                          onChange={(event) => handleInputLibelle(event, index)}
-                        />
+                  <Col sm={24} md={24}>
+                    <div>
+                      <div style={{ marginBottom: "5px" }}>
+                        {translate("Equipes")}
                       </div>
-                    </Col>
-                  )}
-                  {selectedProgram?.fieldConfig?.supervisor?.dataElements
-                    ?.length > 0 && (
-                    <Col sm={24} md={24}>
-                      <div>
-                        <div style={{ marginBottom: "5px" }}>
-                          {translate("Equipes")}
-                        </div>
-                        <Select
-                          placeholder={translate("Equipes")}
-                          style={{ width: "100%" }}
-                          value={inputFields[index]?.equipe?.name}
-                          onChange={(value) => handleInputEquipe(value, index)}
-                          optionFilterProp="label"
-                          showSearch
-                          options={equipeList.map((eq) => ({
-                            label: eq.name,
-                            value: eq.name,
-                          }))}
-                          allowClear
-                        />
+                      <Select
+                        placeholder={translate("Equipes")}
+                        style={{ width: "100%" }}
+                        value={inputFields[index]?.equipe?.name}
+                        onChange={(value) => handleInputEquipe(value, index)}
+                        optionFilterProp="label"
+                        showSearch
+                        options={equipeList.map((eq) => ({
+                          label: eq.name,
+                          value: eq.name,
+                        }))}
+                        allowClear
+                      />
+                    </div>
+                  </Col>
+                  <Col sm={24} md={24}>
+                    <div>
+                      <div style={{ marginBottom: "5px" }}>
+                        {
+                          <span>
+                            {translate("Superviseurs")} (
+                            <span style={{ color: RED }}> * </span>)
+                          </span>
+                        }
                       </div>
-                    </Col>
-                  )}
-
-                  {selectedProgram?.fieldConfig?.supervisor?.dataElements
-                    ?.length > 0 && (
-                    <Col sm={24} md={24}>
-                      <div>
-                        <div style={{ marginBottom: "5px" }}>
-                          {
-                            <span>
-                              {translate("Superviseurs")} (
-                              <span style={{ color: RED }}> * </span>)
-                            </span>
-                          }
-                        </div>
-                        <Select
-                          placeholder={translate("Superviseurs")}
-                          style={{ width: "100%" }}
-                          loading={loadingUsers}
-                          disabled={loadingUsers}
-                          value={inputFields[index]?.supervisors?.map(
-                            (sup) => sup.id
-                          )}
-                          onChange={(values) =>
-                            handleInputSupervisors(values, index)
-                          }
-                          mode="multiple"
-                          optionFilterProp="label"
-                          showSearch
-                          options={users.map((user) => ({
-                            label: user.displayName,
-                            value: user.id,
-                          }))}
-                          allowClear
-                        />
+                      <Select
+                        placeholder={translate("Superviseurs")}
+                        style={{ width: "100%" }}
+                        loading={loadingUsers}
+                        disabled={loadingUsers}
+                        value={inputFields[index]?.supervisors?.map(
+                          (sup) => sup.id
+                        )}
+                        onChange={(values) =>
+                          handleInputSupervisors(values, index)
+                        }
+                        mode="multiple"
+                        optionFilterProp="label"
+                        showSearch
+                        options={users.map((user) => ({
+                          label: user.displayName,
+                          value: user.id,
+                        }))}
+                        allowClear
+                      />
+                    </div>
+                  </Col>
+                  <Col md={24}>
+                    <div>
+                      <div style={{ marginBottom: "5px" }}>
+                        {translate("Autre_Superviseurs")}
                       </div>
-                    </Col>
-                  )}
-                  {selectedProgram?.fieldConfig?.supervisor?.dataElements
-                    ?.length > 0 && (
-                    <Col md={24}>
-                      <div>
-                        <div style={{ marginBottom: "5px" }}>
-                          {translate("Autre_Superviseurs")}
-                        </div>
-                        <Row gutter={[10, 10]}>
-                          <Col md={19} sm={24}>
-                            <Input
-                              placeholder={translate("Autre_Superviseurs")}
-                              value={inputFields[index]?.inputOtherSupervisor}
-                              onChange={(event) =>
-                                handleInputOtherSupervisor(event, index)
-                              }
-                            />
-                          </Col>
-                          <Col flex="auto" style={{ textAlign: "right" }}>
-                            <Button
-                              primary
-                              onClick={() =>
-                                handleInputAddOtherSupervisors(index)
-                              }
-                            >
-                              + {translate("Ajouter")}{" "}
-                            </Button>
-                          </Col>
-                        </Row>
-                      </div>
-                    </Col>
-                  )}
+                      <Row gutter={[10, 10]}>
+                        <Col md={19} sm={24}>
+                          <Input
+                            placeholder={translate("Autre_Superviseurs")}
+                            value={inputFields[index]?.inputOtherSupervisor}
+                            onChange={(event) =>
+                              handleInputOtherSupervisor(event, index)
+                            }
+                          />
+                        </Col>
+                        <Col flex="auto" style={{ textAlign: "right" }}>
+                          <Button
+                            primary
+                            onClick={() =>
+                              handleInputAddOtherSupervisors(index)
+                            }
+                          >
+                            + {translate("Ajouter")}{" "}
+                          </Button>
+                        </Col>
+                      </Row>
+                    </div>
+                  </Col>
 
                   {inputFields[index]?.otherSupervisors?.length > 0 && (
                     <Col md={24}>
@@ -6508,7 +6641,6 @@ const Supervision = ({ me }) => {
           }}
         >
           <span>
-            {" "}
             <AntCheckbox
               onChange={() => handleSelectCheckbox(an)}
               checked={selectedOrganisationUnits
@@ -7311,6 +7443,8 @@ const Supervision = ({ me }) => {
           fieldConfig: selectedProgram.fieldConfig,
           generationType: selectedProgram.generationType,
           libelle: "",
+          specificStage: false,
+          programStageConfig: null,
           payment: null,
           period: null,
           equipe: null,

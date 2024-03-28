@@ -469,7 +469,6 @@ export const Dashboard = ({ me }) => {
                 programStageId: current.enrollments?.filter(
                   (en) => en.program === selectedProgram?.program?.id
                 )[0]?.events[0]?.programStage,
-                // statusSupervision: dayjs(eventDate).isAfter(dayjs()) ? getDefaultStatusSupervisionIfStatusIsNull() : current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
                 statusSupervision:
                   current.enrollments
                     ?.filter(
@@ -585,12 +584,13 @@ export const Dashboard = ({ me }) => {
                 dayjs(event.eventDate).format("YYYYMM") ===
                   dayjs(selectedPeriod).format("YYYYMM")
               ) {
-                if (
-                  event.programStage ===
-                  selectedProgram?.statusSupervision?.programStage?.id
-                ) {
-                  eventList.push(event);
-                }
+                // if (
+                //   event.programStage ===
+                //   selectedProgram?.statusSupervision?.programStage?.id
+                // ) {
+                //   eventList.push(event);
+                // }
+                eventList.push(event);
               }
             }
 
@@ -614,26 +614,23 @@ export const Dashboard = ({ me }) => {
                 program: currentEnrollment?.program,
                 orgUnit: currentEnrollment?.orgUnit,
                 storedBy: ev?.storedBy,
-                superviseurs:
-                  selectedProgram?.fieldConfig?.supervisor?.dataElements?.reduce(
-                    (prevEl, curr) => {
-                      const foundedDataValue = ev?.dataValues?.find(
-                        (el) => el.dataElement === curr.id
-                      );
-                      if (
-                        foundedDataValue &&
-                        foundedDataValue.value &&
-                        foundedDataValue.value?.trim()?.length > 0
-                      )
-                        prevEl.push(foundedDataValue.value);
+                superviseurs: selectedProgram?.programStageConfigurations
+                  ?.find((p) => p.programStage?.id === ev.programStage)
+                  .supervisorField?.reduce((prevEl, curr) => {
+                    const foundedDataValue = ev?.dataValues?.find(
+                      (el) => el.dataElement === curr.id
+                    );
+                    if (
+                      foundedDataValue &&
+                      foundedDataValue.value &&
+                      foundedDataValue.value?.trim()?.length > 0
+                    )
+                      prevEl.push(foundedDataValue.value);
 
-                      return prevEl;
-                    },
-                    []
-                  ),
+                    return prevEl;
+                  }, []),
                 libelle: currentEnrollment?.orgUnitName,
                 programStageId: ev.programStage,
-                // statusSupervision: dayjs(ev.eventDate).isAfter(dayjs()) ? getDefaultStatusSupervisionIfStatusIsNull() : currentEnrollment?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
                 statusSupervision:
                   ev.dataValues?.find(
                     (dv) =>

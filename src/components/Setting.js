@@ -87,11 +87,21 @@ const Setting = () => {
     useState(false);
   const [selectedOrganisationUnitGroup, setSelectedOrganisationUnitGroup] =
     useState(null);
+
+  const [
+    currentProgramstageConfiguration,
+    setCurrentProgramstageConfiguration,
+  ] = useState(null);
   const [
     selectedProgramStageForConfiguration,
     setSelectedProgramStageForConfiguration,
   ] = useState(null);
-
+  const [selectedSupervisorDataElements, setSelectedSupervisorDataElements] =
+    useState([]);
+  const [
+    selectedStatusSupervisionDataElement,
+    setSelectedStatusSupervisionDataElement,
+  ] = useState(null);
   const [programStageConfigurations, setProgramStageConfigurations] = useState(
     []
   );
@@ -600,6 +610,10 @@ const Setting = () => {
       }
 
       if (selectedTEIProgram && selectedSupervisionGenerationType) {
+        if (programStageConfigurations.length === 0) {
+          throw new Error(translate("Please_Configure_The_Program_Stage"));
+        }
+
         const existingConfig = mappingConfigSupervisions.find(
           (mapping) => mapping.program?.id === selectedTEIProgram.id
         );
@@ -632,6 +646,14 @@ const Setting = () => {
           statusSupervision: null,
           statusPayment: null,
           paymentConfigs: paymentConfigList,
+          programStageConfigurations: programStageConfigurations.map((p) => ({
+            ...p,
+            programStage: p.programStage && {
+              id: p.programStage.id,
+              displayName: p.programStage.displayName,
+              name: p.programStage.name,
+            },
+          })),
         };
 
         if (selectedProgramStage && selectedDataElements.length > 0) {
@@ -705,6 +727,11 @@ const Setting = () => {
         setSelectedProgramStage(null);
         setFieldEditingMode(false);
         setSelectedDataElements([]);
+        setSelectedProgramStageForConfiguration(null);
+        setSelectedSupervisorDataElements([]);
+        setProgramStageConfigurations([]);
+        setSelectedOrganisationUnitGroup(null);
+        setSelectedStatusSupervisionDataElement(null);
         setSelectedAttributesToDisplay([]);
         setLoadingSaveSupervionsConfig(false);
         cleanPaymentConfigState();
@@ -948,9 +975,9 @@ const Setting = () => {
   };
 
   const handleSelectDataElements = (values) => {
-    setSelectedDataElements(
+    setSelectedSupervisorDataElements(
       values.map((value) =>
-        selectedProgramStage.programStageDataElements
+        selectedProgramStageForConfiguration.programStageDataElements
           ?.map((p) => p.dataElement)
           .find((dataElement) => dataElement.id === value)
       )
@@ -966,7 +993,7 @@ const Setting = () => {
 
   const handleSelectStatutSupervisionDataElement = (value) => {
     setSelectedStatutSupervisionDataElement(
-      selectedStatutSupervisionProgramStage.programStageDataElements
+      selectedProgramStageForConfiguration.programStageDataElements
         ?.map((p) => p.dataElement)
         .find((dataElement) => dataElement.id === value)
     );
@@ -976,13 +1003,15 @@ const Setting = () => {
     setSelectedStatutSupervisionProgramStage(
       programStages.find((pstage) => pstage.id === value)
     );
-    setSelectedStatutSupervisionDataElement(null);
   };
 
   const handleSelectProgramStageForConfiguration = (value) => {
     setSelectedProgramStageForConfiguration(
       programStages.find((pstage) => pstage.id === value)
     );
+
+    setSelectedStatutSupervisionProgramStage(null);
+    setSelectedSupervisorDataElements([]);
   };
 
   const handleSelectOrganisationUnitGroupProgramStage = (value) => {
@@ -1223,6 +1252,7 @@ const Setting = () => {
       setSelectedPlanificationIndicatorRDQeCase(prog.isRDQAConfigCase || false);
       setPaymentConfigList(prog?.paymentConfigs || []);
       setFieldEditingMode(true);
+      setProgramStageConfigurations(prog.programStageConfigurations || []);
     } catch (err) {
       setNotification({
         show: true,
@@ -1351,29 +1381,94 @@ const Setting = () => {
     </div>
   );
 
-  const handleAddProgramStageConfigurations = () => {
-    if (
-      programStageConfigurations
-        .map((p) => p.programStage?.id)
-        .includes(selectedProgramStageForConfiguration?.id)
-    ) {
-      return setNotification({
+  const handleEditProgramStageConfigurations = (value) => {
+    console.log("Value : ", value);
+    try {
+      const foundProgramStage = programStages.find(
+        (p) => p.id === value.programStage?.id
+      );
+      if (!foundProgramStage) throw new Error("No program stage found ");
+
+      setSelectedProgramStageForConfiguration(foundProgramStage);
+      setSelectedOrganisationUnitGroup(
+        organisationUnitGroups.find(
+          (orgG) => orgG.id === value.organisationUnitGroup?.id
+        )
+      );
+
+      setSelectedSupervisorDataElements(value.supervisorField);
+      setSelectedStatusSupervisionDataElement(value.statusSupervisionField);
+      setCurrentProgramstageConfiguration(value);
+    } catch (err) {
+      setNotification({
         show: true,
-        message: translate("Configuration_Deja_Ajouter"),
+        message: err.message,
         type: NOTIFICATION_CRITICAL,
       });
     }
+  };
 
-    const newProgramStageConfigurations = [
-      ...programStageConfigurations,
-      {
-        programStage: selectedProgramStageForConfiguration,
-        organisationUnitGroup: selectedOrganisationUnitGroup,
-      },
-    ];
-    setProgramStageConfigurations(newProgramStageConfigurations);
-    setSelectedProgramStageForConfiguration(null);
-    setSelectedOrganisationUnitGroup(null);
+  const handleAddProgramStageConfigurations = () => {
+    try {
+      if (!selectedProgramStageForConfiguration)
+        throw new Error(translate("Please_Select_Program_Stage"));
+
+      if (!selectedOrganisationUnitGroup)
+        throw new Error(translate("Please_Select_Organisation_Unit_Group"));
+
+      if (selectedSupervisorDataElements.length === 0)
+        throw new Error(translate("Please_Select_Supervisor_Fields"));
+
+      if (
+        programStageConfigurations
+          .map((p) => p.programStage?.id)
+          .includes(selectedProgramStageForConfiguration?.id) &&
+        !currentProgramstageConfiguration
+      ) {
+        throw new Error(translate("Configuration_Deja_Ajouter"));
+      }
+
+      const newProgramStageConfigurations = currentProgramstageConfiguration
+        ? programStageConfigurations.map((p) => {
+            if (
+              p.programStage?.id ===
+              currentProgramstageConfiguration.programStage?.id
+            )
+              return {
+                programStage: selectedProgramStageForConfiguration,
+                organisationUnitGroup: selectedOrganisationUnitGroup,
+                supervisorField: selectedSupervisorDataElements,
+                statusSupervisionField: selectedStatusSupervisionDataElement,
+              };
+            return p;
+          })
+        : [
+            ...programStageConfigurations,
+            {
+              programStage: selectedProgramStageForConfiguration,
+              organisationUnitGroup: selectedOrganisationUnitGroup,
+              supervisorField: selectedSupervisorDataElements,
+              statusSupervisionField: selectedStatusSupervisionDataElement,
+            },
+          ];
+
+      console.log(
+        "newProgramStageConfigurations: ",
+        newProgramStageConfigurations
+      );
+      setProgramStageConfigurations(newProgramStageConfigurations);
+      setSelectedProgramStageForConfiguration(null);
+      setSelectedOrganisationUnitGroup(null);
+      setSelectedStatusSupervisionDataElement(null);
+      setSelectedSupervisorDataElements([]);
+      setCurrentProgramstageConfiguration(null);
+    } catch (err) {
+      setNotification({
+        show: true,
+        message: err.message,
+        type: NOTIFICATION_CRITICAL,
+      });
+    }
   };
 
   const RenderProgramStageConfiguration = () => (
@@ -1384,7 +1479,7 @@ const Setting = () => {
           <div
             style={{ marginTop: "10px", color: "#00000080", fontSize: "13px" }}
           >
-            {translate("Aide_Config_Element")}
+            {translate("Program_Stage_Configuration_Help")}
           </div>
           <div style={{ margin: "10px 0px" }}>
             <Row gutter={[10, 10]}>
@@ -1442,11 +1537,13 @@ const Setting = () => {
                 ></div>
               </Col>
 
-              {
-                selectedProgramStageForConfiguration && selectedOrganisationUnitGroup && (
+              {selectedProgramStageForConfiguration &&
+                selectedOrganisationUnitGroup && (
                   <Col md={12}>
                     <div>
-                      <div style={{ marginBottom: "5px" }}>Supervisor fields</div>
+                      <div style={{ marginBottom: "5px" }}>
+                        Supervisor fields
+                      </div>
                       <Select
                         options={selectedProgramStageForConfiguration?.programStageDataElements?.map(
                           (progStageDE) => ({
@@ -1458,19 +1555,17 @@ const Setting = () => {
                         style={{ width: "100%" }}
                         mode="multiple"
                         onChange={handleSelectDataElements}
-                        value={selectedDataElements?.map((s) => s.id)}
+                        value={selectedSupervisorDataElements?.map((s) => s.id)}
                         optionFilterProp="label"
                         showSearch
                         allowClear
                       />
                     </div>
                   </Col>
-                )
-              }
+                )}
 
-
-              {
-                selectedProgramStageForConfiguration && selectedOrganisationUnitGroup && (
+              {selectedProgramStageForConfiguration &&
+                selectedOrganisationUnitGroup && (
                   <Col md={12}>
                     <div>
                       <div style={{ marginBottom: "5px" }}>
@@ -1486,36 +1581,35 @@ const Setting = () => {
                         placeholder={translate("Elements_De_Donnees")}
                         style={{ width: "100%" }}
                         onChange={handleSelectStatutSupervisionDataElement}
-                        value={selectedStatutSupervisionDataElement?.id}
+                        value={selectedStatusSupervisionDataElement?.id}
                         optionFilterProp="label"
                         showSearch
                         allowClear
                       />
                     </div>
                   </Col>
-                )
-              }
-
+                )}
 
               <Col md={4} sm={24}>
                 <div style={{ marginTop: "22px" }}>
                   <Button
                     disabled={
                       selectedProgramStageForConfiguration &&
-                        selectedOrganisationUnitGroup
+                      selectedOrganisationUnitGroup
                         ? false
                         : true
                     }
                     primary
                     onClick={handleAddProgramStageConfigurations}
                   >
-                    + Add
+                    {currentProgramstageConfiguration
+                      ? translate("Mise_A_Jour")
+                      : "+ ".concat(translate("Add"))}
                   </Button>
                 </div>
               </Col>
             </Row>
           </div>
-          {console.log(programStageConfigurations)}
 
           {programStageConfigurations.length > 0 && (
             <div style={{ marginTop: "20px" }}>
@@ -1543,6 +1637,18 @@ const Setting = () => {
                     width: "80px",
                     render: (value) => (
                       <div style={{ display: "flex", alignItems: "center" }}>
+                        <div style={{ marginRight: "10px" }}>
+                          <FiEdit
+                            style={{
+                              color: BLUE,
+                              fontSize: "18px",
+                              cursor: "pointer",
+                            }}
+                            onClick={() =>
+                              handleEditProgramStageConfigurations(value)
+                            }
+                          />
+                        </div>
                         <Popconfirm
                           title={translate("Suppression_Configuration")}
                           description={translate(
@@ -1554,6 +1660,8 @@ const Setting = () => {
                           onConfirm={() => {
                             setSelectedProgramStageForConfiguration(null);
                             setSelectedOrganisationUnitGroup(null);
+                            setSelectedSupervisorDataElements([]);
+                            setSelectedStatusSupervisionDataElement(null);
                             setProgramStageConfigurations(
                               programStageConfigurations.filter(
                                 (p) =>
@@ -1578,6 +1686,7 @@ const Setting = () => {
                 ]}
                 size="small"
                 pagination={false}
+                bordered
               />
             </div>
           )}
@@ -1902,6 +2011,10 @@ const Setting = () => {
                       setSelectedStatutPaymentDataElement(null);
                       setSelectedDataElements([]);
                       setSelectedAttributesToDisplay([]);
+                      setProgramStageConfigurations([]);
+                      setSelectedProgramStageForConfiguration(null);
+                      setSelectedStatutSupervisionDataElement(null);
+                      setSelectedSupervisorDataElements([]);
                       setSelectedSupervisionGenerationType(
                         TYPE_GENERATION_AS_TEI
                       );
@@ -2719,29 +2832,32 @@ const Setting = () => {
           <div style={{ marginBottom: "2px", position: "sticky", top: 30 }}>
             {0 > 1 && (
               <div
-                className={`setting-menu-item ${selectedTypeSupervisionPage === PAGE_CONFIG_INDICATORS
-                  ? "active"
-                  : ""
-                  }`}
+                className={`setting-menu-item ${
+                  selectedTypeSupervisionPage === PAGE_CONFIG_INDICATORS
+                    ? "active"
+                    : ""
+                }`}
                 onClick={() => handleClickConfigMenu(PAGE_CONFIG_INDICATORS)}
               >
                 {translate("Configuration_Des_Indicateurs")}
               </div>
             )}
             <div
-              className={`setting-menu-item ${selectedTypeSupervisionPage === PAGE_CONFIG_SUPERVISION
-                ? "active"
-                : ""
-                }`}
+              className={`setting-menu-item ${
+                selectedTypeSupervisionPage === PAGE_CONFIG_SUPERVISION
+                  ? "active"
+                  : ""
+              }`}
               onClick={() => handleClickConfigMenu(PAGE_CONFIG_SUPERVISION)}
             >
               {translate("Parametre_Supervision")}
             </div>
             <div
-              className={`setting-menu-item ${selectedTypeSupervisionPage === PAGE_CONFIG_ANALYSE
-                ? "active"
-                : ""
-                }`}
+              className={`setting-menu-item ${
+                selectedTypeSupervisionPage === PAGE_CONFIG_ANALYSE
+                  ? "active"
+                  : ""
+              }`}
               onClick={() => handleClickConfigMenu(PAGE_CONFIG_ANALYSE)}
             >
               {translate("Analyses")}
@@ -2813,6 +2929,7 @@ const Setting = () => {
 
   return (
     <>
+      {console.log("program stage configuraito, ", programStageConfigurations)}
       {RenderTopContent()}
       {RenderContent()}
       <MyNotification
