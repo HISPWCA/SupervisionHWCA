@@ -230,5 +230,11 @@
     "Specific_Stage": "Plan for a specific stage ? ",
     "Supervision_Planned_With_Success_On": "Supervision planned with success on ",
     "Supervision_Status_fields":"Supervision Status fields",
-    "Supervisor_Fields":"Supervisor Fields"
+    "Supervisor_Fields":"Supervisor Fields",
+    "Program_Stage_Configuration":"Program stage configuration",
+
+    "Planifiée": "Planned",
+    "Annulée": "Cancel",
+    "En Cours": "Pending",
+    "Terminée": "Completed"
 }

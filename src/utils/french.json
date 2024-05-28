@@ -172,6 +172,7 @@
     "Display_Supervisions": "Afficher les Supervisions",
     "Recherche": "Rechercher",
     "Groupe_Unite_Organisations": "Groupe d'unité d'organisation",
+    "Groupe_Unite_Organisation": "Group d'unité d'organisation ",
     "Veuillez_Selectionner_Unite_Organisation": "Veuillez sélectionner l'unité d'organisation",
     "Configuration_Equipes": "Configuration des Equipes de superviseurs",
     "Nom_De_Equipe": "Nom de l'équipe",
@@ -224,10 +225,15 @@
     "Please_Configure_The_Program_Stage": "Veuillez configurer le programme stage",
     "Please_Select_Supervisor_Fields": "Veuillez selectionner les champs superviseur",
     "Program_Stage_Configuration_Help": "Configurez pour chaque program stage, le groupe d'unités d'organisation, les champs du superviseur et le statut de supervision. Cette configuration aidera l'application à savoir dans quels champs elle peut prendre ou écrire des informations",
-    "Add":"Ajouter",
-    "Specific_Stage":"Planifier pour une stade spécifique ? ",
-    "Supervision_Planned_With_Success_On":"Supervision planifiée avec succès sur ",
-    "Supervision_Status_fields":"Champs status supervision",
-    "Supervisor_Fields":"Champs superviseur"
-
+    "Add": "Ajouter",
+    "Specific_Stage": "Planifier pour une stade spécifique ? ",
+    "Supervision_Planned_With_Success_On": "Supervision planifiée avec succès sur ",
+    "Supervision_Status_fields": "Champs status supervision",
+    "Supervisor_Fields": "Champs superviseur",
+    "Program_Stage_Configuration": "Configuration du programme stage",
+    
+    "Planifiée":"Planifiée",
+    "Annulée":"Annulée",
+    "En Cours":"En Cours",
+    "Terminée":"Terminée"
 }
