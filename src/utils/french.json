@@ -237,5 +237,6 @@
     "Terminée": "Terminée",
 
 
-    "Create_Favorites":"Création des favoris"
+    "Create_Favorites":"Création des favoris",
+        "Delete_Favorite": "Supprimer le favoris"
 }

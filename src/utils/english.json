@@ -237,5 +237,6 @@
     "En Cours": "Pending",
     "Terminée": "Completed",
 
-    "Create_Favorites":"Favorites creation"
+    "Create_Favorites":"Favorites creation",
+    "Delete_Favorite":"Delete favorite"
 }

@@ -1408,26 +1408,6 @@ const Supervision = ({ me }) => {
             }
       };
 
-      const handleDeleteConfigItem = async value => {
-            try {
-                  if (value) {
-                        const newList = mappingConfigs.filter(mapConf => mapConf.id !== value.id);
-                        setMappingConfigs(newList);
-                        setNotification({
-                              show: true,
-                              message: translate('Suppression_Effectuee'),
-                              type: NOTIFICATION_SUCCESS
-                        });
-                  }
-            } catch (err) {
-                  setNotification({
-                        show: true,
-                        message: err.response?.data?.message || err.message,
-                        type: NOTIFICATION_CRITICAL
-                  });
-            }
-      };
-
       const handleChangeSupervisionType = ({ value }) => {
             setSelectedProgram(null);
             setSelectedAgents([]);
@@ -5489,29 +5469,7 @@ const Supervision = ({ me }) => {
                                     <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
                                           {translate('Liste_Configuration_Element_De_Donnees')}
                                     </div>
-                                    <div>
-                                          {mappingConfigs.length > 0 && (
-                                                <Button
-                                                      loading={loadingSaveFavoritBackgroundInformations}
-                                                      disabled={mappingConfigs.length > 0 ? false : true}
-                                                      // small
-                                                      onClick={handleSaveAsFavoritesForBackgroundInformations}
-                                                      icon={
-                                                            <MdStars
-                                                                  style={{
-                                                                        color: 'red',
-                                                                        fontSize: '20px',
-                                                                        cursor: 'pointer'
-                                                                  }}
-                                                            />
-                                                      }
-                                                >
-                                                      {selectedBackgroundInformationTypeConfiguration === DIRECTE
-                                                            ? translate('Enregistrer_Comme_Favorites')
-                                                            : translate('Mise_A_Jour')}
-                                                </Button>
-                                          )}
-                                    </div>
+                                
                               </div>
 
                               <hr style={{ margin: '10px auto' }} />
@@ -5746,7 +5704,7 @@ const Supervision = ({ me }) => {
                         </div>
                         <div style={{ padding: '10px' }}>
                               <Row gutter={[10, 10]}>
-                                    <Col md={24}>
+                                    {/* <Col md={24}>
                                           <div style={{ marginTop: '10px' }}>
                                                 <div>
                                                       <Radio
@@ -5777,12 +5735,12 @@ const Supervision = ({ me }) => {
                                                       />
                                                 </div>
                                           </div>
-                                    </Col>
-                                    <Col md={24}>
+                                    </Col> */}
+                                    {/* <Col md={24}>
                                           <hr style={{ margin: '10px auto', color: '#ccc' }} />
-                                    </Col>
+                                    </Col> */}
 
-                                    {selectedBackgroundInformationTypeConfiguration === FAVORIS && (
+                                    {/* {selectedBackgroundInformationTypeConfiguration === FAVORIS && ( */}
                                           <Col md={24}>
                                                 <div>
                                                       <div style={{ marginBottom: '5px' }}>
@@ -5809,9 +5767,9 @@ const Supervision = ({ me }) => {
                                                       />
                                                 </div>
                                           </Col>
-                                    )}
+                                    {/* )} */}
 
-                                    {selectedBackgroundInformationTypeConfiguration === FAVORIS &&
+                                    {/* {selectedBackgroundInformationTypeConfiguration === FAVORIS &&
                                           selectedBackgroundInformationFavorit && (
                                                 <Col md={24}>
                                                       <div style={{ marginTop: '10px' }}>
@@ -6136,7 +6094,7 @@ const Supervision = ({ me }) => {
                                                       </div>
                                                 )}
                                           </Col>
-                                    )}
+                                    )} */}
                               </Row>
                         </div>
                   </Card>

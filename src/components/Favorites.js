@@ -17,6 +17,7 @@ import {
 } from 'antd';
 import { IoMdAdd } from 'react-icons/io';
 import { IoListCircleOutline } from 'react-icons/io5';
+
 import {
       Button,
       ButtonStrip,
@@ -31,6 +32,7 @@ import {
 } from '@dhis2/ui';
 import { BsArrowRight } from 'react-icons/bs';
 import { BsArrowLeft } from 'react-icons/bs';
+import { MdStars } from 'react-icons/md';
 import { Stepper } from 'react-form-stepper';
 import { FiSave } from 'react-icons/fi';
 import { ImCancelCircle } from 'react-icons/im';
@@ -38,13 +40,24 @@ import { CgCloseO } from 'react-icons/cg';
 import { TbSelect } from 'react-icons/tb';
 import translate from '../utils/translator';
 import MyNotification from './MyNotification';
-import { ALL, DIRECTE, ELEMENT_GROUP, ORGANISATION_UNIT } from '../utils/constants';
-import { loadDataStore } from '../utils/functions';
-import { MyNoticeBox } from './MyNoticeBox';
-import { PROGRAMS_STAGE_ROUTE } from '../utils/api.routes';
+import {
+      ALL,
+      DIRECTE,
+      ELEMENT_GROUP,
+      FAVORIS,
+      NOTIFICATION_CRITICAL,
+      NOTIFICATION_SUCCESS,
+      ORGANISATION_UNIT
+} from '../utils/constants';
+import { loadDataStore, saveDataToDataStore } from '../utils/functions';
+import { DATA_ELEMENT_GROUPS_ROUTE, PROGRAMS_STAGE_ROUTE } from '../utils/api.routes';
 import axios from 'axios';
 import { v4 as uuid } from 'uuid';
-
+import { DataDimension } from '@dhis2/analytics';
+import { QuestionCircleOutlined } from '@ant-design/icons';
+import { RiDeleteBinLine } from 'react-icons/ri';
+import { IoMdOpen } from 'react-icons/io';
+import dayjs from 'dayjs';
 
 const Favorites = ({ me }) => {
       const [dataStoreSupervisionConfigs, setDataStoreSupervisionConfigs] = useState([]);
@@ -125,6 +138,8 @@ const Favorites = ({ me }) => {
 
       const [loadingDataStoreSupervisionConfigs, setLoadingDataStoreSupervisionConfigs] = useState(false);
       const [loadingSaveFavoritBackgroundInformations, setLoadingSaveFavoritBackgroundInformations] = useState(false);
+      const [loadingDeleteFavoritBackgroundInformations, setLoadingDeleteFavoritBackgroundInformations] =
+            useState(false);
       const [loadingDataStoreSupervisions, setLoadingDataStoreSupervisions] = useState(false);
       const [loadingDataStoreIndicatorConfigs, setLoadingDataStoreIndicatorConfigs] = useState(false);
       const [loadingOrganisationUnits, setLoadingOrganisationUnits] = useState(false);
@@ -185,6 +200,17 @@ const Favorites = ({ me }) => {
             }
       };
 
+      const loadDataElementGroups = async () => {
+            try {
+                  setLoadingDataElementGroups(true);
+                  const response = await axios.get(`${DATA_ELEMENT_GROUPS_ROUTE}?paging=false&fields=id,displayName`);
+                  setDataElementGroups(response.data?.dataElementGroups);
+                  setLoadingDataElementGroups(false);
+            } catch (err) {
+                  setLoadingDataElementGroups(false);
+            }
+      };
+
       const loadDataStoreSupervisionConfigs = async () => {
             try {
                   setLoadingDataStoreSupervisionConfigs(true);
@@ -193,12 +219,40 @@ const Favorites = ({ me }) => {
                         setLoadingDataStoreSupervisionConfigs(false);
                   }
 
-                  //  await loadAllSupervisionsFromTracker(response, organisationUnitList);
                   setDataStoreSupervisionConfigs(response);
                   setLoadingDataStoreSupervisionConfigs(false);
             } catch (err) {
                   setLoadingDataStoreSupervisionConfigs(false);
             }
+      };
+
+      const handleChangeSelectionTypeConfigurationForBackgroundInformation = ({ value }) => {
+            setSelectedProgramStage(null);
+            setMappingConfigs([]);
+            setSelectedBackgroundInformationFavorit(null);
+
+            setSelectedBackgroundInformationTypeConfiguration(value);
+      };
+
+      const handleSelectBackgroundInformationFavorit = value => {
+            const currentFav = favoritBackgroundInformationList.find(b => b.id === value);
+            if (currentFav) {
+                  setSelectedBackgroundInformationFavorit(currentFav);
+                  setInputFavoritNameForBackgroundInforation(currentFav.name);
+                  setMappingConfigs(currentFav.configs);
+            }
+      };
+
+      const handleOkAnalyticComponentModal = () => {
+            setInputDataSourceDisplayName(selectedMetaDatas[0]?.name);
+            setInputDataSourceID(selectedMetaDatas[0]?.id);
+            setSelectedMetaDatas([]);
+            setVisibleAnalyticComponentModal(false);
+      };
+
+      const handleCancelAnalyticComponentModal = () => {
+            setSelectedMetaDatas([]);
+            setVisibleAnalyticComponentModal(false);
       };
 
       const handleSelectDataElement = value => {
@@ -280,10 +334,170 @@ const Favorites = ({ me }) => {
             }
       };
 
+      const handleCloseAddFavoritForBackgroundInformation = () => {
+            setInputFavoritNameForBackgroundInforation('');
+            setVisibleAddFavoritBackgroundInformationModal(false);
+      };
+
+      const handleAddFavoritBackgroundInformationSave = async () => {
+            try {
+                  setLoadingSaveFavoritBackgroundInformations(true);
+
+                  let backgroundInformationConfigList = [];
+                  const backgroundInfoList = await loadDataStore(
+                        process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY,
+                        null,
+                        null,
+                        []
+                  );
+
+                  if (
+                        !inputFavorisNameForBackgroundInforation ||
+                        inputFavorisNameForBackgroundInforation?.trim()?.length === 0
+                  )
+                        throw new Error(translate('Nom_Obligatoire'));
+
+                  if (
+                        !selectedBackgroundInformationFavorit &&
+                        selectedBackgroundInformationTypeConfiguration === DIRECTE &&
+                        favoritBackgroundInformationList
+                              .map(f => f.name?.trim())
+                              .includes(inputFavorisNameForBackgroundInforation?.trim())
+                  ) {
+                        throw new Error(translate('Favorit_Exist_Deja'));
+                  }
+
+                  let payload = {
+                        name: inputFavorisNameForBackgroundInforation,
+                        configs: mappingConfigs,
+                        program: selectedProgram?.program,
+                        createdAt: dayjs(),
+                        updatedAt: dayjs()
+                  };
+
+                  if (
+                        selectedBackgroundInformationTypeConfiguration === FAVORIS &&
+                        selectedBackgroundInformationFavorit &&
+                        backgroundInfoList
+                  ) {
+                        backgroundInformationConfigList = backgroundInfoList.map(favo => {
+                              if (favo.id === selectedBackgroundInformationFavorit?.id) {
+                                    return {
+                                          ...favo,
+                                          ...payload,
+                                          updatedAt: dayjs()
+                                    };
+                              }
+                              return favo;
+                        });
+                  } else {
+                        payload.id = uuid();
+                        backgroundInformationConfigList = [payload, ...backgroundInfoList];
+                  }
+
+                  saveDataToDataStore(
+                        process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY,
+                        backgroundInformationConfigList
+                  );
+                  setFavoritBackgroundInformationList(backgroundInformationConfigList);
+
+                  setVisibleAddFavoritBackgroundInformationModal(false);
+                  setNotification({
+                        show: true,
+                        message: translate('Favorit_Enregistrer_Avec_Succes'),
+                        type: NOTIFICATION_SUCCESS
+                  });
+                  setLoadingSaveFavoritBackgroundInformations(false);
+
+                  if (selectedBackgroundInformationTypeConfiguration === DIRECTE) {
+                        setInputFavoritNameForBackgroundInforation('');
+                  }
+            } catch (err) {
+                  setNotification({
+                        show: true,
+                        message: err.response?.data?.message || err.message,
+                        type: NOTIFICATION_CRITICAL
+                  });
+                  setLoadingSaveFavoritBackgroundInformations(false);
+                  setVisibleAddFavoritBackgroundInformationModal(false);
+            }
+      };
+
+      const RenderAddFavoritBackgroundInformationModal = () =>
+            visibleAddFavoritBackgroundInformationModal && (
+                  <>
+                        <Modal onClose={handleCloseAddFavoritForBackgroundInformation} dense small>
+                              <ModalTitle>
+                                    <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
+                                          {translate('Enregistrement_Favorit')}
+                                    </div>
+                              </ModalTitle>
+                              <ModalContent>
+                                    <div
+                                          style={{
+                                                padding: '10px',
+                                                border: '1px solid #ccc',
+                                          }}
+                                    >
+                                          <div
+                                                style={{
+                                                      marginTop: '10px',
+                                                      padding: '10px',
+                                                      background: '#CAF0F8',
+                                                      fontSize: '13px',
+                                                      fontWeight: 'bold'
+                                                }}
+                                          >
+                                                {translate('Nom_Claire_Favorit')}
+                                          </div>
+                                          <div style={{ marginTop: '10px' }}>
+                                                <div style={{ marginBottom: '5px' }}>{translate('Nom')}</div>
+                                                <Input
+                                                      placeholder={translate('Nom')}
+                                                      style={{ width: '100%' }}
+                                                      value={inputFavorisNameForBackgroundInforation}
+                                                      onChange={event =>
+                                                            setInputFavoritNameForBackgroundInforation(
+                                                                  event.target.value
+                                                            )
+                                                      }
+                                                />
+                                          </div>
+                                    </div>
+                              </ModalContent>
+                              <ModalActions>
+                                    <ButtonStrip end>
+                                          <Button
+                                                destructive
+                                                onClick={handleCloseAddFavoritForBackgroundInformation}
+                                                icon={<CgCloseO style={{ fontSize: '18px' }} />}
+                                                small
+                                          >
+                                                {translate('Annuler')}
+                                          </Button>
+                                          <Button
+                                                small
+                                                primary
+                                                loading={loadingSaveFavoritBackgroundInformations}
+                                                disabled={
+                                                      inputFavorisNameForBackgroundInforation?.trim()?.length > 0
+                                                            ? false
+                                                            : true
+                                                }
+                                                onClick={handleAddFavoritBackgroundInformationSave}
+                                                icon={<FiSave style={{ fontSize: '18px' }} />}
+                                          >
+                                                {translate('Enregistrer')}
+                                          </Button>
+                                    </ButtonStrip>
+                              </ModalActions>
+                        </Modal>
+                  </>
+            );
+
       const handleSaveAsFavoritesForBackgroundInformations = () => {
             setVisibleAddFavoritBackgroundInformationModal(true);
       };
-
 
       const handleSaveNewMappingConfig = async () => {
             try {
@@ -336,6 +550,7 @@ const Favorites = ({ me }) => {
                         }
                   }
             } catch (err) {
+                  console.log('Error : ', err);
                   setNotification({
                         show: true,
                         type: NOTIFICATION_CRITICAL,
@@ -344,6 +559,8 @@ const Favorites = ({ me }) => {
                   setLoadingSaveDateElementMappingConfig(false);
             }
       };
+
+      const handleDeleteFavoritesForBackgroundInformations = () => {};
 
       const RenderDataElementConfigList = () => (
             <>
@@ -370,25 +587,55 @@ const Favorites = ({ me }) => {
                                     </div>
                                     <div>
                                           {mappingConfigs.length > 0 && (
-                                                <Button
-                                                      loading={loadingSaveFavoritBackgroundInformations}
-                                                      disabled={mappingConfigs.length > 0 ? false : true}
-                                                      // small
-                                                      onClick={handleSaveAsFavoritesForBackgroundInformations}
-                                                      icon={
-                                                            <MdStars
-                                                                  style={{
-                                                                        color: 'red',
-                                                                        fontSize: '20px',
-                                                                        cursor: 'pointer'
-                                                                  }}
-                                                            />
-                                                      }
-                                                >
-                                                      {selectedBackgroundInformationTypeConfiguration === DIRECTE
-                                                            ? translate('Enregistrer_Comme_Favorites')
-                                                            : translate('Mise_A_Jour')}
-                                                </Button>
+                                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                      {selectedBackgroundInformationTypeConfiguration === FAVORIS && (
+                                                            <div style={{ marginRight: '10px' }}>
+                                                                  <Button
+                                                                        small
+                                                                        destructive
+                                                                        loading={
+                                                                              loadingDeleteFavoritBackgroundInformations
+                                                                        }
+                                                                        disabled={
+                                                                              mappingConfigs.length > 0 ? false : true
+                                                                        }
+                                                                        onClick={
+                                                                              handleDeleteFavoritesForBackgroundInformations
+                                                                        }
+                                                                        icon={
+                                                                              <MdStars
+                                                                                    style={{
+                                                                                          fontSize: '20px',
+                                                                                          cursor: 'pointer'
+                                                                                    }}
+                                                                              />
+                                                                        }
+                                                                  >
+                                                                        {translate('Delete_Favorite')}
+                                                                  </Button>
+                                                            </div>
+                                                      )}
+                                                      <Button
+                                                            small
+                                                            primary
+                                                            loading={loadingSaveFavoritBackgroundInformations}
+                                                            disabled={mappingConfigs.length > 0 ? false : true}
+                                                            onClick={handleSaveAsFavoritesForBackgroundInformations}
+                                                            icon={
+                                                                  <MdStars
+                                                                        style={{
+                                                                              color: 'white',
+                                                                              fontSize: '20px',
+                                                                              cursor: 'pointer'
+                                                                        }}
+                                                                  />
+                                                            }
+                                                      >
+                                                            {selectedBackgroundInformationTypeConfiguration === DIRECTE
+                                                                  ? translate('Enregistrer_Comme_Favorites')
+                                                                  : translate('Mise_A_Jour')}
+                                                      </Button>
+                                                </div>
                                           )}
                                     </div>
                               </div>
@@ -471,6 +718,32 @@ const Favorites = ({ me }) => {
             </div>
       );
 
+      const handleAddNewMappingConfig = () => {
+            setIsNewMappingMode(!isNewMappingMode);
+
+            if (!isNewMappingMode) {
+                  setSelectedDataElement(null);
+            }
+      };
+
+      const loadDataStoreBackgroundInformationFavoritsConfigs = async () => {
+            try {
+                  setLoadingBackgroundInformationFavoritsConfigs(true);
+                  const response = await loadDataStore(
+                        process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY,
+                        null,
+                        null,
+                        []
+                  );
+
+                  setFavoritBackgroundInformationList(response);
+                  setSelectedBackgroundInformationFavorit(null);
+                  setLoadingBackgroundInformationFavoritsConfigs(false);
+            } catch (err) {
+                  setLoadingBackgroundInformationFavoritsConfigs(false);
+            }
+      };
+
       const RenderDataElementConfigContent = () => (
             <div style={{ marginTop: '10px' }}>
                   <Card className="my-shadow my-scrollable" bodyStyle={{ padding: '0px' }} size="small">
@@ -487,227 +760,393 @@ const Favorites = ({ me }) => {
                               <Row gutter={[10, 10]}>
                                     <Col md={24}>
                                           <div style={{ marginTop: '10px' }}>
-                                                <div style={{ marginBottom: '5px' }}>
-                                                      {translate('Programmes_Stage')}
+                                                <div>
+                                                      <Radio
+                                                            label={translate('Venant_Des_Favoris')}
+                                                            className="cursor-pointer"
+                                                            onChange={
+                                                                  handleChangeSelectionTypeConfigurationForBackgroundInformation
+                                                            }
+                                                            value={FAVORIS}
+                                                            checked={
+                                                                  selectedBackgroundInformationTypeConfiguration ===
+                                                                  FAVORIS
+                                                            }
+                                                      />
                                                 </div>
-                                                <Select
-                                                      options={programStages.map(program => ({
-                                                            label: program.displayName,
-                                                            value: program.id
-                                                      }))}
-                                                      placeholder={translate('Programmes_Stage')}
-                                                      style={{ width: '100%' }}
-                                                      optionFilterProp="label"
-                                                      value={selectedProgramStage?.id}
-                                                      onChange={handleSelectProgramStage}
-                                                      showSearch
-                                                      loading={loadingProgramStages}
-                                                      disabled={loadingProgramStages}
-                                                />
+                                                <div>
+                                                      <Radio
+                                                            label={translate('Create_New_Configuration') + ' ? '}
+                                                            className="cursor-pointer"
+                                                            onChange={
+                                                                  handleChangeSelectionTypeConfigurationForBackgroundInformation
+                                                            }
+                                                            value={DIRECTE}
+                                                            checked={
+                                                                  selectedBackgroundInformationTypeConfiguration ===
+                                                                  DIRECTE
+                                                            }
+                                                      />
+                                                </div>
                                           </div>
                                     </Col>
+                                    <Col md={24}>
+                                          <hr style={{ margin: '10px auto', color: '#ccc' }} />
+                                    </Col>
+
+                                    {selectedBackgroundInformationTypeConfiguration === FAVORIS && (
+                                          <Col md={24}>
+                                                <div>
+                                                      <div style={{ marginBottom: '5px' }}>
+                                                            {translate('Select_Favorit')}
+                                                      </div>
+                                                      <Select
+                                                            options={favoritBackgroundInformationList
+                                                                  .filter(
+                                                                        f =>
+                                                                              f.program?.id ===
+                                                                              selectedProgram?.program?.id
+                                                                  )
+                                                                  .map(favorit => ({
+                                                                        label: favorit.name,
+                                                                        value: favorit.id
+                                                                  }))}
+                                                            placeholder={translate('Select_Favorit')}
+                                                            style={{ width: '100%' }}
+                                                            optionFilterProp="label"
+                                                            loading={loadingBackgroundInformationFavoritsConfigs}
+                                                            value={selectedBackgroundInformationFavorit?.id}
+                                                            onChange={handleSelectBackgroundInformationFavorit}
+                                                            showSearch
+                                                      />
+                                                </div>
+                                          </Col>
+                                    )}
+
+                                    {selectedBackgroundInformationTypeConfiguration === FAVORIS &&
+                                          selectedBackgroundInformationFavorit && (
+                                                <Col md={24}>
+                                                      <div style={{ marginTop: '10px' }}>
+                                                            <Button
+                                                                  small
+                                                                  icon={
+                                                                        isNewMappingMode && (
+                                                                              <ImCancelCircle
+                                                                                    style={{
+                                                                                          color: '#fff',
+                                                                                          fontSize: '18px'
+                                                                                    }}
+                                                                              />
+                                                                        )
+                                                                  }
+                                                                  primary={!isNewMappingMode ? true : false}
+                                                                  destructive={isNewMappingMode ? true : false}
+                                                                  onClick={handleAddNewMappingConfig}
+                                                            >
+                                                                  {!isNewMappingMode && (
+                                                                        <span>
+                                                                              + {translate('Ajouter_Nouveau_Mapping')}
+                                                                        </span>
+                                                                  )}
+                                                                  {isNewMappingMode && (
+                                                                        <span>{translate('Annuler_Le_Mapping')}</span>
+                                                                  )}
+                                                            </Button>
+                                                      </div>
+                                                      {isNewMappingMode && (
+                                                            <div style={{ marginTop: '10px' }}>
+                                                                  <div style={{ marginBottom: '5px' }}>
+                                                                        {translate('Programmes_Stage')}
+                                                                  </div>
+                                                                  <Select
+                                                                        options={programStages.map(program => ({
+                                                                              label: program.displayName,
+                                                                              value: program.id
+                                                                        }))}
+                                                                        placeholder={translate('Programmes_Stage')}
+                                                                        style={{ width: '100%' }}
+                                                                        optionFilterProp="label"
+                                                                        value={selectedProgramStage?.id}
+                                                                        onChange={handleSelectProgramStage}
+                                                                        showSearch
+                                                                        loading={loadingProgramStages}
+                                                                        disabled={loadingProgramStages}
+                                                                  />
+                                                            </div>
+                                                      )}
+                                                </Col>
+                                          )}
+
+                                    {selectedBackgroundInformationTypeConfiguration === DIRECTE && (
+                                          <Col md={24}>
+                                                <div>
+                                                      <div style={{ marginBottom: '5px' }}>
+                                                            {translate('Programmes_Stage')}
+                                                      </div>
+                                                      <Select
+                                                            options={programStages.map(program => ({
+                                                                  label: program.displayName,
+                                                                  value: program.id
+                                                            }))}
+                                                            placeholder={translate('Programmes_Stage')}
+                                                            style={{ width: '100%' }}
+                                                            optionFilterProp="label"
+                                                            value={selectedProgramStage?.id}
+                                                            onChange={handleSelectProgramStage}
+                                                            showSearch
+                                                            loading={loadingProgramStages}
+                                                            disabled={loadingProgramStages}
+                                                      />
+                                                </div>
+                                                <Divider style={{ margin: '10px auto' }} />
+                                                {selectedProgramStage && (
+                                                      <Button
+                                                            small
+                                                            icon={
+                                                                  isNewMappingMode && (
+                                                                        <ImCancelCircle
+                                                                              style={{
+                                                                                    color: '#fff',
+                                                                                    fontSize: '18px'
+                                                                              }}
+                                                                        />
+                                                                  )
+                                                            }
+                                                            primary={!isNewMappingMode ? true : false}
+                                                            destructive={isNewMappingMode ? true : false}
+                                                            onClick={handleAddNewMappingConfig}
+                                                      >
+                                                            {!isNewMappingMode && (
+                                                                  <span>+ {translate('Ajouter_Nouveau_Mapping')}</span>
+                                                            )}
+                                                            {isNewMappingMode && (
+                                                                  <span>{translate('Annuler_Le_Mapping')}</span>
+                                                            )}
+                                                      </Button>
+                                                )}
+                                          </Col>
+                                    )}
 
                                     {selectedProgramStage && (
                                           <Col md={24} xs={24}>
-                                                <div style={{ marginTop: '20px' }}>
-                                                      <div>
-                                                            <div>
-                                                                  <Radio
-                                                                        label={translate(
-                                                                              'Choisir_Element_Donne_De_Group'
-                                                                        )}
-                                                                        className="cursor-pointer"
-                                                                        onChange={handleSelectedDataElementFromWhere}
-                                                                        value={ELEMENT_GROUP}
-                                                                        checked={
-                                                                              selectedDataElementFromWhere ===
-                                                                              ELEMENT_GROUP
-                                                                        }
-                                                                  />
-                                                            </div>
-                                                            <div>
-                                                                  <Radio
-                                                                        label={translate(
-                                                                              'Element_Donne_A_Partie_De_Liste'
-                                                                        )}
-                                                                        className="cursor-pointer"
-                                                                        onChange={handleSelectedDataElementFromWhere}
-                                                                        value={ALL}
-                                                                        checked={selectedDataElementFromWhere === ALL}
-                                                                  />
-                                                            </div>
-                                                      </div>
-
+                                                {isNewMappingMode && (
                                                       <div style={{ marginTop: '20px' }}>
-                                                            <Row gutter={[10, 10]}>
-                                                                  {selectedProgramStage &&
-                                                                        selectedDataElementFromWhere ===
-                                                                              ELEMENT_GROUP && (
-                                                                              <Col md={24}>
-                                                                                    <div
-                                                                                          style={{
-                                                                                                marginBottom: '5px'
-                                                                                          }}
-                                                                                    >
-                                                                                          {translate(
-                                                                                                'Group_Element_Donnee'
-                                                                                          )}
+                                                            <div>
+                                                                  <div>
+                                                                        <Radio
+                                                                              label={translate(
+                                                                                    'Choisir_Element_Donne_De_Group'
+                                                                              )}
+                                                                              className="cursor-pointer"
+                                                                              onChange={
+                                                                                    handleSelectedDataElementFromWhere
+                                                                              }
+                                                                              value={ELEMENT_GROUP}
+                                                                              checked={
+                                                                                    selectedDataElementFromWhere ===
+                                                                                    ELEMENT_GROUP
+                                                                              }
+                                                                        />
+                                                                  </div>
+                                                                  <div>
+                                                                        <Radio
+                                                                              label={translate(
+                                                                                    'Element_Donne_A_Partie_De_Liste'
+                                                                              )}
+                                                                              className="cursor-pointer"
+                                                                              onChange={
+                                                                                    handleSelectedDataElementFromWhere
+                                                                              }
+                                                                              value={ALL}
+                                                                              checked={
+                                                                                    selectedDataElementFromWhere === ALL
+                                                                              }
+                                                                        />
+                                                                  </div>
+                                                            </div>
+
+                                                            <div style={{ marginTop: '20px' }}>
+                                                                  <Row gutter={[10, 10]}>
+                                                                        {selectedProgramStage &&
+                                                                              selectedDataElementFromWhere ===
+                                                                                    ELEMENT_GROUP && (
+                                                                                    <Col md={24}>
+                                                                                          <div
+                                                                                                style={{
+                                                                                                      marginBottom:
+                                                                                                            '5px'
+                                                                                                }}
+                                                                                          >
+                                                                                                {translate(
+                                                                                                      'Group_Element_Donnee'
+                                                                                                )}
+                                                                                          </div>
+                                                                                          <Select
+                                                                                                options={dataElementGroups.map(
+                                                                                                      elGroup => ({
+                                                                                                            label: elGroup.displayName,
+                                                                                                            value: elGroup.id
+                                                                                                      })
+                                                                                                )}
+                                                                                                placeholder={translate(
+                                                                                                      'Group_Element_Donnee'
+                                                                                                )}
+                                                                                                style={{
+                                                                                                      width: '100%'
+                                                                                                }}
+                                                                                                optionFilterProp="label"
+                                                                                                value={
+                                                                                                      selectedDataElementGroup?.id
+                                                                                                }
+                                                                                                onChange={
+                                                                                                      handleSelectedDataElementGroup
+                                                                                                }
+                                                                                                showSearch
+                                                                                                loading={
+                                                                                                      loadingDataElementGroups
+                                                                                                }
+                                                                                                disabled={
+                                                                                                      loadingDataElementGroups
+                                                                                                }
+                                                                                                allowClear
+                                                                                          />
+                                                                                    </Col>
+                                                                              )}
+
+                                                                        {selectedProgramStage && (
+                                                                              <Col md={12} xs={24}>
+                                                                                    <div>
+                                                                                          <div
+                                                                                                style={{
+                                                                                                      marginBottom:
+                                                                                                            '5px'
+                                                                                                }}
+                                                                                          >
+                                                                                                {translate(
+                                                                                                      'Form_Field'
+                                                                                                )}
+                                                                                          </div>
+                                                                                          <Select
+                                                                                                options={
+                                                                                                      selectedProgramStage?.programStageDataElements
+                                                                                                            ?.filter(
+                                                                                                                  progStageDE =>
+                                                                                                                        selectedDataElementFromWhere ===
+                                                                                                                              ELEMENT_GROUP &&
+                                                                                                                        selectedDataElementGroup
+                                                                                                                              ? progStageDE.dataElement?.dataElementGroups
+                                                                                                                                      ?.map(
+                                                                                                                                            gp =>
+                                                                                                                                                  gp.id
+                                                                                                                                      )
+                                                                                                                                      ?.includes(
+                                                                                                                                            selectedDataElementGroup?.id
+                                                                                                                                      )
+                                                                                                                              : true
+                                                                                                            )
+                                                                                                            ?.map(
+                                                                                                                  progStageDE => ({
+                                                                                                                        label: progStageDE
+                                                                                                                              .dataElement
+                                                                                                                              ?.displayName,
+                                                                                                                        value: progStageDE
+                                                                                                                              .dataElement
+                                                                                                                              ?.id
+                                                                                                                  })
+                                                                                                            ) || []
+                                                                                                }
+                                                                                                placeholder={translate(
+                                                                                                      'Form_Field'
+                                                                                                )}
+                                                                                                style={{
+                                                                                                      width: '100%'
+                                                                                                }}
+                                                                                                onChange={
+                                                                                                      handleSelectDataElement
+                                                                                                }
+                                                                                                value={
+                                                                                                      selectedDataElement?.id
+                                                                                                }
+                                                                                                optionFilterProp="label"
+                                                                                                showSearch
+                                                                                          />
                                                                                     </div>
-                                                                                    <Select
-                                                                                          options={dataElementGroups.map(
-                                                                                                elGroup => ({
-                                                                                                      label: elGroup.displayName,
-                                                                                                      value: elGroup.id
-                                                                                                })
-                                                                                          )}
-                                                                                          placeholder={translate(
-                                                                                                'Group_Element_Donnee'
-                                                                                          )}
-                                                                                          style={{
-                                                                                                width: '100%'
-                                                                                          }}
-                                                                                          optionFilterProp="label"
-                                                                                          value={
-                                                                                                selectedDataElementGroup?.id
-                                                                                          }
-                                                                                          onChange={
-                                                                                                handleSelectedDataElementGroup
-                                                                                          }
-                                                                                          showSearch
-                                                                                          loading={
-                                                                                                loadingDataElementGroups
-                                                                                          }
-                                                                                          disabled={
-                                                                                                loadingDataElementGroups
-                                                                                          }
-                                                                                          allowClear
-                                                                                    />
                                                                               </Col>
                                                                         )}
 
-                                                                  {selectedProgramStage && (
-                                                                        <Col md={12} xs={24}>
+                                                                        <Col md={10} xs={24}>
                                                                               <div>
                                                                                     <div
                                                                                           style={{
                                                                                                 marginBottom: '5px'
                                                                                           }}
                                                                                     >
-                                                                                          {translate('Form_Field')}
-                                                                                    </div>
-                                                                                    <Select
-                                                                                          options={
-                                                                                                selectedProgramStage?.programStageDataElements
-                                                                                                      ?.filter(
-                                                                                                            progStageDE =>
-                                                                                                                  selectedDataElementFromWhere ===
-                                                                                                                        ELEMENT_GROUP &&
-                                                                                                                  selectedDataElementGroup
-                                                                                                                        ? progStageDE.dataElement?.dataElementGroups
-                                                                                                                                ?.map(
-                                                                                                                                      gp =>
-                                                                                                                                            gp.id
-                                                                                                                                )
-                                                                                                                                ?.includes(
-                                                                                                                                      selectedDataElementGroup?.id
-                                                                                                                                )
-                                                                                                                        : true
-                                                                                                      )
-                                                                                                      ?.map(
-                                                                                                            progStageDE => ({
-                                                                                                                  label: progStageDE
-                                                                                                                        .dataElement
-                                                                                                                        ?.displayName,
-                                                                                                                  value: progStageDE
-                                                                                                                        .dataElement
-                                                                                                                        ?.id
-                                                                                                            })
-                                                                                                      ) || []
-                                                                                          }
-                                                                                          placeholder={translate(
-                                                                                                'Form_Field'
+                                                                                          {translate(
+                                                                                                'Source_De_Donnee'
                                                                                           )}
-                                                                                          style={{
-                                                                                                width: '100%'
-                                                                                          }}
-                                                                                          onChange={
-                                                                                                handleSelectDataElement
-                                                                                          }
+                                                                                    </div>
+                                                                                    <Input
+                                                                                          placeholder={translate(
+                                                                                                'Source_De_Donnee'
+                                                                                          )}
+                                                                                          style={{ width: '100%' }}
                                                                                           value={
-                                                                                                selectedDataElement?.id
+                                                                                                inputDataSourceDisplayName
                                                                                           }
-                                                                                          optionFilterProp="label"
-                                                                                          showSearch
+                                                                                          onChange={event => {
+                                                                                                setInputDataSourceDisplayName(
+                                                                                                      ''.concat(
+                                                                                                            event.target
+                                                                                                                  .value
+                                                                                                      )
+                                                                                                );
+                                                                                          }}
                                                                                     />
                                                                               </div>
                                                                         </Col>
-                                                                  )}
-
-                                                                  <Col md={10} xs={24}>
-                                                                        <div>
-                                                                              <div
-                                                                                    style={{
-                                                                                          marginBottom: '5px'
-                                                                                    }}
-                                                                              >
-                                                                                    {translate('Source_De_Donnee')}
-                                                                              </div>
-                                                                              <Input
-                                                                                    placeholder={translate(
-                                                                                          'Source_De_Donnee'
-                                                                                    )}
-                                                                                    style={{ width: '100%' }}
-                                                                                    value={inputDataSourceDisplayName}
-                                                                                    onChange={event => {
-                                                                                          setInputDataSourceDisplayName(
-                                                                                                ''.concat(
-                                                                                                      event.target.value
+                                                                        <Col md={2} xs={24}>
+                                                                              <div style={{ marginTop: '28px' }}>
+                                                                                    <Button
+                                                                                          small
+                                                                                          primary
+                                                                                          icon={
+                                                                                                <TbSelect
+                                                                                                      style={{
+                                                                                                            fontSize: '18px',
+                                                                                                            color: '#fff'
+                                                                                                      }}
+                                                                                                />
+                                                                                          }
+                                                                                          onClick={() =>
+                                                                                                setVisibleAnalyticComponentModal(
+                                                                                                      true
                                                                                                 )
-                                                                                          );
-                                                                                    }}
-                                                                              />
-                                                                        </div>
-                                                                  </Col>
-                                                                  <Col md={2} xs={24}>
-                                                                        <div style={{ marginTop: '28px' }}>
-                                                                              <Button
-                                                                                    small
-                                                                                    primary
-                                                                                    icon={
-                                                                                          <TbSelect
-                                                                                                style={{
-                                                                                                      fontSize: '18px',
-                                                                                                      color: '#fff'
-                                                                                                }}
-                                                                                          />
-                                                                                    }
-                                                                                    onClick={() =>
-                                                                                          setVisibleAnalyticComponentModal(
-                                                                                                true
-                                                                                          )
-                                                                                    }
-                                                                              ></Button>
-                                                                        </div>
-                                                                  </Col>
-                                                                  <Col md={24} xs={24}>
-                                                                        <div style={{ marginTop: '18px' }}>
-                                                                              <Button
-                                                                                    loading={
-                                                                                          loadingSaveDateElementMappingConfig
-                                                                                    }
-                                                                                    disabled={
-                                                                                          loadingSaveDateElementMappingConfig
-                                                                                    }
-                                                                                    primary
-                                                                                    onClick={handleSaveNewMappingConfig}
-                                                                              >
-                                                                                    + {translate('Ajouter')}
-                                                                              </Button>
-                                                                        </div>
-                                                                  </Col>
-                                                            </Row>
+                                                                                          }
+                                                                                    ></Button>
+                                                                              </div>
+                                                                        </Col>
+                                                                        <Col md={24} xs={24}>
+                                                                              <div style={{ marginTop: '18px' }}>
+                                                                                    <Button
+                                                                                          loading={
+                                                                                                loadingSaveDateElementMappingConfig
+                                                                                          }
+                                                                                          disabled={
+                                                                                                loadingSaveDateElementMappingConfig
+                                                                                          }
+                                                                                          primary
+                                                                                          onClick={
+                                                                                                handleSaveNewMappingConfig
+                                                                                          }
+                                                                                    >
+                                                                                          + {translate('Ajouter')}
+                                                                                    </Button>
+                                                                              </div>
+                                                                        </Col>
+                                                                  </Row>
+                                                            </div>
                                                       </div>
-                                                </div>
+                                                )}
                                           </Col>
                                     )}
                               </Row>
@@ -730,24 +1169,68 @@ const Favorites = ({ me }) => {
                                     {selectedProgram && RenderDataElementConfigContent()}
                               </Col>
                               <Col sm={24} md={16}>
-                                    {/* {selectedProgram &&
-                                          selectedSupervisionType === TYPE_SUPERVISION_AGENT &&
-                                          selectedProgram.attributesToDisplay?.length > 0 &&
-                                          RenderAgentConfigList()}
-                                    {selectedProgram && RenderDataElementConfigList()} */}
+                                    {selectedProgram && RenderDataElementConfigList()}
                               </Col>
                         </Row>
                   </div>
             </div>
       );
+      const RenderAnalyticComponentModal = () =>
+            visibleAnalyticComponentModal ? (
+                  <Modal onClose={() => handleCancelAnalyticComponentModal()} large>
+                        <ModalTitle>
+                              <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
+                                    {translate('Source_De_Donnee')}
+                              </div>
+                        </ModalTitle>
+                        <ModalContent>
+                              <div>
+                                    <DataDimension
+                                          selectedDimensions={selectedMetaDatas.map(it => ({
+                                                ...it,
+                                                isDeactivated: true
+                                          }))}
+                                          onSelect={value => {
+                                                setSelectedMetaDatas(value?.items?.length > 0 ? [value.items[0]] : []);
+                                          }}
+                                          displayNameProp="displayName"
+                                    />
+                              </div>
+                        </ModalContent>
+                        <ModalActions>
+                              <ButtonStrip end>
+                                    <Button
+                                          destructive
+                                          onClick={() => handleCancelAnalyticComponentModal()}
+                                          icon={<CgCloseO style={{ fontSize: '18px' }} />}
+                                    >
+                                          {translate('Annuler')}
+                                    </Button>
+                                    <Button
+                                          primary
+                                          onClick={() => handleOkAnalyticComponentModal()}
+                                          icon={<FiSave style={{ fontSize: '18px' }} />}
+                                    >
+                                          {translate('Enregistrer')}
+                                    </Button>
+                              </ButtonStrip>
+                        </ModalActions>
+                  </Modal>
+            ) : (
+                  <></>
+            );
 
       useEffect(() => {
             loadDataStoreSupervisionConfigs();
+            loadDataElementGroups();
+            loadDataStoreBackgroundInformationFavoritsConfigs();
       }, []);
       return (
             <>
-                  <pre>{JSON.stringify(programStages, null, 2)}</pre>
                   {RenderContent()}
+
+                  {RenderAddFavoritBackgroundInformationModal()}
+                  {RenderAnalyticComponentModal()}
                   <MyNotification notification={notification} setNotification={setNotification} />
             </>
       );
