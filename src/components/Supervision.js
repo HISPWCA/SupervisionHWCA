@@ -86,7 +86,7 @@ import OrganisationUnitsTree from './OrganisationUnitsTree';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import MyNotification from './MyNotification';
-import { v1 as uuid } from 'uuid';
+import { v4 as uuid } from 'uuid';
 import { BsArrowRight } from 'react-icons/bs';
 import { BsArrowLeft } from 'react-icons/bs';
 import { Stepper } from 'react-form-stepper';
@@ -5541,31 +5541,6 @@ const Supervision = ({ me }) => {
                                           {
                                                 title: translate('Source_De_Donnée'),
                                                 dataIndex: 'indicatorName'
-                                          },
-                                          {
-                                                title: translate('Actions'),
-                                                dataIndex: 'action',
-                                                width: '80px',
-                                                render: value => (
-                                                      <Popconfirm
-                                                            title={translate('Suppression')}
-                                                            description={translate(
-                                                                  'Confirmation_Suppression_Configuration'
-                                                            )}
-                                                            icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
-                                                            onConfirm={() => handleDeleteConfigItem(value)}
-                                                      >
-                                                            <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                                                  <RiDeleteBinLine
-                                                                        style={{
-                                                                              color: 'red',
-                                                                              fontSize: '20px',
-                                                                              cursor: 'pointer'
-                                                                        }}
-                                                                  />
-                                                            </div>
-                                                      </Popconfirm>
-                                                )
                                           }
                                     ]}
                                     size="small"
@@ -6152,7 +6127,7 @@ const Supervision = ({ me }) => {
                                                                                                 handleSaveNewMappingConfig
                                                                                           }
                                                                                     >
-                                                                                          + {translate('Ajouter')}{' '}
+                                                                                          + {translate('Ajouter')}
                                                                                     </Button>
                                                                               </div>
                                                                         </Col>
