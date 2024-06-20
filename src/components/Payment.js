@@ -840,7 +840,6 @@ const Payment = ({ me }) => {
 
     return (
         <>
-            {console.log("Results: ", results)}
             {RenderTopContent()}
             <div style={{ padding: '10px', height: '100%', marginBottom: '10px' }}>
                 {RenderTopFilter()}

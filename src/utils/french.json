@@ -231,9 +231,11 @@
     "Supervision_Status_fields": "Champs status supervision",
     "Supervisor_Fields": "Champs superviseur",
     "Program_Stage_Configuration": "Configuration du programme stage",
-    
-    "Planifiée":"Planifiée",
-    "Annulée":"Annulée",
-    "En Cours":"En Cours",
-    "Terminée":"Terminée"
+    "Planifiée": "Planifiée",
+    "Annulée": "Annulée",
+    "En Cours": "En Cours",
+    "Terminée": "Terminée",
+
+
+    "Create_Favorites":"Création des favoris"
 }
