@@ -1,5 +1,5 @@
 import axios from "axios"
-import { DATA_STORE_ROUTE, PROGRAMS_ROUTE } from "./api.routes"
+import { DATA_STORE_ROUTE } from "./api.routes"
 
 
 export const loadDataStore = async (key_string, setLoading, setState, payload = null) => {
@@ -18,7 +18,6 @@ export const loadDataStore = async (key_string, setLoading, setState, payload = 
         setLoading && setLoading(false)
         return data
     } catch (err) {
-        console.log(err)
         setLoading && setLoading(false)
         createDataToDataStore(key_string, payload ? payload : [])
         console.clear()

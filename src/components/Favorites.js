@@ -1,39 +1,8 @@
 import { useState, useEffect } from 'react';
-import {
-      Card,
-      Col,
-      DatePicker,
-      Divider,
-      FloatButton,
-      Input,
-      InputNumber,
-      List,
-      Popconfirm,
-      Row,
-      Select,
-      Checkbox as AntCheckbox,
-      Table,
-      Popover
-} from 'antd';
-import { IoMdAdd } from 'react-icons/io';
-import { IoListCircleOutline } from 'react-icons/io5';
+import { Card, Col, Divider, Input, Popconfirm, Row, Select, Table } from 'antd';
 
-import {
-      Button,
-      ButtonStrip,
-      Checkbox,
-      CircularLoader,
-      Modal,
-      ModalActions,
-      ModalContent,
-      ModalTitle,
-      NoticeBox,
-      Radio
-} from '@dhis2/ui';
-import { BsArrowRight } from 'react-icons/bs';
-import { BsArrowLeft } from 'react-icons/bs';
+import { Button, ButtonStrip, Modal, ModalActions, ModalContent, ModalTitle, Radio } from '@dhis2/ui';
 import { MdStars } from 'react-icons/md';
-import { Stepper } from 'react-form-stepper';
 import { FiSave } from 'react-icons/fi';
 import { ImCancelCircle } from 'react-icons/im';
 import { CgCloseO } from 'react-icons/cg';
@@ -49,6 +18,7 @@ import {
       NOTIFICATION_SUCCESS,
       ORGANISATION_UNIT
 } from '../utils/constants';
+
 import { loadDataStore, saveDataToDataStore } from '../utils/functions';
 import { DATA_ELEMENT_GROUPS_ROUTE, PROGRAMS_STAGE_ROUTE } from '../utils/api.routes';
 import axios from 'axios';
@@ -56,107 +26,39 @@ import { v4 as uuid } from 'uuid';
 import { DataDimension } from '@dhis2/analytics';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { RiDeleteBinLine } from 'react-icons/ri';
-import { IoMdOpen } from 'react-icons/io';
 import dayjs from 'dayjs';
 
 const Favorites = ({ me }) => {
       const [dataStoreSupervisionConfigs, setDataStoreSupervisionConfigs] = useState([]);
-      const [dataStoreSupervisions, setDataStoreSupervisions] = useState([]);
-      const [dataStoreIndicatorConfigs, setDataStoreIndicatorConfigs] = useState([]);
-
-      const [isEditionMode, setEditionMode] = useState(false);
-      const [organisationUnits, setOrganisationUnits] = useState([]);
-      const [users, setUsers] = useState([]);
-      const [organisationUnitGroupSets, setOrganisationUnitGroupSets] = useState([]);
       const [programStages, setProgramStages] = useState([]);
       const [isNewMappingMode, setIsNewMappingMode] = useState(false);
       const [mappingConfigs, setMappingConfigs] = useState([]);
-      const [analyticIndicatorResults, setAnalyticIndicatorResults] = useState([]);
-      const [randomResults, setRandomResults] = useState([]);
-      const [_, setAnalyticErrorMessage] = useState(null);
-      const [teisList, setTeisList] = useState([]);
-      const [isEmpty, setEmpty] = useState(false);
-      const [allSupervisionsFromTracker, setAllSupervisionsFromTracker] = useState([]);
-      const [organisationUnitGroups, setOrganisationUnitGroups] = useState([]);
-      const [teisPerformanceList, setTeisPerformanceList] = useState([]);
-      const [equipeList, setEquipeList] = useState([]);
-      const [favoritPerformanceList, setFavoritPerformanceList] = useState([]);
       const [dataElementGroups, setDataElementGroups] = useState([]);
       const [favoritBackgroundInformationList, setFavoritBackgroundInformationList] = useState([]);
-
-      const [visibleTeamLeadContent, setVisibleTeamLeadContent] = useState(false);
       const [visibleAnalyticComponentModal, setVisibleAnalyticComponentModal] = useState(false);
-      const [visibleAnalyticComponentPerformanceModal, setVisibleAnalyticComponentPerformanceModal] = useState(false);
-      const [visibleAddEquipeModal, setVisibleAddEquipeModal] = useState(false);
-      const [visibleAddFavoritPerformanceModal, setVisibleAddFavoritPerformanceModal] = useState(false);
       const [visibleAddFavoritBackgroundInformationModal, setVisibleAddFavoritBackgroundInformationModal] =
             useState(false);
-
       const [selectedBackgroundInformationTypeConfiguration, setSelectedBackgroundInformationTypeConfiguration] =
             useState(DIRECTE);
       const [selectedBackgroundInformationFavorit, setSelectedBackgroundInformationFavorit] = useState(null);
-
-      const [selectedTeamLead, setSelectedTeamLead] = useState(null);
-      const [selectedStep, setSelectedStep] = useState(0);
-      const [selectedSupervisionType, setSelectedSupervisionType] = useState(null);
       const [selectedProgram, setSelectedProgram] = useState(null);
-      const [selectedPlanificationType, setSelectedPlanificationType] = useState(null);
-      const [selectedOrganisationUnits, setSelectedOrganisationUnits] = useState([]);
-      const [selectedIndicators, setSelectedIndicators] = useState([]);
-      const [selectedPeriod, setSelectedPeriod] = useState(null);
-      const [selectedOrganisationUnitGroupSet, setSelectedOrganisationUnitGroupSet] = useState(null);
-      const [selectedOrganisationUnitGroup, setSelectedOrganisationUnitGroup] = useState(null);
-      const [selectedPeriodType, setSelectedPeriodType] = useState(null);
       const [selectedProgramStage, setSelectedProgramStage] = useState(null);
       const [selectedDataElement, setSelectedDataElement] = useState(null);
       const [selectedMetaDatas, setSelectedMetaDatas] = useState([]);
-      const [selectedOrganisationUnitSingle, setSelectedOrganisationUnitSingle] = useState(null);
-      const [selectedAgents, setSelectedAgents] = useState([]);
-      const [selectedSupervisionsConfigProgram, setSelectedSupervisionConfigProgram] = useState(null);
-      const [selectedOrgUnitSupervisionFromTracker, setSelectedOrgUnitSupervisionFromTracker] = useState(null);
-      const [selectedPeriodSupervisionConfig, setSelectedPeriodSupervisionConfig] = useState(null);
-      const [selectedOrganisationUnitGroups, setSelectedOrganisationUnitGroups] = useState([]);
-      const [selectedEquipeSuperviseurs, setSelectedEquipeSuperviseurs] = useState([]);
-      const [selectedEquipeAutreSuperviseurs, setSelectedEquipeAutreSuperviseurs] = useState([]);
-      const [selectedSelectionTypeForPerformance, setSelectedSelectionTypeForPerformance] = useState(DIRECTE);
-      const [selectedElementForPerformances, setSelectedElementForPerformances] = useState([]);
-      const [selectedFavoritForPerformance, setSelectedFavoritForPerformance] = useState(null);
       const [selectedDataElementFromWhere, setSelectedDataElementFromWhere] = useState(ELEMENT_GROUP);
       const [selectedDataElementGroup, setSelectedDataElementGroup] = useState(null);
-
-      const [inputFavorisName, setInputFavoritName] = useState('');
       const [inputFavorisNameForBackgroundInforation, setInputFavoritNameForBackgroundInforation] = useState('');
-      const [inputEquipeAutreSuperviseur, setInputEquipeAutreSuperviseur] = useState('');
-      const [inputMeilleur, setInputMeilleur] = useState(0);
-      const [inputMauvais, setInputMauvais] = useState(0);
-      const [inputMeilleurPositif, setInputMeilleurPositif] = useState(true);
-      const [inputFields, setInputFields] = useState([]);
       const [inputDataSourceDisplayName, setInputDataSourceDisplayName] = useState('');
       const [inputDataSourceID, setInputDataSourceID] = useState(null);
-      const [inputEquipeName, setInputEquipeName] = useState('');
-      const [inputNbrOrgUnit, setInputNbrOrgUnit] = useState(0);
-
-      const [loadingDataStoreSupervisionConfigs, setLoadingDataStoreSupervisionConfigs] = useState(false);
       const [loadingSaveFavoritBackgroundInformations, setLoadingSaveFavoritBackgroundInformations] = useState(false);
       const [loadingDeleteFavoritBackgroundInformations, setLoadingDeleteFavoritBackgroundInformations] =
             useState(false);
-      const [loadingDataStoreSupervisions, setLoadingDataStoreSupervisions] = useState(false);
-      const [loadingDataStoreIndicatorConfigs, setLoadingDataStoreIndicatorConfigs] = useState(false);
-      const [loadingOrganisationUnits, setLoadingOrganisationUnits] = useState(false);
-      const [loadingOrganisationUnitGroupSets, setLoadingOrganisationUnitGroupSets] = useState(false);
-      const [loadingUsers, setLoadingUsers] = useState(false);
       const [loadingProgramStages, setLoadingProgramStages] = useState(false);
       const [loadingSaveDateElementMappingConfig, setLoadingSaveDateElementMappingConfig] = useState(false);
-      const [loadingSupervisionPlanification, setLoadingSupervisionPlanification] = useState(false);
-      const [loadingAnalyticIndicatorResults, setLoadingAnalyticIndicatorResults] = useState(false);
-      const [loadingTeiList, setLoadingTeiList] = useState(false);
-      const [loadingAllSupervisionsFromTracker, setLoadingAllSupervisionsFromTracker] = useState(false);
-      const [loadingOrgUnitsSupervisionsFromTracker, setLoadingOrgUnitsSupervisionsFromTracker] = useState(false);
-      const [loadingOrganisationUnitGroups, setLoadingOrganisationUnitGroups] = useState(false);
-      const [loadingPerformanceFavoritsConfigs, setLoadingPerformanceFavoritsConfigs] = useState(false);
       const [loadingBackgroundInformationFavoritsConfigs, setLoadingBackgroundInformationFavoritsConfigs] =
             useState(false);
       const [loadingDataElementGroups, setLoadingDataElementGroups] = useState(false);
+      const [loadingDataStoreSupervisionConfigs, setLoadingDataStoreSupervisionConfigs] = useState(false);
 
       const [notification, setNotification] = useState({
             show: false,
@@ -185,7 +87,6 @@ const Favorites = ({ me }) => {
 
       const loadProgramStages = async (programID, setState = null) => {
             try {
-                  console.log('program ID : ', programID);
                   setLoadingProgramStages(true);
 
                   let route = `${PROGRAMS_STAGE_ROUTE},program,programStageDataElements[dataElement[id,displayName,dataElementGroups]]`;
@@ -436,7 +337,7 @@ const Favorites = ({ me }) => {
                                     <div
                                           style={{
                                                 padding: '10px',
-                                                border: '1px solid #ccc',
+                                                border: '1px solid #ccc'
                                           }}
                                     >
                                           <div
@@ -537,6 +438,7 @@ const Favorites = ({ me }) => {
                               setMappingConfigs(newList);
                               setSelectedDataElement(null);
                               setInputDataSourceDisplayName('');
+                              setInputFavoritNameForBackgroundInforation('');
                               setInputDataSourceID(null);
                               setSelectedProgramStage(null);
                               setNotification({
@@ -550,7 +452,6 @@ const Favorites = ({ me }) => {
                         }
                   }
             } catch (err) {
-                  console.log('Error : ', err);
                   setNotification({
                         show: true,
                         type: NOTIFICATION_CRITICAL,
@@ -560,7 +461,48 @@ const Favorites = ({ me }) => {
             }
       };
 
-      const handleDeleteFavoritesForBackgroundInformations = () => {};
+      const handleDeleteFavoritesForBackgroundInformations = async () => {
+            try {
+                  setLoadingDeleteFavoritBackgroundInformations(true);
+                  if (selectedBackgroundInformationFavorit) {
+                        let newFavoritList = [];
+                        const backgroundInfoList = await loadDataStore(
+                              process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY,
+                              null,
+                              null,
+                              []
+                        );
+
+                        newFavoritList = backgroundInfoList.filter(
+                              fav => fav.id !== selectedBackgroundInformationFavorit.id
+                        );
+
+                        await saveDataToDataStore(
+                              process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY,
+                              newFavoritList
+                        );
+
+                        setFavoritBackgroundInformationList(newFavoritList);
+                        setSelectedBackgroundInformationFavorit(null);
+                        setMappingConfigs([]);
+                        setInputFavoritNameForBackgroundInforation('');
+
+                        setNotification({
+                              show: true,
+                              type: NOTIFICATION_SUCCESS,
+                              message: translate('Favorite_Deleted_Success')
+                        });
+                        setLoadingDeleteFavoritBackgroundInformations(false);
+                  }
+            } catch (err) {
+                  setNotification({
+                        show: true,
+                        type: NOTIFICATION_CRITICAL,
+                        message: err.response?.data?.message || err.message
+                  });
+                  setLoadingDeleteFavoritBackgroundInformations(false);
+            }
+      };
 
       const RenderDataElementConfigList = () => (
             <>
@@ -714,7 +656,7 @@ const Favorites = ({ me }) => {
                         background: '#FFF'
                   }}
             >
-                  <span style={{ fontWeight: 'bold', fontSize: '18px' }}>Favorites creation</span>
+                  <span style={{ fontWeight: 'bold', fontSize: '18px' }}>{translate('Create_Favorites')}</span>
             </div>
       );
 
@@ -1161,10 +1103,6 @@ const Favorites = ({ me }) => {
                   <div style={{ marginTop: '10px', padding: '10px' }}>
                         <Row gutter={[12, 12]}>
                               <Col sm={24} md={8}>
-                                    {/* {RenderSupervisionTypeContent()}
-                                    {selectedSupervisionType && RenderSelectedSupervisionTypeList()}
-                                    {selectedProgram &&
-                                          selectedProgram?.isRDQAConfigCase && */}
                                     {RenderSelectedSupervisionTypeList()}
                                     {selectedProgram && RenderDataElementConfigContent()}
                               </Col>
@@ -1228,7 +1166,6 @@ const Favorites = ({ me }) => {
       return (
             <>
                   {RenderContent()}
-
                   {RenderAddFavoritBackgroundInformationModal()}
                   {RenderAnalyticComponentModal()}
                   <MyNotification notification={notification} setNotification={setNotification} />

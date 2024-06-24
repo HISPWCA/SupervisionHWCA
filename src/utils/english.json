@@ -238,5 +238,6 @@
     "Terminée": "Completed",
 
     "Create_Favorites":"Favorites creation",
-    "Delete_Favorite":"Delete favorite"
+    "Delete_Favorite":"Delete favorite",
+    "Favorite_Deleted_Success": "Favoris supprimé avec succès"
 }

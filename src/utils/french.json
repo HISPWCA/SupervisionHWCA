@@ -238,5 +238,6 @@
 
 
     "Create_Favorites":"Création des favoris",
-        "Delete_Favorite": "Supprimer le favoris"
+        "Delete_Favorite": "Supprimer le favoris",
+        "Favorite_Deleted_Success": "Favoris supprimé avec succès"
 }
