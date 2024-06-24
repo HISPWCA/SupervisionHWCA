@@ -101,7 +101,7 @@ import shuffle from 'shuffle-array';
 
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { BLACK, BLUE, GRAY_DARK, GREEN, ORANGE, RED, WHITE } from '../utils/couleurs';
+import { BLUE, GRAY_DARK, GREEN, ORANGE, RED, WHITE } from '../utils/couleurs';
 import { getDefaultStatusPaymentIfStatusIsNull, getDefaultStatusSupervisionIfStatusIsNull } from './Dashboard';
 import translate from '../utils/translator';
 const quarterOfYear = require('dayjs/plugin/quarterOfYear');
@@ -151,6 +151,7 @@ const Supervision = ({ me }) => {
       const [visibleAnalyticComponentModal, setVisibleAnalyticComponentModal] = useState(false);
       const [visibleAnalyticComponentPerformanceModal, setVisibleAnalyticComponentPerformanceModal] = useState(false);
       const [visibleAddEquipeModal, setVisibleAddEquipeModal] = useState(false);
+      const [visibleMissionName, setVisibleMissionName] = useState(false);
       const [visibleAddFavoritPerformanceModal, setVisibleAddFavoritPerformanceModal] = useState(false);
       const [visibleAddFavoritBackgroundInformationModal, setVisibleAddFavoritBackgroundInformationModal] =
             useState(false);
@@ -198,6 +199,7 @@ const Supervision = ({ me }) => {
       const [inputDataSourceID, setInputDataSourceID] = useState(null);
       const [inputEquipeName, setInputEquipeName] = useState('');
       const [inputNbrOrgUnit, setInputNbrOrgUnit] = useState(0);
+      const [inputMissionName, setInputMissionName] = useState('');
 
       const [loadingDataStoreSupervisionConfigs, setLoadingDataStoreSupervisionConfigs] = useState(false);
       const [loadingSaveFavoritBackgroundInformations, setLoadingSaveFavoritBackgroundInformations] = useState(false);
@@ -2679,8 +2681,11 @@ const Supervision = ({ me }) => {
                   if (
                         selectedSupervisionType === TYPE_SUPERVISION_AGENT &&
                         selectedProgram.generationType === TYPE_GENERATION_AS_EVENT
-                  )
+                  ) {
                         await saveSupervisionAsEventStrategy(inputFields, newDataStoreSupervisions);
+                  }
+
+                  console.log('inputFields : ', inputFields);
 
                   loadDataStoreSupervisionConfigs(organisationUnits);
                   loadDataStorePerformanceFavoritsConfigs();
@@ -2695,6 +2700,9 @@ const Supervision = ({ me }) => {
                   setEditionMode(false);
                   setEquipeList([]);
                   cleanAllNewSupervisionState();
+                  
+                  setVisibleMissionName(false)
+                  setInputMissionName('')
             } catch (err) {
                   setLoadingSupervisionPlanification(false);
                   setNotification({
@@ -2929,7 +2937,10 @@ const Supervision = ({ me }) => {
                                                             description={translate(
                                                                   'Confirmation_Planification_Message'
                                                             )}
-                                                            onConfirm={handleSupervisionPlanificationSaveBtn}
+                                                            onConfirm={() => {
+                                                                  setInputMissionName('');
+                                                                  setVisibleMissionName(true);
+                                                            }}
                                                             okButtonProps={{ loading: loadingSupervisionPlanification }}
                                                       >
                                                             <Button
@@ -2955,7 +2966,10 @@ const Supervision = ({ me }) => {
                                                             icon={
                                                                   <FiSave style={{ color: '#fff', fontSize: '18px' }} />
                                                             }
-                                                            onClick={handleSupervisionPlanificationSaveBtn}
+                                                            onClick={() => {
+                                                                  setInputMissionName('');
+                                                                  setVisibleMissionName(true);
+                                                            }}
                                                             primary
                                                             disabled={loadingSupervisionPlanification}
                                                             loading={loadingSupervisionPlanification}
@@ -3454,6 +3468,60 @@ const Supervision = ({ me }) => {
                                                       {translate('Enregistrer')}
                                                 </Button>
                                           )}
+                                    </ButtonStrip>
+                              </ModalActions>
+                        </Modal>
+                  </>
+            );
+
+      const RenderAddMissionNameModal = () =>
+            visibleMissionName && (
+                  <>
+                        <Modal
+                              onClose={() => {
+                                    setVisibleMissionName(false);
+                                    setInputMissionName('');
+                              }}
+                        >
+                              <ModalTitle>{translate('Nom_De_La_Mission')}</ModalTitle>
+                              <ModalContent>
+                                    <div style={{ margin: '10px', padding: '10px', border: '1px solid #ccc' }}>
+                                          {translate('Help_Mission_Text')}
+                                    </div>
+                                    <div
+                                          style={{
+                                                padding: '20px',
+                                                border: '1px solid #ccc',
+                                                borderRadius: '5px'
+                                          }}
+                                    >
+                                          <Input
+                                                placeholder={translate('Nom_De_La_Mission')}
+                                                style={{ width: '100%' }}
+                                                onChange={event => setInputMissionName(event.target.value)}
+                                          />
+                                    </div>
+                              </ModalContent>
+                              <ModalActions>
+                                    <ButtonStrip end>
+                                          <Button
+                                                destructive
+                                                onClose={() => {
+                                                      setVisibleMissionName(false);
+                                                      setInputMissionName('');
+                                                }}
+                                                icon={<CgCloseO style={{ fontSize: '18px' }} />}
+                                          >
+                                                {translate('Annuler')}
+                                          </Button>
+                                          <Button
+                                                loading={loadingSupervisionPlanification}
+                                                primary
+                                                onClick={handleSupervisionPlanificationSaveBtn}
+                                                icon={<FiSave style={{ fontSize: '18px' }} />}
+                                          >
+                                                {translate('Enregistrer')}
+                                          </Button>
                                     </ButtonStrip>
                               </ModalActions>
                         </Modal>
@@ -5469,7 +5537,6 @@ const Supervision = ({ me }) => {
                                     <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
                                           {translate('Liste_Configuration_Element_De_Donnees')}
                                     </div>
-                                
                               </div>
 
                               <hr style={{ margin: '10px auto' }} />
@@ -5741,32 +5808,26 @@ const Supervision = ({ me }) => {
                                     </Col> */}
 
                                     {/* {selectedBackgroundInformationTypeConfiguration === FAVORIS && ( */}
-                                          <Col md={24}>
-                                                <div>
-                                                      <div style={{ marginBottom: '5px' }}>
-                                                            {translate('Select_Favorit')}
-                                                      </div>
-                                                      <Select
-                                                            options={favoritBackgroundInformationList
-                                                                  .filter(
-                                                                        f =>
-                                                                              f.program?.id ===
-                                                                              selectedProgram?.program?.id
-                                                                  )
-                                                                  .map(favorit => ({
-                                                                        label: favorit.name,
-                                                                        value: favorit.id
-                                                                  }))}
-                                                            placeholder={translate('Select_Favorit')}
-                                                            style={{ width: '100%' }}
-                                                            optionFilterProp="label"
-                                                            loading={loadingBackgroundInformationFavoritsConfigs}
-                                                            value={selectedBackgroundInformationFavorit?.id}
-                                                            onChange={handleSelectBackgroundInformationFavorit}
-                                                            showSearch
-                                                      />
-                                                </div>
-                                          </Col>
+                                    <Col md={24}>
+                                          <div>
+                                                <div style={{ marginBottom: '5px' }}>{translate('Select_Favorit')}</div>
+                                                <Select
+                                                      options={favoritBackgroundInformationList
+                                                            .filter(f => f.program?.id === selectedProgram?.program?.id)
+                                                            .map(favorit => ({
+                                                                  label: favorit.name,
+                                                                  value: favorit.id
+                                                            }))}
+                                                      placeholder={translate('Select_Favorit')}
+                                                      style={{ width: '100%' }}
+                                                      optionFilterProp="label"
+                                                      loading={loadingBackgroundInformationFavoritsConfigs}
+                                                      value={selectedBackgroundInformationFavorit?.id}
+                                                      onChange={handleSelectBackgroundInformationFavorit}
+                                                      showSearch
+                                                />
+                                          </div>
+                                    </Col>
                                     {/* )} */}
 
                                     {/* {selectedBackgroundInformationTypeConfiguration === FAVORIS &&
@@ -7062,7 +7123,7 @@ const Supervision = ({ me }) => {
                         newList.push(inputFields.find(inp => inp.organisationUnit.id === org.id));
                   } else {
                         newList.push({
-                              organisationUnit: { id: org.id, displayName: org.displayName },
+                              organisationUnit: { id: org.id, displayName: org.displayName, level: org.level },
                               program: {
                                     id: selectedProgram.program?.id,
                                     displayName: selectedProgram.program?.displayName
@@ -7070,8 +7131,6 @@ const Supervision = ({ me }) => {
                               fieldConfig: selectedProgram.fieldConfig,
                               generationType: selectedProgram.generationType,
                               libelle: '',
-                              // specificStage: false,
-                              // programStageConfig: null,
                               payment: null,
                               period: null,
                               equipe: null,
@@ -7138,6 +7197,7 @@ const Supervision = ({ me }) => {
                         </>
                   )}
 
+                  {RenderAddMissionNameModal()}
                   {RenderAddEquipeModal()}
                   {RenderAnalyticComponenPerformancetModal()}
                   {RenderAddFavoritPerformanceModal()}

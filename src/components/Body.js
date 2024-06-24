@@ -17,6 +17,8 @@ import Supervision from './Supervision';
 import { AiOutlineSetting } from 'react-icons/ai';
 import { RxDashboard } from 'react-icons/rx';
 import { MdAttachMoney } from 'react-icons/md';
+import { GrSchedule } from 'react-icons/gr';
+
 import { MdOutlineEditNote } from 'react-icons/md';
 import translate from '../utils/translator';
 import Payment from './Payment';
@@ -131,9 +133,9 @@ export const Body = () => {
                         onClick={_ => handleClickMenu(PAGE_DASHBOARD)}
                   >
                         <span>
-                              <RxDashboard style={{ fontSize: '22px' }} />
+                              <GrSchedule style={{ fontSize: '22px' }} />
                         </span>
-                        <span style={{ marginLeft: '10px' }}>{translate('Dashboard')}</span>
+                        <span style={{ marginLeft: '10px' }}>{translate('Supervision_Schedule')}</span>
                   </div>
 
                   <div
