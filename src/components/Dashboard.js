@@ -238,7 +238,7 @@ export const Dashboard = ({ me }) => {
                                     />
                               </Col>
 
-                              <Col sm={24} md={3}>
+                              <Col sm={24} md={5}>
                                     <div style={{ marginTop: '20px' }}>
                                           <Button
                                                 onClick={printReportAsPDF}
