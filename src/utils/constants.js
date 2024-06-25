@@ -77,3 +77,5 @@ export const DISPLAY_SUPERVISORS = "DISPLAY_SUPERVISORS"
 
 export const DIRECTE = 'DIRECTE'
 export const FAVORIS = 'FAVORIS'
+
+export const MAP ="MAP"

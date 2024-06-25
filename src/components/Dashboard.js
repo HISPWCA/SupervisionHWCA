@@ -1,42 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Card, Col, DatePicker, Row, Select, Table } from 'antd';
-import { Calendar, dayjsLocalizer } from 'react-big-calendar';
-import ReactEchart from 'echarts-for-react';
+import { Col, DatePicker, Row, Select } from 'antd';
+import { dayjsLocalizer } from 'react-big-calendar';
+import ReactDOMServer from 'react-dom/server';
 import axios from 'axios';
-import {
-      DATA_ELEMENT_OPTION_SETS,
-      ORGANISATION_UNITS_ROUTE,
-      SERVER_URL,
-      TRACKED_ENTITY_INSTANCES_ROUTE,
-      USERS_ROUTE
-} from '../utils/api.routes';
+import { ORGANISATION_UNITS_ROUTE, SERVER_URL } from '../utils/api.routes';
 import OrganisationUnitsTree from './OrganisationUnitsTree';
-import {
-      CANCELED,
-      DESCENDANTS,
-      NOTICE_BOX_DEFAULT,
-      NOTIFICATION_CRITICAL,
-      PENDING_VALIDATION,
-      PLANIFICATION_PAR_MOI,
-      PLANIFICATION_PAR_TOUS,
-      PLANIFICATION_PAR_UN_USER,
-      COMPLETED,
-      SCHEDULED,
-      TYPE_GENERATION_AS_ENROLMENT,
-      TYPE_GENERATION_AS_EVENT,
-      TYPE_GENERATION_AS_TEI,
-      NA,
-      PAYMENT_DONE,
-      PENDING_PAYMENT,
-      AGENT,
-      MES_PLANIFICATIONS
-} from '../utils/constants';
-import MapView from './MapView';
+import { NOTICE_BOX_DEFAULT, NOTIFICATION_CRITICAL, NA, SCHEDULED, MES_PLANIFICATIONS } from '../utils/constants';
 import { loadDataStore } from '../utils/functions';
-import { IoMdOpen } from 'react-icons/io';
-import { BLACK, BLUE, GRAY_DARK, GREEN, ORANGE, RED, WHITE } from '../utils/couleurs';
 import { AiOutlineSearch } from 'react-icons/ai';
-import { MyNoticeBox } from './MyNoticeBox';
 import MyNotification from './MyNotification';
 import { Button } from '@dhis2/ui';
 
@@ -44,7 +15,9 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import timezone from 'dayjs/plugin/timezone';
 import translate from '../utils/translator';
-import { v1 as uuid } from 'uuid';
+import VisualizationItem from './VisualizationItem';
+import MyFrame from './MyFrame';
+import { ImPrinter } from 'react-icons/im';
 
 const quarterOfYear = require('dayjs/plugin/quarterOfYear');
 const weekOfYear = require('dayjs/plugin/weekOfYear');
@@ -61,14 +34,13 @@ export const getDefaultStatusSupervisionIfStatusIsNull = _ => SCHEDULED.value;
 export const getDefaultStatusPaymentIfStatusIsNull = _ => NA.value;
 export const Dashboard = ({ me }) => {
       const [organisationUnits, setOrganisationUnits] = useState([]);
-      const [users, setUsers] = useState([]);
 
       const [dataStoreSupervisionsConfigs, setDataStoreSupervisionsConfigs] = useState([]);
       const [dataStoreMissions, setDataStoreMissions] = useState([]);
+      const [dataStoreVisualizations, setDataStoreVisualizations] = useState([]);
 
       const [selectedMission, setSelectedMission] = useState(null);
 
-      const [_, setDataStoreSupervisionPlanifications] = useState([]);
       const [teiList, setTeiList] = useState([]);
       const [noticeBox, setNoticeBox] = useState({
             show: false,
@@ -81,9 +53,7 @@ export const Dashboard = ({ me }) => {
             message: null,
             type: null
       });
-      const [calendarDate, setCalendarDate] = useState(dayjs().format('YYYY-MM-DD'));
       const [statusSupervisionOptions, setStatusSupervisionOptions] = useState([]);
-      const [statusPaymentOptions, setStatusPaymentOptions] = useState([]);
 
       const [selectedOrganisationUnit, setSelectedOrganisationUnit] = useState(null);
       const [selectedPlanification, setSelectedPlanification] = useState(MES_PLANIFICATIONS);
@@ -92,9 +62,9 @@ export const Dashboard = ({ me }) => {
 
       const [loadingOrganisationUnits, setLoadingOrganisationUnits] = useState(false);
       const [loadingUsers, setLoadingUsers] = useState(false);
-      const [loadingDataStoreSupervisionPlanifications, setLoadingDataStoreSupervisionPlanifications] = useState(false);
+      const [loadingDataStoreVisualizations, setLoadingDataStoreVisualizations] = useState(false);
       const [loadingDataStoreSupervisionsConfigs, setLoadingDataStoreSupervisionsConfigs] = useState(false);
-      const [loadingTeiList, setLoadingTeiList] = useState(false);
+      const [loadingInjection, setLoadingInjection] = useState(false);
 
       const [loadingDataStoreMissions, setLoadingDataStoreMissions] = useState(false);
 
@@ -118,30 +88,17 @@ export const Dashboard = ({ me }) => {
                   const progs = await loadDataStoreSupervisionsConfigs();
 
                   setOrganisationUnits(orgUnits);
-                  setSelectedPeriod(dayjs());
                   if (progs.length > 0) {
                         const currentProgram = progs[0];
                         const currentOrgUnit = orgUnits.find(ou => ou.id === me?.organisationUnits?.[0]?.id);
                         const currentPeriod = dayjs();
-                        const currentPlanification = MES_PLANIFICATIONS;
 
                         if (currentProgram) {
                               setSelectedProgram(currentProgram);
                               setSelectedOrganisationUnit(currentOrgUnit);
                               setSelectedPeriod(currentPeriod);
-                              setSelectedPlanification(currentPlanification);
-                              loadTeisPlanifications(currentProgram.program.id, currentOrgUnit?.id, null, DESCENDANTS);
-                              loadOptions(
-                                    currentProgram?.programStageConfigurations?.[0]?.statusSupervisionField?.id,
-                                    setStatusSupervisionOptions
-                              );
-                              // loadOptions(
-                              //   currentProgram.statusPayment?.dataElement?.id,
-                              //   setStatusPaymentOptions
-                              // );
                         }
                   }
-                  loadUsers(me?.organisationUnits?.[0]?.id);
                   setLoadingOrganisationUnits(false);
             } catch (err) {
                   setLoadingOrganisationUnits(false);
@@ -150,26 +107,6 @@ export const Dashboard = ({ me }) => {
                         message: err.response?.data?.message || err.message,
                         type: NOTIFICATION_CRITICAL
                   });
-            }
-      };
-
-      const loadTeisPlanifications = async (program_id, orgUnit_id, period, ouMode = DESCENDANTS) => {
-            try {
-                  setLoadingTeiList(true);
-                  const response = await axios.get(
-                        `${TRACKED_ENTITY_INSTANCES_ROUTE}.json?program=${program_id}&ou=${orgUnit_id}&ouMode=${ouMode}&order=created:DESC&fields=trackedEntityInstance,created,program,orgUnit,enrollments[*],attributes&pageSize=10000`
-                  );
-                  const trackedEntityInstances = response.data.trackedEntityInstances;
-                  setTeiList(trackedEntityInstances);
-                  setLoadingTeiList(false);
-                  setCalendarDate(period ? period : selectedPeriod);
-            } catch (err) {
-                  setNotification({
-                        show: true,
-                        message: err.response?.data?.message || err.message,
-                        type: NOTIFICATION_CRITICAL
-                  });
-                  setLoadingTeiList(false);
             }
       };
 
@@ -187,54 +124,17 @@ export const Dashboard = ({ me }) => {
             }
       };
 
-      const loadDataStoreSupervisionPlanifications = async () => {
+      const loadDataStoreVisualizations = async () => {
             try {
-                  setLoadingDataStoreSupervisionPlanifications(true);
-                  const response = await loadDataStore(process.env.REACT_APP_SUPERVISIONS_KEY, null, null, null);
+                  setLoadingDataStoreVisualizations(true);
+                  const response = await loadDataStore(process.env.REACT_APP_VISUALIZATION_KEY, null, null, null);
 
-                  let supervisionList = [];
-                  const eventList = [];
-
-                  for (let planification of response) {
-                        for (let sup of planification.supervisions) {
-                              if (!supervisionList.map(s => s.id).includes(sup.id)) {
-                                    supervisionList.push(sup);
-                              }
-                        }
-                  }
-
-                  for (let sup of supervisionList) {
-                        const payload = {
-                              id: sup.id,
-                              title: 'Supervision',
-                              allDay: true,
-                              start: new Date(2015, 3, 0),
-                              end: new Date(2015, 3, 1)
-                        };
-
-                        eventList.push(payload);
-                  }
-
-                  setDataStoreSupervisionPlanifications(response);
-                  setLoadingDataStoreSupervisionPlanifications(false);
+                  setDataStoreVisualizations(response);
+                  setLoadingDataStoreVisualizations(false);
+                  return response;
             } catch (err) {
-                  setLoadingDataStoreSupervisionPlanifications(false);
-            }
-      };
-
-      const loadUsers = async userOrgUnitId => {
-            try {
-                  if (userOrgUnitId) {
-                        setLoadingUsers(true);
-
-                        const route = `${USERS_ROUTE}&filter=organisationUnits.path:like:${userOrgUnitId}`;
-                        const response = await axios.get(route);
-
-                        setUsers(response.data.users);
-                        setLoadingUsers(false);
-                  }
-            } catch (err) {
-                  setLoadingUsers(false);
+                  setLoadingDataStoreVisualizations(false);
+                  throw err;
             }
       };
 
@@ -242,13 +142,37 @@ export const Dashboard = ({ me }) => {
             setSelectedPeriod(dayjs(event));
       };
 
+      const printReportAsPDF = async () => {
+            let reportDocument = document.querySelector('[id="visualizations-container"]');
 
-      const handleSearch = () => {
-            if (selectedPeriod && selectedOrganisationUnit && selectedProgram) {
-                  loadTeisPlanifications(selectedProgram.program?.id, selectedOrganisationUnit.id);
+            reportDocument.querySelectorAll('canvas').forEach(cv => {
+                  const current_canvas_parent = cv.parentElement;
+                  const current_canvas_url = cv.toDataURL();
+                  current_canvas_parent.innerHTML = "<img src='" + current_canvas_url + "' />";
+            });
+
+            const iframeList = reportDocument.querySelectorAll('iframe');
+            for (let ifr of iframeList) {
+                  const canvas = await window.html2canvas(ifr.contentWindow.document.body);
+                  if (canvas) {
+                        const current_iframe_parent = ifr.parentElement;
+                        const current_iframe_url = canvas.toDataURL();
+                        current_iframe_parent.innerHTML = "<img src='" + current_iframe_url + "' />";
+                        ifr.replaceWith("<img src='" + current_iframe_url + "' />");
+                  }
             }
+
+            const win = window.open('', '', 'height=1000,width=1000');
+
+            win.document.write(`<!DOCTYPE html><head></head>`);
+            win.document.write(`<body lang="en">`);
+            win.document.write(reportDocument.innerHTML);
+            win.document.write(`</body></html>`);
+
+            win.document.close();
+            win.print();
       };
-      
+
       const handleSelectMission = value => setSelectedMission(dataStoreMissions.find(m => m.id === value));
 
       const handleSelectProgram = value => {
@@ -314,15 +238,14 @@ export const Dashboard = ({ me }) => {
                                     />
                               </Col>
 
-                              <Col sm={24} md={1}>
+                              <Col sm={24} md={3}>
                                     <div style={{ marginTop: '20px' }}>
                                           <Button
-                                                onClick={handleSearch}
-                                                loading={loadingTeiList}
+                                                onClick={printReportAsPDF}
                                                 primary
-                                                icon={<AiOutlineSearch style={{ fontSize: '20px' }} />}
+                                                icon={<ImPrinter style={{ fontSize: '20px' }} />}
                                           >
-                                                {translate('Appliquer')}
+                                                {translate('Print_Dashboard')}
                                           </Button>
                                     </div>
                               </Col>
@@ -331,18 +254,83 @@ export const Dashboard = ({ me }) => {
             </>
       );
 
+      const RenderVisualizations = () => (
+            <div id="visualizations-container">
+                  <Row gutter={[8, 8]}>
+                        {dataStoreVisualizations?.map(v => (
+                              <VisualizationItem
+                                    key={v.id}
+                                    id={`${v.id}-${selectedOrganisationUnit?.id}`}
+                                    loading={loadingInjection}
+                              />
+                        ))}
+                  </Row>
+            </div>
+      );
+
+      const loadAndInjectVisualizations = async () => {
+            try {
+                  setLoadingInjection(true);
+                  dataStoreVisualizations.forEach(v => {
+                        const responseString = ReactDOMServer.renderToString(
+                              <MyFrame
+                                    type={v.type}
+                                    base_url={SERVER_URL}
+                                    id={v.id}
+                                    style={{
+                                          width: '100%',
+                                          heigth: '100%',
+                                          overflow: 'none'
+                                    }}
+                                    periods={[selectedPeriod.format('YYYYMM')].join(',')}
+                                    orgUnitIDs={[selectedOrganisationUnit.id].join(',')}
+                              />
+                        );
+
+                        const rightElement = document.getElementById(`${v.id}-${selectedOrganisationUnit?.id}`);
+                        if (rightElement) {
+                              rightElement.innerHTML = responseString;
+                        }
+
+                        const foundIframe = rightElement.querySelector('iframe');
+                        if (foundIframe) {
+                              foundIframe.onload = frame => {
+                                    setTimeout(() => {
+                                          foundIframe.style.height =
+                                                foundIframe.contentWindow.document.body.scrollHeight + 'px';
+                                          foundIframe.style.width =
+                                                foundIframe.contentWindow.document.body.scrollWidth + 'px';
+                                    }, 6000);
+                              };
+                        }
+                  });
+                  setLoadingInjection(false);
+            } catch (err) {
+                  console.log('Error: ', err);
+                  setLoadingInjection(false);
+            }
+      };
+
       useEffect(() => {
             if (me) {
                   loadDataStoreSupervisionsConfigs();
                   loadDataStoreMissions();
+                  loadOrganisationUnits();
+                  loadDataStoreVisualizations();
             }
       }, [me]);
+
+      useEffect(() => {
+            if (dataStoreVisualizations.length > 0 && selectedPeriod && selectedOrganisationUnit) {
+                  loadAndInjectVisualizations();
+            }
+      }, [selectedPeriod, selectedOrganisationUnit, dataStoreVisualizations]);
 
       return (
             <>
                   <div style={{ padding: '10px', width: '100%' }}>
                         {RenderFilters()}
-
+                        {RenderVisualizations()}
                         <MyNotification notification={notification} setNotification={setNotification} />
                   </div>
             </>

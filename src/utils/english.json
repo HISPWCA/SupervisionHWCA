@@ -243,5 +243,6 @@
     "Nom_De_La_Mission": "Mission name ",
     "Nom_Mission_Deja_Utiliser":"This name is already used !",
     "Supervision_Schedule": "Supervision schedule",
-    "Help_Mission_Text":"For analysis purposes at the dashboard side, the application needs to record this planning as an output/mission."
+    "Help_Mission_Text":"For analysis purposes at the dashboard side, the application needs to record this planning as an output/mission.",
+    "Print_Dashboard":"Print Dashboard"
 }

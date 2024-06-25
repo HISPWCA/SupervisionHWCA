@@ -59,10 +59,9 @@ const localizer = dayjsLocalizer(dayjs);
 
 export const getDefaultStatusSupervisionIfStatusIsNull = _ => SCHEDULED.value;
 export const getDefaultStatusPaymentIfStatusIsNull = _ => NA.value;
-export const DashboardSchedule = ({ me }) => {
+export const Dashboard = ({ me }) => {
       const [organisationUnits, setOrganisationUnits] = useState([]);
-
-
+      const [users, setUsers] = useState([]);
       const [dataStoreSupervisionsConfigs, setDataStoreSupervisionsConfigs] = useState([]);
       const [_, setDataStoreSupervisionPlanifications] = useState([]);
       const [teiList, setTeiList] = useState([]);
@@ -92,9 +91,108 @@ export const DashboardSchedule = ({ me }) => {
       const [loadingUsers, setLoadingUsers] = useState(false);
       const [loadingDataStoreSupervisionPlanifications, setLoadingDataStoreSupervisionPlanifications] = useState(false);
       const [loadingDataStoreSupervisionsConfigs, setLoadingDataStoreSupervisionsConfigs] = useState(false);
-   
+      const [loadingTeiList, setLoadingTeiList] = useState(false);
 
-   
+      const colors = ['#5470C6', '#EE6666'];
+
+      const analyleLineOptions = {
+            color: colors,
+            tooltip: {
+                  trigger: 'none',
+                  axisPointer: {
+                        type: 'cross'
+                  }
+            },
+            legend: {},
+            grid: {
+                  top: 70,
+                  bottom: 50
+            },
+            xAxis: [
+                  {
+                        type: 'category',
+                        axisTick: {
+                              alignWithLabel: true
+                        },
+                        axisLine: {
+                              onZero: false,
+                              lineStyle: {
+                                    color: colors[1]
+                              }
+                        },
+                        axisPointer: {
+                              label: {
+                                    formatter: function (params) {
+                                          return (
+                                                'Precipitation  ' +
+                                                params.value +
+                                                (params.seriesData.length ? '：' + params.seriesData[0].data : '')
+                                          );
+                                    }
+                              }
+                        },
+                        // prettier-ignore
+                        data: ['2016-1', '2016-2', '2016-3', '2016-4', '2016-5', '2016-6', '2016-7', '2016-8', '2016-9', '2016-10', '2016-11', '2016-12']
+                  },
+                  {
+                        type: 'category',
+                        axisTick: {
+                              alignWithLabel: true
+                        },
+                        axisLine: {
+                              onZero: false,
+                              lineStyle: {
+                                    color: colors[0]
+                              }
+                        },
+                        axisPointer: {
+                              label: {
+                                    formatter: function (params) {
+                                          return (
+                                                'Precipitation  ' +
+                                                params.value +
+                                                (params.seriesData.length ? '：' + params.seriesData[0].data : '')
+                                          );
+                                    }
+                              }
+                        },
+                        // prettier-ignore
+                        data: ['2015-1', '2015-2', '2015-3', '2015-4', '2015-5', '2015-6', '2015-7', '2015-8', '2015-9', '2015-10', '2015-11', '2015-12']
+                  }
+            ],
+            yAxis: [
+                  {
+                        type: 'value'
+                  }
+            ],
+            series: [
+                  {
+                        name: 'Precipitation(2015)',
+                        type: 'line',
+                        xAxisIndex: 1,
+                        smooth: true,
+                        emphasis: {
+                              focus: 'series'
+                        },
+                        data: [2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3]
+                  },
+                  {
+                        name: 'Precipitation(2016)',
+                        type: 'line',
+                        smooth: true,
+                        emphasis: {
+                              focus: 'series'
+                        },
+                        data: [3.9, 5.9, 11.1, 18.7, 48.3, 69.2, 231.6, 46.6, 55.4, 18.4, 10.3, 0.7]
+                  }
+            ]
+      };
+
+      const coordinates = [
+            { latitude: '7.653044', longitude: '1.047232' },
+            { latitude: '7.616294', longitude: '1.126936' },
+            { latitude: '7.582263', longitude: '1.508966' }
+      ];
 
       const loadOrganisationUnits = async () => {
             try {
@@ -139,6 +237,26 @@ export const DashboardSchedule = ({ me }) => {
             }
       };
 
+      const loadTeisPlanifications = async (program_id, orgUnit_id, period, ouMode = DESCENDANTS) => {
+            try {
+                  setLoadingTeiList(true);
+                  const response = await axios.get(
+                        `${TRACKED_ENTITY_INSTANCES_ROUTE}.json?program=${program_id}&ou=${orgUnit_id}&ouMode=${ouMode}&order=created:DESC&fields=trackedEntityInstance,created,program,orgUnit,enrollments[*],attributes&pageSize=10000`
+                  );
+                  const trackedEntityInstances = response.data.trackedEntityInstances;
+                  setTeiList(trackedEntityInstances);
+                  setLoadingTeiList(false);
+                  setCalendarDate(period ? period : selectedPeriod);
+            } catch (err) {
+                  setNotification({
+                        show: true,
+                        message: err.response?.data?.message || err.message,
+                        type: NOTIFICATION_CRITICAL
+                  });
+                  setLoadingTeiList(false);
+            }
+      };
+
       const loadDataStoreSupervisionsConfigs = async () => {
             try {
                   setLoadingDataStoreSupervisionsConfigs(true);
@@ -150,6 +268,41 @@ export const DashboardSchedule = ({ me }) => {
             } catch (err) {
                   setLoadingDataStoreSupervisionsConfigs(false);
                   throw err;
+            }
+      };
+
+      const loadDataStoreSupervisionPlanifications = async () => {
+            try {
+                  setLoadingDataStoreSupervisionPlanifications(true);
+                  const response = await loadDataStore(process.env.REACT_APP_SUPERVISIONS_KEY, null, null, null);
+
+                  let supervisionList = [];
+                  const eventList = [];
+
+                  for (let planification of response) {
+                        for (let sup of planification.supervisions) {
+                              if (!supervisionList.map(s => s.id).includes(sup.id)) {
+                                    supervisionList.push(sup);
+                              }
+                        }
+                  }
+
+                  for (let sup of supervisionList) {
+                        const payload = {
+                              id: sup.id,
+                              title: 'Supervision',
+                              allDay: true,
+                              start: new Date(2015, 3, 0),
+                              end: new Date(2015, 3, 1)
+                        };
+
+                        eventList.push(payload);
+                  }
+
+                  setDataStoreSupervisionPlanifications(response);
+                  setLoadingDataStoreSupervisionPlanifications(false);
+            } catch (err) {
+                  setLoadingDataStoreSupervisionPlanifications(false);
             }
       };
 
@@ -1387,6 +1540,24 @@ export const DashboardSchedule = ({ me }) => {
                                     </Col>
                               )}
 
+                              {0 > 1 && (
+                                    <Col sm={24} md={3}>
+                                          <div style={{ marginBottom: '2px' }}>{translate('Superviseurs')}</div>
+                                          <Select
+                                                placeholder={translate('Superviseurs')}
+                                                style={{ width: '100%' }}
+                                                loading={loadingUsers}
+                                                mode="multiple"
+                                                onChange={handleSelectSupervisor}
+                                                value={selectedSupervisors.map(sup => sup.id)}
+                                                options={users.map(user => ({
+                                                      label: user.displayName,
+                                                      value: user.id
+                                                }))}
+                                          />
+                                    </Col>
+                              )}
+
                               <Col sm={24} md={1}>
                                     <div style={{ marginTop: '20px' }}>
                                           <Button
@@ -1434,4 +1605,4 @@ export const DashboardSchedule = ({ me }) => {
       );
 };
 
-export default DashboardSchedule;
+export default Dashboard;

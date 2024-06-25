@@ -241,5 +241,6 @@
     "Nom_De_La_Mission": "Nom de la sortie ( mission ) ",
     "Nom_Mission_Deja_Utiliser": "Ce nom est déjà utilisé !",
     "Supervision_Schedule": "Agenda des supervisions ",
-    "Help_Mission_Text": "A des fins d'analyse au niveau du dashboard, l'application a besoin d'enregistrer cette planification sous forme d'une sortie / mission."
+    "Help_Mission_Text": "A des fins d'analyse au niveau du dashboard, l'application a besoin d'enregistrer cette planification sous forme d'une sortie / mission.",
+    "Print_Dashboard": "Imprimer le Dashboard"
 }
