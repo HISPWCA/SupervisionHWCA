@@ -240,7 +240,8 @@
     "Create_Favorites":"Favorites creation",
     "Delete_Favorite":"Delete favorite",
     "Favorite_Deleted_Success": "Favoris supprimé avec succès",
-    "Nom_De_La_Mission": "Nom de la sortie ( mission ) ",
+    "Nom_De_La_Mission": "Mission name ",
+    "Nom_Mission_Deja_Utiliser":"This name is already used !",
     "Supervision_Schedule": "Supervision schedule",
     "Help_Mission_Text":"For analysis purposes at the dashboard side, the application needs to record this planning as an output/mission."
 }

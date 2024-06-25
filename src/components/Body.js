@@ -7,10 +7,12 @@ import {
       PAGE_SUPERVISIONS,
       PAGE_SETTINGS,
       PAGE_PAYMENT,
-      PAGE_FAVORIS_CREATION
+      PAGE_FAVORIS_CREATION,
+      PAGE_SCHEDULE
 } from '../utils/constants';
 import { BORDER_COLOR } from '../utils/couleurs';
 import { loadDataStore } from '../utils/functions';
+import DashboardSchedule from './DashboardSchedule';
 import Dashboard from './Dashboard';
 import Setting from './Setting';
 import Supervision from './Supervision';
@@ -133,6 +135,15 @@ export const Body = () => {
                         onClick={_ => handleClickMenu(PAGE_DASHBOARD)}
                   >
                         <span>
+                              <RxDashboard style={{ fontSize: '22px' }} />
+                        </span>
+                        <span style={{ marginLeft: '10px' }}>{translate('Dashboard')}</span>
+                  </div>
+                  <div
+                        className={`menu-item ${renderPage === PAGE_SCHEDULE ? 'active' : ''}`}
+                        onClick={_ => handleClickMenu(PAGE_SCHEDULE)}
+                  >
+                        <span>
                               <GrSchedule style={{ fontSize: '22px' }} />
                         </span>
                         <span style={{ marginLeft: '10px' }}>{translate('Supervision_Schedule')}</span>
@@ -197,6 +208,16 @@ export const Body = () => {
                                     style={{ height: '100%', width: '100%', overflowY: 'scroll' }}
                               >
                                     <Dashboard me={me} />
+                              </div>
+                        );
+
+                  case PAGE_SCHEDULE:
+                        return (
+                              <div
+                                    className="my-scrollable"
+                                    style={{ height: '100%', width: '100%', overflowY: 'scroll' }}
+                              >
+                                    <DashboardSchedule me={me} />
                               </div>
                         );
 

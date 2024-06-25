@@ -102,7 +102,7 @@ import shuffle from 'shuffle-array';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { BLUE, GRAY_DARK, GREEN, ORANGE, RED, WHITE } from '../utils/couleurs';
-import { getDefaultStatusPaymentIfStatusIsNull, getDefaultStatusSupervisionIfStatusIsNull } from './Dashboard';
+import { getDefaultStatusPaymentIfStatusIsNull, getDefaultStatusSupervisionIfStatusIsNull } from './DashboardSchedule';
 import translate from '../utils/translator';
 const quarterOfYear = require('dayjs/plugin/quarterOfYear');
 const weekOfYear = require('dayjs/plugin/weekOfYear');
@@ -146,6 +146,7 @@ const Supervision = ({ me }) => {
       const [favoritPerformanceList, setFavoritPerformanceList] = useState([]);
       const [dataElementGroups, setDataElementGroups] = useState([]);
       const [favoritBackgroundInformationList, setFavoritBackgroundInformationList] = useState([]);
+      const [dataStoreMissions, setDataStoreMissions] = useState([]);
 
       const [visibleTeamLeadContent, setVisibleTeamLeadContent] = useState(false);
       const [visibleAnalyticComponentModal, setVisibleAnalyticComponentModal] = useState(false);
@@ -918,6 +919,14 @@ const Supervision = ({ me }) => {
             } catch (err) {
                   setLoadingDataStoreSupervisions(false);
             }
+      };
+
+      const loadDataStoreMissions = async () => {
+            try {
+                  const response = await loadDataStore(process.env.REACT_APP_MISSIONS_KEY, null, null, null);
+                  setDataStoreMissions(response);
+                  return response;
+            } catch (err) {}
       };
 
       const loadDataStoreIndicators = async () => {
@@ -2685,11 +2694,30 @@ const Supervision = ({ me }) => {
                         await saveSupervisionAsEventStrategy(inputFields, newDataStoreSupervisions);
                   }
 
-                  console.log('inputFields : ', inputFields);
+                  const missionList = (await loadDataStore(process.env.REACT_APP_MISSIONS_KEY, null, null, [])) || [];
+                  const newMissionList = [
+                        ...missionList,
+                        {
+                              id: uuid(),
+                              name: inputMissionName,
+                              program: inputFields[0]?.program,
+                              mission: inputFields?.map(inp => ({
+                                    ...inp,
+                                    period: dayjs(inp.period).format('YYYY-MM-DD HH:mm:ss'),
+                                    supervisors: inp.supervisors?.map(sup => ({
+                                          id: sup.id,
+                                          displayName: sup.displayName
+                                    }))
+                              })),
+                              createdAt: dayjs().format('YYYY-MM-DD HH:mm:ss')
+                        }
+                  ];
+                  await saveDataToDataStore(process.env.REACT_APP_MISSIONS_KEY, newMissionList);
 
                   loadDataStoreSupervisionConfigs(organisationUnits);
                   loadDataStorePerformanceFavoritsConfigs();
                   loadDataStoreSupervisions();
+                  loadDataStoreMissions();
 
                   setLoadingSupervisionPlanification(false);
                   setNotification({
@@ -2700,9 +2728,9 @@ const Supervision = ({ me }) => {
                   setEditionMode(false);
                   setEquipeList([]);
                   cleanAllNewSupervisionState();
-                  
-                  setVisibleMissionName(false)
-                  setInputMissionName('')
+
+                  setVisibleMissionName(false);
+                  setInputMissionName('');
             } catch (err) {
                   setLoadingSupervisionPlanification(false);
                   setNotification({
@@ -3485,19 +3513,32 @@ const Supervision = ({ me }) => {
                         >
                               <ModalTitle>{translate('Nom_De_La_Mission')}</ModalTitle>
                               <ModalContent>
-                                    <div style={{ margin: '10px', padding: '10px', border: '1px solid #ccc' }}>
-                                          {translate('Help_Mission_Text')}
-                                    </div>
                                     <div
                                           style={{
-                                                padding: '20px',
-                                                border: '1px solid #ccc',
-                                                borderRadius: '5px'
+                                                margin: '10px'
+                                          }}
+                                    >
+                                          <NoticeBox>{translate('Help_Mission_Text')}</NoticeBox>
+                                    </div>
+
+                                    {dataStoreMissions?.map(m => m.name)?.includes(inputMissionName) && (
+                                          <div
+                                                style={{
+                                                      margin: '10px'
+                                                }}
+                                          >
+                                                <NoticeBox error>{translate('Help_Mission_Text')}</NoticeBox>
+                                          </div>
+                                    )}
+                                    <div
+                                          style={{
+                                                padding: '10px'
                                           }}
                                     >
                                           <Input
                                                 placeholder={translate('Nom_De_La_Mission')}
                                                 style={{ width: '100%' }}
+                                                value={inputMissionName}
                                                 onChange={event => setInputMissionName(event.target.value)}
                                           />
                                     </div>
@@ -3506,7 +3547,7 @@ const Supervision = ({ me }) => {
                                     <ButtonStrip end>
                                           <Button
                                                 destructive
-                                                onClose={() => {
+                                                onClick={() => {
                                                       setVisibleMissionName(false);
                                                       setInputMissionName('');
                                                 }}
@@ -3515,6 +3556,9 @@ const Supervision = ({ me }) => {
                                                 {translate('Annuler')}
                                           </Button>
                                           <Button
+                                                disabled={dataStoreMissions
+                                                      ?.map(m => m.name)
+                                                      ?.includes(inputMissionName)}
                                                 loading={loadingSupervisionPlanification}
                                                 primary
                                                 onClick={handleSupervisionPlanificationSaveBtn}
@@ -4054,8 +4098,7 @@ const Supervision = ({ me }) => {
                                           borderBottom: '1px solid #ccc'
                                     }}
                               >
-                                    {' '}
-                                    {translate('Planification_Sur_Performances')}{' '}
+                                    {translate('Planification_Sur_Performances')}
                               </div>
                               <div style={{ padding: '10px' }}>
                                     <div>{translate('Selectionnez_Indicateurs_De_Performance')}</div>
@@ -7166,6 +7209,7 @@ const Supervision = ({ me }) => {
                   loadOrganisationUnits();
                   loadOrganisationUnitGroups();
                   loadDataStoreSupervisions();
+                  loadDataStoreMissions();
                   loadDataStorePerformanceFavoritsConfigs();
                   loadDataStoreBackgroundInformationFavoritsConfigs();
                   loadDataStoreIndicators();

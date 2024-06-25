@@ -3,6 +3,7 @@ import translate from "./translator"
 export const MAP_BOX_API_KEY = 'dRq6SAPnk2nypi0O4fEY'
 
 export const PAGE_DASHBOARD = 'PAGE_DASHBOARD'
+export const PAGE_SCHEDULE = 'PAGE_SCHEDULE';
 export const PAGE_SETTINGS = 'PAGE_SETTINGS'
 export const PAGE_PAYMENT = 'PAGE_PAYMENT'
 export const PAGE_FAVORIS_CREATION = 'PAGE_FAVORIS_CREATION'

@@ -235,12 +235,11 @@
     "Annulée": "Annulée",
     "En Cours": "En Cours",
     "Terminée": "Terminée",
-    
-    
-    "Create_Favorites":"Création des favoris",
+    "Create_Favorites": "Création des favoris",
     "Delete_Favorite": "Supprimer le favoris",
     "Favorite_Deleted_Success": "Favoris supprimé avec succès",
     "Nom_De_La_Mission": "Nom de la sortie ( mission ) ",
+    "Nom_Mission_Deja_Utiliser": "Ce nom est déjà utilisé !",
     "Supervision_Schedule": "Agenda des supervisions ",
     "Help_Mission_Text": "A des fins d'analyse au niveau du dashboard, l'application a besoin d'enregistrer cette planification sous forme d'une sortie / mission."
 }
