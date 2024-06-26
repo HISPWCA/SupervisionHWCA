@@ -2701,7 +2701,7 @@ const Supervision = ({ me }) => {
                               id: uuid(),
                               name: inputMissionName,
                               program: inputFields[0]?.program,
-                              mission: inputFields?.map(inp => ({
+                              output: inputFields?.map(inp => ({
                                     ...inp,
                                     period: dayjs(inp.period).format('YYYY-MM-DD HH:mm:ss'),
                                     supervisors: inp.supervisors?.map(sup => ({

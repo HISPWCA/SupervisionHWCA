@@ -242,5 +242,10 @@
     "Nom_Mission_Deja_Utiliser": "Ce nom est déjà utilisé !",
     "Supervision_Schedule": "Agenda des supervisions ",
     "Help_Mission_Text": "A des fins d'analyse au niveau du dashboard, l'application a besoin d'enregistrer cette planification sous forme d'une sortie / mission.",
-    "Print_Dashboard": "Imprimer le Dashboard"
+    "Print_Dashboard": "Imprimer le Dashboard",
+    "Missions": "Missions",
+    "Level": "Niveau",
+    "Analysis_For": "Analyses sur ",
+    "Global_Analysis_For": "Analyses Globale sur ",
+    "No_Planification_Done_On_An_OU": "Aucune planification effectuée sur une unité d'organisation à ce level"
 }

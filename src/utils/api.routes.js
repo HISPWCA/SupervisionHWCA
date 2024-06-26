@@ -7,6 +7,9 @@ export const SERVER_URL = FULL_ROUTE.substring(0, FULL_ROUTE.indexOf('/api/apps/
 export const ORGANISATION_UNITS_ROUTE = API_BASE_ROUTE.concat(
       '/organisationUnits.json?paging=false&fields=id,name,displayName,parent[id,displayName],level,path,organisationUnitGroups[id]'
 );
+export const ORGANISATION_UNITS_LEVELS_ROUTE = API_BASE_ROUTE.concat(
+      '/organisationUnitLevels.json?paging=false&fields=id,name,displayName,level&order=level:asc'
+);
 export const ME_ROUTE = API_BASE_ROUTE.concat('/me.json?fields=id,displayName');
 export const USERS_ROUTE = API_BASE_ROUTE.concat(
       '/users.json?fields=id,displayName,name,organisationUnits[id,path,name,displayName]&paging=false'

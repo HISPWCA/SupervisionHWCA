@@ -236,13 +236,20 @@
     "Annulée": "Cancel",
     "En Cours": "Pending",
     "Terminée": "Completed",
-
-    "Create_Favorites":"Favorites creation",
-    "Delete_Favorite":"Delete favorite",
+    "Create_Favorites": "Favorites creation",
+    "Delete_Favorite": "Delete favorite",
     "Favorite_Deleted_Success": "Favoris supprimé avec succès",
     "Nom_De_La_Mission": "Mission name ",
-    "Nom_Mission_Deja_Utiliser":"This name is already used !",
+    "Nom_Mission_Deja_Utiliser": "This name is already used !",
     "Supervision_Schedule": "Supervision schedule",
-    "Help_Mission_Text":"For analysis purposes at the dashboard side, the application needs to record this planning as an output/mission.",
-    "Print_Dashboard":"Print Dashboard"
+    "Help_Mission_Text": "For analysis purposes at the dashboard side, the application needs to record this planning as an output/mission.",
+    "Print_Dashboard": "Print Dashboard",
+
+
+
+    "Missions": "Missions",
+    "Level": "Level",
+    "Analysis_For":"Analysis for",
+    "Global_Analysis_For":"Global Analysis for",
+    "No_Planification_Done_On_An_OU": "No planification done on an organisation unit at this level "
 }

@@ -3,13 +3,12 @@ import { Col, DatePicker, Row, Select } from 'antd';
 import { dayjsLocalizer } from 'react-big-calendar';
 import ReactDOMServer from 'react-dom/server';
 import axios from 'axios';
-import { ORGANISATION_UNITS_ROUTE, SERVER_URL } from '../utils/api.routes';
-import OrganisationUnitsTree from './OrganisationUnitsTree';
+import { ORGANISATION_UNITS_LEVELS_ROUTE, ORGANISATION_UNITS_ROUTE, SERVER_URL } from '../utils/api.routes';
 import { NOTICE_BOX_DEFAULT, NOTIFICATION_CRITICAL, NA, SCHEDULED, MES_PLANIFICATIONS } from '../utils/constants';
 import { loadDataStore } from '../utils/functions';
-import { AiOutlineSearch } from 'react-icons/ai';
 import MyNotification from './MyNotification';
 import { Button } from '@dhis2/ui';
+import { v4 as uuid } from 'uuid';
 
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
@@ -34,49 +33,53 @@ export const getDefaultStatusSupervisionIfStatusIsNull = _ => SCHEDULED.value;
 export const getDefaultStatusPaymentIfStatusIsNull = _ => NA.value;
 export const Dashboard = ({ me }) => {
       const [organisationUnits, setOrganisationUnits] = useState([]);
+      const [organisationUnitLevels, setOrganisationUnitLevels] = useState([]);
 
       const [dataStoreSupervisionsConfigs, setDataStoreSupervisionsConfigs] = useState([]);
       const [dataStoreMissions, setDataStoreMissions] = useState([]);
       const [dataStoreVisualizations, setDataStoreVisualizations] = useState([]);
 
-      const [selectedMission, setSelectedMission] = useState(null);
-
-      const [teiList, setTeiList] = useState([]);
-      const [noticeBox, setNoticeBox] = useState({
-            show: false,
-            message: null,
-            title: null,
-            type: NOTICE_BOX_DEFAULT
-      });
       const [notification, setNotification] = useState({
             show: false,
             message: null,
             type: null
       });
-      const [statusSupervisionOptions, setStatusSupervisionOptions] = useState([]);
 
+      const [selectedMission, setSelectedMission] = useState(null);
       const [selectedOrganisationUnit, setSelectedOrganisationUnit] = useState(null);
-      const [selectedPlanification, setSelectedPlanification] = useState(MES_PLANIFICATIONS);
+      const [selectedLevel, setSelectedLevel] = useState(null);
       const [selectedPeriod, setSelectedPeriod] = useState(dayjs(new Date()));
       const [selectedProgram, setSelectedProgram] = useState(null);
 
       const [loadingOrganisationUnits, setLoadingOrganisationUnits] = useState(false);
-      const [loadingUsers, setLoadingUsers] = useState(false);
       const [loadingDataStoreVisualizations, setLoadingDataStoreVisualizations] = useState(false);
       const [loadingDataStoreSupervisionsConfigs, setLoadingDataStoreSupervisionsConfigs] = useState(false);
       const [loadingInjection, setLoadingInjection] = useState(false);
 
       const [loadingDataStoreMissions, setLoadingDataStoreMissions] = useState(false);
+      const [loadingOrganisationUnitLevels, setLoadingOrganisationUnitLevels] = useState(false);
 
       const loadDataStoreMissions = async () => {
             try {
                   setLoadingDataStoreMissions(true);
                   const response = await loadDataStore(process.env.REACT_APP_MISSIONS_KEY, null, null, null);
-                  setDataStoreMissions(response);
+                  setDataStoreMissions(response || []);
                   setLoadingDataStoreMissions(false);
                   return response;
             } catch (err) {
                   setLoadingDataStoreMissions(false);
+            }
+      };
+
+      const loadOrganisationUnitLevels = async () => {
+            try {
+                  setLoadingOrganisationUnitLevels(true);
+                  const response = await axios.get(ORGANISATION_UNITS_LEVELS_ROUTE);
+                  setOrganisationUnitLevels(response.data.organisationUnitLevels || []);
+                  setLoadingOrganisationUnitLevels(false);
+                  return response;
+            } catch (err) {
+                  setLoadingOrganisationUnitLevels(false);
             }
       };
 
@@ -115,6 +118,10 @@ export const Dashboard = ({ me }) => {
                   setLoadingDataStoreSupervisionsConfigs(true);
                   const response = await loadDataStore(process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY, null, null, null);
 
+                  const currentProgram = response[0];
+                  if (currentProgram) {
+                        setSelectedProgram(currentProgram);
+                  }
                   setDataStoreSupervisionsConfigs(response);
                   setLoadingDataStoreSupervisionsConfigs(false);
                   return response;
@@ -138,8 +145,8 @@ export const Dashboard = ({ me }) => {
             }
       };
 
-      const handleSelectedPeriod = event => {
-            setSelectedPeriod(dayjs(event));
+      const handleSelectedPeriod = period => {
+            setSelectedPeriod(dayjs(period));
       };
 
       const printReportAsPDF = async () => {
@@ -173,17 +180,25 @@ export const Dashboard = ({ me }) => {
             win.print();
       };
 
-      const handleSelectMission = value => setSelectedMission(dataStoreMissions.find(m => m.id === value));
+      const handleSelectMission = value => {
+            if (value) {
+                  setSelectedMission(dataStoreMissions.find(m => m.id === value));
+            }
+      };
+
+      const handleSelectLevel = value => {
+            if (value) {
+                  setSelectedLevel(organisationUnitLevels.find(m => m.id === value));
+            }
+      };
 
       const handleSelectProgram = value => {
             if (value) {
                   const supFound = dataStoreSupervisionsConfigs.find(d => d.program?.id === value);
-                  setTeiList([]);
+                  setSelectedMission(null);
                   setSelectedProgram(supFound);
-                  loadOptions(
-                        supFound?.programStageConfigurations?.[0]?.statusSupervisionField?.id,
-                        setStatusSupervisionOptions
-                  );
+
+                  setDataStoreMissions(dataStoreMissions.filter(m => m.program?.id === supFound?.program?.id) || []);
             }
       };
 
@@ -196,7 +211,10 @@ export const Dashboard = ({ me }) => {
                               padding: '10px',
                               marginTop: '5px',
                               marginBottom: '20px',
-                              borderRadius: '8px'
+                              borderRadius: '8px',
+                              position: 'sticky',
+                              top: '0px',
+                              zIndex: '10'
                         }}
                   >
                         <Row gutter={[8, 8]} align="middle">
@@ -215,17 +233,46 @@ export const Dashboard = ({ me }) => {
                                     />
                               </Col>
 
+                              {selectedProgram && (
+                                    <Col sm={24} md={5}>
+                                          <div style={{ marginBottom: '2px' }}>{translate('Missions')}</div>
+                                          <Select
+                                                placeholder={translate('Missions')}
+                                                onChange={handleSelectMission}
+                                                value={selectedMission?.id}
+                                                style={{ width: '100%' }}
+                                                options={dataStoreMissions
+                                                      .filter(
+                                                            m =>
+                                                                  (selectedProgram &&
+                                                                        m.program?.id ===
+                                                                              selectedProgram?.program?.id) ||
+                                                                  false
+                                                      )
+                                                      .map(d => ({
+                                                            value: d.id,
+                                                            label: d.name
+                                                      }))}
+                                                loading={loadingDataStoreMissions}
+                                          />
+                                    </Col>
+                              )}
+
                               <Col sm={24} md={5}>
-                                    <div style={{ marginBottom: '2px' }}>{translate('Unites_Organisation')}</div>
-                                    <OrganisationUnitsTree
-                                          meOrgUnitId={me?.organisationUnits[0]?.id}
-                                          orgUnits={organisationUnits}
-                                          currentOrgUnits={selectedOrganisationUnit}
-                                          setCurrentOrgUnits={setSelectedOrganisationUnit}
-                                          loadingOrganisationUnits={loadingOrganisationUnits}
-                                          setLoadingOrganisationUnits={setLoadingOrganisationUnits}
+                                    <div style={{ marginBottom: '2px' }}>{translate('Level')}</div>
+                                    <Select
+                                          placeholder={translate('Level')}
+                                          onChange={handleSelectLevel}
+                                          value={selectedLevel?.id}
+                                          style={{ width: '100%' }}
+                                          options={organisationUnitLevels.map(d => ({
+                                                value: d.id,
+                                                label: d.displayName
+                                          }))}
+                                          loading={loadingOrganisationUnitLevels}
                                     />
                               </Col>
+
                               <Col sm={24} md={3}>
                                     <div style={{ marginBottom: '2px' }}>{translate('Periode')}</div>
                                     <DatePicker
@@ -254,56 +301,237 @@ export const Dashboard = ({ me }) => {
             </>
       );
 
-      const RenderVisualizations = () => (
-            <div id="visualizations-container">
-                  <Row gutter={[8, 8]}>
-                        {dataStoreVisualizations?.map(v => (
-                              <VisualizationItem
-                                    key={v.id}
-                                    id={`${v.id}-${selectedOrganisationUnit?.id}`}
-                                    loading={loadingInjection}
-                              />
-                        ))}
-                  </Row>
-            </div>
-      );
+      const RenderNoOrganisationUnitsAtThisLevel = () =>
+            selectedMission?.output?.filter(m => m.organisationUnit?.level === selectedLevel?.level)?.length === 0 && (
+                  <div
+                        className="my-shadow"
+                        style={{
+                              backgroundColor: '#fff',
+                              padding: '10px',
+                              borderRadius: '8px',
+                              textAlign: 'center',
+                              color: '#00000090',
+                              fontWeight: 'bold'
+                        }}
+                  >
+                        {translate('No_Planification_Done_On_An_OU')} !
+                  </div>
+            );
+
+      const RenderVisualizationForEachStructure = () =>
+            selectedMission?.output
+                  ?.filter(m => m.organisationUnit?.level === selectedLevel?.level)
+                  ?.map(m => (
+                        <div key={uuid()} style={{ marginBottom: '40px' }}>
+                              <div
+                                    style={{
+                                          fontWeight: 'bold',
+                                          marginBottom: '10px',
+                                          display: 'flex',
+                                          justifyContent: 'center',
+                                          alignItems: 'center'
+                                    }}
+                              >
+                                    <span style={{ fontSize: '15px' }}>{`${translate('Analysis_For')}  - `}</span>
+                                    <span
+                                          style={{
+                                                marginLeft: '10px',
+                                                fontSize: '18px',
+                                                backgroundColor: 'orange',
+                                                color: '#fff',
+                                                padding: '3px 10px',
+                                                border: '1px solid #00000090'
+                                          }}
+                                    >
+                                          {m.organisationUnit.displayName}
+                                    </span>
+                              </div>
+                              <Row gutter={[8, 8]}>
+                                    {dataStoreVisualizations
+                                          .find(
+                                                vis =>
+                                                      selectedProgram?.program?.id &&
+                                                      vis.program?.id === selectedProgram?.program?.id
+                                          )
+                                          ?.visualizations?.map(v => (
+                                                <VisualizationItem
+                                                      key={uuid()}
+                                                      id={`${v.id}-${m.organisationUnit?.id}`}
+                                                      loading={loadingInjection}
+                                                />
+                                          ))}
+                              </Row>
+                        </div>
+                  ));
+      const RenderVisualizationForGlobalStructure = () => {
+            const ouList =
+                  selectedMission?.output
+                        ?.filter(m => selectedLevel?.level > 1 && m.organisationUnit?.level === selectedLevel?.level)
+                        .map(m => m.organisationUnit) || [];
+
+            return (
+                  selectedLevel?.level > 1 &&
+                  ouList.length > 1 && (
+                        <div style={{ marginTop: '20px' }}>
+                              <div key={uuid()} style={{ marginBottom: '40px' }}>
+                                    <div
+                                          style={{
+                                                fontWeight: 'bold',
+                                                marginBottom: '10px',
+                                                display: 'flex',
+                                                justifyContent: 'center',
+                                                alignItems: 'center'
+                                          }}
+                                    >
+                                          <span style={{ fontSize: '15px' }}>{`${translate(
+                                                'Global_Analysis_For'
+                                          )}  - `}</span>
+
+                                          {ouList.map(ou => (
+                                                <span
+                                                      key={uuid()}
+                                                      style={{
+                                                            marginLeft: '10px',
+                                                            fontSize: '18px',
+                                                            backgroundColor: 'orange',
+                                                            color: '#fff',
+                                                            padding: '3px 10px',
+                                                            border: '1px solid #00000090'
+                                                      }}
+                                                >
+                                                      {ou.displayName}
+                                                </span>
+                                          ))}
+                                    </div>
+                                    <Row gutter={[8, 8]}>
+                                          {dataStoreVisualizations
+                                                .find(
+                                                      vis =>
+                                                            selectedProgram?.program?.id &&
+                                                            vis.program?.id === selectedProgram?.program?.id
+                                                )
+                                                ?.visualizations?.map(v => (
+                                                      <VisualizationItem
+                                                            key={uuid()}
+                                                            id={v.id}
+                                                            loading={loadingInjection}
+                                                      />
+                                                ))}
+                                    </Row>
+                              </div>
+                        </div>
+                  )
+            );
+      };
+
+      const RenderVisualizations = () =>
+            selectedMission &&
+            selectedLevel && (
+                  <div id="visualizations-container">
+                        {RenderVisualizationForEachStructure()}
+                        {RenderVisualizationForGlobalStructure()}
+                        {RenderNoOrganisationUnitsAtThisLevel()}
+                  </div>
+            );
 
       const loadAndInjectVisualizations = async () => {
             try {
                   setLoadingInjection(true);
-                  dataStoreVisualizations.forEach(v => {
-                        const responseString = ReactDOMServer.renderToString(
-                              <MyFrame
-                                    type={v.type}
-                                    base_url={SERVER_URL}
-                                    id={v.id}
-                                    style={{
-                                          width: '100%',
-                                          heigth: '100%',
-                                          overflow: 'none'
-                                    }}
-                                    periods={[selectedPeriod.format('YYYYMM')].join(',')}
-                                    orgUnitIDs={[selectedOrganisationUnit.id].join(',')}
-                              />
-                        );
 
-                        const rightElement = document.getElementById(`${v.id}-${selectedOrganisationUnit?.id}`);
-                        if (rightElement) {
-                              rightElement.innerHTML = responseString;
-                        }
+                  const concerningOUs =
+                        selectedMission.output?.filter(m => m.organisationUnit?.level === selectedLevel?.level) || [];
 
-                        const foundIframe = rightElement.querySelector('iframe');
-                        if (foundIframe) {
-                              foundIframe.onload = frame => {
-                                    setTimeout(() => {
-                                          foundIframe.style.height =
-                                                foundIframe.contentWindow.document.body.scrollHeight + 'px';
-                                          foundIframe.style.width =
-                                                foundIframe.contentWindow.document.body.scrollWidth + 'px';
-                                    }, 6000);
-                              };
-                        }
+                  // generation for specifique ou
+                  concerningOUs.forEach(output => {
+                        dataStoreVisualizations
+                              .find(
+                                    vis =>
+                                          selectedProgram?.program?.id &&
+                                          vis.program?.id === selectedProgram?.program?.id
+                              )
+                              ?.visualizations?.forEach(v => {
+                                    const responseString = ReactDOMServer.renderToString(
+                                          <MyFrame
+                                                type={v.type}
+                                                base_url={SERVER_URL}
+                                                id={v.id}
+                                                style={{
+                                                      width: '100%',
+                                                      heigth: '100%',
+                                                      overflow: 'none'
+                                                }}
+                                                periods={[selectedPeriod.format('YYYYMM')].join(',')}
+                                                orgUnitIDs={[output.organisationUnit?.id].join(',')}
+                                          />
+                                    );
+
+                                    const rightElement = document.getElementById(
+                                          `${v.id}-${output.organisationUnit?.id}`
+                                    );
+                                    if (rightElement) {
+                                          rightElement.innerHTML = responseString;
+                                    }
+
+                                    const foundIframe = rightElement.querySelector('iframe');
+                                    if (foundIframe) {
+                                          foundIframe.onload = frame => {
+                                                setTimeout(() => {
+                                                      foundIframe.style.height =
+                                                            foundIframe.contentWindow.document.body.scrollHeight + 'px';
+                                                      foundIframe.style.width =
+                                                            foundIframe.contentWindow.document.body.scrollWidth + 'px';
+                                                }, 6000);
+                                          };
+                                    }
+                              });
                   });
+
+                  // generation for all ou
+                  if (selectedLevel?.level > 1) {
+                        const rightOUs =
+                              concerningOUs.filter(m => m.organisationUnit?.level > 1)?.map(m => m.organisationUnit) ||
+                              [];
+                        dataStoreVisualizations
+                              .find(
+                                    vis =>
+                                          selectedProgram?.program?.id &&
+                                          vis.program?.id === selectedProgram?.program?.id
+                              )
+                              ?.visualizations?.forEach(v => {
+                                    const responseString = ReactDOMServer.renderToString(
+                                          <MyFrame
+                                                type={v.type}
+                                                base_url={SERVER_URL}
+                                                id={v.id}
+                                                style={{
+                                                      width: '100%',
+                                                      heigth: '100%',
+                                                      overflow: 'none'
+                                                }}
+                                                periods={[selectedPeriod.format('YYYYMM')].join(',')}
+                                                orgUnitIDs={rightOUs.map(r => r.id).join(',')}
+                                          />
+                                    );
+
+                                    const rightElement = document.getElementById(`${v.id}`);
+                                    if (rightElement) {
+                                          rightElement.innerHTML = responseString;
+                                    }
+
+                                    const foundIframe = rightElement.querySelector('iframe');
+                                    if (foundIframe) {
+                                          foundIframe.onload = frame => {
+                                                setTimeout(() => {
+                                                      foundIframe.style.height =
+                                                            foundIframe.contentWindow.document.body.scrollHeight + 'px';
+                                                      foundIframe.style.width =
+                                                            foundIframe.contentWindow.document.body.scrollWidth + 'px';
+                                                }, 6000);
+                                          };
+                                    }
+                              });
+                  }
+
                   setLoadingInjection(false);
             } catch (err) {
                   console.log('Error: ', err);
@@ -314,17 +542,17 @@ export const Dashboard = ({ me }) => {
       useEffect(() => {
             if (me) {
                   loadDataStoreSupervisionsConfigs();
-                  loadDataStoreMissions();
-                  loadOrganisationUnits();
                   loadDataStoreVisualizations();
+                  loadDataStoreMissions();
+                  loadOrganisationUnitLevels();
             }
       }, [me]);
 
       useEffect(() => {
-            if (dataStoreVisualizations.length > 0 && selectedPeriod && selectedOrganisationUnit) {
+            if (dataStoreVisualizations.length > 0 && selectedPeriod && selectedLevel && selectedLevel) {
                   loadAndInjectVisualizations();
             }
-      }, [selectedPeriod, selectedOrganisationUnit, dataStoreVisualizations]);
+      }, [selectedPeriod, selectedProgram, selectedLevel, selectedMission, dataStoreVisualizations]);
 
       return (
             <>
