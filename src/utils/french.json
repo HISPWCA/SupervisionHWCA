@@ -247,5 +247,11 @@
     "Level": "Niveau",
     "Analysis_For": "Analyses sur ",
     "Global_Analysis_For": "Analyses Globale sur ",
-    "No_Planification_Done_On_An_OU": "Aucune planification effectuée sur une unité d'organisation à ce level"
+    "No_Planification_Done_On_An_OU": "Aucune planification effectuée sur une unité d'organisation à ce level",
+    "Visualizations": "Graphiques & Cartes",
+    "VisualisationType": "Graphiques",
+    "MapType": "Cartes",
+    "SelectVisualizations": "Selectionner les graphiques ( Favoris ) ",
+    "SelectMaps": "Selectionner les Cartes ( Favoris ) ",
+    "Favoris": "Favoris"
 }

@@ -47,3 +47,5 @@ export const DATA_ELEMENT_OPTION_SETS = API_BASE_ROUTE.concat('/dataElements');
 export const ME_SETTINGS_ROUTE = API_BASE_ROUTE.concat('/userSettings.json');
 export const DATA_ELEMENT_GROUPS_ROUTE = API_BASE_ROUTE.concat('/dataElementGroups.json');
 export const USER_GROUPS_ROUTE = API_BASE_ROUTE.concat('/userGroups.json');
+export const MAPS_ROUTE = API_BASE_ROUTE.concat('/maps.json');
+export const VISUALIZATIONS_ROUTE = API_BASE_ROUTE.concat('/visualizations.json');
