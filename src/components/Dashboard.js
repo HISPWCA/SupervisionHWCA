@@ -457,8 +457,7 @@ export const Dashboard = ({ me }) => {
                                                 id={v.id}
                                                 style={{
                                                       width: '100%',
-                                                      heigth: '100%',
-                                                      overflow: 'none'
+                                                      height: '450px'
                                                 }}
                                                 periods={[selectedPeriod.format('YYYYMM')].join(',')}
                                                 orgUnitIDs={[output.organisationUnit?.id].join(',')}
@@ -473,16 +472,16 @@ export const Dashboard = ({ me }) => {
                                     }
 
                                     const foundIframe = rightElement.querySelector('iframe');
-                                    if (foundIframe) {
-                                          foundIframe.onload = frame => {
-                                                setTimeout(() => {
-                                                      foundIframe.style.height =
-                                                            foundIframe.contentWindow.document.body.scrollHeight + 'px';
-                                                      foundIframe.style.width =
-                                                            foundIframe.contentWindow.document.body.scrollWidth + 'px';
-                                                }, 6000);
-                                          };
-                                    }
+                                    // if (foundIframe) {
+                                    //       foundIframe.onload = frame => {
+                                    //             setTimeout(() => {
+                                    //                   foundIframe.style.height =
+                                    //                         foundIframe.contentWindow.document.body.scrollHeight + 'px';
+                                    //                   foundIframe.style.width =
+                                    //                         foundIframe.contentWindow.document.body.scrollWidth + 'px';
+                                    //             }, 6000);
+                                    //       };
+                                    // }
                               });
                   });
 
@@ -505,8 +504,7 @@ export const Dashboard = ({ me }) => {
                                                 id={v.id}
                                                 style={{
                                                       width: '100%',
-                                                      heigth: '100%',
-                                                      overflow: 'none'
+                                                      height: '450px'
                                                 }}
                                                 periods={[selectedPeriod.format('YYYYMM')].join(',')}
                                                 orgUnitIDs={rightOUs.map(r => r.id).join(',')}
@@ -518,17 +516,17 @@ export const Dashboard = ({ me }) => {
                                           rightElement.innerHTML = responseString;
                                     }
 
-                                    const foundIframe = rightElement.querySelector('iframe');
-                                    if (foundIframe) {
-                                          foundIframe.onload = frame => {
-                                                setTimeout(() => {
-                                                      foundIframe.style.height =
-                                                            foundIframe.contentWindow.document.body.scrollHeight + 'px';
-                                                      foundIframe.style.width =
-                                                            foundIframe.contentWindow.document.body.scrollWidth + 'px';
-                                                }, 6000);
-                                          };
-                                    }
+                                    // const foundIframe = rightElement.querySelector('iframe');
+                                    // if (foundIframe) {
+                                    //       foundIframe.onload = frame => {
+                                    //             setTimeout(() => {
+                                    //                   foundIframe.style.height =
+                                    //                         foundIframe.contentWindow.document.body.scrollHeight + 'px';
+                                    //                   foundIframe.style.width =
+                                    //                         foundIframe.contentWindow.document.body.scrollWidth + 'px';
+                                    //             }, 6000);
+                                    //       };
+                                    // }
                               });
                   }
 

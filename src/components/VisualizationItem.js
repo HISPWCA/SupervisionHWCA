@@ -11,7 +11,7 @@ const VisualizationItem = ({ id, loading }) => (
                         borderRadius: '8px',
                         minHeight: '450px',
                         maxHeight: '450px',
-                        overflow: 'auto'
+                        overflow: 'hidden'
                   }}
             >
                   {loading ? (
