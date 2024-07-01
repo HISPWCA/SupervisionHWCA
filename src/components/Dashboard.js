@@ -470,18 +470,6 @@ export const Dashboard = ({ me }) => {
                                     if (rightElement) {
                                           rightElement.innerHTML = responseString;
                                     }
-
-                                    const foundIframe = rightElement.querySelector('iframe');
-                                    // if (foundIframe) {
-                                    //       foundIframe.onload = frame => {
-                                    //             setTimeout(() => {
-                                    //                   foundIframe.style.height =
-                                    //                         foundIframe.contentWindow.document.body.scrollHeight + 'px';
-                                    //                   foundIframe.style.width =
-                                    //                         foundIframe.contentWindow.document.body.scrollWidth + 'px';
-                                    //             }, 6000);
-                                    //       };
-                                    // }
                               });
                   });
 
@@ -515,18 +503,6 @@ export const Dashboard = ({ me }) => {
                                     if (rightElement) {
                                           rightElement.innerHTML = responseString;
                                     }
-
-                                    // const foundIframe = rightElement.querySelector('iframe');
-                                    // if (foundIframe) {
-                                    //       foundIframe.onload = frame => {
-                                    //             setTimeout(() => {
-                                    //                   foundIframe.style.height =
-                                    //                         foundIframe.contentWindow.document.body.scrollHeight + 'px';
-                                    //                   foundIframe.style.width =
-                                    //                         foundIframe.contentWindow.document.body.scrollWidth + 'px';
-                                    //             }, 6000);
-                                    //       };
-                                    // }
                               });
                   }
 

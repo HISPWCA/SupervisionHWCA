@@ -253,5 +253,10 @@
     "MapType": "Cartes",
     "SelectVisualizations": "Selectionner les graphiques ( Favoris ) ",
     "SelectMaps": "Selectionner les Cartes ( Favoris ) ",
-    "Favoris": "Favoris"
+    "Favoris": "Favoris",
+
+
+
+
+    "Confirmation_Suppression_Visualisation": "Voulez-vous vraiment supprimer cet item "
 }

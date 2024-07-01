@@ -64,6 +64,8 @@ const Setting = () => {
       const [paymentConfigList, setPaymentConfigList] = useState([]);
       const [isEditModePayment, setEditModePayment] = useState(false);
       const [currentPaymentConfig, setCurrentPaymentConfig] = useState(null);
+      const [dataStoreVisualizations, setDataStoreVisualizations] = useState([]);
+      const [currentVisualizationProgram, setCurrentVisualizationProgram] = useState(null);
 
       const [visualizations, setVisualizations] = useState([]);
       const [maps, setMaps] = useState([]);
@@ -128,6 +130,8 @@ const Setting = () => {
       const [loadingDataElements, setLoadingDataElements] = useState(false);
       const [loadingAddAnalyseConfigs, setLoadingAddAnalyseConfigs] = useState(false);
       const [loadingProgramStages, setLoadingProgramStages] = useState(false);
+      const [loadingSaveVisualizationInDatastore, setLoadingSaveVisualizationInDatastore] = useState(false);
+      const [loadingDataStoreVisualizations, setLoadingDataStoreVisualizations] = useState(false);
 
       const loadPrograms = async () => {
             try {
@@ -152,7 +156,7 @@ const Setting = () => {
       const loadVisualizations = async () => {
             try {
                   const response = await axios.get(
-                        `${VISUALIZATIONS_ROUTE}?pageSize=10000&fields=id,displayName,name,type`
+                        `${VISUALIZATIONS_ROUTE}?pageSize=50&fields=id,displayName,name,type`
                   );
                   setVisualizations(response.data.visualizations || []);
             } catch (err) {}
@@ -343,6 +347,20 @@ const Setting = () => {
             }
       };
 
+      const loadDataStoreVisualizations = async () => {
+            try {
+                  setLoadingDataStoreVisualizations(true);
+                  const response = await loadDataStore(process.env.REACT_APP_VISUALIZATION_KEY, null, null, null);
+
+                  setDataStoreVisualizations(response);
+                  setLoadingDataStoreVisualizations(false);
+                  return response;
+            } catch (err) {
+                  setLoadingDataStoreVisualizations(false);
+                  throw err;
+            }
+      };
+
       const initIndicatorConfigStates = async () => {
             try {
                   setMappingConfigs([]);
@@ -437,11 +455,11 @@ const Setting = () => {
       const handleDeleteSupervisionConfig = async item => {
             try {
                   if (item) {
-                        const existingDXMappingOfPrograms =
-                              mappingConfigs.filter(mConfig => mConfig?.program?.id === item?.program?.id) || [];
+                        // const existingDXMappingOfPrograms =
+                        //       mappingConfigs.filter(mConfig => mConfig?.program?.id === item?.program?.id) || [];
 
-                        if (existingDXMappingOfPrograms.length > 0)
-                              throw new Error(translate('Configuration_Deja_Mapper'));
+                        // if (existingDXMappingOfPrograms.length > 0)
+                        //       throw new Error(translate('Configuration_Deja_Mapper'));
 
                         const newList = mappingConfigSupervisions.filter(mapConf => mapConf.id !== item.id);
                         await saveDataToDataStore(
@@ -480,6 +498,37 @@ const Setting = () => {
                         message: err.response?.data?.message || err.message,
                         type: NOTIFICATION_CRITICAL
                   });
+            }
+      };
+
+      const handleDeleteVisatualizationProgramConfig = async item => {
+            try {
+                  if (item) {
+                        const newList = dataStoreVisualizations.filter(dataFav => dataFav.id !== item.id);
+                        await saveDataToDataStore(process.env.REACT_APP_VISUALIZATION_KEY, newList, null, null, null);
+                        setDataStoreVisualizations(newList);
+                        setNotification({
+                              show: true,
+                              message: translate('Suppression_Effectuee'),
+                              type: NOTIFICATION_SUCCESS
+                        });
+                        setSelectedProgramForVisualization(null);
+                        setSelectedMaps([]);
+                        setSelectedVisualizations([]);
+                        setCurrentVisualizationProgram(null);
+                  }
+            } catch (err) {
+                  setNotification({
+                        show: true,
+                        message: err.response?.data?.message || err.message,
+                        type: NOTIFICATION_CRITICAL
+                  });
+            }
+      };
+
+      const handleDeleteVisualizationConfig = visID => {
+            if (visID) {
+                  setFavorisItems(favorisItems.filter(f => f.id !== visID));
             }
       };
 
@@ -1697,6 +1746,59 @@ const Setting = () => {
             });
       };
 
+      const handleSaveVisualizationToDataStore = async () => {
+            try {
+                  setLoadingSaveVisualizationInDatastore(true);
+
+                  if (favorisItems.length > 0) {
+                        const listFromDataStore = await loadDataStore(
+                              process.env.REACT_APP_VISUALIZATION_KEY,
+                              null,
+                              null,
+                              null
+                        );
+
+                        if (listFromDataStore?.map(d => d.id)?.includes(selectedProgramForVisualization?.id)) {
+                              throw new Error(translate('Configuration_Deja_Ajoutee'));
+                        }
+
+                        const newList = [
+                              {
+                                    program: selectedProgramForVisualization,
+                                    visualizations: favorisItems
+                              },
+                              ...listFromDataStore
+                        ];
+
+                        await saveDataToDataStore(
+                              process.env.REACT_APP_VISUALIZATION_KEY,
+                              newList,
+                              setLoadingSaveVisualizationInDatastore,
+                              null,
+                              null
+                        );
+
+                        await loadDataStoreVisualizations();
+                        setNotification({
+                              show: true,
+                              message: !currentItem
+                                    ? translate('Configuration_Ajoutee')
+                                    : translate('Mise_A_Jour_Succes'),
+                              type: NOTIFICATION_SUCCESS
+                        });
+                  }
+
+                  setLoadingSaveVisualizationInDatastore(false);
+            } catch (err) {
+                  setLoadingSaveVisualizationInDatastore(false);
+                  setNotification({
+                        show: true,
+                        message: err.response?.data?.message || err.message,
+                        type: NOTIFICATION_CRITICAL
+                  });
+            }
+      };
+
       const RenderPageSupervisionConfig = () => (
             <>
                   <Row gutter={[8, 10]}>
@@ -1783,7 +1885,7 @@ const Setting = () => {
                                                       fontSize: '16px'
                                                 }}
                                           >
-                                                {translate('Liste_Programme_Tracker')}{' '}
+                                                {translate('Liste_Programme_Tracker')}
                                           </div>
                                           <Table
                                                 dataSource={mappingConfigSupervisions.map(mapConf => ({
@@ -1976,24 +2078,22 @@ const Setting = () => {
       );
 
       const handleAddVisualizationToFavorisList = () => {
-            () => {
-                  const newFavList = [];
-                  for (let m of selectedMaps) {
-                        if (!newFavList.map(f => f.id).includes(m.id)) {
-                              newFavList.push(m);
-                        }
+            const newFavList = [];
+            for (let m of selectedMaps) {
+                  if (!newFavList.map(f => f.id).includes(m.id)) {
+                        newFavList.push(m);
                   }
+            }
 
-                  for (let v of selectedVisualizations) {
-                        if (!newFavList.map(f => f.id).includes(v.id)) {
-                              newFavList.push(v);
-                        }
+            for (let v of selectedVisualizations) {
+                  if (!newFavList.map(f => f.id).includes(v.id)) {
+                        newFavList.push(v);
                   }
+            }
 
-                  setFavorisItems([...newFavList, ...favorisItems]);
-                  setSelectedVisualizations([]);
-                  setSelectedMaps([]);
-            };
+            setFavorisItems([...newFavList, ...favorisItems]);
+            setSelectedVisualizations([]);
+            setSelectedMaps([]);
       };
 
       const RenderPageVisualizationsConfig = () => (
@@ -2121,17 +2221,16 @@ const Setting = () => {
                                                       </div>
                                                 )}
 
-                                                {selectedMaps.length > 0 ||
-                                                      (selectedVisualizations.length > 0 && (
-                                                            <div style={{ marginTop: '10px' }}>
-                                                                  <Button
-                                                                        primary
-                                                                        onClick={handleAddVisualizationToFavorisList}
-                                                                  >
-                                                                        +{translate('Ajouter')}
-                                                                  </Button>
-                                                            </div>
-                                                      ))}
+                                                {(selectedMaps.length > 0 || selectedVisualizations.length > 0) && (
+                                                      <div style={{ marginTop: '10px' }}>
+                                                            <Button
+                                                                  primary
+                                                                  onClick={handleAddVisualizationToFavorisList}
+                                                            >
+                                                                  +{translate('Ajouter')}
+                                                            </Button>
+                                                      </div>
+                                                )}
                                           </div>
                                     </>
 
@@ -2146,9 +2245,10 @@ const Setting = () => {
                                                             borderRadius: '8px'
                                                       }}
                                                 >
-                                                      <pre>{JSON.stringify(favorisItems, null, 2)}</pre>
                                                       <Table
                                                             bordered
+                                                            size="small"
+                                                            pagination={false}
                                                             dataSource={favorisItems.map(f => ({ ...f, action: f.id }))}
                                                             columns={[
                                                                   {
@@ -2160,17 +2260,16 @@ const Setting = () => {
                                                                         dataIndex: 'type'
                                                                   },
                                                                   {
-                                                                        title: translate('Action'),
+                                                                        title: translate('Actions'),
                                                                         dataIndex: 'action',
                                                                         render: value => (
                                                                               <div>
-                                                                                    {console.log('Valeu Tableau')}
                                                                                     <Popconfirm
                                                                                           title={translate(
                                                                                                 'Suppression'
                                                                                           )}
                                                                                           description={translate(
-                                                                                                'Confirmation_Suppression_Configuration'
+                                                                                                'Confirmation_Suppression_Visualisation'
                                                                                           )}
                                                                                           icon={
                                                                                                 <QuestionCircleOutlined
@@ -2180,7 +2279,7 @@ const Setting = () => {
                                                                                                 />
                                                                                           }
                                                                                           onConfirm={() =>
-                                                                                                handleDeleteSupervisionConfig(
+                                                                                                handleDeleteVisualizationConfig(
                                                                                                       value
                                                                                                 )
                                                                                           }
@@ -2202,7 +2301,13 @@ const Setting = () => {
                                                       />
                                                 </div>
 
-                                                <div style={{ marginLeft: '10px' }}>
+                                                <div
+                                                      style={{
+                                                            marginTop: '10px',
+                                                            display: 'flex',
+                                                            alignItems: 'center'
+                                                      }}
+                                                >
                                                       <Button
                                                             loading={loadingSaveSupervionsConfig}
                                                             disabled={
@@ -2211,60 +2316,45 @@ const Setting = () => {
                                                             icon={
                                                                   <FiSave style={{ color: '#FFF', fontSize: '18px' }} />
                                                             }
-                                                            primary
-                                                            onClick={handleSaveSupConfig}
-                                                      >
-                                                            {isFieldEditingMode && (
-                                                                  <span>{translate('Mise_A_Jour')}</span>
-                                                            )}
-                                                            {!isFieldEditingMode && (
-                                                                  <span>{translate('Enregistrer')}</span>
-                                                            )}
-                                                      </Button>
-                                                </div>
-                                          </>
-                                    )}
-
-                                    {/* <div
-                                          style={{
-                                                marginTop: '20px',
-                                                display: 'flex',
-                                                alignItems: 'center'
-                                          }}
-                                    >
-                                          {isFieldEditingMode && (
-                                                <div>
-                                                      <Button
-                                                            icon={
-                                                                  <CgCloseO
-                                                                        style={{ color: '#fff', fontSize: '18px' }}
-                                                                  />
-                                                            }
                                                             destructive
                                                             onClick={() => {
-                                                                  setFieldEditingMode(false);
-                                                                  setSelectedTEIProgram(null);
-                                                                  setSelectedProgramStage(null);
-                                                                  setSelectedStatusSupervisionProgramStage(null);
-                                                                  setSelectedStatutSupervisionDataElement(null);
-                                                                  setSelectedStatutPaymentProgramStage(null);
-                                                                  setSelectedStatutPaymentDataElement(null);
-                                                                  setSelectedDataElements([]);
-                                                                  setSelectedAttributesToDisplay([]);
-                                                                  setProgramStageConfigurations([]);
-                                                                  setSelectedProgramStageForConfiguration(null);
-                                                                  setSelectedSupervisorDataElements([]);
-                                                                  setSelectedSupervisionGenerationType(
-                                                                        TYPE_GENERATION_AS_TEI
-                                                                  );
+                                                                  setFavorisItems([]);
+                                                                  setSelectedMaps([]);
+                                                                  setSelectedVisualizations([]);
+                                                                  setSelectedProgramForVisualization(null);
                                                             }}
                                                       >
                                                             {translate('Annuler')}
                                                       </Button>
+                                                      <div style={{ marginLeft: '10px' }}>
+                                                            <Button
+                                                                  loading={loadingSaveSupervionsConfig}
+                                                                  disabled={
+                                                                        loadingSaveSupervionsConfig ||
+                                                                        !selectedTEIProgram
+                                                                  }
+                                                                  icon={
+                                                                        <FiSave
+                                                                              style={{
+                                                                                    color: '#FFF',
+                                                                                    fontSize: '18px'
+                                                                              }}
+                                                                        />
+                                                                  }
+                                                                  primary
+                                                                  onClick={handleSaveVisualizationToDataStore}
+                                                            >
+                                                                  {isFieldEditingMode && (
+                                                                        <span>{translate('Mise_A_Jour')}</span>
+                                                                  )}
+                                                                  {!isFieldEditingMode && (
+                                                                        <span>{translate('Enregistrer')}</span>
+                                                                  )}
+                                                            </Button>
+                                                      </div>
                                                 </div>
-                                          )}
-                                         
-                                    </div> */}
+                                          </>
+                                    )}
                               </div>
                         </Col>
                         <Col md={12} sm={24}>
@@ -2288,10 +2378,11 @@ const Setting = () => {
                                                 {translate('Liste_Programme_Tracker')}{' '}
                                           </div>
                                           <Table
-                                                dataSource={mappingConfigSupervisions.map(mapConf => ({
-                                                      ...mapConf,
-                                                      programName: mapConf?.program?.displayName,
-                                                      action: { ...mapConf }
+                                                dataSource={favorisItems.map(fav => ({
+                                                      ...fav,
+                                                      programName: fav?.program?.displayName,
+                                                      nbrVisualizations: fav?.visualizations?.length || 0,
+                                                      action: fav
                                                 }))}
                                                 columns={[
                                                       {
@@ -2300,18 +2391,8 @@ const Setting = () => {
                                                       },
 
                                                       {
-                                                            title: translate('Type_Strategie'),
-                                                            dataIndex: 'generationType',
-                                                            render: value => (
-                                                                  <>
-                                                                        {value === TYPE_GENERATION_AS_ENROLMENT &&
-                                                                              translate('Enrolements')}
-                                                                        {value === TYPE_GENERATION_AS_EVENT &&
-                                                                              translate('Evenements')}
-                                                                        {value === TYPE_GENERATION_AS_TEI &&
-                                                                              translate('Teis')}
-                                                                  </>
-                                                            )
+                                                            title: translate('Visualizations'),
+                                                            dataIndex: 'nbrVisualizations'
                                                       },
                                                       {
                                                             title: translate('Actions'),
@@ -2349,7 +2430,9 @@ const Setting = () => {
                                                                                     />
                                                                               }
                                                                               onConfirm={() =>
-                                                                                    handleDeleteSupervisionConfig(value)
+                                                                                    handleDeleteVisatualizationProgramConfig(
+                                                                                          value
+                                                                                    )
                                                                               }
                                                                         >
                                                                               <div>
@@ -3183,6 +3266,7 @@ const Setting = () => {
             loadPrograms();
             loadMaps();
             loadVisualizations();
+            loadDataStoreVisualizations();
             selectedTypeSupervisionPage === PAGE_CONFIG_INDICATORS && initIndicatorConfigStates();
             selectedTypeSupervisionPage === PAGE_CONFIG_SUPERVISION && initSupConfigStates();
             selectedTypeSupervisionPage === PAGE_CONFIG_ANALYSE && initAnalyseConfigStates();
