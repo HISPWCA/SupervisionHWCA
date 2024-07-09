@@ -259,7 +259,11 @@
     "Configuration_DQe_Case": "Configuration pour le cas de DQe ",
     "Program_Stage_Configuration_Fields_For_Recoupement_And_Indicator": "Configuration des champs indicateurs et leurs recoupements",
     "Recoupements": "Recoupements",
-
     "NumberOfIndicators": "Nombre d'indicateurs",
-    "NumberOfRecoupements": "Nombre de recoupements"
+    "NumberOfRecoupements": "Nombre de recoupements",
+    "MarginOfErrorConfiguration": "Configuration de la marge d'erreur",
+    "Marge_Recoupements": "Marge d'erreur recoupement ",
+    "Marge_Indicateurs": "Marge d'erreur indicateurs",
+    "Marge": "Marge",
+   "AddConfiguration": "Ajouter la configuration"
 }

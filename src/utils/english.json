@@ -255,12 +255,15 @@
     "SelectVisualizations": "Select Visualiztaions",
     "SelectMaps": "Select Maps",
     "Favoris": "Favorite",
-    "Configuration_RDQe_Case": "Configuration for RDQe Case ",
-    "Configuration_DQe_Case": "Configuration for DQe Case ",
-    "Program_Stage_Configuration_Fields_For_Recoupement_And_Indicator": "Fields Indicators and Cross check configutation ",
+    "Configuration_RDQe_Case": "Configuration for eRDQ Case ",
+    "Configuration_DQe_Case": "Configuration for DQR Case ",
+    "Program_Stage_Configuration_Fields_For_Recoupement_And_Indicator": "Fields Indicators and Cross check configuration ",
     "Recoupements": "Cross Check",
-
-
-    "NumberOfIndicators":"Number of indicators",
-    "NumberOfRecoupements":"Number of cross checks"
+    "NumberOfIndicators": "Number of indicators",
+    "NumberOfRecoupements": "Number of cross checks",
+    "MarginOfErrorConfiguration": "Margin of error configuration",
+    "Marge_Recoupements": "Error margin cross checks",
+    "Marge_Indicateurs": "Error margin indicators",
+    "Marge":"Margin",
+    "AddConfiguration": "Add configuration"
 }

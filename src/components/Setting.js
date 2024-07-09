@@ -271,6 +271,9 @@ const Setting = () => {
       };
 
       const handleSelectedTEIProgram = value => {
+            setSelectedProgramStageForConfiguration(null);
+            setIndicatorsFieldsConfigs([]);
+
             setSelectedIndicatorGroup(null);
             setIndicatorGroups([]);
             setSelectedProgramStage(null);
@@ -464,22 +467,26 @@ const Setting = () => {
             setCurrentPaymentConfig(null);
       };
 
-      const generateIndicatorsConfigFieldsList = (nbrIndicators, nbrRecoupement) => {
+      const generateIndicatorsConfigFieldsList = () => {
             const newList = [];
-            for (let i = 1; i <= nbrIndicators; i++) {
+            for (let i = 1; i <= selectedNumberOfIndicators; i++) {
                   const recoupements = [];
 
-                  for (let j = 1; j <= nbrRecoupement; j++) {
+                  for (let j = 1; j <= selectedNumberOfRecoupements; j++) {
                         const recoupementPayload = {
-                              name: `${translate('Indicateurs')} ${i} ${translate('Recoupement')} ${j}`,
+                              id: uuid(),
+                              name: `${translate('Indicateurs')} ${i} ${translate('Recoupements')} ${j}`,
                               position: j,
-                              value: null
+                              value: null,
+                              indicatorMargin: 0,
+                              recoupementMargin: 0
                         };
 
                         recoupements.push(recoupementPayload);
                   }
 
                   const indicatorsPayload = {
+                        id: uuid(),
                         name: `${translate('Indicateurs')} ${i}`,
                         position: i,
                         value: null,
@@ -1203,7 +1210,7 @@ const Setting = () => {
                               <div style={{ fontWeight: 'bold' }}>{translate('Configuration_Des_Attributes')}</div>
                               <Divider style={{ margin: '5px 0px' }} />
                               <div style={{ fontWeight: 'bold' }}>{translate('Attributs')}</div>
-                              <div style={{ color: '#00000080', fontSize: '13px' }}>
+                              <div style={{ color: '#00000070', fontSize: '13px' }}>
                                     {translate('Aide_Attribute_Configurer')}
                               </div>
                               <div style={{ marginTop: '2px' }}>
@@ -1227,7 +1234,7 @@ const Setting = () => {
                                     />
                               </div>
                               <Divider style={{ margin: '10px 0px' }} />
-                              <div style={{ color: '#00000080', fontSize: '13px' }}>
+                              <div style={{ color: '#00000070', fontSize: '13px' }}>
                                     {translate('Attribute_Representant_Nom_Et_Prenom')}
                               </div>
                               <div style={{ marginTop: '5px' }}>
@@ -1355,6 +1362,7 @@ const Setting = () => {
                   setSelectedStatusSupervisionDataElement(null);
                   setSelectedSupervisorDataElements([]);
                   setCurrentProgramstageConfiguration(null);
+                  setIndicatorsFieldsConfigs([])
             } catch (err) {
                   setNotification({
                         show: true,
@@ -1369,7 +1377,7 @@ const Setting = () => {
                   <Card className="my-shadow" size="small">
                         <div>
                               <div style={{ fontWeight: 'bold' }}>{translate('Program_Stage_Configuration')}</div>
-                              <div style={{ marginTop: '10px', color: '#00000080', fontSize: '13px' }}>
+                              <div style={{ marginTop: '10px', color: '#00000070', fontSize: '13px' }}>
                                     {translate('Program_Stage_Configuration_Help')}
                               </div>
                               <div style={{ margin: '10px 0px' }}>
@@ -1440,14 +1448,14 @@ const Setting = () => {
                                                                               value: progStageDE.dataElement?.id
                                                                         })
                                                                   )}
+                                                                  showSearch
+                                                                  allowClear
+                                                                  optionFilterProp="label"
                                                                   placeholder={translate('Element_Donne')}
                                                                   style={{ width: '100%' }}
                                                                   mode="multiple"
                                                                   onChange={handleSelectDataElements}
                                                                   value={selectedSupervisorDataElements?.map(s => s.id)}
-                                                                  optionFilterProp="label"
-                                                                  showSearch
-                                                                  allowClear
                                                             />
                                                       </div>
                                                 </Col>
@@ -1478,25 +1486,6 @@ const Setting = () => {
                                                       </div>
                                                 </Col>
                                           )}
-                                          {/* 
-                                          <Col md={4} sm={24}>
-                                                <div style={{ marginTop: '22px' }}>
-                                                      <Button
-                                                            disabled={
-                                                                  selectedProgramStageForConfiguration &&
-                                                                  selectedOrganisationUnitGroup
-                                                                        ? false
-                                                                        : true
-                                                            }
-                                                            primary
-                                                            onClick={handleAddProgramStageConfigurations}
-                                                      >
-                                                            {currentProgramstageConfiguration
-                                                                  ? translate('Mise_A_Jour')
-                                                                  : '+ '.concat(translate('Add'))}
-                                                      </Button>
-                                                </div>
-                                          </Col> */}
                                     </Row>
                               </div>
                         </div>
@@ -1663,7 +1652,7 @@ const Setting = () => {
                                                 <div
                                                       style={{
                                                             marginTop: '5px',
-                                                            color: '#00000080',
+                                                            color: '#00000070',
                                                             fontSize: '13px'
                                                       }}
                                                 >
@@ -1859,38 +1848,42 @@ const Setting = () => {
                                                 'Program_Stage_Configuration_Fields_For_Recoupement_And_Indicator'
                                           )}
                                     </div>
-
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                          <div>
+                                    <div
+                                          style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                width: '100%',
+                                                marginTop: '10px'
+                                          }}
+                                    >
+                                          <div style={{ width: '100%' }}>
+                                                <div style={{ marginBottom: '5px' }}>
+                                                      {translate('NumberOfIndicators')}
+                                                </div>
                                                 <Select
                                                       options={numberList}
                                                       placeholder={translate('NumberOfIndicators')}
                                                       style={{ width: '100%' }}
                                                       optionFilterProp="label"
                                                       value={selectedNumberOfIndicators}
-                                                      onChange={event => {
-                                                            setSelectedNumberOfIndicators(event.target.value);
-                                                            generateIndicatorsConfigFieldsList(
-                                                                  event.target.value,
-                                                                  selectedNumberOfRecoupements
-                                                            );
+                                                      onChange={value => {
+                                                            setSelectedNumberOfIndicators(value);
                                                       }}
                                                       showSearch
                                                 />
                                           </div>
-                                          <div>
+                                          <div style={{ width: '100%' }}>
+                                                <div style={{ marginBottom: '5px' }}>
+                                                      {translate('NumberOfRecoupements')}
+                                                </div>
                                                 <Select
                                                       options={numberList}
                                                       placeholder={translate('NumberOfRecoupements')}
                                                       style={{ width: '100%' }}
                                                       optionFilterProp="label"
                                                       value={selectedNumberOfRecoupements}
-                                                      onChange={event => {
-                                                            setSelectedNumberOfRecoupements(event.target.value);
-                                                            generateIndicatorsConfigFieldsList(
-                                                                  selectedNumberOfIndicators,
-                                                                  event.target.value
-                                                            );
+                                                      onChange={value => {
+                                                            setSelectedNumberOfRecoupements(value);
                                                       }}
                                                       showSearch
                                                 />
@@ -1898,56 +1891,389 @@ const Setting = () => {
                                     </div>
 
                                     <div style={{ margin: '10px 0px' }}>
-                                          {selectedConfigurationType === 'RDQe' && (
-                                                <>
-                                                      <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-                                                            <thead>
-                                                                  <tr>
-                                                                        <th
+                                          <>
+                                                <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+                                                      <thead>
+                                                            <tr style={{ background: '#ccc' }}>
+                                                                  <th
+                                                                        style={{
+                                                                              padding: '10px',
+                                                                              textAlign: 'center',
+                                                                              border: '1px solid #00000070',
+                                                                              width: '50%'
+                                                                        }}
+                                                                  >
+                                                                        {translate('Indicateurs')}
+                                                                  </th>
+                                                                  <th
+                                                                        style={{
+                                                                              padding: '10px',
+                                                                              textAlign: 'center',
+                                                                              border: '1px solid #00000070',
+                                                                              width: '50%'
+                                                                        }}
+                                                                  >
+                                                                        {translate('Recoupements')}
+                                                                  </th>
+                                                            </tr>
+                                                      </thead>
+                                                      <tbody>
+                                                            {indicatorsFieldsConfigs.map(ind => (
+                                                                  <tr key={uuid()}>
+                                                                        <td
                                                                               style={{
+                                                                                    border: '1px solid #00000070',
                                                                                     padding: '10px',
-                                                                                    textAlign: 'center',
-                                                                                    border: '1px solid #000'
+                                                                                    width: '50%'
                                                                               }}
                                                                         >
-                                                                              {translate('Indicateurs')}
-                                                                        </th>
-                                                                        <th
-                                                                              style={{
-                                                                                    padding: '10px',
-                                                                                    textAlign: 'center',
-                                                                                    border: '1px solid #000'
-                                                                              }}
-                                                                        >
-                                                                              {translate('Recoupements')}
-                                                                        </th>
-                                                                  </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                  {indicatorsFieldsConfigs.map(ind => (
-                                                                        <tr key={uuid()}>
-                                                                              <td
+                                                                              <div
                                                                                     style={{
-                                                                                          border: '1px solid #000',
-                                                                                          padding: '10px'
+                                                                                          marginBottom: '5px'
                                                                                     }}
                                                                               >
-                                                                                    <Input
+                                                                                    {ind.name}
+                                                                              </div>
+                                                                              <div>
+                                                                                    <Select
                                                                                           placeholder={ind.name}
-                                                                                          width="100%"
+                                                                                          style={{
+                                                                                                width: '307px'
+                                                                                          }}
+                                                                                          options={selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                                                progStageDE => ({
+                                                                                                      label: progStageDE
+                                                                                                            .dataElement
+                                                                                                            ?.displayName,
+                                                                                                      value: progStageDE
+                                                                                                            .dataElement
+                                                                                                            ?.id
+                                                                                                })
+                                                                                          )}
+                                                                                          showSearch
+                                                                                          allowClear
+                                                                                          optionFilterProp="label"
+                                                                                          value={
+                                                                                                indicatorsFieldsConfigs.find(
+                                                                                                      i =>
+                                                                                                            i.id ===
+                                                                                                            ind.id
+                                                                                                )?.value?.id
+                                                                                          }
+                                                                                          onSelect={value => {
+                                                                                                setIndicatorsFieldsConfigs(
+                                                                                                      indicatorsFieldsConfigs.map(
+                                                                                                            i => {
+                                                                                                                  if (
+                                                                                                                        i.id ===
+                                                                                                                        ind.id
+                                                                                                                  ) {
+                                                                                                                        return {
+                                                                                                                              ...i,
+                                                                                                                              value: selectedProgramStageForConfiguration?.programStageDataElements?.find(
+                                                                                                                                    p =>
+                                                                                                                                          p
+                                                                                                                                                .dataElement
+                                                                                                                                                .id ===
+                                                                                                                                          value
+                                                                                                                              )
+                                                                                                                                    ?.dataElement
+                                                                                                                        };
+                                                                                                                  }
+                                                                                                                  return i;
+                                                                                                            }
+                                                                                                      )
+                                                                                                );
+                                                                                          }}
                                                                                     />
-                                                                              </td>
-                                                                        </tr>
-                                                                  ))}
-                                                            </tbody>
-                                                      </table>
-                                                </>
-                                          )}
+                                                                              </div>
+                                                                        </td>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '10px',
+                                                                                    width: '50%'
+                                                                              }}
+                                                                        >
+                                                                              {ind.recoupements.map(r => (
+                                                                                    <div
+                                                                                          key={uuid()}
+                                                                                          style={{
+                                                                                                marginTop: '3px'
+                                                                                          }}
+                                                                                    >
+                                                                                          <div
+                                                                                                style={{
+                                                                                                      marginBottom:
+                                                                                                            '5px'
+                                                                                                }}
+                                                                                          >
+                                                                                                {r.name}
+                                                                                          </div>
+
+                                                                                          <div>
+                                                                                                <Select
+                                                                                                      placeholder={
+                                                                                                            r.name
+                                                                                                      }
+                                                                                                      style={{
+                                                                                                            width: '307px'
+                                                                                                      }}
+                                                                                                      options={selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                                                            progStageDE => ({
+                                                                                                                  label: progStageDE
+                                                                                                                        .dataElement
+                                                                                                                        ?.displayName,
+                                                                                                                  value: progStageDE
+                                                                                                                        .dataElement
+                                                                                                                        ?.id
+                                                                                                            })
+                                                                                                      )}
+                                                                                                      showSearch
+                                                                                                      allowClear
+                                                                                                      optionFilterProp="label"
+                                                                                                      value={
+                                                                                                            indicatorsFieldsConfigs
+                                                                                                                  .find(
+                                                                                                                        i =>
+                                                                                                                              i.id ===
+                                                                                                                              ind.id
+                                                                                                                  )
+                                                                                                                  ?.recoupements?.find(
+                                                                                                                        rec =>
+                                                                                                                              rec.id ===
+                                                                                                                              r.id
+                                                                                                                  )
+                                                                                                                  ?.value
+                                                                                                                  ?.id
+                                                                                                      }
+                                                                                                      onSelect={value => {
+                                                                                                            setIndicatorsFieldsConfigs(
+                                                                                                                  indicatorsFieldsConfigs.map(
+                                                                                                                        i => {
+                                                                                                                              if (
+                                                                                                                                    i.id ===
+                                                                                                                                    ind.id
+                                                                                                                              ) {
+                                                                                                                                    return {
+                                                                                                                                          ...i,
+                                                                                                                                          recoupements:
+                                                                                                                                                i.recoupements?.map(
+                                                                                                                                                      recoupement => {
+                                                                                                                                                            if (
+                                                                                                                                                                  recoupement.id ===
+                                                                                                                                                                  r.id
+                                                                                                                                                            ) {
+                                                                                                                                                                  return {
+                                                                                                                                                                        ...recoupement,
+                                                                                                                                                                        value: selectedProgramStageForConfiguration?.programStageDataElements?.find(
+                                                                                                                                                                              p =>
+                                                                                                                                                                                    p
+                                                                                                                                                                                          .dataElement
+                                                                                                                                                                                          .id ===
+                                                                                                                                                                                    value
+                                                                                                                                                                        )
+                                                                                                                                                                              ?.dataElement
+                                                                                                                                                                  };
+                                                                                                                                                            }
+                                                                                                                                                            return recoupement;
+                                                                                                                                                      }
+                                                                                                                                                )
+                                                                                                                                    };
+                                                                                                                              }
+                                                                                                                              return i;
+                                                                                                                        }
+                                                                                                                  )
+                                                                                                            );
+                                                                                                      }}
+                                                                                                />
+                                                                                          </div>
+                                                                                    </div>
+                                                                              ))}
+                                                                        </td>
+                                                                  </tr>
+                                                            ))}
+                                                      </tbody>
+                                                </table>
+                                          </>
                                     </div>
                               </div>
                         </Card>
                   </div>
             );
+      const RenderErrorMargeIndicatorAndRecoupementConfigFields = () =>
+            indicatorsFieldsConfigs.length > 0 &&
+            selectedConfigurationType === 'DQe' && (
+                  <div style={{ marginTop: '20px' }}>
+                        <Card className="my-shadow" size="small">
+                              <div>
+                                    <div style={{ fontWeight: 'bold' }}>{translate('MarginOfErrorConfiguration')}</div>
+
+                                    <div style={{ margin: '10px 0px' }}>
+                                          <>
+                                                <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+                                                      <thead>
+                                                            <tr style={{ background: '#ccc' }}>
+                                                                  <th
+                                                                        style={{
+                                                                              padding: '10px',
+                                                                              textAlign: 'center',
+                                                                              border: '1px solid #00000070',
+                                                                              width: '50%'
+                                                                        }}
+                                                                  >
+                                                                        {translate('Marge_Indicateurs')}
+                                                                  </th>
+                                                                  <th
+                                                                        style={{
+                                                                              padding: '10px',
+                                                                              textAlign: 'center',
+                                                                              border: '1px solid #00000070',
+                                                                              width: '50%'
+                                                                        }}
+                                                                  >
+                                                                        {translate('Marge_Recoupements')}
+                                                                  </th>
+                                                            </tr>
+                                                      </thead>
+                                                      <tbody>
+                                                            {indicatorsFieldsConfigs.map((ind, index) => (
+                                                                  <tr key={uuid()}>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '10px',
+                                                                                    width: '50%'
+                                                                              }}
+                                                                        >
+                                                                              <div
+                                                                                    style={{
+                                                                                          marginBottom: '5px'
+                                                                                    }}
+                                                                              >
+                                                                                    {`${translate('Marge')} ${
+                                                                                          index + 1
+                                                                                    }`}
+                                                                              </div>
+                                                                              <div>
+                                                                                    <Input
+                                                                                          placeholder={`${translate(
+                                                                                                'Marge'
+                                                                                          )} ${index + 1}`}
+                                                                                          style={{
+                                                                                                width: '100%'
+                                                                                          }}
+                                                                                          type="number"
+                                                                                          value={
+                                                                                                indicatorsFieldsConfigs.find(
+                                                                                                      i =>
+                                                                                                            i.id ===
+                                                                                                            ind.id
+                                                                                                )?.indicatorMargin
+                                                                                          }
+                                                                                          onChange={event => {
+                                                                                                console.log(
+                                                                                                      'margin value: ',
+                                                                                                      event.target.value
+                                                                                                );
+                                                                                                setIndicatorsFieldsConfigs(
+                                                                                                      indicatorsFieldsConfigs.map(
+                                                                                                            i => {
+                                                                                                                  if (
+                                                                                                                        i.id ===
+                                                                                                                        ind.id
+                                                                                                                  ) {
+                                                                                                                        return {
+                                                                                                                              ...i,
+                                                                                                                              indicatorMargin:
+                                                                                                                                    event.target.value
+                                                                                                                        };
+                                                                                                                  }
+                                                                                                                  return i;
+                                                                                                            }
+                                                                                                      )
+                                                                                                );
+                                                                                          }}
+                                                                                    />
+                                                                              </div>
+                                                                        </td>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '10px',
+                                                                                    width: '50%'
+                                                                              }}
+                                                                        >
+                                                                              <div
+                                                                                    style={{
+                                                                                          marginBottom: '5px'
+                                                                                    }}
+                                                                              >
+                                                                                    {`${translate('Marge')} ${
+                                                                                          index + 1
+                                                                                    }`}
+                                                                              </div>
+                                                                              <Input
+                                                                                    placeholder={`${translate(
+                                                                                          'Marge'
+                                                                                    )} ${index + 1}`}
+                                                                                    style={{
+                                                                                          width: '100%'
+                                                                                    }}
+                                                                                    value={
+                                                                                          indicatorsFieldsConfigs.find(
+                                                                                                i => i.id === ind.id
+                                                                                          )?.recoupementMargin
+                                                                                    }
+                                                                                    onChange={event => {
+                                                                                          console.log(
+                                                                                                'event:  ',
+                                                                                                event
+                                                                                          );
+                                                                                          setIndicatorsFieldsConfigs(
+                                                                                                indicatorsFieldsConfigs.map(
+                                                                                                      i => {
+                                                                                                            if (
+                                                                                                                  i.id ===
+                                                                                                                  ind.id
+                                                                                                            ) {
+                                                                                                                  return {
+                                                                                                                        ...i,
+                                                                                                                        recoupementMargin:
+                                                                                                                              event.target.value
+                                                                                                                  };
+                                                                                                            }
+                                                                                                            return i;
+                                                                                                      }
+                                                                                                )
+                                                                                          );
+                                                                                    }}
+                                                                              />
+                                                                        </td>
+                                                                  </tr>
+                                                            ))}
+                                                      </tbody>
+                                                </table>
+                                          </>
+                                    </div>
+                              </div>
+                        </Card>
+                  </div>
+            );
+
+      const RenderSaveConfigurationButton = () => (
+            <div style={{ marginTop: '22px' }}>
+                  <Button
+                        disabled={selectedProgramStageForConfiguration && selectedOrganisationUnitGroup ? false : true}
+                        primary
+                        onClick={handleAddProgramStageConfigurations}
+                  >
+                        {currentProgramstageConfiguration
+                              ? translate('Mise_A_Jour')
+                              : '+ '.concat(translate('AddConfiguration'))}
+                  </Button>
+            </div>
+      );
 
       const RenderPageSupervisionConfig = () => (
             <>
@@ -1966,11 +2292,14 @@ const Setting = () => {
                                           <div>
                                                 {RenderProgramStageConfiguration()}
                                                 {RenderIndicatorAndRecoupementConfigFields()}
-                                                {RenderConfigurationForEachProgramStageList()}
+                                                {RenderErrorMargeIndicatorAndRecoupementConfigFields()}
+                                                {RenderSaveConfigurationButton()}
+
+                                                <pre>{JSON.stringify(indicatorsFieldsConfigs, null, 4)}</pre>
                                           </div>
                                     )}
 
-                                    <div
+                                    {/* <div
                                           style={{
                                                 marginTop: '20px',
                                                 display: 'flex',
@@ -2020,7 +2349,7 @@ const Setting = () => {
                                                       {!isFieldEditingMode && <span>{translate('Enregistrer')}</span>}
                                                 </Button>
                                           </div>
-                                    </div>
+                                    </div> */}
                               </div>
                         </Col>
                         <Col md={12} sm={24}>
@@ -2126,6 +2455,8 @@ const Setting = () => {
                                           />
                                     </div>
                               )}
+
+                              {RenderConfigurationForEachProgramStageList()}
 
                               {selectedPlanificationType === AGENT &&
                                     selectedTEIProgram &&
@@ -3427,6 +3758,16 @@ const Setting = () => {
             selectedTypeSupervisionPage === PAGE_CONFIG_SUPERVISION && initSupConfigStates();
             selectedTypeSupervisionPage === PAGE_CONFIG_ANALYSE && initAnalyseConfigStates();
       }, []);
+
+      useEffect(() => {
+            if (
+                  selectedNumberOfIndicators > 0 &&
+                  selectedNumberOfRecoupements > 0 &&
+                  selectedProgramStageForConfiguration
+            ) {
+                  generateIndicatorsConfigFieldsList();
+            }
+      }, [selectedNumberOfIndicators, selectedNumberOfRecoupements, selectedProgramStageForConfiguration]);
 
       useEffect(() => {
             currentItem && initUpdateIndicatorConfigStage();
