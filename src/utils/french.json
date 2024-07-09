@@ -230,7 +230,7 @@
     "Supervision_Planned_With_Success_On": "Supervision planifiée avec succès sur ",
     "Supervision_Status_fields": "Champs status supervision",
     "Supervisor_Fields": "Champs superviseur",
-    "Program_Stage_Configuration": "Configuration du programme stage",
+    "Program_Stage_Configuration": "Configuration des Champs nom des superviseurs et status de la supervision",
     "Planifiée": "Planifiée",
     "Annulée": "Annulée",
     "En Cours": "En Cours",
@@ -254,9 +254,12 @@
     "SelectVisualizations": "Selectionner les graphiques ( Favoris ) ",
     "SelectMaps": "Selectionner les Cartes ( Favoris ) ",
     "Favoris": "Favoris",
+    "Confirmation_Suppression_Visualisation": "Voulez-vous vraiment supprimer cet item ",
+    "Configuration_RDQe_Case": "Configuration pour le cas de  RDQe ",
+    "Configuration_DQe_Case": "Configuration pour le cas de DQe ",
+    "Program_Stage_Configuration_Fields_For_Recoupement_And_Indicator": "Configuration des champs indicateurs et leurs recoupements",
+    "Recoupements": "Recoupements",
 
-
-
-
-    "Confirmation_Suppression_Visualisation": "Voulez-vous vraiment supprimer cet item "
+    "NumberOfIndicators": "Nombre d'indicateurs",
+    "NumberOfRecoupements": "Nombre de recoupements"
 }

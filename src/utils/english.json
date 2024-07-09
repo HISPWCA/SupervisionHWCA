@@ -231,7 +231,7 @@
     "Supervision_Planned_With_Success_On": "Supervision planned with success on ",
     "Supervision_Status_fields": "Supervision Status fields",
     "Supervisor_Fields": "Supervisor Fields",
-    "Program_Stage_Configuration": "Program stage configuration",
+    "Program_Stage_Configuration": "Fields supervisor name and supervision status configuration",
     "Planifiée": "Planned",
     "Annulée": "Cancel",
     "En Cours": "Pending",
@@ -254,5 +254,13 @@
     "MapType": "Maps",
     "SelectVisualizations": "Select Visualiztaions",
     "SelectMaps": "Select Maps",
-    "Favoris": "Favorite"
+    "Favoris": "Favorite",
+    "Configuration_RDQe_Case": "Configuration for RDQe Case ",
+    "Configuration_DQe_Case": "Configuration for DQe Case ",
+    "Program_Stage_Configuration_Fields_For_Recoupement_And_Indicator": "Fields Indicators and Cross check configutation ",
+    "Recoupements": "Cross Check",
+
+
+    "NumberOfIndicators":"Number of indicators",
+    "NumberOfRecoupements":"Number of cross checks"
 }

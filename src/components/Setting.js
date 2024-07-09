@@ -44,6 +44,19 @@ import { CgCloseO } from 'react-icons/cg';
 import MyNotification from './MyNotification';
 import translate from '../utils/translator';
 
+const numberList = [
+      { value: 1, label: '1' },
+      { value: 2, label: '2' },
+      { value: 3, label: '3' },
+      { value: 4, label: '4' },
+      { value: 5, label: '5' },
+      { value: 6, label: '6' },
+      { value: 7, label: '7' },
+      { value: 8, label: '8' },
+      { value: 9, label: '9' },
+      { value: 10, label: '10' }
+];
+
 const Setting = () => {
       const [currentItem, setCurrentItem] = useState(null);
       const [notification, setNotification] = useState({
@@ -66,6 +79,7 @@ const Setting = () => {
       const [currentPaymentConfig, setCurrentPaymentConfig] = useState(null);
       const [dataStoreVisualizations, setDataStoreVisualizations] = useState([]);
       const [currentVisualizationProgram, setCurrentVisualizationProgram] = useState(null);
+      const [indicatorsFieldsConfigs, setIndicatorsFieldsConfigs] = useState([]);
 
       const [visualizations, setVisualizations] = useState([]);
       const [maps, setMaps] = useState([]);
@@ -78,22 +92,20 @@ const Setting = () => {
 
       const [organisationUnitGroups, setOrganisationUnitGroups] = useState([]);
       const [loadingOrganisationUnitGroups, setLoadingOrganisationUnitGroups] = useState(false);
-      const [selectedOrganisationUnitGroup, setSelectedOrganisationUnitGroup] = useState(null);
-
+      const [programStageConfigurations, setProgramStageConfigurations] = useState([]);
       const [currentProgramstageConfiguration, setCurrentProgramstageConfiguration] = useState(null);
+
+      const [selectedOrganisationUnitGroup, setSelectedOrganisationUnitGroup] = useState(null);
       const [selectedProgramStageForConfiguration, setSelectedProgramStageForConfiguration] = useState(null);
       const [selectedSupervisorDataElements, setSelectedSupervisorDataElements] = useState([]);
       const [selectedStatusSupervisionDataElement, setSelectedStatusSupervisionDataElement] = useState(null);
-
-      const [programStageConfigurations, setProgramStageConfigurations] = useState([]);
-
+      const [selectedConfigurationType, setSelectedConfigurationType] = useState('RDQe');
       const [selectedIndicator, setSelectedIndicator] = useState(null);
       const [selectedIndicatorGroup, setSelectedIndicatorGroup] = useState(null);
       const [selectedIndicatorType, setSelectedIndicatorType] = useState(PROGRAM_INDICATOR);
       const [selectedTEIProgram, setSelectedTEIProgram] = useState(null);
       const [selectedSupervisionGenerationType, setSelectedSupervisionGenerationType] =
-            useState(TYPE_GENERATION_AS_TEI);
-
+            useState(TYPE_GENERATION_AS_EVENT);
       const [selectedProgram, setSelectedProgram] = useState(null);
       const [selectedTypeSupervisionPage, setSelectedTypeSupervisionPage] = useState(PAGE_CONFIG_SUPERVISION);
       const [selectedAnalyseType, setSelectedAnalyseType] = useState(TYPE_ANALYSE_DATA_ELEMENT);
@@ -108,15 +120,15 @@ const Setting = () => {
       const [selectedDataElements, setSelectedDataElements] = useState([]);
       const [selectedAttributesToDisplay, setSelectedAttributesToDisplay] = useState([]);
       const [selectedPlanificationIndicatorRDQeCase, setSelectedPlanificationIndicatorRDQeCase] = useState(false);
-
       const [selectedPlanificationType, setSelectedPlanificationType] = useState(ORGANISATION_UNIT);
       const [selectedAttributeNameForAgent, setSelectedAttributeNameForAgent] = useState(null);
       const [selectedAttributeFirstNameForAgent, setSelectedAttributeFirstNameForAgent] = useState(null);
-
       const [selectedProgramForVisualization, setSelectedProgramForVisualization] = useState(null);
       const [selectedTypeForVisualization, setSelectedTypeForVisualization] = useState(null);
       const [selectedMaps, setSelectedMaps] = useState([]);
       const [selectedVisualizations, setSelectedVisualizations] = useState([]);
+      const [selectedNumberOfRecoupements, setSelectedNumberOfRecoupements] = useState(3);
+      const [selectedNumberOfIndicators, setSelectedNumberOfIndicators] = useState(3);
 
       const [inputLibellePayment, setInputLibellePayment] = useState('');
       const [inputMontantConstantPayment, setInputMontantConstantPayment] = useState(0);
@@ -421,7 +433,7 @@ const Setting = () => {
                   setMappingConfigSupervisions([]);
                   setProgramStageConfigurations([]);
                   setSelectedTEIProgram(null);
-                  setSelectedSupervisionGenerationType(TYPE_GENERATION_AS_TEI);
+                  setSelectedSupervisionGenerationType(TYPE_GENERATION_AS_EVENT);
                   setSelectedIndicatorType(PROGRAM_INDICATOR);
                   setSelectedIndicatorGroup(null);
                   setSelectedIndicator(null);
@@ -450,6 +462,34 @@ const Setting = () => {
             setInputLibellePayment('');
             setPaymentConfigList([]);
             setCurrentPaymentConfig(null);
+      };
+
+      const generateIndicatorsConfigFieldsList = (nbrIndicators, nbrRecoupement) => {
+            const newList = [];
+            for (let i = 1; i <= nbrIndicators; i++) {
+                  const recoupements = [];
+
+                  for (let j = 1; j <= nbrRecoupement; j++) {
+                        const recoupementPayload = {
+                              name: `${translate('Indicateurs')} ${i} ${translate('Recoupement')} ${j}`,
+                              position: j,
+                              value: null
+                        };
+
+                        recoupements.push(recoupementPayload);
+                  }
+
+                  const indicatorsPayload = {
+                        name: `${translate('Indicateurs')} ${i}`,
+                        position: i,
+                        value: null,
+                        recoupements
+                  };
+
+                  newList.push(indicatorsPayload);
+            }
+
+            setIndicatorsFieldsConfigs(newList);
       };
 
       const handleDeleteSupervisionConfig = async item => {
@@ -484,7 +524,7 @@ const Setting = () => {
                         setSelectedStatutSupervisionDataElement(null);
                         setSelectedStatutPaymentProgramStage(null);
                         setSelectedStatutPaymentDataElement(null);
-                        setSelectedSupervisionGenerationType(TYPE_GENERATION_AS_TEI);
+                        setSelectedSupervisionGenerationType(TYPE_GENERATION_AS_EVENT);
                         setSelectedPlanificationType(ORGANISATION_UNIT);
                         setSelectedPlanificationIndicatorRDQeCase(false);
                         setSelectedAttributesToDisplay([]);
@@ -1058,7 +1098,7 @@ const Setting = () => {
                         {selectedTEIProgram && (
                               <div>
                                     <Divider style={{ margin: '20px 0px' }} />
-                                    <Checkbox
+                                    {/* <Checkbox
                                           onChange={_ =>
                                                 setSelectedPlanificationIndicatorRDQeCase(
                                                       !selectedPlanificationIndicatorRDQeCase
@@ -1067,7 +1107,26 @@ const Setting = () => {
                                           checked={selectedPlanificationIndicatorRDQeCase}
                                     >
                                           <div style={{ fontWeight: 'bold' }}> {translate('RDQA_Case')}</div>
-                                    </Checkbox>
+                                    </Checkbox> */}
+
+                                    <div style={{ marginTop: '20px' }}>
+                                          <div style={{ marginTop: '5px' }}>
+                                                <Radio
+                                                      label={translate('Configuration_RDQe_Case')}
+                                                      onChange={({ value }) => setSelectedConfigurationType(value)}
+                                                      value="RDQe"
+                                                      checked={selectedConfigurationType === 'RDQe'}
+                                                />
+                                          </div>
+                                          <div style={{ marginTop: '5px' }}>
+                                                <Radio
+                                                      label={translate('Configuration_DQe_Case')}
+                                                      onChange={({ value }) => setSelectedConfigurationType(value)}
+                                                      value="DQe"
+                                                      checked={selectedConfigurationType === 'DQe'}
+                                                />
+                                          </div>
+                                    </div>
                               </div>
                         )}
                   </div>
@@ -1419,7 +1478,7 @@ const Setting = () => {
                                                       </div>
                                                 </Col>
                                           )}
-
+                                          {/* 
                                           <Col md={4} sm={24}>
                                                 <div style={{ marginTop: '22px' }}>
                                                       <Button
@@ -1437,114 +1496,105 @@ const Setting = () => {
                                                                   : '+ '.concat(translate('Add'))}
                                                       </Button>
                                                 </div>
-                                          </Col>
+                                          </Col> */}
                                     </Row>
                               </div>
-
-                              {programStageConfigurations.length > 0 && (
-                                    <div style={{ marginTop: '20px' }}>
-                                          <Table
-                                                dataSource={programStageConfigurations.map(p => ({
-                                                      ...p,
-                                                      programStageName: p.programStage?.displayName,
-                                                      organisationUnitGroupName: p.organisationUnitGroup?.displayName,
-                                                      action: p
-                                                }))}
-                                                columns={[
-                                                      {
-                                                            title: translate('Program_Stage'),
-                                                            dataIndex: 'programStageName'
-                                                      },
-                                                      {
-                                                            title: translate('Groupe_Unite_Organisation'),
-                                                            dataIndex: 'organisationUnitGroupName'
-                                                      },
-
-                                                      {
-                                                            title: translate('Actions'),
-                                                            dataIndex: 'action',
-                                                            width: '80px',
-                                                            render: value => (
-                                                                  <div
-                                                                        style={{
-                                                                              display: 'flex',
-                                                                              alignItems: 'center'
-                                                                        }}
-                                                                  >
-                                                                        <div style={{ marginRight: '10px' }}>
-                                                                              <FiEdit
-                                                                                    style={{
-                                                                                          color: BLUE,
-                                                                                          fontSize: '18px',
-                                                                                          cursor: 'pointer'
-                                                                                    }}
-                                                                                    onClick={() =>
-                                                                                          handleEditProgramStageConfigurations(
-                                                                                                value
-                                                                                          )
-                                                                                    }
-                                                                              />
-                                                                        </div>
-                                                                        <Popconfirm
-                                                                              title={translate(
-                                                                                    'Suppression_Configuration'
-                                                                              )}
-                                                                              description={translate(
-                                                                                    'Confirmation_Suppression_Configuration'
-                                                                              )}
-                                                                              icon={
-                                                                                    <QuestionCircleOutlined
-                                                                                          style={{ color: 'red' }}
-                                                                                    />
-                                                                              }
-                                                                              onConfirm={() => {
-                                                                                    setSelectedProgramStageForConfiguration(
-                                                                                          null
-                                                                                    );
-                                                                                    setSelectedOrganisationUnitGroup(
-                                                                                          null
-                                                                                    );
-                                                                                    setSelectedSupervisorDataElements(
-                                                                                          []
-                                                                                    );
-                                                                                    setSelectedStatusSupervisionDataElement(
-                                                                                          null
-                                                                                    );
-                                                                                    setProgramStageConfigurations(
-                                                                                          programStageConfigurations.filter(
-                                                                                                p =>
-                                                                                                      p.programStage
-                                                                                                            ?.id !==
-                                                                                                      value.programStage
-                                                                                                            ?.id
-                                                                                          )
-                                                                                    );
-                                                                              }}
-                                                                        >
-                                                                              <div>
-                                                                                    <RiDeleteBinLine
-                                                                                          style={{
-                                                                                                color: 'red',
-                                                                                                fontSize: '18px',
-                                                                                                cursor: 'pointer'
-                                                                                          }}
-                                                                                    />
-                                                                              </div>
-                                                                        </Popconfirm>
-                                                                  </div>
-                                                            )
-                                                      }
-                                                ]}
-                                                size="small"
-                                                pagination={false}
-                                                bordered
-                                          />
-                                    </div>
-                              )}
                         </div>
                   </Card>
             </div>
       );
+
+      const RenderConfigurationForEachProgramStageList = () =>
+            programStageConfigurations.length > 0 && (
+                  <div style={{ marginTop: '20px' }}>
+                        <Card className="my-shadow" size="small">
+                              <Table
+                                    dataSource={programStageConfigurations.map(p => ({
+                                          ...p,
+                                          programStageName: p.programStage?.displayName,
+                                          organisationUnitGroupName: p.organisationUnitGroup?.displayName,
+                                          action: p
+                                    }))}
+                                    columns={[
+                                          {
+                                                title: translate('Program_Stage'),
+                                                dataIndex: 'programStageName'
+                                          },
+                                          {
+                                                title: translate('Groupe_Unite_Organisation'),
+                                                dataIndex: 'organisationUnitGroupName'
+                                          },
+
+                                          {
+                                                title: translate('Actions'),
+                                                dataIndex: 'action',
+                                                width: '80px',
+                                                render: value => (
+                                                      <div
+                                                            style={{
+                                                                  display: 'flex',
+                                                                  alignItems: 'center'
+                                                            }}
+                                                      >
+                                                            <div style={{ marginRight: '10px' }}>
+                                                                  <FiEdit
+                                                                        style={{
+                                                                              color: BLUE,
+                                                                              fontSize: '18px',
+                                                                              cursor: 'pointer'
+                                                                        }}
+                                                                        onClick={() =>
+                                                                              handleEditProgramStageConfigurations(
+                                                                                    value
+                                                                              )
+                                                                        }
+                                                                  />
+                                                            </div>
+                                                            <Popconfirm
+                                                                  title={translate('Suppression_Configuration')}
+                                                                  description={translate(
+                                                                        'Confirmation_Suppression_Configuration'
+                                                                  )}
+                                                                  icon={
+                                                                        <QuestionCircleOutlined
+                                                                              style={{ color: 'red' }}
+                                                                        />
+                                                                  }
+                                                                  onConfirm={() => {
+                                                                        setSelectedProgramStageForConfiguration(null);
+                                                                        setSelectedOrganisationUnitGroup(null);
+                                                                        setSelectedSupervisorDataElements([]);
+                                                                        setSelectedStatusSupervisionDataElement(null);
+                                                                        setProgramStageConfigurations(
+                                                                              programStageConfigurations.filter(
+                                                                                    p =>
+                                                                                          p.programStage?.id !==
+                                                                                          value.programStage?.id
+                                                                              )
+                                                                        );
+                                                                  }}
+                                                            >
+                                                                  <div>
+                                                                        <RiDeleteBinLine
+                                                                              style={{
+                                                                                    color: 'red',
+                                                                                    fontSize: '18px',
+                                                                                    cursor: 'pointer'
+                                                                              }}
+                                                                        />
+                                                                  </div>
+                                                            </Popconfirm>
+                                                      </div>
+                                                )
+                                          }
+                                    ]}
+                                    size="small"
+                                    pagination={false}
+                                    bordered
+                              />
+                        </Card>
+                  </div>
+            );
 
       const handleAddPaymentConfig = () => {
             try {
@@ -1799,6 +1849,106 @@ const Setting = () => {
             }
       };
 
+      const RenderIndicatorAndRecoupementConfigFields = () =>
+            selectedProgramStageForConfiguration && (
+                  <div style={{ marginTop: '20px' }}>
+                        <Card className="my-shadow" size="small">
+                              <div>
+                                    <div style={{ fontWeight: 'bold' }}>
+                                          {translate(
+                                                'Program_Stage_Configuration_Fields_For_Recoupement_And_Indicator'
+                                          )}
+                                    </div>
+
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                          <div>
+                                                <Select
+                                                      options={numberList}
+                                                      placeholder={translate('NumberOfIndicators')}
+                                                      style={{ width: '100%' }}
+                                                      optionFilterProp="label"
+                                                      value={selectedNumberOfIndicators}
+                                                      onChange={event => {
+                                                            setSelectedNumberOfIndicators(event.target.value);
+                                                            generateIndicatorsConfigFieldsList(
+                                                                  event.target.value,
+                                                                  selectedNumberOfRecoupements
+                                                            );
+                                                      }}
+                                                      showSearch
+                                                />
+                                          </div>
+                                          <div>
+                                                <Select
+                                                      options={numberList}
+                                                      placeholder={translate('NumberOfRecoupements')}
+                                                      style={{ width: '100%' }}
+                                                      optionFilterProp="label"
+                                                      value={selectedNumberOfRecoupements}
+                                                      onChange={event => {
+                                                            setSelectedNumberOfRecoupements(event.target.value);
+                                                            generateIndicatorsConfigFieldsList(
+                                                                  selectedNumberOfIndicators,
+                                                                  event.target.value
+                                                            );
+                                                      }}
+                                                      showSearch
+                                                />
+                                          </div>
+                                    </div>
+
+                                    <div style={{ margin: '10px 0px' }}>
+                                          {selectedConfigurationType === 'RDQe' && (
+                                                <>
+                                                      <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+                                                            <thead>
+                                                                  <tr>
+                                                                        <th
+                                                                              style={{
+                                                                                    padding: '10px',
+                                                                                    textAlign: 'center',
+                                                                                    border: '1px solid #000'
+                                                                              }}
+                                                                        >
+                                                                              {translate('Indicateurs')}
+                                                                        </th>
+                                                                        <th
+                                                                              style={{
+                                                                                    padding: '10px',
+                                                                                    textAlign: 'center',
+                                                                                    border: '1px solid #000'
+                                                                              }}
+                                                                        >
+                                                                              {translate('Recoupements')}
+                                                                        </th>
+                                                                  </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                  {indicatorsFieldsConfigs.map(ind => (
+                                                                        <tr key={uuid()}>
+                                                                              <td
+                                                                                    style={{
+                                                                                          border: '1px solid #000',
+                                                                                          padding: '10px'
+                                                                                    }}
+                                                                              >
+                                                                                    <Input
+                                                                                          placeholder={ind.name}
+                                                                                          width="100%"
+                                                                                    />
+                                                                              </td>
+                                                                        </tr>
+                                                                  ))}
+                                                            </tbody>
+                                                      </table>
+                                                </>
+                                          )}
+                                    </div>
+                              </div>
+                        </Card>
+                  </div>
+            );
+
       const RenderPageSupervisionConfig = () => (
             <>
                   <Row gutter={[8, 10]}>
@@ -1812,7 +1962,13 @@ const Setting = () => {
                                     {selectedTEIProgram &&
                                           selectedPlanificationType === AGENT &&
                                           RenderStatusPaymentDataElementToUse()}
-                                    {selectedTEIProgram && RenderProgramStageConfiguration()}
+                                    {selectedTEIProgram && (
+                                          <div>
+                                                {RenderProgramStageConfiguration()}
+                                                {RenderIndicatorAndRecoupementConfigFields()}
+                                                {RenderConfigurationForEachProgramStageList()}
+                                          </div>
+                                    )}
 
                                     <div
                                           style={{
@@ -1844,7 +2000,7 @@ const Setting = () => {
                                                                   setSelectedProgramStageForConfiguration(null);
                                                                   setSelectedSupervisorDataElements([]);
                                                                   setSelectedSupervisionGenerationType(
-                                                                        TYPE_GENERATION_AS_TEI
+                                                                        TYPE_GENERATION_AS_EVENT
                                                                   );
                                                             }}
                                                       >
