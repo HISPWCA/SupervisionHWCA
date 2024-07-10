@@ -256,7 +256,7 @@
     "SelectMaps": "Select Maps",
     "Favoris": "Favorite",
     "Configuration_RDQe_Case": "Configuration for eRDQ Case ",
-    "Configuration_DQe_Case": "Configuration for DQR Case ",
+    "Configuration_DQe_Case": "Configuration for DQR Case ",    
     "Program_Stage_Configuration_Fields_For_Recoupement_And_Indicator": "Fields Indicators and Cross check configuration ",
     "Recoupements": "Cross Check",
     "NumberOfIndicators": "Number of indicators",
@@ -264,6 +264,11 @@
     "MarginOfErrorConfiguration": "Margin of error configuration",
     "Marge_Recoupements": "Error margin cross checks",
     "Marge_Indicateurs": "Error margin indicators",
-    "Marge":"Margin",
-    "AddConfiguration": "Add configuration"
+    "Marge":"Margin of error ",
+    "AddConfiguration": "Add configuration",
+
+
+    "ProgramStage_Already_Configured": "Le program stage à déjà été configuré",
+    "Mise_A_Jour_Configuration":"Update configuration",
+    "Configuration_Added_For_Program_stage":"Configuration added with success for program stage "
 }

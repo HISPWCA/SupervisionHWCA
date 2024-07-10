@@ -4615,73 +4615,7 @@ const Supervision = ({ me }) => {
                                           </div>
                                           <div style={{ padding: '10px' }}>
                                                 <Row gutter={[10, 10]}>
-                                                      {/* <Col sm={24} md={24}>
-                    <div>
-                      <div
-                        style={{
-                          marginBottom: "10px",
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                      >
-                        <Checkbox
-                          checked={inputFields[index]?.specificStage}
-                          onChange={() =>
-                            handleInputSpecificStage(
-                              !inputFields[index]?.specificStage,
-                              index
-                            )
-                          }
-                        />
-                        <span
-                          style={{ marginLeft: "5px", cursor: "pointer" }}
-                          onClick={() =>
-                            handleInputSpecificStage(
-                              !inputFields[index]?.specificStage,
-                              index
-                            )
-                          }
-                        >
-                          {translate("Specific_Stage")}
-                        </span>
-                      </div>
-
-                      {inputFields[index]?.specificStage && (
-                        <>
-                          <div style={{ marginBottom: "5px" }}>
-                            {translate("Programme_Stage")}
-                          </div>
-                          <Select
-                            placeholder={translate("Programme_Stage")}
-                            style={{ width: "100%" }}
-                            value={
-                              inputFields[index]?.programStageConfig
-                                ?.programStage?.id
-                            }
-                            onChange={(value) =>
-                              handleInputProgramStageConfig(
-                                selectedProgram?.programStageConfigurations?.find(
-                                  (p) => p.programStage?.id === value
-                                ),
-                                index
-                              )
-                            }
-                            optionFilterProp="label"
-                            showSearch
-                            options={
-                              selectedProgram?.programStageConfigurations?.map(
-                                (eq) => ({
-                                  label: eq.programStage?.name,
-                                  value: eq.programStage?.id,
-                                })
-                              ) || []
-                            }
-                            allowClear
-                          />
-                        </>
-                      )}
-                    </div>
-                  </Col> */}
+       
 
                                                       <Col sm={24} md={24}>
                                                             <div>

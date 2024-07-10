@@ -99,7 +99,7 @@ const Setting = () => {
       const [selectedProgramStageForConfiguration, setSelectedProgramStageForConfiguration] = useState(null);
       const [selectedSupervisorDataElements, setSelectedSupervisorDataElements] = useState([]);
       const [selectedStatusSupervisionDataElement, setSelectedStatusSupervisionDataElement] = useState(null);
-      const [selectedConfigurationType, setSelectedConfigurationType] = useState('RDQe');
+      const [selectedConfigurationType, setSelectedConfigurationType] = useState('ERDQ');
       const [selectedIndicator, setSelectedIndicator] = useState(null);
       const [selectedIndicatorGroup, setSelectedIndicatorGroup] = useState(null);
       const [selectedIndicatorType, setSelectedIndicatorType] = useState(PROGRAM_INDICATOR);
@@ -127,8 +127,11 @@ const Setting = () => {
       const [selectedTypeForVisualization, setSelectedTypeForVisualization] = useState(null);
       const [selectedMaps, setSelectedMaps] = useState([]);
       const [selectedVisualizations, setSelectedVisualizations] = useState([]);
-      const [selectedNumberOfRecoupements, setSelectedNumberOfRecoupements] = useState(3);
+
+      const [selectedNumberOfRecoupements, setSelectedNumberOfRecoupements] = useState(2);
       const [selectedNumberOfIndicators, setSelectedNumberOfIndicators] = useState(3);
+      const [selectedNumberOfIndicatorsAsArray, setSelectedNumberOfIndicatorsAsArray] = useState([1, 2, 3]);
+      const [selectedNumberOfRecoupementsAsArray, setSelectedNumberOfRecoupementsAsArray] = useState([1, 2]);
 
       const [inputLibellePayment, setInputLibellePayment] = useState('');
       const [inputMontantConstantPayment, setInputMontantConstantPayment] = useState(0);
@@ -243,7 +246,10 @@ const Setting = () => {
 
                   const response = await axios.get(route);
 
-                  setProgramStages(response.data.programStages);
+                  setProgramStages(response.data?.programStages);
+                  if (response.data?.programStages.length === 1) {
+                        selectedProgramStageForConfiguration(response.data?.programStages[0]);
+                  }
                   setLoadingProgramStages(false);
                   return response.data.programStages;
             } catch (err) {
@@ -272,6 +278,7 @@ const Setting = () => {
 
       const handleSelectedTEIProgram = value => {
             setSelectedProgramStageForConfiguration(null);
+            setSelectedStatutSupervisionDataElement(null);
             setIndicatorsFieldsConfigs([]);
 
             setSelectedIndicatorGroup(null);
@@ -279,7 +286,6 @@ const Setting = () => {
             setSelectedProgramStage(null);
             setSelectedDataElements([]);
             setSelectedStatusSupervisionProgramStage(null);
-            setSelectedStatutSupervisionDataElement(null);
             setSelectedStatutPaymentProgramStage(null);
             setSelectedStatutPaymentDataElement(null);
             setSelectedAttributesToDisplay([]);
@@ -435,6 +441,7 @@ const Setting = () => {
                   setAnalyseConfigs([]);
                   setMappingConfigSupervisions([]);
                   setProgramStageConfigurations([]);
+                  setIndicatorsFieldsConfigs([]);
                   setSelectedTEIProgram(null);
                   setSelectedSupervisionGenerationType(TYPE_GENERATION_AS_EVENT);
                   setSelectedIndicatorType(PROGRAM_INDICATOR);
@@ -475,7 +482,7 @@ const Setting = () => {
                   for (let j = 1; j <= selectedNumberOfRecoupements; j++) {
                         const recoupementPayload = {
                               id: uuid(),
-                              name: `${translate('Indicateurs')} ${i} ${translate('Recoupements')} ${j}`,
+                              name: `${translate('Recoupements')} ${j}`,
                               position: j,
                               value: null,
                               indicatorMargin: 0,
@@ -638,140 +645,166 @@ const Setting = () => {
 
                   if (!selectedTEIProgram) throw new Error(translate('Veuillez_Selectionner_Un_Programme'));
 
-                  if (selectedPlanificationType === AGENT) {
-                        if (selectedAttributesToDisplay.length === 0)
-                              throw new Error(translate('Veuillez_Configurer_Attribut_A_Utiliser'));
+                  if (!selectedProgramStageForConfiguration) throw new Error(translate('Please_Select_Program_Stage'));
 
-                        if (!selectedAttributeNameForAgent && !selectedAttributeFirstNameForAgent)
-                              throw new Error(translate('Attribute_Nom'));
+                  if (!selectedOrganisationUnitGroup && selectedConfigurationType === 'ERDQ')
+                        throw new Error(translate('Please_Select_Organisation_Unit_Group'));
+
+                  if (selectedSupervisorDataElements.length === 0)
+                        throw new Error(translate('Please_Select_Supervisor_Fields'));
+
+                  const responseSupervisionTracker = await loadDataStore(
+                        process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY,
+                        null,
+                        null,
+                        null
+                  );
+
+                  const existingConfig = responseSupervisionTracker.find(
+                        mapping => mapping.program?.id === selectedTEIProgram.id
+                  );
+
+                  console.log('response sUP : ', responseSupervisionTracker);
+
+                  if (
+                        !isFieldEditingMode &&
+                        existingConfig &&
+                        existingConfig.programStageConfigurations
+                              .map(p => p.programStage?.id)
+                              .includes(selectedProgramStageForConfiguration?.id)
+                  ) {
+                        throw new Error(translate('ProgramStage_Already_Configured'));
                   }
 
-                  if (selectedTEIProgram && selectedSupervisionGenerationType) {
-                        if (programStageConfigurations.length === 0) {
-                              throw new Error(translate('Please_Configure_The_Program_Stage'));
-                        }
+                  const newProgramStageConfigurations = existingConfig
+                        ? [
+                                ...existingConfig.programStageConfigurations,
+                                {
+                                      programStage: selectedProgramStageForConfiguration,
+                                      organisationUnitGroup: selectedOrganisationUnitGroup,
+                                      supervisorField: selectedSupervisorDataElements,
+                                      statusSupervisionField: selectedStatusSupervisionDataElement,
 
-                        const existingConfig = mappingConfigSupervisions.find(
-                              mapping => mapping.program?.id === selectedTEIProgram.id
-                        );
+                                      indicatorsFieldsConfigs: indicatorsFieldsConfigs,
+                                      numberOfIndicators: selectedNumberOfIndicators,
+                                      numberOfIndicatorsAsArray: selectedNumberOfIndicatorsAsArray,
+                                      numberOfRecoupements: selectedNumberOfRecoupements,
+                                      numberOfRecoupementsAsArray: selectedNumberOfRecoupementsAsArray
+                                }
+                          ]
+                        : [
+                                {
+                                      programStage: selectedProgramStageForConfiguration,
+                                      organisationUnitGroup: selectedOrganisationUnitGroup,
+                                      supervisorField: selectedSupervisorDataElements,
+                                      statusSupervisionField: selectedStatusSupervisionDataElement,
+                                      indicatorsFieldsConfigs: indicatorsFieldsConfigs,
 
-                        if (existingConfig && !isFieldEditingMode)
-                              throw new Error(translate('Configuration_Deja_Ajoutee'));
+                                      indicatorsFieldsConfigs: indicatorsFieldsConfigs,
+                                      numberOfIndicators: selectedNumberOfIndicators,
+                                      numberOfIndicatorsAsArray: selectedNumberOfIndicatorsAsArray,
+                                      numberOfRecoupements: selectedNumberOfRecoupements,
+                                      numberOfRecoupementsAsArray: selectedNumberOfRecoupementsAsArray
+                                }
+                          ];
 
-                        if (!existingConfig && isFieldEditingMode) throw new Error(translate('Programme_Introuvable'));
+                  const payload = {
+                        generationType: selectedSupervisionGenerationType,
+                        planificationType: selectedPlanificationType,
+                        configurationType: selectedConfigurationType,
+                        program: {
+                              id: selectedTEIProgram.id,
+                              displayName: selectedTEIProgram.displayName
+                        },
+                        attributesToDisplay: (selectedPlanificationType === AGENT && selectedAttributesToDisplay) || [],
+                        attributeName: selectedPlanificationType === AGENT && selectedAttributeNameForAgent,
+                        attributeFirstName: selectedPlanificationType === AGENT && selectedAttributeFirstNameForAgent,
+                        isRDQAConfigCase: selectedPlanificationIndicatorRDQeCase,
+                        fieldConfig: null,
+                        statusSupervision: null,
+                        statusPayment: null,
+                        paymentConfigs: paymentConfigList,
+                        programStageConfigurations: newProgramStageConfigurations.map(p => ({
+                              ...p,
+                              programStage: p.programStage && {
+                                    id: p.programStage.id,
+                                    displayName: p.programStage.displayName,
+                                    name: p.programStage.name
+                              }
+                        }))
+                  };
 
-                        const payload = {
-                              generationType: selectedSupervisionGenerationType,
-                              planificationType: selectedPlanificationType,
-                              program: {
-                                    id: selectedTEIProgram.id,
-                                    displayName: selectedTEIProgram.displayName
-                              },
-                              attributesToDisplay:
-                                    (selectedPlanificationType === AGENT && selectedAttributesToDisplay) || [],
-                              attributeName: selectedPlanificationType === AGENT && selectedAttributeNameForAgent,
-                              attributeFirstName:
-                                    selectedPlanificationType === AGENT && selectedAttributeFirstNameForAgent,
-                              isRDQAConfigCase: selectedPlanificationIndicatorRDQeCase,
-                              fieldConfig: null,
-                              statusSupervision: null,
-                              statusPayment: null,
-                              paymentConfigs: paymentConfigList,
-                              programStageConfigurations: programStageConfigurations.map(p => ({
-                                    ...p,
-                                    programStage: p.programStage && {
-                                          id: p.programStage.id,
-                                          displayName: p.programStage.displayName,
-                                          name: p.programStage.name
-                                    }
-                              }))
+                  if (selectedProgramStage && selectedDataElements.length > 0) {
+                        payload.fieldConfig = {
+                              supervisor: {
+                                    programStage: {
+                                          id: selectedProgramStage.id,
+                                          displayName: selectedProgramStage.displayName
+                                    },
+                                    dataElements: selectedDataElements
+                              }
                         };
-
-                        if (selectedProgramStage && selectedDataElements.length > 0) {
-                              payload.fieldConfig = {
-                                    supervisor: {
-                                          programStage: {
-                                                id: selectedProgramStage.id,
-                                                displayName: selectedProgramStage.displayName
-                                          },
-                                          dataElements: selectedDataElements
-                                    }
-                              };
-                        }
-
-                        if (selectedSupervisionProgramStage && selectedStatutSupervisionDataElement) {
-                              payload.statusSupervision = {
-                                    programStage: {
-                                          id: selectedSupervisionProgramStage.id,
-                                          displayName: selectedSupervisionProgramStage.displayName
-                                    },
-                                    dataElement: selectedStatutSupervisionDataElement
-                              };
-                        }
-
-                        if (
-                              selectedStatutPaymentProgramStage &&
-                              selectedStatutPaymentDataElement &&
-                              selectedPlanificationType === AGENT
-                        ) {
-                              payload.statusPayment = {
-                                    programStage: {
-                                          id: selectedStatutPaymentProgramStage.id,
-                                          displayName: selectedStatutPaymentProgramStage.displayName
-                                    },
-                                    dataElement: selectedStatutPaymentDataElement
-                              };
-                        }
-
-                        let newList = [];
-
-                        if (isFieldEditingMode) {
-                              newList = mappingConfigSupervisions.map(m => {
-                                    if (m.id === existingConfig?.id) {
-                                          return { ...m, ...payload };
-                                    }
-                                    return m;
-                              });
-                        } else {
-                              payload.id = uuid();
-                              newList = [...mappingConfigSupervisions, payload];
-                        }
-
-                        await saveDataToDataStore(
-                              process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY,
-                              newList,
-                              setLoadingSaveSupervionsConfig,
-                              null,
-                              null
-                        );
-
-                        setMappingConfigSupervisions(newList);
-                        setSelectedTEIProgram(null);
-                        setSelectedStatusSupervisionProgramStage(null);
-                        setSelectedStatutSupervisionDataElement(null);
-                        setSelectedStatutPaymentProgramStage(null);
-                        setSelectedStatutPaymentDataElement(null);
-                        setSelectedPlanificationIndicatorRDQeCase(false);
-                        setSelectedProgramStage(null);
-                        setFieldEditingMode(false);
-                        setSelectedDataElements([]);
-                        setSelectedProgramStageForConfiguration(null);
-                        setSelectedSupervisorDataElements([]);
-                        setProgramStageConfigurations([]);
-                        setSelectedOrganisationUnitGroup(null);
-                        setSelectedStatusSupervisionDataElement(null);
-                        setSelectedAttributesToDisplay([]);
-                        setLoadingSaveSupervionsConfig(false);
-                        cleanPaymentConfigState();
-                        setNotification({
-                              show: true,
-                              type: NOTIFICATION_SUCCESS,
-                              message: isFieldEditingMode
-                                    ? translate('Mise_A_Jour_Effectuer')
-                                    : translate('Configuration_Ajoutee')
-                        });
                   }
+
+                  if (selectedSupervisionProgramStage && selectedStatutSupervisionDataElement) {
+                        payload.statusSupervision = {
+                              programStage: {
+                                    id: selectedSupervisionProgramStage.id,
+                                    displayName: selectedSupervisionProgramStage.displayName
+                              },
+                              dataElement: selectedStatutSupervisionDataElement
+                        };
+                  }
+
+                  let newList = [];
+
+                  if (isFieldEditingMode || existingConfig) {
+                        newList = mappingConfigSupervisions.map(m => {
+                              if (m.id === existingConfig?.id) {
+                                    return { ...m, ...payload };
+                              }
+                              return m;
+                        });
+                  } else {
+                        payload.id = uuid();
+                        newList = [...mappingConfigSupervisions, payload];
+                  }
+
+                  await saveDataToDataStore(
+                        process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY,
+                        newList,
+                        setLoadingSaveSupervionsConfig,
+                        null,
+                        null
+                  );
+
+                  setIndicatorsFieldsConfigs([]);
+                  setMappingConfigSupervisions(newList);
+                  setProgramStageConfigurations(newProgramStageConfigurations);
+
+                  setSelectedStatusSupervisionProgramStage(null);
+                  setSelectedStatutSupervisionDataElement(null);
+                  setSelectedPlanificationIndicatorRDQeCase(false);
+                  setSelectedProgramStage(null);
+                  setFieldEditingMode(false);
+                  setSelectedDataElements([]);
+                  setSelectedOrganisationUnitGroup(null);
+                  setSelectedSupervisorDataElements([]);
+                  setSelectedStatusSupervisionDataElement(null);
+                  setSelectedAttributesToDisplay([]);
+                  setCurrentProgramstageConfiguration(null);
+
+                  setLoadingSaveSupervionsConfig(false);
+                  generateIndicatorsConfigFieldsList();
+                  setNotification({
+                        show: true,
+                        type: NOTIFICATION_SUCCESS,
+                        message: isFieldEditingMode
+                              ? translate('Mise_A_Jour_Effectuer')
+                              : translate('Configuration_Added_For_Program_stage')
+                  });
             } catch (err) {
+                  console.log('err:r ', err);
                   setNotification({
                         show: true,
                         type: NOTIFICATION_CRITICAL,
@@ -1000,8 +1033,9 @@ const Setting = () => {
       const handleSelectProgramStageForConfiguration = value => {
             setSelectedProgramStageForConfiguration(programStages.find(pstage => pstage.id === value));
 
-            setSelectedStatusSupervisionProgramStage(null);
+            setSelectedStatusSupervisionDataElement(null);
             setSelectedSupervisorDataElements([]);
+            setIndicatorsFieldsConfigs([]);
       };
 
       const handleSelectOrganisationUnitGroupProgramStage = value => {
@@ -1056,6 +1090,7 @@ const Setting = () => {
                                           onChange={handleSupervisionGenerationType}
                                           value={TYPE_GENERATION_AS_TEI}
                                           checked={selectedSupervisionGenerationType === TYPE_GENERATION_AS_TEI}
+                                          disabled={true}
                                     />
                               </div>
                               <div style={{ marginTop: '5px' }}>
@@ -1064,6 +1099,7 @@ const Setting = () => {
                                           onChange={handleSupervisionGenerationType}
                                           value={TYPE_GENERATION_AS_ENROLMENT}
                                           checked={selectedSupervisionGenerationType === TYPE_GENERATION_AS_ENROLMENT}
+                                          disabled={true}
                                     />
                               </div>
                               <div style={{ marginTop: '5px' }}>
@@ -1096,6 +1132,7 @@ const Setting = () => {
                                                       onChange={handleSupervisionPlanificationType}
                                                       value={AGENT}
                                                       checked={selectedPlanificationType === AGENT}
+                                                      disabled={true}
                                                 />
                                           </div>
                                     </div>
@@ -1105,32 +1142,22 @@ const Setting = () => {
                         {selectedTEIProgram && (
                               <div>
                                     <Divider style={{ margin: '20px 0px' }} />
-                                    {/* <Checkbox
-                                          onChange={_ =>
-                                                setSelectedPlanificationIndicatorRDQeCase(
-                                                      !selectedPlanificationIndicatorRDQeCase
-                                                )
-                                          }
-                                          checked={selectedPlanificationIndicatorRDQeCase}
-                                    >
-                                          <div style={{ fontWeight: 'bold' }}> {translate('RDQA_Case')}</div>
-                                    </Checkbox> */}
 
                                     <div style={{ marginTop: '20px' }}>
                                           <div style={{ marginTop: '5px' }}>
                                                 <Radio
                                                       label={translate('Configuration_RDQe_Case')}
                                                       onChange={({ value }) => setSelectedConfigurationType(value)}
-                                                      value="RDQe"
-                                                      checked={selectedConfigurationType === 'RDQe'}
+                                                      value="ERDQ"
+                                                      checked={selectedConfigurationType === 'ERDQ'}
                                                 />
                                           </div>
                                           <div style={{ marginTop: '5px' }}>
                                                 <Radio
                                                       label={translate('Configuration_DQe_Case')}
                                                       onChange={({ value }) => setSelectedConfigurationType(value)}
-                                                      value="DQe"
-                                                      checked={selectedConfigurationType === 'DQe'}
+                                                      value="DQR"
+                                                      checked={selectedConfigurationType === 'DQR'}
                                                 />
                                           </div>
                                     </div>
@@ -1146,29 +1173,34 @@ const Setting = () => {
 
                   setSelectedTEIProgram(programs.find(p => p.id === prog.program?.id));
                   const programStageList = await loadProgramStages(prog?.program?.id);
+                  setProgramStages(programStageList);
 
-                  setSelectedProgramStage(
-                        programStageList.find(psg => psg.id === prog.fieldConfig?.supervisor?.programStage.id)
-                  );
-                  setSelectedDataElements(prog?.fieldConfig?.supervisor?.dataElements || []);
-                  setSelectedStatusSupervisionProgramStage(
-                        programStageList.find(psg => psg.id === prog.statusSupervision?.programStage?.id)
-                  );
-                  setSelectedStatutSupervisionDataElement(prog?.statusSupervision?.dataElement);
-                  setSelectedStatutPaymentProgramStage(
-                        programStageList.find(psg => psg.id === prog.statusPayment?.programStage?.id)
-                  );
-                  setSelectedStatutPaymentDataElement(prog?.statusPayment?.dataElement);
-                  setSelectedAttributesToDisplay(prog.attributesToDisplay || []);
-                  setSelectedAttributeNameForAgent(prog.attributeName);
-                  setSelectedAttributeFirstNameForAgent(prog.attributeFirstName);
+                  // setSelectedProgramStage(
+                  //       programStageList.find(psg => psg.id === prog.fieldConfig?.supervisor?.programStage.id)
+                  // );
+                  // setSelectedDataElements(prog?.fieldConfig?.supervisor?.dataElements || []);
+                  // setSelectedStatusSupervisionProgramStage(
+                  //       programStageList.find(psg => psg.id === prog.statusSupervision?.programStage?.id)
+                  // );
+                  setSelectedStatutSupervisionDataElement(null);
+                  setIndicatorsFieldsConfigs([]);
+                  setSelectedProgramStageForConfiguration(null);
+                  setSelectedSupervisorDataElements([]);
+                  setCurrentProgramstageConfiguration(null);
+
+                  // setSelectedAttributesToDisplay(prog.attributesToDisplay || []);
+                  // setSelectedAttributeNameForAgent(prog.attributeName);
+
                   setSelectedSupervisionGenerationType(prog?.generationType);
                   setSelectedPlanificationType(prog.planificationType);
-                  setSelectedPlanificationIndicatorRDQeCase(prog.isRDQAConfigCase || false);
-                  setPaymentConfigList(prog?.paymentConfigs || []);
+                  setSelectedConfigurationType(prog.configurationType);
+                  // setSelectedPlanificationIndicatorRDQeCase(prog.isRDQAConfigCase || false);
+                  // setPaymentConfigList(prog?.paymentConfigs || []);
+
                   setFieldEditingMode(true);
                   setProgramStageConfigurations(prog.programStageConfigurations || []);
             } catch (err) {
+                  console.log('edit error : ', err);
                   setNotification({
                         show: true,
                         message: err.response?.data?.message || err.message,
@@ -1177,122 +1209,122 @@ const Setting = () => {
             }
       };
 
-      const handleChangeProgramAttributeToDisplay = values => {
-            setSelectedAttributesToDisplay(
-                  values.map(v =>
-                        selectedTEIProgram.programTrackedEntityAttributes
-                              .map(p => p.trackedEntityAttribute)
-                              .find(att => att.id === v)
-                  )
-            );
-      };
+      // const handleChangeProgramAttributeToDisplay = values => {
+      //       setSelectedAttributesToDisplay(
+      //             values.map(v =>
+      //                   selectedTEIProgram.programTrackedEntityAttributes
+      //                         .map(p => p.trackedEntityAttribute)
+      //                         .find(att => att.id === v)
+      //             )
+      //       );
+      // };
 
-      const handleSelectProgramAttributeNameForAgent = value => {
-            setSelectedAttributeNameForAgent(
-                  selectedTEIProgram.programTrackedEntityAttributes
-                        .map(p => p.trackedEntityAttribute)
-                        .find(att => att.id === value)
-            );
-      };
+      // const handleSelectProgramAttributeNameForAgent = value => {
+      //       setSelectedAttributeNameForAgent(
+      //             selectedTEIProgram.programTrackedEntityAttributes
+      //                   .map(p => p.trackedEntityAttribute)
+      //                   .find(att => att.id === value)
+      //       );
+      // };
 
-      const handleSelectProgramAttributeFirstNameForAgent = value => {
-            setSelectedAttributeFirstNameForAgent(
-                  selectedTEIProgram.programTrackedEntityAttributes
-                        .map(p => p.trackedEntityAttribute)
-                        .find(att => att.id === value)
-            );
-      };
+      // const handleSelectProgramAttributeFirstNameForAgent = value => {
+      //       setSelectedAttributeFirstNameForAgent(
+      //             selectedTEIProgram.programTrackedEntityAttributes
+      //                   .map(p => p.trackedEntityAttribute)
+      //                   .find(att => att.id === value)
+      //       );
+      // };
 
-      const RenderAttributesToDisplay = () => (
-            <div style={{ marginTop: '20px' }}>
-                  <Card className="my-shadow" size="small">
-                        <div>
-                              <div style={{ fontWeight: 'bold' }}>{translate('Configuration_Des_Attributes')}</div>
-                              <Divider style={{ margin: '5px 0px' }} />
-                              <div style={{ fontWeight: 'bold' }}>{translate('Attributs')}</div>
-                              <div style={{ color: '#00000070', fontSize: '13px' }}>
-                                    {translate('Aide_Attribute_Configurer')}
-                              </div>
-                              <div style={{ marginTop: '2px' }}>
-                                    <Select
-                                          options={selectedTEIProgram.programTrackedEntityAttributes
-                                                .map(p => p.trackedEntityAttribute)
-                                                .map(attribute => ({
-                                                      label: attribute.displayName,
-                                                      value: attribute.id
-                                                }))}
-                                          placeholder={translate('Program_Stage')}
-                                          style={{ width: '100%' }}
-                                          optionFilterProp="label"
-                                          value={selectedAttributesToDisplay.map(att => att.id)}
-                                          onChange={handleChangeProgramAttributeToDisplay}
-                                          showSearch
-                                          allowClear
-                                          mode="multiple"
-                                          loading={loadingPrograms}
-                                          disabled={loadingPrograms}
-                                    />
-                              </div>
-                              <Divider style={{ margin: '10px 0px' }} />
-                              <div style={{ color: '#00000070', fontSize: '13px' }}>
-                                    {translate('Attribute_Representant_Nom_Et_Prenom')}
-                              </div>
-                              <div style={{ marginTop: '5px' }}>
-                                    <Row gutter={[10, 10]}>
-                                          <Col md={12}>
-                                                <div style={{ marginBottom: '2px', fontWeight: 'bold' }}>
-                                                      {translate('Nom_Agent')}
-                                                </div>
-                                                <div>
-                                                      <Select
-                                                            options={selectedTEIProgram.programTrackedEntityAttributes
-                                                                  .map(p => p.trackedEntityAttribute)
-                                                                  .map(attribute => ({
-                                                                        label: attribute.displayName,
-                                                                        value: attribute.id
-                                                                  }))}
-                                                            placeholder={translate('Nom_Agent')}
-                                                            style={{ width: '100%' }}
-                                                            optionFilterProp="label"
-                                                            value={selectedAttributeNameForAgent?.id}
-                                                            onChange={handleSelectProgramAttributeNameForAgent}
-                                                            showSearch
-                                                            allowClear
-                                                            loading={loadingPrograms}
-                                                            disabled={loadingPrograms}
-                                                      />
-                                                </div>
-                                          </Col>
-                                          <Col md={12}>
-                                                <div style={{ marginBottom: '2px', fontWeight: 'bold' }}>
-                                                      {translate('Prenom_Agent')}
-                                                </div>
-                                                <div>
-                                                      <Select
-                                                            options={selectedTEIProgram.programTrackedEntityAttributes
-                                                                  .map(p => p.trackedEntityAttribute)
-                                                                  .map(attribute => ({
-                                                                        label: attribute.displayName,
-                                                                        value: attribute.id
-                                                                  }))}
-                                                            placeholder={translate('Prenom_Agent')}
-                                                            style={{ width: '100%' }}
-                                                            optionFilterProp="label"
-                                                            value={selectedAttributeFirstNameForAgent?.id}
-                                                            onChange={handleSelectProgramAttributeFirstNameForAgent}
-                                                            showSearch
-                                                            allowClear
-                                                            loading={loadingPrograms}
-                                                            disabled={loadingPrograms}
-                                                      />
-                                                </div>
-                                          </Col>
-                                    </Row>
-                              </div>
-                        </div>
-                  </Card>
-            </div>
-      );
+      // const RenderAttributesToDisplay = () => (
+      //       <div style={{ marginTop: '20px' }}>
+      //             <Card className="my-shadow" size="small">
+      //                   <div>
+      //                         <div style={{ fontWeight: 'bold' }}>{translate('Configuration_Des_Attributes')}</div>
+      //                         <Divider style={{ margin: '5px 0px' }} />
+      //                         <div style={{ fontWeight: 'bold' }}>{translate('Attributs')}</div>
+      //                         <div style={{ color: '#00000070', fontSize: '13px' }}>
+      //                               {translate('Aide_Attribute_Configurer')}
+      //                         </div>
+      //                         <div style={{ marginTop: '2px' }}>
+      //                               <Select
+      //                                     options={selectedTEIProgram.programTrackedEntityAttributes
+      //                                           .map(p => p.trackedEntityAttribute)
+      //                                           .map(attribute => ({
+      //                                                 label: attribute.displayName,
+      //                                                 value: attribute.id
+      //                                           }))}
+      //                                     placeholder={translate('Program_Stage')}
+      //                                     style={{ width: '100%' }}
+      //                                     optionFilterProp="label"
+      //                                     value={selectedAttributesToDisplay.map(att => att.id)}
+      //                                     onChange={handleChangeProgramAttributeToDisplay}
+      //                                     showSearch
+      //                                     allowClear
+      //                                     mode="multiple"
+      //                                     loading={loadingPrograms}
+      //                                     disabled={loadingPrograms}
+      //                               />
+      //                         </div>
+      //                         <Divider style={{ margin: '10px 0px' }} />
+      //                         <div style={{ color: '#00000070', fontSize: '13px' }}>
+      //                               {translate('Attribute_Representant_Nom_Et_Prenom')}
+      //                         </div>
+      //                         <div style={{ marginTop: '5px' }}>
+      //                               <Row gutter={[10, 10]}>
+      //                                     <Col md={12}>
+      //                                           <div style={{ marginBottom: '2px', fontWeight: 'bold' }}>
+      //                                                 {translate('Nom_Agent')}
+      //                                           </div>
+      //                                           <div>
+      //                                                 <Select
+      //                                                       options={selectedTEIProgram.programTrackedEntityAttributes
+      //                                                             .map(p => p.trackedEntityAttribute)
+      //                                                             .map(attribute => ({
+      //                                                                   label: attribute.displayName,
+      //                                                                   value: attribute.id
+      //                                                             }))}
+      //                                                       placeholder={translate('Nom_Agent')}
+      //                                                       style={{ width: '100%' }}
+      //                                                       optionFilterProp="label"
+      //                                                       value={selectedAttributeNameForAgent?.id}
+      //                                                       onChange={handleSelectProgramAttributeNameForAgent}
+      //                                                       showSearch
+      //                                                       allowClear
+      //                                                       loading={loadingPrograms}
+      //                                                       disabled={loadingPrograms}
+      //                                                 />
+      //                                           </div>
+      //                                     </Col>
+      //                                     <Col md={12}>
+      //                                           <div style={{ marginBottom: '2px', fontWeight: 'bold' }}>
+      //                                                 {translate('Prenom_Agent')}
+      //                                           </div>
+      //                                           <div>
+      //                                                 <Select
+      //                                                       options={selectedTEIProgram.programTrackedEntityAttributes
+      //                                                             .map(p => p.trackedEntityAttribute)
+      //                                                             .map(attribute => ({
+      //                                                                   label: attribute.displayName,
+      //                                                                   value: attribute.id
+      //                                                             }))}
+      //                                                       placeholder={translate('Prenom_Agent')}
+      //                                                       style={{ width: '100%' }}
+      //                                                       optionFilterProp="label"
+      //                                                       value={selectedAttributeFirstNameForAgent?.id}
+      //                                                       onChange={handleSelectProgramAttributeFirstNameForAgent}
+      //                                                       showSearch
+      //                                                       allowClear
+      //                                                       loading={loadingPrograms}
+      //                                                       disabled={loadingPrograms}
+      //                                                 />
+      //                                           </div>
+      //                                     </Col>
+      //                               </Row>
+      //                         </div>
+      //                   </div>
+      //             </Card>
+      //       </div>
+      // );
 
       const handleEditProgramStageConfigurations = value => {
             try {
@@ -1307,62 +1339,14 @@ const Setting = () => {
                   setSelectedSupervisorDataElements(value.supervisorField);
                   setSelectedStatusSupervisionDataElement(value.statusSupervisionField);
                   setCurrentProgramstageConfiguration(value);
-            } catch (err) {
-                  setNotification({
-                        show: true,
-                        message: err.message,
-                        type: NOTIFICATION_CRITICAL
-                  });
-            }
-      };
+                  setSelectedNumberOfIndicators(value.numberOfIndicators);
+                  setSelectedNumberOfRecoupements(value.numberOfRecoupements);
+                  setSelectedNumberOfIndicatorsAsArray(value.numberOfIndicatorsAsArray);
+                  setSelectedNumberOfRecoupementsAsArray(value.numberOfRecoupementsAsArray);
+                  setSelectedNumberOfRecoupements(value.numberOfRecoupements);
 
-      const handleAddProgramStageConfigurations = () => {
-            try {
-                  if (!selectedProgramStageForConfiguration) throw new Error(translate('Please_Select_Program_Stage'));
-
-                  if (!selectedOrganisationUnitGroup)
-                        throw new Error(translate('Please_Select_Organisation_Unit_Group'));
-
-                  if (selectedSupervisorDataElements.length === 0)
-                        throw new Error(translate('Please_Select_Supervisor_Fields'));
-
-                  if (
-                        programStageConfigurations
-                              .map(p => p.programStage?.id)
-                              .includes(selectedProgramStageForConfiguration?.id) &&
-                        !currentProgramstageConfiguration
-                  ) {
-                        throw new Error(translate('Configuration_Deja_Ajouter'));
-                  }
-
-                  const newProgramStageConfigurations = currentProgramstageConfiguration
-                        ? programStageConfigurations.map(p => {
-                                if (p.programStage?.id === currentProgramstageConfiguration.programStage?.id)
-                                      return {
-                                            programStage: selectedProgramStageForConfiguration,
-                                            organisationUnitGroup: selectedOrganisationUnitGroup,
-                                            supervisorField: selectedSupervisorDataElements,
-                                            statusSupervisionField: selectedStatusSupervisionDataElement
-                                      };
-                                return p;
-                          })
-                        : [
-                                ...programStageConfigurations,
-                                {
-                                      programStage: selectedProgramStageForConfiguration,
-                                      organisationUnitGroup: selectedOrganisationUnitGroup,
-                                      supervisorField: selectedSupervisorDataElements,
-                                      statusSupervisionField: selectedStatusSupervisionDataElement
-                                }
-                          ];
-
-                  setProgramStageConfigurations(newProgramStageConfigurations);
-                  setSelectedProgramStageForConfiguration(null);
-                  setSelectedOrganisationUnitGroup(null);
-                  setSelectedStatusSupervisionDataElement(null);
-                  setSelectedSupervisorDataElements([]);
-                  setCurrentProgramstageConfiguration(null);
-                  setIndicatorsFieldsConfigs([])
+                  setCurrentProgramstageConfiguration(value);
+                  setIndicatorsFieldsConfigs(value.indicatorsFieldsConfigs);
             } catch (err) {
                   setNotification({
                         show: true,
@@ -1405,36 +1389,36 @@ const Setting = () => {
                                                 </div>
                                           </Col>
 
-                                          <Col md={12} sm={24}>
-                                                <div>
-                                                      <div style={{ marginBottom: '5px' }}>
-                                                            {translate('Groupe_Unite_Organisation')}
+                                          {selectedConfigurationType === 'ERDQ' && (
+                                                <Col md={12} sm={24}>
+                                                      <div>
+                                                            <div style={{ marginBottom: '5px' }}>
+                                                                  {translate('Groupe_Unite_Organisation')}
+                                                            </div>
+                                                            <Select
+                                                                  options={organisationUnitGroups.map(
+                                                                        organisationUnitGroup => ({
+                                                                              label: organisationUnitGroup.displayName,
+                                                                              value: organisationUnitGroup.id
+                                                                        })
+                                                                  )}
+                                                                  placeholder={translate('Groupe_Unite_Organisation')}
+                                                                  style={{ width: '100%' }}
+                                                                  optionFilterProp="label"
+                                                                  value={selectedOrganisationUnitGroup?.id}
+                                                                  onChange={
+                                                                        handleSelectOrganisationUnitGroupProgramStage
+                                                                  }
+                                                                  showSearch
+                                                                  allowClear
+                                                                  loading={loadingOrganisationUnitGroups}
+                                                                  disabled={loadingOrganisationUnitGroups}
+                                                            />
                                                       </div>
-                                                      <Select
-                                                            options={organisationUnitGroups.map(
-                                                                  organisationUnitGroup => ({
-                                                                        label: organisationUnitGroup.displayName,
-                                                                        value: organisationUnitGroup.id
-                                                                  })
-                                                            )}
-                                                            placeholder={translate('Groupe_Unite_Organisation')}
-                                                            style={{ width: '100%' }}
-                                                            optionFilterProp="label"
-                                                            value={selectedOrganisationUnitGroup?.id}
-                                                            onChange={handleSelectOrganisationUnitGroupProgramStage}
-                                                            showSearch
-                                                            allowClear
-                                                            loading={loadingOrganisationUnitGroups}
-                                                            disabled={loadingOrganisationUnitGroups}
-                                                      />
-                                                </div>
-                                          </Col>
+                                                </Col>
+                                          )}
 
-                                          <Col md={24}>
-                                                <div style={{ padding: '10px', borderBottom: '1px solid #ccc' }}></div>
-                                          </Col>
-
-                                          {selectedProgramStageForConfiguration && selectedOrganisationUnitGroup && (
+                                          {selectedProgramStageForConfiguration && (
                                                 <Col md={12}>
                                                       <div>
                                                             <div style={{ marginBottom: '5px' }}>
@@ -1461,7 +1445,7 @@ const Setting = () => {
                                                 </Col>
                                           )}
 
-                                          {selectedProgramStageForConfiguration && selectedOrganisationUnitGroup && (
+                                          {selectedProgramStageForConfiguration && (
                                                 <Col md={12}>
                                                       <div>
                                                             <div style={{ marginBottom: '5px' }}>
@@ -1504,79 +1488,177 @@ const Setting = () => {
                                           organisationUnitGroupName: p.organisationUnitGroup?.displayName,
                                           action: p
                                     }))}
-                                    columns={[
-                                          {
-                                                title: translate('Program_Stage'),
-                                                dataIndex: 'programStageName'
-                                          },
-                                          {
-                                                title: translate('Groupe_Unite_Organisation'),
-                                                dataIndex: 'organisationUnitGroupName'
-                                          },
+                                    columns={
+                                          selectedConfigurationType === 'ERDQ'
+                                                ? [
+                                                        {
+                                                              title: translate('Program_Stage'),
+                                                              dataIndex: 'programStageName'
+                                                        },
+                                                        {
+                                                              title: translate('Groupe_Unite_Organisation'),
+                                                              dataIndex: 'organisationUnitGroupName'
+                                                        },
 
-                                          {
-                                                title: translate('Actions'),
-                                                dataIndex: 'action',
-                                                width: '80px',
-                                                render: value => (
-                                                      <div
-                                                            style={{
-                                                                  display: 'flex',
-                                                                  alignItems: 'center'
-                                                            }}
-                                                      >
-                                                            <div style={{ marginRight: '10px' }}>
-                                                                  <FiEdit
-                                                                        style={{
-                                                                              color: BLUE,
-                                                                              fontSize: '18px',
-                                                                              cursor: 'pointer'
-                                                                        }}
-                                                                        onClick={() =>
-                                                                              handleEditProgramStageConfigurations(
-                                                                                    value
-                                                                              )
-                                                                        }
-                                                                  />
-                                                            </div>
-                                                            <Popconfirm
-                                                                  title={translate('Suppression_Configuration')}
-                                                                  description={translate(
-                                                                        'Confirmation_Suppression_Configuration'
-                                                                  )}
-                                                                  icon={
-                                                                        <QuestionCircleOutlined
-                                                                              style={{ color: 'red' }}
-                                                                        />
-                                                                  }
-                                                                  onConfirm={() => {
-                                                                        setSelectedProgramStageForConfiguration(null);
-                                                                        setSelectedOrganisationUnitGroup(null);
-                                                                        setSelectedSupervisorDataElements([]);
-                                                                        setSelectedStatusSupervisionDataElement(null);
-                                                                        setProgramStageConfigurations(
-                                                                              programStageConfigurations.filter(
-                                                                                    p =>
-                                                                                          p.programStage?.id !==
-                                                                                          value.programStage?.id
-                                                                              )
-                                                                        );
-                                                                  }}
-                                                            >
-                                                                  <div>
-                                                                        <RiDeleteBinLine
-                                                                              style={{
-                                                                                    color: 'red',
-                                                                                    fontSize: '18px',
-                                                                                    cursor: 'pointer'
-                                                                              }}
-                                                                        />
-                                                                  </div>
-                                                            </Popconfirm>
-                                                      </div>
-                                                )
-                                          }
-                                    ]}
+                                                        {
+                                                              title: translate('Actions'),
+                                                              dataIndex: 'action',
+                                                              width: '80px',
+                                                              render: value => (
+                                                                    <div
+                                                                          style={{
+                                                                                display: 'flex',
+                                                                                alignItems: 'center'
+                                                                          }}
+                                                                    >
+                                                                          <div style={{ marginRight: '10px' }}>
+                                                                                <FiEdit
+                                                                                      style={{
+                                                                                            color: BLUE,
+                                                                                            fontSize: '18px',
+                                                                                            cursor: 'pointer'
+                                                                                      }}
+                                                                                      onClick={() =>
+                                                                                            handleEditProgramStageConfigurations(
+                                                                                                  value
+                                                                                            )
+                                                                                      }
+                                                                                />
+                                                                          </div>
+                                                                          <Popconfirm
+                                                                                title={translate(
+                                                                                      'Suppression_Configuration'
+                                                                                )}
+                                                                                description={translate(
+                                                                                      'Confirmation_Suppression_Configuration'
+                                                                                )}
+                                                                                icon={
+                                                                                      <QuestionCircleOutlined
+                                                                                            style={{ color: 'red' }}
+                                                                                      />
+                                                                                }
+                                                                                onConfirm={() => {
+                                                                                      setSelectedProgramStageForConfiguration(
+                                                                                            null
+                                                                                      );
+                                                                                      setSelectedOrganisationUnitGroup(
+                                                                                            null
+                                                                                      );
+                                                                                      setSelectedSupervisorDataElements(
+                                                                                            []
+                                                                                      );
+                                                                                      setSelectedStatusSupervisionDataElement(
+                                                                                            null
+                                                                                      );
+                                                                                      setProgramStageConfigurations(
+                                                                                            programStageConfigurations.filter(
+                                                                                                  p =>
+                                                                                                        p.programStage
+                                                                                                              ?.id !==
+                                                                                                        value
+                                                                                                              .programStage
+                                                                                                              ?.id
+                                                                                            )
+                                                                                      );
+                                                                                }}
+                                                                          >
+                                                                                <div>
+                                                                                      <RiDeleteBinLine
+                                                                                            style={{
+                                                                                                  color: 'red',
+                                                                                                  fontSize: '18px',
+                                                                                                  cursor: 'pointer'
+                                                                                            }}
+                                                                                      />
+                                                                                </div>
+                                                                          </Popconfirm>
+                                                                    </div>
+                                                              )
+                                                        }
+                                                  ]
+                                                : [
+                                                        {
+                                                              title: translate('Program_Stage'),
+                                                              dataIndex: 'programStageName'
+                                                        },
+
+                                                        {
+                                                              title: translate('Actions'),
+                                                              dataIndex: 'action',
+                                                              width: '80px',
+                                                              render: value => (
+                                                                    <div
+                                                                          style={{
+                                                                                display: 'flex',
+                                                                                alignItems: 'center'
+                                                                          }}
+                                                                    >
+                                                                          <div style={{ marginRight: '10px' }}>
+                                                                                <FiEdit
+                                                                                      style={{
+                                                                                            color: BLUE,
+                                                                                            fontSize: '18px',
+                                                                                            cursor: 'pointer'
+                                                                                      }}
+                                                                                      onClick={() =>
+                                                                                            handleEditProgramStageConfigurations(
+                                                                                                  value
+                                                                                            )
+                                                                                      }
+                                                                                />
+                                                                          </div>
+                                                                          <Popconfirm
+                                                                                title={translate(
+                                                                                      'Suppression_Configuration'
+                                                                                )}
+                                                                                description={translate(
+                                                                                      'Confirmation_Suppression_Configuration'
+                                                                                )}
+                                                                                icon={
+                                                                                      <QuestionCircleOutlined
+                                                                                            style={{ color: 'red' }}
+                                                                                      />
+                                                                                }
+                                                                                onConfirm={() => {
+                                                                                      setSelectedProgramStageForConfiguration(
+                                                                                            null
+                                                                                      );
+                                                                                      setSelectedOrganisationUnitGroup(
+                                                                                            null
+                                                                                      );
+                                                                                      setSelectedSupervisorDataElements(
+                                                                                            []
+                                                                                      );
+                                                                                      setSelectedStatusSupervisionDataElement(
+                                                                                            null
+                                                                                      );
+                                                                                      setProgramStageConfigurations(
+                                                                                            programStageConfigurations.filter(
+                                                                                                  p =>
+                                                                                                        p.programStage
+                                                                                                              ?.id !==
+                                                                                                        value
+                                                                                                              .programStage
+                                                                                                              ?.id
+                                                                                            )
+                                                                                      );
+                                                                                }}
+                                                                          >
+                                                                                <div>
+                                                                                      <RiDeleteBinLine
+                                                                                            style={{
+                                                                                                  color: 'red',
+                                                                                                  fontSize: '18px',
+                                                                                                  cursor: 'pointer'
+                                                                                            }}
+                                                                                      />
+                                                                                </div>
+                                                                          </Popconfirm>
+                                                                    </div>
+                                                              )
+                                                        }
+                                                  ]
+                                    }
                                     size="small"
                                     pagination={false}
                                     bordered
@@ -1868,6 +1950,12 @@ const Setting = () => {
                                                       value={selectedNumberOfIndicators}
                                                       onChange={value => {
                                                             setSelectedNumberOfIndicators(value);
+                                                            const newIndList = [];
+                                                            for (let i = 1; i <= value; i++) {
+                                                                  newIndList.push(i);
+                                                            }
+
+                                                            setSelectedNumberOfIndicatorsAsArray(newIndList);
                                                       }}
                                                       showSearch
                                                 />
@@ -1884,6 +1972,14 @@ const Setting = () => {
                                                       value={selectedNumberOfRecoupements}
                                                       onChange={value => {
                                                             setSelectedNumberOfRecoupements(value);
+                                                            const newRecoupList = [];
+
+                                                            for (let i = 1; i <= value; i++) {
+                                                                  newRecoupList.push(i);
+                                                            }
+                                                            setSelectedNumberOfRecoupementsAsArray(
+                                                                  numberOfRecoupements
+                                                            );
                                                       }}
                                                       showSearch
                                                 />
@@ -1918,7 +2014,7 @@ const Setting = () => {
                                                             </tr>
                                                       </thead>
                                                       <tbody>
-                                                            {indicatorsFieldsConfigs.map(ind => (
+                                                            {selectedNumberOfIndicatorsAsArray.map((ind, indexInd) => (
                                                                   <tr key={uuid()}>
                                                                         <td
                                                                               style={{
@@ -1932,7 +2028,11 @@ const Setting = () => {
                                                                                           marginBottom: '5px'
                                                                                     }}
                                                                               >
-                                                                                    {ind.name}
+                                                                                    {
+                                                                                          indicatorsFieldsConfigs[
+                                                                                                indexInd
+                                                                                          ]?.name
+                                                                                    }
                                                                               </div>
                                                                               <div>
                                                                                     <Select
@@ -1954,19 +2054,20 @@ const Setting = () => {
                                                                                           allowClear
                                                                                           optionFilterProp="label"
                                                                                           value={
-                                                                                                indicatorsFieldsConfigs.find(
-                                                                                                      i =>
-                                                                                                            i.id ===
-                                                                                                            ind.id
-                                                                                                )?.value?.id
+                                                                                                indicatorsFieldsConfigs[
+                                                                                                      indexInd
+                                                                                                ]?.value?.id
                                                                                           }
                                                                                           onSelect={value => {
                                                                                                 setIndicatorsFieldsConfigs(
                                                                                                       indicatorsFieldsConfigs.map(
-                                                                                                            i => {
+                                                                                                            (
+                                                                                                                  i,
+                                                                                                                  indexi
+                                                                                                            ) => {
                                                                                                                   if (
-                                                                                                                        i.id ===
-                                                                                                                        ind.id
+                                                                                                                        indexInd ===
+                                                                                                                        indexi
                                                                                                                   ) {
                                                                                                                         return {
                                                                                                                               ...i,
@@ -1987,6 +2088,66 @@ const Setting = () => {
                                                                                           }}
                                                                                     />
                                                                               </div>
+
+                                                                              {selectedConfigurationType === 'DQR' && (
+                                                                                    <div style={{ marginTop: '15px' }}>
+                                                                                          <div>
+                                                                                                {`${translate(
+                                                                                                      'Marge'
+                                                                                                )} ${indexInd + 1}`}
+                                                                                          </div>
+                                                                                          <div
+                                                                                                style={{
+                                                                                                      marginTop: '5px'
+                                                                                                }}
+                                                                                          >
+                                                                                                <Input
+                                                                                                      type="number"
+                                                                                                      style={{
+                                                                                                            width: '100%'
+                                                                                                      }}
+                                                                                                      placeholder={`${translate(
+                                                                                                            'Marge'
+                                                                                                      )} ${
+                                                                                                            indexInd + 1
+                                                                                                      }`}
+                                                                                                      value={
+                                                                                                            indicatorsFieldsConfigs[
+                                                                                                                  indexInd
+                                                                                                            ]
+                                                                                                                  ?.indicatorMargin
+                                                                                                      }
+                                                                                                      onChange={event => {
+                                                                                                            setIndicatorsFieldsConfigs(
+                                                                                                                  [
+                                                                                                                        ...indicatorsFieldsConfigs.map(
+                                                                                                                              (
+                                                                                                                                    i,
+                                                                                                                                    index
+                                                                                                                              ) => {
+                                                                                                                                    if (
+                                                                                                                                          index ===
+                                                                                                                                          indexInd
+                                                                                                                                    ) {
+                                                                                                                                          return {
+                                                                                                                                                ...i,
+                                                                                                                                                indicatorMargin:
+                                                                                                                                                      '' +
+                                                                                                                                                      event
+                                                                                                                                                            .target
+                                                                                                                                                            .value
+                                                                                                                                          };
+                                                                                                                                    }
+                                                                                                                                    return i;
+                                                                                                                              }
+                                                                                                                        )
+                                                                                                                  ]
+                                                                                                            );
+                                                                                                      }}
+                                                                                                />
+                                                                                          </div>
+                                                                                    </div>
+                                                                              )}
                                                                         </td>
                                                                         <td
                                                                               style={{
@@ -1995,7 +2156,9 @@ const Setting = () => {
                                                                                     width: '50%'
                                                                               }}
                                                                         >
-                                                                              {ind.recoupements.map(r => (
+                                                                              {indicatorsFieldsConfigs[
+                                                                                    indexInd
+                                                                              ]?.recoupements?.map(r => (
                                                                                     <div
                                                                                           key={uuid()}
                                                                                           style={{
@@ -2033,27 +2196,24 @@ const Setting = () => {
                                                                                                       allowClear
                                                                                                       optionFilterProp="label"
                                                                                                       value={
-                                                                                                            indicatorsFieldsConfigs
-                                                                                                                  .find(
-                                                                                                                        i =>
-                                                                                                                              i.id ===
-                                                                                                                              ind.id
-                                                                                                                  )
-                                                                                                                  ?.recoupements?.find(
-                                                                                                                        rec =>
-                                                                                                                              rec.id ===
-                                                                                                                              r.id
-                                                                                                                  )
-                                                                                                                  ?.value
-                                                                                                                  ?.id
+                                                                                                            indicatorsFieldsConfigs[
+                                                                                                                  indexInd
+                                                                                                            ]?.recoupements?.find(
+                                                                                                                  rec =>
+                                                                                                                        rec.id ===
+                                                                                                                        r.id
+                                                                                                            )?.value?.id
                                                                                                       }
                                                                                                       onSelect={value => {
                                                                                                             setIndicatorsFieldsConfigs(
                                                                                                                   indicatorsFieldsConfigs.map(
-                                                                                                                        i => {
+                                                                                                                        (
+                                                                                                                              i,
+                                                                                                                              indexj
+                                                                                                                        ) => {
                                                                                                                               if (
-                                                                                                                                    i.id ===
-                                                                                                                                    ind.id
+                                                                                                                                    indexInd ===
+                                                                                                                                    indexj
                                                                                                                               ) {
                                                                                                                                     return {
                                                                                                                                           ...i,
@@ -2090,168 +2250,69 @@ const Setting = () => {
                                                                                           </div>
                                                                                     </div>
                                                                               ))}
-                                                                        </td>
-                                                                  </tr>
-                                                            ))}
-                                                      </tbody>
-                                                </table>
-                                          </>
-                                    </div>
-                              </div>
-                        </Card>
-                  </div>
-            );
-      const RenderErrorMargeIndicatorAndRecoupementConfigFields = () =>
-            indicatorsFieldsConfigs.length > 0 &&
-            selectedConfigurationType === 'DQe' && (
-                  <div style={{ marginTop: '20px' }}>
-                        <Card className="my-shadow" size="small">
-                              <div>
-                                    <div style={{ fontWeight: 'bold' }}>{translate('MarginOfErrorConfiguration')}</div>
 
-                                    <div style={{ margin: '10px 0px' }}>
-                                          <>
-                                                <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-                                                      <thead>
-                                                            <tr style={{ background: '#ccc' }}>
-                                                                  <th
-                                                                        style={{
-                                                                              padding: '10px',
-                                                                              textAlign: 'center',
-                                                                              border: '1px solid #00000070',
-                                                                              width: '50%'
-                                                                        }}
-                                                                  >
-                                                                        {translate('Marge_Indicateurs')}
-                                                                  </th>
-                                                                  <th
-                                                                        style={{
-                                                                              padding: '10px',
-                                                                              textAlign: 'center',
-                                                                              border: '1px solid #00000070',
-                                                                              width: '50%'
-                                                                        }}
-                                                                  >
-                                                                        {translate('Marge_Recoupements')}
-                                                                  </th>
-                                                            </tr>
-                                                      </thead>
-                                                      <tbody>
-                                                            {indicatorsFieldsConfigs.map((ind, index) => (
-                                                                  <tr key={uuid()}>
-                                                                        <td
-                                                                              style={{
-                                                                                    border: '1px solid #00000070',
-                                                                                    padding: '10px',
-                                                                                    width: '50%'
-                                                                              }}
-                                                                        >
-                                                                              <div
-                                                                                    style={{
-                                                                                          marginBottom: '5px'
-                                                                                    }}
-                                                                              >
-                                                                                    {`${translate('Marge')} ${
-                                                                                          index + 1
-                                                                                    }`}
-                                                                              </div>
-                                                                              <div>
-                                                                                    <Input
-                                                                                          placeholder={`${translate(
-                                                                                                'Marge'
-                                                                                          )} ${index + 1}`}
-                                                                                          style={{
-                                                                                                width: '100%'
-                                                                                          }}
-                                                                                          type="number"
-                                                                                          value={
-                                                                                                indicatorsFieldsConfigs.find(
-                                                                                                      i =>
-                                                                                                            i.id ===
-                                                                                                            ind.id
-                                                                                                )?.indicatorMargin
-                                                                                          }
-                                                                                          onChange={event => {
-                                                                                                console.log(
-                                                                                                      'margin value: ',
-                                                                                                      event.target.value
-                                                                                                );
-                                                                                                setIndicatorsFieldsConfigs(
-                                                                                                      indicatorsFieldsConfigs.map(
-                                                                                                            i => {
-                                                                                                                  if (
-                                                                                                                        i.id ===
-                                                                                                                        ind.id
-                                                                                                                  ) {
-                                                                                                                        return {
-                                                                                                                              ...i,
-                                                                                                                              indicatorMargin:
-                                                                                                                                    event.target.value
-                                                                                                                        };
-                                                                                                                  }
-                                                                                                                  return i;
-                                                                                                            }
-                                                                                                      )
-                                                                                                );
-                                                                                          }}
-                                                                                    />
-                                                                              </div>
-                                                                        </td>
-                                                                        <td
-                                                                              style={{
-                                                                                    border: '1px solid #00000070',
-                                                                                    padding: '10px',
-                                                                                    width: '50%'
-                                                                              }}
-                                                                        >
-                                                                              <div
-                                                                                    style={{
-                                                                                          marginBottom: '5px'
-                                                                                    }}
-                                                                              >
-                                                                                    {`${translate('Marge')} ${
-                                                                                          index + 1
-                                                                                    }`}
-                                                                              </div>
-                                                                              <Input
-                                                                                    placeholder={`${translate(
-                                                                                          'Marge'
-                                                                                    )} ${index + 1}`}
-                                                                                    style={{
-                                                                                          width: '100%'
-                                                                                    }}
-                                                                                    value={
-                                                                                          indicatorsFieldsConfigs.find(
-                                                                                                i => i.id === ind.id
-                                                                                          )?.recoupementMargin
-                                                                                    }
-                                                                                    onChange={event => {
-                                                                                          console.log(
-                                                                                                'event:  ',
-                                                                                                event
-                                                                                          );
-                                                                                          setIndicatorsFieldsConfigs(
-                                                                                                indicatorsFieldsConfigs.map(
-                                                                                                      i => {
-                                                                                                            if (
-                                                                                                                  i.id ===
-                                                                                                                  ind.id
-                                                                                                            ) {
-                                                                                                                  return {
-                                                                                                                        ...i,
-                                                                                                                        recoupementMargin:
-                                                                                                                              event.target.value
-                                                                                                                  };
-                                                                                                            }
-                                                                                                            return i;
+                                                                              {selectedConfigurationType === 'DQR' && (
+                                                                                    <div style={{ marginTop: '15px' }}>
+                                                                                          <div>
+                                                                                                {`${translate(
+                                                                                                      'Marge'
+                                                                                                )} ${indexInd + 1}`}
+                                                                                          </div>
+                                                                                          <div
+                                                                                                style={{
+                                                                                                      marginTop: '5px'
+                                                                                                }}
+                                                                                          >
+                                                                                                <Input
+                                                                                                      type="number"
+                                                                                                      style={{
+                                                                                                            width: '100%'
+                                                                                                      }}
+                                                                                                      placeholder={`${translate(
+                                                                                                            'Marge'
+                                                                                                      )} ${
+                                                                                                            indexInd + 1
+                                                                                                      }`}
+                                                                                                      value={
+                                                                                                            indicatorsFieldsConfigs[
+                                                                                                                  indexInd
+                                                                                                            ]
+                                                                                                                  ?.recoupementMargin
                                                                                                       }
-                                                                                                )
-                                                                                          );
-                                                                                    }}
-                                                                              />
+                                                                                                      onChange={event => {
+                                                                                                            setIndicatorsFieldsConfigs(
+                                                                                                                  indicatorsFieldsConfigs.map(
+                                                                                                                        (
+                                                                                                                              i,
+                                                                                                                              indexJ
+                                                                                                                        ) => {
+                                                                                                                              if (
+                                                                                                                                    indexJ ===
+                                                                                                                                    indexInd
+                                                                                                                              ) {
+                                                                                                                                    return {
+                                                                                                                                          ...i,
+                                                                                                                                          recoupementMargin:
+                                                                                                                                                event
+                                                                                                                                                      .target
+                                                                                                                                                      .value
+                                                                                                                                    };
+                                                                                                                              }
+                                                                                                                              return i;
+                                                                                                                        }
+                                                                                                                  )
+                                                                                                            );
+                                                                                                      }}
+                                                                                                />
+                                                                                          </div>
+                                                                                    </div>
+                                                                              )}
                                                                         </td>
                                                                   </tr>
                                                             ))}
+                                                            {/* {indicatorsFieldsConfigs.map((ind, indexInd) => (
+                                                                 
+                                                            ))} */}
                                                       </tbody>
                                                 </table>
                                           </>
@@ -2264,12 +2325,13 @@ const Setting = () => {
       const RenderSaveConfigurationButton = () => (
             <div style={{ marginTop: '22px' }}>
                   <Button
-                        disabled={selectedProgramStageForConfiguration && selectedOrganisationUnitGroup ? false : true}
+                        disabled={selectedProgramStageForConfiguration ? false : true}
                         primary
-                        onClick={handleAddProgramStageConfigurations}
+                        onClick={handleSaveSupConfig}
+                        loading={loadingSaveSupervionsConfig}
                   >
                         {currentProgramstageConfiguration
-                              ? translate('Mise_A_Jour')
+                              ? translate('Mise_A_Jour_Configuration')
                               : '+ '.concat(translate('AddConfiguration'))}
                   </Button>
             </div>
@@ -2281,75 +2343,13 @@ const Setting = () => {
                         <Col md={12} sm={24}>
                               <div>
                                     {RenderSupervisionConfiguration()}
-                                    {selectedTEIProgram &&
-                                          selectedTEIProgram.programTrackedEntityAttributes &&
-                                          selectedPlanificationType === AGENT &&
-                                          RenderAttributesToDisplay()}
-                                    {selectedTEIProgram &&
-                                          selectedPlanificationType === AGENT &&
-                                          RenderStatusPaymentDataElementToUse()}
                                     {selectedTEIProgram && (
                                           <div>
                                                 {RenderProgramStageConfiguration()}
                                                 {RenderIndicatorAndRecoupementConfigFields()}
-                                                {RenderErrorMargeIndicatorAndRecoupementConfigFields()}
                                                 {RenderSaveConfigurationButton()}
-
-                                                <pre>{JSON.stringify(indicatorsFieldsConfigs, null, 4)}</pre>
                                           </div>
                                     )}
-
-                                    {/* <div
-                                          style={{
-                                                marginTop: '20px',
-                                                display: 'flex',
-                                                alignItems: 'center'
-                                          }}
-                                    >
-                                          {isFieldEditingMode && (
-                                                <div>
-                                                      <Button
-                                                            icon={
-                                                                  <CgCloseO
-                                                                        style={{ color: '#fff', fontSize: '18px' }}
-                                                                  />
-                                                            }
-                                                            destructive
-                                                            onClick={() => {
-                                                                  setFieldEditingMode(false);
-                                                                  setSelectedTEIProgram(null);
-                                                                  setSelectedProgramStage(null);
-                                                                  setSelectedStatusSupervisionProgramStage(null);
-                                                                  setSelectedStatutSupervisionDataElement(null);
-                                                                  setSelectedStatutPaymentProgramStage(null);
-                                                                  setSelectedStatutPaymentDataElement(null);
-                                                                  setSelectedDataElements([]);
-                                                                  setSelectedAttributesToDisplay([]);
-                                                                  setProgramStageConfigurations([]);
-                                                                  setSelectedProgramStageForConfiguration(null);
-                                                                  setSelectedSupervisorDataElements([]);
-                                                                  setSelectedSupervisionGenerationType(
-                                                                        TYPE_GENERATION_AS_EVENT
-                                                                  );
-                                                            }}
-                                                      >
-                                                            {translate('Annuler')}
-                                                      </Button>
-                                                </div>
-                                          )}
-                                          <div style={{ marginLeft: '10px' }}>
-                                                <Button
-                                                      loading={loadingSaveSupervionsConfig}
-                                                      disabled={loadingSaveSupervionsConfig || !selectedTEIProgram}
-                                                      icon={<FiSave style={{ color: '#FFF', fontSize: '18px' }} />}
-                                                      primary
-                                                      onClick={handleSaveSupConfig}
-                                                >
-                                                      {isFieldEditingMode && <span>{translate('Mise_A_Jour')}</span>}
-                                                      {!isFieldEditingMode && <span>{translate('Enregistrer')}</span>}
-                                                </Button>
-                                          </div>
-                                    </div> */}
                               </div>
                         </Col>
                         <Col md={12} sm={24}>
@@ -2457,108 +2457,6 @@ const Setting = () => {
                               )}
 
                               {RenderConfigurationForEachProgramStageList()}
-
-                              {selectedPlanificationType === AGENT &&
-                                    selectedTEIProgram &&
-                                    paymentConfigList.length > 0 && (
-                                          <div
-                                                className="my-shadow"
-                                                style={{
-                                                      padding: '20px',
-                                                      marginTop: '10px',
-                                                      background: '#FFF',
-                                                      marginBottom: '2px',
-                                                      borderRadius: '8px'
-                                                }}
-                                          >
-                                                <div
-                                                      style={{
-                                                            marginBottom: '10px',
-                                                            fontWeight: 'bold',
-                                                            fontSize: '16px'
-                                                      }}
-                                                >
-                                                      {translate('Liste_Config_Paiement')}
-                                                </div>
-                                                <Table
-                                                      dataSource={paymentConfigList.map(conf => ({
-                                                            ...conf,
-                                                            programName: conf.program?.displayName,
-                                                            action: conf
-                                                      }))}
-                                                      columns={[
-                                                            { title: translate('Programme'), dataIndex: 'programName' },
-
-                                                            { title: translate('Libelle'), dataIndex: 'libelle' },
-                                                            {
-                                                                  title: translate('Montant_Constant'),
-                                                                  dataIndex: 'montantConstant'
-                                                            },
-                                                            {
-                                                                  title: translate('Frais_Mobile_Money'),
-                                                                  dataIndex: 'fraisMobileMoney'
-                                                            },
-                                                            {
-                                                                  title: translate('Actions'),
-                                                                  dataIndex: 'action',
-                                                                  width: '80px',
-                                                                  render: value => (
-                                                                        <div
-                                                                              style={{
-                                                                                    display: 'flex',
-                                                                                    alignItems: 'center'
-                                                                              }}
-                                                                        >
-                                                                              <div style={{ marginRight: '10px' }}>
-                                                                                    <FiEdit
-                                                                                          style={{
-                                                                                                color: BLUE,
-                                                                                                fontSize: '18px',
-                                                                                                cursor: 'pointer'
-                                                                                          }}
-                                                                                          onClick={() =>
-                                                                                                handleEditPaymentConfig(
-                                                                                                      value
-                                                                                                )
-                                                                                          }
-                                                                                    />
-                                                                              </div>
-                                                                              <Popconfirm
-                                                                                    title={translate(
-                                                                                          'Suppression_Configuration'
-                                                                                    )}
-                                                                                    description={translate(
-                                                                                          'Confirmation_Suppression_Configuration'
-                                                                                    )}
-                                                                                    icon={
-                                                                                          <QuestionCircleOutlined
-                                                                                                style={{ color: 'red' }}
-                                                                                          />
-                                                                                    }
-                                                                                    onConfirm={() =>
-                                                                                          handleDeletePaymentConfig(
-                                                                                                value
-                                                                                          )
-                                                                                    }
-                                                                              >
-                                                                                    <div>
-                                                                                          <RiDeleteBinLine
-                                                                                                style={{
-                                                                                                      color: 'red',
-                                                                                                      fontSize: '18px',
-                                                                                                      cursor: 'pointer'
-                                                                                                }}
-                                                                                          />
-                                                                                    </div>
-                                                                              </Popconfirm>
-                                                                        </div>
-                                                                  )
-                                                            }
-                                                      ]}
-                                                      size="small"
-                                                />
-                                          </div>
-                                    )}
                         </Col>
                   </Row>
             </>
@@ -2862,7 +2760,7 @@ const Setting = () => {
                                                       fontSize: '16px'
                                                 }}
                                           >
-                                                {translate('Liste_Programme_Tracker')}{' '}
+                                                {translate('Liste_Programme_Tracker')}
                                           </div>
                                           <Table
                                                 dataSource={favorisItems.map(fav => ({

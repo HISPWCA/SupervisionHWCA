@@ -255,8 +255,8 @@
     "SelectMaps": "Selectionner les Cartes ( Favoris ) ",
     "Favoris": "Favoris",
     "Confirmation_Suppression_Visualisation": "Voulez-vous vraiment supprimer cet item ",
-    "Configuration_RDQe_Case": "Configuration pour le cas de  RDQe ",
-    "Configuration_DQe_Case": "Configuration pour le cas de DQe ",
+    "Configuration_RDQe_Case": "Configuration pour le cas de  eRDQ ",
+    "Configuration_DQe_Case": "Configuration pour le cas de DQR ",
     "Program_Stage_Configuration_Fields_For_Recoupement_And_Indicator": "Configuration des champs indicateurs et leurs recoupements",
     "Recoupements": "Recoupements",
     "NumberOfIndicators": "Nombre d'indicateurs",
@@ -264,6 +264,11 @@
     "MarginOfErrorConfiguration": "Configuration de la marge d'erreur",
     "Marge_Recoupements": "Marge d'erreur recoupement ",
     "Marge_Indicateurs": "Marge d'erreur indicateurs",
-    "Marge": "Marge",
-   "AddConfiguration": "Ajouter la configuration"
+    "Marge": "Marge d'erreur",
+   "AddConfiguration": "Ajouter la configuration",
+
+   "ProgramStage_Already_Configured":"Le program stage à déjà été configuré",
+   "Mise_A_Jour_Configuration":"Mèttre à jour la configuration",
+
+   "Configuration_Added_For_Program_stage": "la configuration a été ajoutée avec succès pour le program stage  "
 }
