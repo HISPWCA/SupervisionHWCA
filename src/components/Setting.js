@@ -40,9 +40,9 @@ import { FiEdit } from 'react-icons/fi';
 import { MdOutlineCancel } from 'react-icons/md';
 import { loadDataStore, saveDataToDataStore } from '../utils/functions';
 import { BLUE } from '../utils/couleurs';
-import { CgCloseO } from 'react-icons/cg';
 import MyNotification from './MyNotification';
 import translate from '../utils/translator';
+import GenerateIndicatorsConfigFieldsList from './GenerateIndicatorsFields';
 
 const numberList = [
       { value: 1, label: '1' },
@@ -475,35 +475,37 @@ const Setting = () => {
       };
 
       const generateIndicatorsConfigFieldsList = () => {
-            const newList = [];
-            for (let i = 1; i <= selectedNumberOfIndicators; i++) {
-                  const recoupements = [];
+            if (!currentProgramstageConfiguration) {
+                  const newList = [];
+                  for (let i = 1; i <= selectedNumberOfIndicators; i++) {
+                        const recoupements = [];
 
-                  for (let j = 1; j <= selectedNumberOfRecoupements; j++) {
-                        const recoupementPayload = {
+                        for (let j = 1; j <= selectedNumberOfRecoupements; j++) {
+                              const recoupementPayload = {
+                                    id: uuid(),
+                                    name: `${translate('Recoupements')} ${j}`,
+                                    position: j,
+                                    value: null,
+                                    indicatorMargin: 0,
+                                    recoupementMargin: 0
+                              };
+
+                              recoupements.push(recoupementPayload);
+                        }
+
+                        const indicatorsPayload = {
                               id: uuid(),
-                              name: `${translate('Recoupements')} ${j}`,
-                              position: j,
+                              name: `${translate('Indicateurs')} ${i}`,
+                              position: i,
                               value: null,
-                              indicatorMargin: 0,
-                              recoupementMargin: 0
+                              recoupements
                         };
 
-                        recoupements.push(recoupementPayload);
+                        newList.push(indicatorsPayload);
                   }
 
-                  const indicatorsPayload = {
-                        id: uuid(),
-                        name: `${translate('Indicateurs')} ${i}`,
-                        position: i,
-                        value: null,
-                        recoupements
-                  };
-
-                  newList.push(indicatorsPayload);
+                  setIndicatorsFieldsConfigs(newList);
             }
-
-            setIndicatorsFieldsConfigs(newList);
       };
 
       const handleDeleteSupervisionConfig = async item => {
@@ -676,22 +678,43 @@ const Setting = () => {
                         throw new Error(translate('ProgramStage_Already_Configured'));
                   }
 
-                  const newProgramStageConfigurations = existingConfig
-                        ? [
-                                ...existingConfig.programStageConfigurations,
-                                {
-                                      programStage: selectedProgramStageForConfiguration,
-                                      organisationUnitGroup: selectedOrganisationUnitGroup,
-                                      supervisorField: selectedSupervisorDataElements,
-                                      statusSupervisionField: selectedStatusSupervisionDataElement,
+                  console.log('Current program statge : ', currentProgramstageConfiguration);
 
-                                      indicatorsFieldsConfigs: indicatorsFieldsConfigs,
-                                      numberOfIndicators: selectedNumberOfIndicators,
-                                      numberOfIndicatorsAsArray: selectedNumberOfIndicatorsAsArray,
-                                      numberOfRecoupements: selectedNumberOfRecoupements,
-                                      numberOfRecoupementsAsArray: selectedNumberOfRecoupementsAsArray
-                                }
-                          ]
+                  const newProgramStageConfigurations = existingConfig
+                        ? isFieldEditingMode && currentProgramstageConfiguration
+                              ? programStageConfigurations.map(p => {
+                                      if (p.programStage?.id === currentProgramstageConfiguration?.programStage?.id) {
+                                            return {
+                                                  programStage: selectedProgramStageForConfiguration,
+                                                  organisationUnitGroup: selectedOrganisationUnitGroup,
+                                                  supervisorField: selectedSupervisorDataElements,
+                                                  statusSupervisionField: selectedStatusSupervisionDataElement,
+
+                                                  indicatorsFieldsConfigs: indicatorsFieldsConfigs,
+                                                  numberOfIndicators: selectedNumberOfIndicators,
+                                                  numberOfIndicatorsAsArray: selectedNumberOfIndicatorsAsArray,
+                                                  numberOfRecoupements: selectedNumberOfRecoupements,
+                                                  numberOfRecoupementsAsArray: selectedNumberOfRecoupementsAsArray
+                                            };
+                                      }
+
+                                      return p;
+                                })
+                              : [
+                                      ...existingConfig.programStageConfigurations,
+                                      {
+                                            programStage: selectedProgramStageForConfiguration,
+                                            organisationUnitGroup: selectedOrganisationUnitGroup,
+                                            supervisorField: selectedSupervisorDataElements,
+                                            statusSupervisionField: selectedStatusSupervisionDataElement,
+
+                                            indicatorsFieldsConfigs: indicatorsFieldsConfigs,
+                                            numberOfIndicators: selectedNumberOfIndicators,
+                                            numberOfIndicatorsAsArray: selectedNumberOfIndicatorsAsArray,
+                                            numberOfRecoupements: selectedNumberOfRecoupements,
+                                            numberOfRecoupementsAsArray: selectedNumberOfRecoupementsAsArray
+                                      }
+                                ]
                         : [
                                 {
                                       programStage: selectedProgramStageForConfiguration,
@@ -1338,7 +1361,6 @@ const Setting = () => {
 
                   setSelectedSupervisorDataElements(value.supervisorField);
                   setSelectedStatusSupervisionDataElement(value.statusSupervisionField);
-                  setCurrentProgramstageConfiguration(value);
                   setSelectedNumberOfIndicators(value.numberOfIndicators);
                   setSelectedNumberOfRecoupements(value.numberOfRecoupements);
                   setSelectedNumberOfIndicatorsAsArray(value.numberOfIndicatorsAsArray);
@@ -1346,6 +1368,7 @@ const Setting = () => {
                   setSelectedNumberOfRecoupements(value.numberOfRecoupements);
 
                   setCurrentProgramstageConfiguration(value);
+                  setFieldEditingMode(true);
                   setIndicatorsFieldsConfigs(value.indicatorsFieldsConfigs);
             } catch (err) {
                   setNotification({
@@ -1477,6 +1500,54 @@ const Setting = () => {
             </div>
       );
 
+      const handleDeleteProgramStageConfiguration = async value => {
+            try {
+                  const filteredProgramStages = programStageConfigurations.filter(
+                        p => p.programStage?.id !== value.programStage?.id
+                  );
+                  const newList = mappingConfigSupervisions.map(mappingConf => {
+                        if (mappingConf.program?.id === selectedTEIProgram?.id) {
+                              return {
+                                    ...mappingConf,
+                                    programStageConfigurations: filteredProgramStages
+                              };
+                        }
+                        return mappingConf;
+                  });
+
+                  await saveDataToDataStore(
+                        process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY,
+                        newList,
+                        setLoadingSaveSupervionsConfig,
+                        null,
+                        null
+                  );
+
+                  setProgramStageConfigurations(filteredProgramStages);
+                  setMappingConfigSupervisions(newList);
+                  setIndicatorsFieldsConfigs([]);
+                  setSelectedOrganisationUnitGroup(null);
+                  setSelectedSupervisorDataElements([]);
+                  setSelectedStatutSupervisionDataElement(null);
+                  setSelectedStatusSupervisionDataElement(null);
+                  setFieldEditingMode(false);
+                  setCurrentProgramstageConfiguration(null);
+
+                  generateIndicatorsConfigFieldsList();
+                  setNotification({
+                        show: true,
+                        type: NOTIFICATION_SUCCESS,
+                        message: translate('Configuration_Supprimer')
+                  });
+            } catch (err) {
+                  setNotification({
+                        show: true,
+                        type: NOTIFICATION_CRITICAL,
+                        message: err.response?.data?.message || err.message
+                  });
+            }
+      };
+
       const RenderConfigurationForEachProgramStageList = () =>
             programStageConfigurations.length > 0 && (
                   <div style={{ marginTop: '20px' }}>
@@ -1538,27 +1609,8 @@ const Setting = () => {
                                                                                       />
                                                                                 }
                                                                                 onConfirm={() => {
-                                                                                      setSelectedProgramStageForConfiguration(
-                                                                                            null
-                                                                                      );
-                                                                                      setSelectedOrganisationUnitGroup(
-                                                                                            null
-                                                                                      );
-                                                                                      setSelectedSupervisorDataElements(
-                                                                                            []
-                                                                                      );
-                                                                                      setSelectedStatusSupervisionDataElement(
-                                                                                            null
-                                                                                      );
-                                                                                      setProgramStageConfigurations(
-                                                                                            programStageConfigurations.filter(
-                                                                                                  p =>
-                                                                                                        p.programStage
-                                                                                                              ?.id !==
-                                                                                                        value
-                                                                                                              .programStage
-                                                                                                              ?.id
-                                                                                            )
+                                                                                      handleDeleteProgramStageConfiguration(
+                                                                                            value
                                                                                       );
                                                                                 }}
                                                                           >
@@ -1988,333 +2040,14 @@ const Setting = () => {
 
                                     <div style={{ margin: '10px 0px' }}>
                                           <>
-                                                <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-                                                      <thead>
-                                                            <tr style={{ background: '#ccc' }}>
-                                                                  <th
-                                                                        style={{
-                                                                              padding: '10px',
-                                                                              textAlign: 'center',
-                                                                              border: '1px solid #00000070',
-                                                                              width: '50%'
-                                                                        }}
-                                                                  >
-                                                                        {translate('Indicateurs')}
-                                                                  </th>
-                                                                  <th
-                                                                        style={{
-                                                                              padding: '10px',
-                                                                              textAlign: 'center',
-                                                                              border: '1px solid #00000070',
-                                                                              width: '50%'
-                                                                        }}
-                                                                  >
-                                                                        {translate('Recoupements')}
-                                                                  </th>
-                                                            </tr>
-                                                      </thead>
-                                                      <tbody>
-                                                            {selectedNumberOfIndicatorsAsArray.map((ind, indexInd) => (
-                                                                  <tr key={uuid()}>
-                                                                        <td
-                                                                              style={{
-                                                                                    border: '1px solid #00000070',
-                                                                                    padding: '10px',
-                                                                                    width: '50%'
-                                                                              }}
-                                                                        >
-                                                                              <div
-                                                                                    style={{
-                                                                                          marginBottom: '5px'
-                                                                                    }}
-                                                                              >
-                                                                                    {
-                                                                                          indicatorsFieldsConfigs[
-                                                                                                indexInd
-                                                                                          ]?.name
-                                                                                    }
-                                                                              </div>
-                                                                              <div>
-                                                                                    <Select
-                                                                                          placeholder={ind.name}
-                                                                                          style={{
-                                                                                                width: '307px'
-                                                                                          }}
-                                                                                          options={selectedProgramStageForConfiguration?.programStageDataElements?.map(
-                                                                                                progStageDE => ({
-                                                                                                      label: progStageDE
-                                                                                                            .dataElement
-                                                                                                            ?.displayName,
-                                                                                                      value: progStageDE
-                                                                                                            .dataElement
-                                                                                                            ?.id
-                                                                                                })
-                                                                                          )}
-                                                                                          showSearch
-                                                                                          allowClear
-                                                                                          optionFilterProp="label"
-                                                                                          value={
-                                                                                                indicatorsFieldsConfigs[
-                                                                                                      indexInd
-                                                                                                ]?.value?.id
-                                                                                          }
-                                                                                          onSelect={value => {
-                                                                                                setIndicatorsFieldsConfigs(
-                                                                                                      indicatorsFieldsConfigs.map(
-                                                                                                            (
-                                                                                                                  i,
-                                                                                                                  indexi
-                                                                                                            ) => {
-                                                                                                                  if (
-                                                                                                                        indexInd ===
-                                                                                                                        indexi
-                                                                                                                  ) {
-                                                                                                                        return {
-                                                                                                                              ...i,
-                                                                                                                              value: selectedProgramStageForConfiguration?.programStageDataElements?.find(
-                                                                                                                                    p =>
-                                                                                                                                          p
-                                                                                                                                                .dataElement
-                                                                                                                                                .id ===
-                                                                                                                                          value
-                                                                                                                              )
-                                                                                                                                    ?.dataElement
-                                                                                                                        };
-                                                                                                                  }
-                                                                                                                  return i;
-                                                                                                            }
-                                                                                                      )
-                                                                                                );
-                                                                                          }}
-                                                                                    />
-                                                                              </div>
-
-                                                                              {selectedConfigurationType === 'DQR' && (
-                                                                                    <div style={{ marginTop: '15px' }}>
-                                                                                          <div>
-                                                                                                {`${translate(
-                                                                                                      'Marge'
-                                                                                                )} ${indexInd + 1}`}
-                                                                                          </div>
-                                                                                          <div
-                                                                                                style={{
-                                                                                                      marginTop: '5px'
-                                                                                                }}
-                                                                                          >
-                                                                                                <Input
-                                                                                                      type="number"
-                                                                                                      style={{
-                                                                                                            width: '100%'
-                                                                                                      }}
-                                                                                                      placeholder={`${translate(
-                                                                                                            'Marge'
-                                                                                                      )} ${
-                                                                                                            indexInd + 1
-                                                                                                      }`}
-                                                                                                      value={
-                                                                                                            indicatorsFieldsConfigs[
-                                                                                                                  indexInd
-                                                                                                            ]
-                                                                                                                  ?.indicatorMargin
-                                                                                                      }
-                                                                                                      onChange={event => {
-                                                                                                            setIndicatorsFieldsConfigs(
-                                                                                                                  [
-                                                                                                                        ...indicatorsFieldsConfigs.map(
-                                                                                                                              (
-                                                                                                                                    i,
-                                                                                                                                    index
-                                                                                                                              ) => {
-                                                                                                                                    if (
-                                                                                                                                          index ===
-                                                                                                                                          indexInd
-                                                                                                                                    ) {
-                                                                                                                                          return {
-                                                                                                                                                ...i,
-                                                                                                                                                indicatorMargin:
-                                                                                                                                                      '' +
-                                                                                                                                                      event
-                                                                                                                                                            .target
-                                                                                                                                                            .value
-                                                                                                                                          };
-                                                                                                                                    }
-                                                                                                                                    return i;
-                                                                                                                              }
-                                                                                                                        )
-                                                                                                                  ]
-                                                                                                            );
-                                                                                                      }}
-                                                                                                />
-                                                                                          </div>
-                                                                                    </div>
-                                                                              )}
-                                                                        </td>
-                                                                        <td
-                                                                              style={{
-                                                                                    border: '1px solid #00000070',
-                                                                                    padding: '10px',
-                                                                                    width: '50%'
-                                                                              }}
-                                                                        >
-                                                                              {indicatorsFieldsConfigs[
-                                                                                    indexInd
-                                                                              ]?.recoupements?.map(r => (
-                                                                                    <div
-                                                                                          key={uuid()}
-                                                                                          style={{
-                                                                                                marginTop: '3px'
-                                                                                          }}
-                                                                                    >
-                                                                                          <div
-                                                                                                style={{
-                                                                                                      marginBottom:
-                                                                                                            '5px'
-                                                                                                }}
-                                                                                          >
-                                                                                                {r.name}
-                                                                                          </div>
-
-                                                                                          <div>
-                                                                                                <Select
-                                                                                                      placeholder={
-                                                                                                            r.name
-                                                                                                      }
-                                                                                                      style={{
-                                                                                                            width: '307px'
-                                                                                                      }}
-                                                                                                      options={selectedProgramStageForConfiguration?.programStageDataElements?.map(
-                                                                                                            progStageDE => ({
-                                                                                                                  label: progStageDE
-                                                                                                                        .dataElement
-                                                                                                                        ?.displayName,
-                                                                                                                  value: progStageDE
-                                                                                                                        .dataElement
-                                                                                                                        ?.id
-                                                                                                            })
-                                                                                                      )}
-                                                                                                      showSearch
-                                                                                                      allowClear
-                                                                                                      optionFilterProp="label"
-                                                                                                      value={
-                                                                                                            indicatorsFieldsConfigs[
-                                                                                                                  indexInd
-                                                                                                            ]?.recoupements?.find(
-                                                                                                                  rec =>
-                                                                                                                        rec.id ===
-                                                                                                                        r.id
-                                                                                                            )?.value?.id
-                                                                                                      }
-                                                                                                      onSelect={value => {
-                                                                                                            setIndicatorsFieldsConfigs(
-                                                                                                                  indicatorsFieldsConfigs.map(
-                                                                                                                        (
-                                                                                                                              i,
-                                                                                                                              indexj
-                                                                                                                        ) => {
-                                                                                                                              if (
-                                                                                                                                    indexInd ===
-                                                                                                                                    indexj
-                                                                                                                              ) {
-                                                                                                                                    return {
-                                                                                                                                          ...i,
-                                                                                                                                          recoupements:
-                                                                                                                                                i.recoupements?.map(
-                                                                                                                                                      recoupement => {
-                                                                                                                                                            if (
-                                                                                                                                                                  recoupement.id ===
-                                                                                                                                                                  r.id
-                                                                                                                                                            ) {
-                                                                                                                                                                  return {
-                                                                                                                                                                        ...recoupement,
-                                                                                                                                                                        value: selectedProgramStageForConfiguration?.programStageDataElements?.find(
-                                                                                                                                                                              p =>
-                                                                                                                                                                                    p
-                                                                                                                                                                                          .dataElement
-                                                                                                                                                                                          .id ===
-                                                                                                                                                                                    value
-                                                                                                                                                                        )
-                                                                                                                                                                              ?.dataElement
-                                                                                                                                                                  };
-                                                                                                                                                            }
-                                                                                                                                                            return recoupement;
-                                                                                                                                                      }
-                                                                                                                                                )
-                                                                                                                                    };
-                                                                                                                              }
-                                                                                                                              return i;
-                                                                                                                        }
-                                                                                                                  )
-                                                                                                            );
-                                                                                                      }}
-                                                                                                />
-                                                                                          </div>
-                                                                                    </div>
-                                                                              ))}
-
-                                                                              {selectedConfigurationType === 'DQR' && (
-                                                                                    <div style={{ marginTop: '15px' }}>
-                                                                                          <div>
-                                                                                                {`${translate(
-                                                                                                      'Marge'
-                                                                                                )} ${indexInd + 1}`}
-                                                                                          </div>
-                                                                                          <div
-                                                                                                style={{
-                                                                                                      marginTop: '5px'
-                                                                                                }}
-                                                                                          >
-                                                                                                <Input
-                                                                                                      type="number"
-                                                                                                      style={{
-                                                                                                            width: '100%'
-                                                                                                      }}
-                                                                                                      placeholder={`${translate(
-                                                                                                            'Marge'
-                                                                                                      )} ${
-                                                                                                            indexInd + 1
-                                                                                                      }`}
-                                                                                                      value={
-                                                                                                            indicatorsFieldsConfigs[
-                                                                                                                  indexInd
-                                                                                                            ]
-                                                                                                                  ?.recoupementMargin
-                                                                                                      }
-                                                                                                      onChange={event => {
-                                                                                                            setIndicatorsFieldsConfigs(
-                                                                                                                  indicatorsFieldsConfigs.map(
-                                                                                                                        (
-                                                                                                                              i,
-                                                                                                                              indexJ
-                                                                                                                        ) => {
-                                                                                                                              if (
-                                                                                                                                    indexJ ===
-                                                                                                                                    indexInd
-                                                                                                                              ) {
-                                                                                                                                    return {
-                                                                                                                                          ...i,
-                                                                                                                                          recoupementMargin:
-                                                                                                                                                event
-                                                                                                                                                      .target
-                                                                                                                                                      .value
-                                                                                                                                    };
-                                                                                                                              }
-                                                                                                                              return i;
-                                                                                                                        }
-                                                                                                                  )
-                                                                                                            );
-                                                                                                      }}
-                                                                                                />
-                                                                                          </div>
-                                                                                    </div>
-                                                                              )}
-                                                                        </td>
-                                                                  </tr>
-                                                            ))}
-                                                            {/* {indicatorsFieldsConfigs.map((ind, indexInd) => (
-                                                                 
-                                                            ))} */}
-                                                      </tbody>
-                                                </table>
+                                                <GenerateIndicatorsConfigFieldsList
+                                                      selectedProgramStageForConfiguration={
+                                                            selectedProgramStageForConfiguration
+                                                      }
+                                                      indicatorsFieldsConfigs={indicatorsFieldsConfigs}
+                                                      setIndicatorsFieldsConfigs={setIndicatorsFieldsConfigs}
+                                                      selectedConfigurationType={selectedConfigurationType}
+                                                />
                                           </>
                                     </div>
                               </div>
