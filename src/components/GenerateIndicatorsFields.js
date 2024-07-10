@@ -9,11 +9,8 @@ const GenerateIndicatorsConfigFieldsList = ({
       setIndicatorsFieldsConfigs,
       selectedConfigurationType
 }) => {
-      const [list, setList] = useState(indicatorsFieldsConfigs);
-
       return (
             <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-            <pre>{JSON.stringify(list.map(l => l.indicatorMargin ))}</pre>
                   <thead>
                         <tr style={{ background: '#ccc' }}>
                               <th
@@ -105,10 +102,10 @@ const GenerateIndicatorsConfigFieldsList = ({
                                                                         width: '100%'
                                                                   }}
                                                                   placeholder={`${translate('Marge')} ${indexInd + 1}`}
-                                                                  value={list[indexInd]?.indicatorMargin}
+                                                                  value={ind?.indicatorMargin}
                                                                   onChange={event => {
-                                                                        setIndicatorsFieldsConfigs([
-                                                                              ...indicatorsFieldsConfigs.map(
+                                                                        setIndicatorsFieldsConfigs(
+                                                                              indicatorsFieldsConfigs.map(
                                                                                     (i, index) => {
                                                                                           if (i.id === ind.id) {
                                                                                                 return {
@@ -122,20 +119,7 @@ const GenerateIndicatorsConfigFieldsList = ({
                                                                                           return i;
                                                                                     }
                                                                               )
-                                                                        ]);
-
-                                                                        setList([
-                                                                              ...list.map((i, index) => {
-                                                                                    if (i.id === ind.id) {
-                                                                                          return {
-                                                                                                ...i,
-                                                                                                indicatorMargin:
-                                                                                                      event.target.value
-                                                                                          };
-                                                                                    }
-                                                                                    return i;
-                                                                              })
-                                                                        ]);
+                                                                        );
                                                                   }}
                                                             />
                                                       </div>

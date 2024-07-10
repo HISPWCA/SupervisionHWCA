@@ -42,7 +42,7 @@ import { loadDataStore, saveDataToDataStore } from '../utils/functions';
 import { BLUE } from '../utils/couleurs';
 import MyNotification from './MyNotification';
 import translate from '../utils/translator';
-import GenerateIndicatorsConfigFieldsList from './GenerateIndicatorsFields';
+import GenerateIndicatorsFieldsList from './GenerateIndicatorsFields';
 
 const numberList = [
       { value: 1, label: '1' },
@@ -130,8 +130,6 @@ const Setting = () => {
 
       const [selectedNumberOfRecoupements, setSelectedNumberOfRecoupements] = useState(2);
       const [selectedNumberOfIndicators, setSelectedNumberOfIndicators] = useState(3);
-      const [selectedNumberOfIndicatorsAsArray, setSelectedNumberOfIndicatorsAsArray] = useState([1, 2, 3]);
-      const [selectedNumberOfRecoupementsAsArray, setSelectedNumberOfRecoupementsAsArray] = useState([1, 2]);
 
       const [inputLibellePayment, setInputLibellePayment] = useState('');
       const [inputMontantConstantPayment, setInputMontantConstantPayment] = useState(0);
@@ -475,7 +473,7 @@ const Setting = () => {
       };
 
       const generateIndicatorsConfigFieldsList = () => {
-            if (!currentProgramstageConfiguration) {
+            if (!isFieldEditingMode) {
                   const newList = [];
                   for (let i = 1; i <= selectedNumberOfIndicators; i++) {
                         const recoupements = [];
@@ -511,12 +509,6 @@ const Setting = () => {
       const handleDeleteSupervisionConfig = async item => {
             try {
                   if (item) {
-                        // const existingDXMappingOfPrograms =
-                        //       mappingConfigs.filter(mConfig => mConfig?.program?.id === item?.program?.id) || [];
-
-                        // if (existingDXMappingOfPrograms.length > 0)
-                        //       throw new Error(translate('Configuration_Deja_Mapper'));
-
                         const newList = mappingConfigSupervisions.filter(mapConf => mapConf.id !== item.id);
                         await saveDataToDataStore(
                               process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY,
@@ -533,6 +525,9 @@ const Setting = () => {
                         });
 
                         setFieldEditingMode(false);
+                        setCurrentProgramstageConfiguration(null);
+                        setSelectedProgramStageForConfiguration(null);
+                        setIndicatorsFieldsConfigs([]);
                         setSelectedTEIProgram(null);
                         setSelectedProgramStage(null);
                         setSelectedDataElements([]);
@@ -641,6 +636,17 @@ const Setting = () => {
             }
       };
 
+      const handleCancelSupConfig = ()=> {
+            setFieldEditingMode(false)
+            setCurrentProgramstageConfiguration(null)
+            setSelectedStatusSupervisionDataElement(null)
+            setSelectedSupervisorDataElements([])
+            setSelectedProgramStageForConfiguration(null)
+            setIndicatorsFieldsConfigs([])
+            setSelectedOrganisationUnitGroup(null)
+            
+      }
+
       const handleSaveSupConfig = async () => {
             try {
                   setLoadingSaveSupervionsConfig(true);
@@ -690,11 +696,9 @@ const Setting = () => {
                                                   supervisorField: selectedSupervisorDataElements,
                                                   statusSupervisionField: selectedStatusSupervisionDataElement,
 
-                                                  indicatorsFieldsConfigs: indicatorsFieldsConfigs,
+                                                  indicatorsFieldsConfigs: indicatorsFieldsConfigs || [],
                                                   numberOfIndicators: selectedNumberOfIndicators,
-                                                  numberOfIndicatorsAsArray: selectedNumberOfIndicatorsAsArray,
-                                                  numberOfRecoupements: selectedNumberOfRecoupements,
-                                                  numberOfRecoupementsAsArray: selectedNumberOfRecoupementsAsArray
+                                                  numberOfRecoupements: selectedNumberOfRecoupements
                                             };
                                       }
 
@@ -708,11 +712,9 @@ const Setting = () => {
                                             supervisorField: selectedSupervisorDataElements,
                                             statusSupervisionField: selectedStatusSupervisionDataElement,
 
-                                            indicatorsFieldsConfigs: indicatorsFieldsConfigs,
+                                            indicatorsFieldsConfigs: indicatorsFieldsConfigs || [],
                                             numberOfIndicators: selectedNumberOfIndicators,
-                                            numberOfIndicatorsAsArray: selectedNumberOfIndicatorsAsArray,
-                                            numberOfRecoupements: selectedNumberOfRecoupements,
-                                            numberOfRecoupementsAsArray: selectedNumberOfRecoupementsAsArray
+                                            numberOfRecoupements: selectedNumberOfRecoupements
                                       }
                                 ]
                         : [
@@ -721,13 +723,10 @@ const Setting = () => {
                                       organisationUnitGroup: selectedOrganisationUnitGroup,
                                       supervisorField: selectedSupervisorDataElements,
                                       statusSupervisionField: selectedStatusSupervisionDataElement,
-                                      indicatorsFieldsConfigs: indicatorsFieldsConfigs,
+                                      indicatorsFieldsConfigs: indicatorsFieldsConfigs || [],
 
-                                      indicatorsFieldsConfigs: indicatorsFieldsConfigs,
                                       numberOfIndicators: selectedNumberOfIndicators,
-                                      numberOfIndicatorsAsArray: selectedNumberOfIndicatorsAsArray,
-                                      numberOfRecoupements: selectedNumberOfRecoupements,
-                                      numberOfRecoupementsAsArray: selectedNumberOfRecoupementsAsArray
+                                      numberOfRecoupements: selectedNumberOfRecoupements
                                 }
                           ];
 
@@ -1195,30 +1194,18 @@ const Setting = () => {
                   cleanPaymentConfigState();
 
                   setSelectedTEIProgram(programs.find(p => p.id === prog.program?.id));
-                  const programStageList = await loadProgramStages(prog?.program?.id);
-                  setProgramStages(programStageList);
+                  await loadProgramStages(prog?.program?.id);
+                  // setProgramStages(programStageList);
 
-                  // setSelectedProgramStage(
-                  //       programStageList.find(psg => psg.id === prog.fieldConfig?.supervisor?.programStage.id)
-                  // );
-                  // setSelectedDataElements(prog?.fieldConfig?.supervisor?.dataElements || []);
-                  // setSelectedStatusSupervisionProgramStage(
-                  //       programStageList.find(psg => psg.id === prog.statusSupervision?.programStage?.id)
-                  // );
                   setSelectedStatutSupervisionDataElement(null);
                   setIndicatorsFieldsConfigs([]);
                   setSelectedProgramStageForConfiguration(null);
                   setSelectedSupervisorDataElements([]);
                   setCurrentProgramstageConfiguration(null);
 
-                  // setSelectedAttributesToDisplay(prog.attributesToDisplay || []);
-                  // setSelectedAttributeNameForAgent(prog.attributeName);
-
                   setSelectedSupervisionGenerationType(prog?.generationType);
                   setSelectedPlanificationType(prog.planificationType);
                   setSelectedConfigurationType(prog.configurationType);
-                  // setSelectedPlanificationIndicatorRDQeCase(prog.isRDQAConfigCase || false);
-                  // setPaymentConfigList(prog?.paymentConfigs || []);
 
                   setFieldEditingMode(true);
                   setProgramStageConfigurations(prog.programStageConfigurations || []);
@@ -1361,10 +1348,9 @@ const Setting = () => {
 
                   setSelectedSupervisorDataElements(value.supervisorField);
                   setSelectedStatusSupervisionDataElement(value.statusSupervisionField);
+
                   setSelectedNumberOfIndicators(value.numberOfIndicators);
                   setSelectedNumberOfRecoupements(value.numberOfRecoupements);
-                  setSelectedNumberOfIndicatorsAsArray(value.numberOfIndicatorsAsArray);
-                  setSelectedNumberOfRecoupementsAsArray(value.numberOfRecoupementsAsArray);
                   setSelectedNumberOfRecoupements(value.numberOfRecoupements);
 
                   setCurrentProgramstageConfiguration(value);
@@ -2002,12 +1988,6 @@ const Setting = () => {
                                                       value={selectedNumberOfIndicators}
                                                       onChange={value => {
                                                             setSelectedNumberOfIndicators(value);
-                                                            const newIndList = [];
-                                                            for (let i = 1; i <= value; i++) {
-                                                                  newIndList.push(i);
-                                                            }
-
-                                                            setSelectedNumberOfIndicatorsAsArray(newIndList);
                                                       }}
                                                       showSearch
                                                 />
@@ -2024,14 +2004,6 @@ const Setting = () => {
                                                       value={selectedNumberOfRecoupements}
                                                       onChange={value => {
                                                             setSelectedNumberOfRecoupements(value);
-                                                            const newRecoupList = [];
-
-                                                            for (let i = 1; i <= value; i++) {
-                                                                  newRecoupList.push(i);
-                                                            }
-                                                            setSelectedNumberOfRecoupementsAsArray(
-                                                                  numberOfRecoupements
-                                                            );
                                                       }}
                                                       showSearch
                                                 />
@@ -2040,7 +2012,7 @@ const Setting = () => {
 
                                     <div style={{ margin: '10px 0px' }}>
                                           <>
-                                                <GenerateIndicatorsConfigFieldsList
+                                                <GenerateIndicatorsFieldsList
                                                       selectedProgramStageForConfiguration={
                                                             selectedProgramStageForConfiguration
                                                       }
@@ -2056,7 +2028,14 @@ const Setting = () => {
             );
 
       const RenderSaveConfigurationButton = () => (
-            <div style={{ marginTop: '22px' }}>
+            <div style={{ marginTop: '22px', display: 'flex', alignItems: 'center' }}>
+                  {isFieldEditingMode && (
+                        <div style={{ marginRight: '10px' }}>
+                              <Button destructive onClick={handleCancelSupConfig}>
+                                    {translate('Cancel')}
+                              </Button>
+                        </div>
+                  )}
                   <Button
                         disabled={selectedProgramStageForConfiguration ? false : true}
                         primary
