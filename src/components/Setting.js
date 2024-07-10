@@ -473,7 +473,7 @@ const Setting = () => {
       };
 
       const generateIndicatorsConfigFieldsList = () => {
-            if (!isFieldEditingMode) {
+            if (!isFieldEditingMode && !currentProgramstageConfiguration) {
                   const newList = [];
                   for (let i = 1; i <= selectedNumberOfIndicators; i++) {
                         const recoupements = [];
@@ -1191,7 +1191,6 @@ const Setting = () => {
 
       const handleEditProgramSup = async prog => {
             try {
-                  cleanPaymentConfigState();
 
                   setSelectedTEIProgram(programs.find(p => p.id === prog.program?.id));
                   await loadProgramStages(prog?.program?.id);
@@ -2032,7 +2031,7 @@ const Setting = () => {
                   {isFieldEditingMode && (
                         <div style={{ marginRight: '10px' }}>
                               <Button destructive onClick={handleCancelSupConfig}>
-                                    {translate('Cancel')}
+                                    {translate('Annulée')}
                               </Button>
                         </div>
                   )}
