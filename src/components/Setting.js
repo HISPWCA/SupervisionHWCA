@@ -278,6 +278,9 @@ const Setting = () => {
             setSelectedProgramStageForConfiguration(null);
             setSelectedStatutSupervisionDataElement(null);
             setIndicatorsFieldsConfigs([]);
+            setProgramStageConfigurations([])
+            setCurrentProgramstageConfiguration(null)
+            setFieldEditingMode(false)
 
             setSelectedIndicatorGroup(null);
             setIndicatorGroups([]);
