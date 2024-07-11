@@ -265,10 +265,14 @@
     "Marge_Recoupements": "Marge d'erreur recoupement ",
     "Marge_Indicateurs": "Marge d'erreur indicateurs",
     "Marge": "Marge d'erreur",
-   "AddConfiguration": "Ajouter la configuration",
-
-   "ProgramStage_Already_Configured":"Le program stage à déjà été configuré",
-   "Mise_A_Jour_Configuration":"Mèttre à jour la configuration",
-
-   "Configuration_Added_For_Program_stage": "la configuration a été ajoutée avec succès pour le program stage  "
+    "AddConfiguration": "Ajouter la configuration",
+    "ProgramStage_Already_Configured": "Le program stage à déjà été configuré",
+    "Mise_A_Jour_Configuration": "Mèttre à jour la configuration",
+    "Configuration_Added_For_Program_stage": "la configuration a été ajoutée avec succès pour le program stage  ",
+    "Program_Stage_Configuration_List": "Liste des configurations du programme stage ",
+    "Indicators_Configuration": "Configuration des indicateurs",
+    "Venant_Du_DHIS2": "Venant du DHIS2 ",
+    "Venant_Du_Group": "Venant d'un group d'indicateur",
+    "Indicators_Recoupements": "Indicateurs et Recoupements",
+    "Margin_Of_Errors": "Marge d'erreurs "
 }

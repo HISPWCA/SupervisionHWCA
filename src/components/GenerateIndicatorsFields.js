@@ -96,29 +96,40 @@ const GenerateIndicatorsConfigFieldsList = ({
                                                                   marginTop: '5px'
                                                             }}
                                                       >
-                                                            <Input
-                                                                  type="number"
-                                                                  style={{
-                                                                        width: '100%'
-                                                                  }}
+                                                            <Select
                                                                   placeholder={`${translate('Marge')} ${indexInd + 1}`}
-                                                                  value={ind?.indicatorMargin}
-                                                                  onChange={event => {
+                                                                  style={{
+                                                                        width: '307px'
+                                                                  }}
+                                                                  options={selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                        progStageDE => ({
+                                                                              label: progStageDE.dataElement
+                                                                                    ?.displayName,
+                                                                              value: progStageDE.dataElement?.id
+                                                                        })
+                                                                  )}
+                                                                  showSearch
+                                                                  allowClear
+                                                                  optionFilterProp="label"
+                                                                  value={ind?.indicatorMargin?.id}
+                                                                  onSelect={value => {
                                                                         setIndicatorsFieldsConfigs(
-                                                                              indicatorsFieldsConfigs.map(
-                                                                                    (i, index) => {
-                                                                                          if (i.id === ind.id) {
-                                                                                                return {
-                                                                                                      ...i,
-                                                                                                      indicatorMargin:
-                                                                                                            '' +
-                                                                                                            event.target
-                                                                                                                  .value
-                                                                                                };
-                                                                                          }
-                                                                                          return i;
+                                                                              indicatorsFieldsConfigs.map(i => {
+                                                                                    if (i.id === ind.id) {
+                                                                                          return {
+                                                                                                ...i,
+                                                                                                indicatorMargin:
+                                                                                                      selectedProgramStageForConfiguration?.programStageDataElements?.find(
+                                                                                                            p =>
+                                                                                                                  p
+                                                                                                                        .dataElement
+                                                                                                                        .id ===
+                                                                                                                  value
+                                                                                                      )?.dataElement
+                                                                                          };
                                                                                     }
-                                                                              )
+                                                                                    return i;
+                                                                              })
                                                                         );
                                                                   }}
                                                             />
@@ -217,28 +228,40 @@ const GenerateIndicatorsConfigFieldsList = ({
                                                                   marginTop: '5px'
                                                             }}
                                                       >
-                                                            <Input
-                                                                  type="number"
-                                                                  style={{
-                                                                        width: '100%'
-                                                                  }}
+                                                            <Select
                                                                   placeholder={`${translate('Marge')} ${indexInd + 1}`}
-                                                                  value={ind.recoupementMargin}
-                                                                  onChange={event => {
+                                                                  style={{
+                                                                        width: '307px'
+                                                                  }}
+                                                                  options={selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                        progStageDE => ({
+                                                                              label: progStageDE.dataElement
+                                                                                    ?.displayName,
+                                                                              value: progStageDE.dataElement?.id
+                                                                        })
+                                                                  )}
+                                                                  showSearch
+                                                                  allowClear
+                                                                  optionFilterProp="label"
+                                                                  value={ind?.recoupementMargin?.id}
+                                                                  onSelect={value => {
                                                                         setIndicatorsFieldsConfigs(
-                                                                              indicatorsFieldsConfigs.map(
-                                                                                    (i, indexJ) => {
-                                                                                          if (i.id === ind.id) {
-                                                                                                return {
-                                                                                                      ...i,
-                                                                                                      recoupementMargin:
-                                                                                                            event.target
-                                                                                                                  .value
-                                                                                                };
-                                                                                          }
-                                                                                          return i;
+                                                                              indicatorsFieldsConfigs.map(i => {
+                                                                                    if (i.id === ind.id) {
+                                                                                          return {
+                                                                                                ...i,
+                                                                                                recoupementMargin:
+                                                                                                      selectedProgramStageForConfiguration?.programStageDataElements?.find(
+                                                                                                            p =>
+                                                                                                                  p
+                                                                                                                        .dataElement
+                                                                                                                        .id ===
+                                                                                                                  value
+                                                                                                      )?.dataElement
+                                                                                          };
                                                                                     }
-                                                                              )
+                                                                                    return i;
+                                                                              })
                                                                         );
                                                                   }}
                                                             />

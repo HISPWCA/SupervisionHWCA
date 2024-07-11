@@ -38,6 +38,8 @@ import { RiDeleteBinLine } from 'react-icons/ri';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { FiEdit } from 'react-icons/fi';
 import { MdOutlineCancel } from 'react-icons/md';
+import { GiCancel } from 'react-icons/gi';
+
 import { loadDataStore, saveDataToDataStore } from '../utils/functions';
 import { BLUE } from '../utils/couleurs';
 import MyNotification from './MyNotification';
@@ -278,9 +280,9 @@ const Setting = () => {
             setSelectedProgramStageForConfiguration(null);
             setSelectedStatutSupervisionDataElement(null);
             setIndicatorsFieldsConfigs([]);
-            setProgramStageConfigurations([])
-            setCurrentProgramstageConfiguration(null)
-            setFieldEditingMode(false)
+            setProgramStageConfigurations([]);
+            setCurrentProgramstageConfiguration(null);
+            setFieldEditingMode(false);
 
             setSelectedIndicatorGroup(null);
             setIndicatorGroups([]);
@@ -476,7 +478,7 @@ const Setting = () => {
       };
 
       const generateIndicatorsConfigFieldsList = () => {
-            if (!isFieldEditingMode && !currentProgramstageConfiguration) {
+            if (!currentProgramstageConfiguration) {
                   const newList = [];
                   for (let i = 1; i <= selectedNumberOfIndicators; i++) {
                         const recoupements = [];
@@ -487,8 +489,8 @@ const Setting = () => {
                                     name: `${translate('Recoupements')} ${j}`,
                                     position: j,
                                     value: null,
-                                    indicatorMargin: 0,
-                                    recoupementMargin: 0
+                                    indicatorMargin: null,
+                                    recoupementMargin: null
                               };
 
                               recoupements.push(recoupementPayload);
@@ -639,16 +641,15 @@ const Setting = () => {
             }
       };
 
-      const handleCancelSupConfig = ()=> {
-            setFieldEditingMode(false)
-            setCurrentProgramstageConfiguration(null)
-            setSelectedStatusSupervisionDataElement(null)
-            setSelectedSupervisorDataElements([])
-            setSelectedProgramStageForConfiguration(null)
-            setIndicatorsFieldsConfigs([])
-            setSelectedOrganisationUnitGroup(null)
-            
-      }
+      const handleCancelSupConfig = () => {
+            setFieldEditingMode(false);
+            setCurrentProgramstageConfiguration(null);
+            setSelectedStatusSupervisionDataElement(null);
+            setSelectedSupervisorDataElements([]);
+            setSelectedProgramStageForConfiguration(null);
+            setIndicatorsFieldsConfigs([]);
+            setSelectedOrganisationUnitGroup(null);
+      };
 
       const handleSaveSupConfig = async () => {
             try {
@@ -1194,7 +1195,6 @@ const Setting = () => {
 
       const handleEditProgramSup = async prog => {
             try {
-
                   setSelectedTEIProgram(programs.find(p => p.id === prog.program?.id));
                   await loadProgramStages(prog?.program?.id);
                   // setProgramStages(programStageList);
@@ -1538,8 +1538,24 @@ const Setting = () => {
 
       const RenderConfigurationForEachProgramStageList = () =>
             programStageConfigurations.length > 0 && (
-                  <div style={{ marginTop: '20px' }}>
+                  <div style={{ marginTop: '20px', position: 'sticky', top: 5 }}>
                         <Card className="my-shadow" size="small">
+                              <div style={{ marginBottom: '10px' }}>
+                                    <span style={{ marginRight: '5px', fontWeight: 'bold' }}>
+                                          {translate('Program_Stage_Configuration_List')}
+                                    </span>
+                                    <span
+                                          style={{
+                                                backgroundColor: 'orange',
+                                                padding: '5px 10px',
+                                                color: 'white',
+                                                fontWeight: 'bold',
+                                                border: '1px solid orange'
+                                          }}
+                                    >
+                                          {selectedTEIProgram?.displayName}
+                                    </span>
+                              </div>
                               <Table
                                     dataSource={programStageConfigurations.map(p => ({
                                           ...p,
@@ -2033,7 +2049,11 @@ const Setting = () => {
             <div style={{ marginTop: '22px', display: 'flex', alignItems: 'center' }}>
                   {isFieldEditingMode && (
                         <div style={{ marginRight: '10px' }}>
-                              <Button destructive onClick={handleCancelSupConfig}>
+                              <Button
+                                    destructive
+                                    onClick={handleCancelSupConfig}
+                                    icon={<GiCancel style={{ fontSize: '18px', color: 'white' }} />}
+                              >
                                     {translate('Annulée')}
                               </Button>
                         </div>
@@ -2043,6 +2063,7 @@ const Setting = () => {
                         primary
                         onClick={handleSaveSupConfig}
                         loading={loadingSaveSupervionsConfig}
+                        icon={<FiSave style={{ fontSize: '18px', color: '#FFF' }} />}
                   >
                         {currentProgramstageConfiguration
                               ? translate('Mise_A_Jour_Configuration')

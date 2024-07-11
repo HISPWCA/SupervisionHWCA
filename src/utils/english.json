@@ -97,7 +97,7 @@
     "Attribute_Nom": "Please configure the attribute that represents the agent's name!",
     "Attribute_Prenom": "Please configure the attribute that represents the agent's first name!",
     "Programme_Introuvable": "Program not found!",
-    "Mise_A_Jour_Effectuer": "Update performed",
+    "Mise_A_Jour_Effectuer": "Update success",
     "Nom_Obligatoire": "Name is mandatory!",
     "Etiquette_Obligatoire": "Label is mandatory!",
     "Poid_Obligatoire": "Weight is mandatory!",
@@ -256,7 +256,7 @@
     "SelectMaps": "Select Maps",
     "Favoris": "Favorite",
     "Configuration_RDQe_Case": "Configuration for eRDQ Case ",
-    "Configuration_DQe_Case": "Configuration for DQR Case ",    
+    "Configuration_DQe_Case": "Configuration for DQR Case ",
     "Program_Stage_Configuration_Fields_For_Recoupement_And_Indicator": "Fields Indicators and Cross check configuration ",
     "Recoupements": "Cross Check",
     "NumberOfIndicators": "Number of indicators",
@@ -264,11 +264,15 @@
     "MarginOfErrorConfiguration": "Margin of error configuration",
     "Marge_Recoupements": "Error margin cross checks",
     "Marge_Indicateurs": "Error margin indicators",
-    "Marge":"Margin of error ",
+    "Marge": "Margin of error ",
     "AddConfiguration": "Add configuration",
-
-
     "ProgramStage_Already_Configured": "Le program stage à déjà été configuré",
-    "Mise_A_Jour_Configuration":"Update configuration",
-    "Configuration_Added_For_Program_stage":"Configuration added with success for program stage "
+    "Mise_A_Jour_Configuration": "Update configuration",
+    "Configuration_Added_For_Program_stage": "Configuration added with success for program stage ",
+    "Program_Stage_Configuration_List": "List of program stage configurations",
+    "Indicators_Configuration": "Indicators Configuration",
+    "Venant_Du_DHIS2": "From DHIS2 ",
+    "Venant_Du_Group": "From Indicator Group",
+    "Indicators_Recoupements": "Indicators and Cross checks",
+    "Margin_Of_Errors":"Margin of errors"
 }

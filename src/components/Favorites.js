@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Card, Col, Divider, Input, Popconfirm, Row, Select, Table } from 'antd';
+import { Card, Col, Input, Popconfirm, Row, Select, Table } from 'antd';
 
 import { Button, ButtonStrip, Modal, ModalActions, ModalContent, ModalTitle, Radio } from '@dhis2/ui';
 import { MdStars } from 'react-icons/md';
 import { FiSave } from 'react-icons/fi';
-import { ImCancelCircle } from 'react-icons/im';
 import { CgCloseO } from 'react-icons/cg';
 import { TbSelect } from 'react-icons/tb';
 import translate from '../utils/translator';
@@ -45,7 +44,6 @@ const Favorites = ({ me }) => {
       const [selectedProgramStage, setSelectedProgramStage] = useState(null);
       const [selectedDataElement, setSelectedDataElement] = useState(null);
       const [selectedMetaDatas, setSelectedMetaDatas] = useState([]);
-      const [selectedDataElementFromWhere, setSelectedDataElementFromWhere] = useState(ELEMENT_GROUP);
       const [selectedDataElementGroup, setSelectedDataElementGroup] = useState(null);
       const [inputFavorisNameForBackgroundInforation, setInputFavoritNameForBackgroundInforation] = useState('');
       const [inputDataSourceDisplayName, setInputDataSourceDisplayName] = useState('');
@@ -60,11 +58,18 @@ const Favorites = ({ me }) => {
       const [loadingDataElementGroups, setLoadingDataElementGroups] = useState(false);
       const [loadingDataStoreSupervisionConfigs, setLoadingDataStoreSupervisionConfigs] = useState(false);
 
+      const [formIndicatorConfiguration, setFormIndicatorConfiguration] = useState({
+            selectedIndicator: { dataElement: null, source: null },
+            selectedRecoupements: []
+      });
+
       const [notification, setNotification] = useState({
             show: false,
             message: null,
             type: null
       });
+
+      const [selectedTypeSource, setSelectedTypeSource] = useState('DHIS2');
 
       const handleSelectProgramStage = value => {
             setSelectedProgramStage(programStages.find(pstage => pstage.id === value));
@@ -77,12 +82,12 @@ const Favorites = ({ me }) => {
       };
 
       const handleClickSupervisionItem = sup => {
-            setSelectedProgramStage(null);
             setSelectedDataElement(null);
             setMappingConfigs([]);
 
             loadProgramStages(sup.program?.id);
             setSelectedProgram(sup);
+            handleSelectProgramStage(sup.programStageConfigurations[0]?.programStage?.id);
       };
 
       const loadProgramStages = async (programID, setState = null) => {
@@ -145,10 +150,18 @@ const Favorites = ({ me }) => {
       };
 
       const handleOkAnalyticComponentModal = () => {
-            setInputDataSourceDisplayName(selectedMetaDatas[0]?.name);
-            setInputDataSourceID(selectedMetaDatas[0]?.id);
+            // setInputDataSourceDisplayName(selectedMetaDatas[0]?.name);
+            // setInputDataSourceID(selectedMetaDatas[0]?.id);
             setSelectedMetaDatas([]);
             setVisibleAnalyticComponentModal(false);
+
+            setFormIndicatorConfiguration({
+                  ...formIndicatorConfiguration,
+                  selectedIndicator: formIndicatorConfiguration?.selectedIndicator && {
+                        ...formIndicatorConfiguration.selectedIndicator,
+                        source: selectedMetaDatas[0]
+                  }
+            });
       };
 
       const handleCancelAnalyticComponentModal = () => {
@@ -157,18 +170,28 @@ const Favorites = ({ me }) => {
       };
 
       const handleSelectDataElement = value => {
-            setSelectedDataElement(
-                  selectedProgramStage.programStageDataElements
-                        ?.map(p => p.dataElement)
-                        .find(dataElement => dataElement.id === value)
+            const found_indicators = selectedProgram?.programStageConfigurations[0]?.indicatorsFieldsConfigs.find(
+                  dataElement => dataElement.value?.id === value
             );
+            console.log('found_indicators:', found_indicators);
+
+            if (found_indicators) {
+                  setFormIndicatorConfiguration({
+                        ...formIndicatorConfiguration,
+                        selectedIndicator: found_indicators.value,
+
+                        selectedRecoupements:
+                              found_indicators.recoupements?.map(rec => ({ source: null, dataElement: rec.value })) ||
+                              []
+                  });
+            }
       };
 
-      const handleSelectedDataElementFromWhere = ({ value }) => {
-            setSelectedDataElement(null);
-            setSelectedDataElementFromWhere(value);
-            if (value === ALL) setSelectedDataElementGroup(null);
-      };
+      // const handleSelectedDataElementFromWhere = ({ value }) => {
+      //       setSelectedDataElement(null);
+      //       setSelectedDataElementFromWhere(value);
+      //       if (value === ALL) setSelectedDataElementGroup(null);
+      // };
 
       const RenderSelectedSupervisionTypeList = () => (
             <>
@@ -696,7 +719,7 @@ const Favorites = ({ me }) => {
                                     borderBottom: '1px solid #ccc'
                               }}
                         >
-                              {translate('Configurations_Globales')}
+                              {translate('Indicators_Configuration')}
                         </div>
                         <div style={{ padding: '10px' }}>
                               <Row gutter={[10, 10]}>
@@ -736,7 +759,7 @@ const Favorites = ({ me }) => {
                                           <hr style={{ margin: '10px auto', color: '#ccc' }} />
                                     </Col>
 
-                                    {selectedBackgroundInformationTypeConfiguration === FAVORIS && (
+                                    {/* {selectedBackgroundInformationTypeConfiguration === FAVORIS && (
                                           <Col md={24}>
                                                 <div>
                                                       <div style={{ marginBottom: '5px' }}>
@@ -817,9 +840,9 @@ const Favorites = ({ me }) => {
                                                             </div>
                                                       )}
                                                 </Col>
-                                          )}
+                                          )} */}
 
-                                    {selectedBackgroundInformationTypeConfiguration === DIRECTE && (
+                                    {/* {selectedBackgroundInformationTypeConfiguration === DIRECTE && (
                                           <Col md={24}>
                                                 <div>
                                                       <div style={{ marginBottom: '5px' }}>
@@ -1090,7 +1113,240 @@ const Favorites = ({ me }) => {
                                                       </div>
                                                 )}
                                           </Col>
+                                    )} */}
+
+                                    {console.log('formIndicatorConfiguration: ', formIndicatorConfiguration)}
+
+                                    {/* <pre>{JSON.stringify(formIndicatorConfiguration, null, 4)}</pre> */}
+
+                                    {selectedBackgroundInformationTypeConfiguration === DIRECTE && (
+                                          <Col md={24}>
+                                                <div>
+                                                      <div
+                                                            style={{
+                                                                  fontWeight: 'bold',
+                                                                  marginBottom: '10px'
+                                                            }}
+                                                      >
+                                                            {translate('Indicators_Recoupements')}
+                                                      </div>
+                                                      <Row gutter={[10, 10]}>
+                                                            <Col md={12} xs={24}>
+                                                                  <div>
+                                                                        <div
+                                                                              style={{
+                                                                                    marginBottom: '5px'
+                                                                              }}
+                                                                        >
+                                                                              {translate('Indicateurs')}
+                                                                        </div>
+
+                                                                        <Select
+                                                                              options={
+                                                                                    selectedProgram?.programStageConfigurations[0]?.indicatorsFieldsConfigs?.map(
+                                                                                          indic => ({
+                                                                                                label: indic.value
+                                                                                                      ?.displayName,
+                                                                                                value: indic.value?.id
+                                                                                          })
+                                                                                    ) || []
+                                                                              }
+                                                                              placeholder={translate('Indicateurs')}
+                                                                              style={{
+                                                                                    width: '100%'
+                                                                              }}
+                                                                              onChange={handleSelectDataElement}
+                                                                              value={selectedDataElement?.id}
+                                                                              optionFilterProp="label"
+                                                                              showSearch
+                                                                        />
+                                                                  </div>
+                                                            </Col>
+
+                                                            <Col md={10} xs={24}>
+                                                                  <div>
+                                                                        <div
+                                                                              style={{
+                                                                                    marginBottom: '5px'
+                                                                              }}
+                                                                        >
+                                                                              {translate('Source_De_Donnee')}
+                                                                        </div>
+                                                                        <Input
+                                                                              placeholder={translate(
+                                                                                    'Source_De_Donnee'
+                                                                              )}
+                                                                              disabled
+                                                                              style={{ width: '100%' }}
+                                                                              value={
+                                                                                    formIndicatorConfiguration
+                                                                                          ?.selectedIndicator?.source
+                                                                                          ?.name
+                                                                              }
+                                                                              onChange={event => {
+                                                                                    setInputDataSourceDisplayName(
+                                                                                          ''.concat(event.target.value)
+                                                                                    );
+                                                                              }}
+                                                                        />
+                                                                  </div>
+                                                            </Col>
+
+                                                            <Col md={2} xs={24}>
+                                                                  <div style={{ marginTop: '28px' }}>
+                                                                        <Button
+                                                                              small
+                                                                              primary
+                                                                              disabled={
+                                                                                    formIndicatorConfiguration
+                                                                                          ?.selectedIndicator
+                                                                                          ?.dataElement
+                                                                                          ? false
+                                                                                          : true
+                                                                              }
+                                                                              icon={
+                                                                                    <TbSelect
+                                                                                          style={{
+                                                                                                fontSize: '18px',
+                                                                                                color: '#fff'
+                                                                                          }}
+                                                                                    />
+                                                                              }
+                                                                              onClick={() =>
+                                                                                    setVisibleAnalyticComponentModal(
+                                                                                          true
+                                                                                    )
+                                                                              }
+                                                                        ></Button>
+                                                                  </div>
+                                                            </Col>
+                                                      </Row>
+                                                </div>
+                                          </Col>
                                     )}
+
+                                    {formIndicatorConfiguration?.selectedRecoupements?.map((rec, recIndex) => (
+                                          <Col md={24}>
+                                                <div>
+                                                      <Row gutter={[10, 10]}>
+                                                            <Col md={12} xs={24}>
+                                                                  <div>
+                                                                        <div
+                                                                              style={{
+                                                                                    marginBottom: '5px'
+                                                                              }}
+                                                                        >
+                                                                              {`${translate('Recoupements')} ${
+                                                                                    recIndex + 1
+                                                                              }`}
+                                                                        </div>
+
+                                                                        <Input
+                                                                              disabled
+                                                                              placeholder={`${translate(
+                                                                                    'Recoupements'
+                                                                              )} ${recIndex + 1}`}
+                                                                              style={{
+                                                                                    width: '100%'
+                                                                              }}
+                                                                              value={rec?.dataElement?.displayName}
+                                                                              optionFilterProp="label"
+                                                                              showSearch
+                                                                        />
+                                                                  </div>
+                                                            </Col>
+
+                                                            <Col md={10} xs={24}>
+                                                                  <div>
+                                                                        <div
+                                                                              style={{
+                                                                                    marginBottom: '5px'
+                                                                              }}
+                                                                        >
+                                                                              {`${translate('Source_De_Donnee')} ${
+                                                                                    recIndex + 1
+                                                                              }`}
+                                                                        </div>
+                                                                        <Input
+                                                                              placeholder={`${translate(
+                                                                                    'Source_De_Donnee'
+                                                                              )} ${recIndex + 1}`}
+                                                                              disabled
+                                                                              style={{ width: '100%' }}
+                                                                              value={
+                                                                                    formIndicatorConfiguration
+                                                                                          ?.selectedIndicator?.source
+                                                                                          ?.name
+                                                                              }
+                                                                              onChange={event => {
+                                                                                    setInputDataSourceDisplayName(
+                                                                                          ''.concat(event.target.value)
+                                                                                    );
+                                                                              }}
+                                                                        />
+                                                                  </div>
+                                                            </Col>
+                                                            <Col md={2} xs={24}>
+                                                                  <div style={{ marginTop: '28px' }}>
+                                                                        <Button
+                                                                              small
+                                                                              primary
+                                                                              disabled={
+                                                                                    formIndicatorConfiguration?.selectedIndicator
+                                                                                          ? false
+                                                                                          : true
+                                                                              }
+                                                                              icon={
+                                                                                    <TbSelect
+                                                                                          style={{
+                                                                                                fontSize: '18px',
+                                                                                                color: '#fff'
+                                                                                          }}
+                                                                                    />
+                                                                              }
+                                                                              onClick={() =>
+                                                                                    setVisibleAnalyticComponentModal(
+                                                                                          true
+                                                                                    )
+                                                                              }
+                                                                        ></Button>
+                                                                  </div>
+                                                            </Col>
+                                                      </Row>
+                                                </div>
+                                          </Col>
+                                    ))}
+
+                                    <Col md={24}>
+                                          <hr style={{ margin: '10px auto', color: '#ccc' }} />
+                                    </Col>
+
+                                    {formIndicatorConfiguration?.selectedIndicator?.dataElement && (
+                                          <Col md={24}>
+                                                <div
+                                                      style={{
+                                                            fontWeight: 'bold',
+                                                            marginBottom: '10px'
+                                                      }}
+                                                >
+                                                      {translate('Margin_Of_Errors')}
+                                                </div>
+                                                <div>List des marges d'erreur pour l'indicateurs et le recoupement</div>
+                                          </Col>
+                                    )}
+
+                                    <Col md={24} xs={24}>
+                                          <div style={{ marginTop: '18px' }}>
+                                                <Button
+                                                      loading={loadingSaveDateElementMappingConfig}
+                                                      disabled={loadingSaveDateElementMappingConfig}
+                                                      primary
+                                                      onClick={handleSaveNewMappingConfig}
+                                                >
+                                                      + {translate('Ajouter')}
+                                                </Button>
+                                          </div>
+                                    </Col>
                               </Row>
                         </div>
                   </Card>
@@ -1122,17 +1378,50 @@ const Favorites = ({ me }) => {
                               </div>
                         </ModalTitle>
                         <ModalContent>
-                              <div>
-                                    <DataDimension
-                                          selectedDimensions={selectedMetaDatas.map(it => ({
-                                                ...it,
-                                                isDeactivated: true
-                                          }))}
-                                          onSelect={value => {
-                                                setSelectedMetaDatas(value?.items?.length > 0 ? [value.items[0]] : []);
-                                          }}
-                                          displayNameProp="displayName"
-                                    />
+                              <div style={{ padding: '20px', border: '1px solid #ccc' }}>
+                                    <div style={{ marginBottom: '20px' }}>
+                                          <div>
+                                                <Radio
+                                                      label={translate('Venant_Du_DHIS2')}
+                                                      className="cursor-pointer"
+                                                      onChange={() => {
+                                                            setSelectedTypeSource('DHIS2');
+                                                      }}
+                                                      value={'DHIS2'}
+                                                      checked={selectedTypeSource === 'DHIS2'}
+                                                />
+                                          </div>
+                                          <div>
+                                                <Radio
+                                                      label={translate('Venant_Du_Group') + ' ? '}
+                                                      className="cursor-pointer"
+                                                      onChange={() => {
+                                                            setSelectedTypeSource('GROUPS');
+                                                      }}
+                                                      value={'GROUPS'}
+                                                      checked={selectedTypeSource === 'GROUPS'}
+                                                />
+                                          </div>
+                                    </div>
+
+                                    {selectedTypeSource === 'DHIS2' && (
+                                          <DataDimension
+                                                selectedDimensions={selectedMetaDatas.map(it => ({
+                                                      ...it,
+                                                      isDeactivated: true
+                                                }))}
+                                                onSelect={value => {
+                                                      setSelectedMetaDatas(
+                                                            value?.items?.length > 0 ? [value.items[0]] : []
+                                                      );
+                                                }}
+                                                displayNameProp="displayName"
+                                          />
+                                    )}
+
+                                    {selectedTypeSource === 'GROUPS' && (
+                                          <div>Donc on affiche la liste venant du data store</div>
+                                    )}
                               </div>
                         </ModalContent>
                         <ModalActions>
