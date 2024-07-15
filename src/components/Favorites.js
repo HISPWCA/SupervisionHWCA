@@ -527,6 +527,14 @@ const Favorites = ({ me }) => {
                   //       throw new Error(translate('Configuration_Deja_Ajoutee'));
                   // }
                   // }
+                  selectedCrosscheck(null);
+                  setSelectedCrosscheckChild(null);
+                  setFormIndicatorConfiguration({
+                        selectedIndicator: { dataElement: null, source: null },
+                        selectedRecoupements: [],
+                        isIndicator: true,
+                        currentElement: null
+                  });
             } catch (err) {
                   setNotification({
                         show: true,
@@ -1398,14 +1406,14 @@ const Favorites = ({ me }) => {
                                                                                                 true
                                                                                           );
 
-                                                                                          // setFormIndicatorConfiguration(
-                                                                                          //       {
-                                                                                          //             ...formIndicatorConfiguration,
-                                                                                          //             currentElement:
-                                                                                          //                   rec,
-                                                                                          //             isIndicator: false
-                                                                                          //       }
-                                                                                          // );
+                                                                                          setFormIndicatorConfiguration(
+                                                                                                {
+                                                                                                      ...formIndicatorConfiguration,
+                                                                                                      currentElement:
+                                                                                                            rec,
+                                                                                                      isIndicator: false
+                                                                                                }
+                                                                                          );
                                                                                     }}
                                                                               ></Button>
                                                                         </div>
@@ -1604,8 +1612,6 @@ const Favorites = ({ me }) => {
                                           />
                                     </div>
                               )}
-
-                              <pre>{JSON.stringify(formIndicatorConfiguration, null, 2)}</pre>
                         </ModalContent>
                         <ModalActions>
                               <ButtonStrip end>
@@ -1642,6 +1648,10 @@ const Favorites = ({ me }) => {
                                                                   }
                                                             )
                                                 });
+
+                                                setSelectedCrosscheck(null);
+                                                setSelectedCrosscheckChild(null);
+                                                setVisibleAnalyticComponentModalForCrossCheck(false);
                                           }}
                                           icon={<FiSave style={{ fontSize: '18px' }} />}
                                     >
