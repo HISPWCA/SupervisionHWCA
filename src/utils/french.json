@@ -274,7 +274,7 @@
     "Venant_Du_DHIS2": "Venant du DHIS2 ",
     "Venant_Du_Group": "Venant d'un group d'indicateur",
     "Indicators_Recoupements": "Indicateurs et Recoupements",
-    "Margin_Of_Errors": "Marge d'erreurs "
-
-    
+    "Margin_Of_Errors": "Marge d'erreurs ",
+    "Indicator_MOE": "Indicateur Marge d'erreur ",
+    "Recoupement_MOE": "Recoupement Marge d'erreur "
 }

@@ -62,7 +62,9 @@ const Favorites = ({ me }) => {
             selectedIndicator: { dataElement: null, source: null },
             selectedRecoupements: [],
             isIndicator: true,
-            currentElement: null
+            currentElement: null,
+            marginOfErrorIndicator: null,
+            marginOfErrorRecoupement: null
       });
 
       const [notification, setNotification] = useState({
@@ -83,11 +85,6 @@ const Favorites = ({ me }) => {
             setSelectedProgramStage(programStages.find(pstage => pstage.id === value));
             setSelectedDataElement(null);
       };
-
-      // const handleSelectedDataElementGroup = value => {
-      //       setSelectedDataElementGroup(dataElementGroups.find(dxGroup => dxGroup.id === value));
-      //       setSelectedDataElement(null);
-      // };
 
       const handleClickSupervisionItem = sup => {
             setSelectedDataElement(null);
@@ -1428,7 +1425,7 @@ const Favorites = ({ me }) => {
                                     </Col>
 
                                     {selectedProgram?.configurationType === 'DQR' &&
-                                          formIndicatorConfiguration?.selectedIndicator?.dataElement && (
+                                          formIndicatorConfiguration?.selectedIndicator?.source && (
                                                 <Col md={24}>
                                                       <div
                                                             style={{
@@ -1439,8 +1436,82 @@ const Favorites = ({ me }) => {
                                                             {translate('Margin_Of_Errors')}
                                                       </div>
                                                       <div>
-                                                            Listes des marges d'erreur pour l'indicateurs et le
-                                                            recoupement
+                                                            <Row gutter={[10, 10]}>
+                                                                  <Col md={12} xs={24}>
+                                                                        <div>
+                                                                              <div
+                                                                                    style={{
+                                                                                          marginBottom: '5px'
+                                                                                    }}
+                                                                              >
+                                                                                    {translate('Indicator_MOE')}
+                                                                              </div>
+
+                                                                              <Input
+                                                                                    min={0}
+                                                                                    type="number"
+                                                                                    placeholder={translate(
+                                                                                          'Indicator_MOE'
+                                                                                    )}
+                                                                                    style={{
+                                                                                          width: '100%'
+                                                                                    }}
+                                                                                    value={
+                                                                                          formIndicatorConfiguration?.marginOfErrorIndicator
+                                                                                    }
+                                                                                    onChange={event => {
+                                                                                          setFormIndicatorConfiguration(
+                                                                                                {
+                                                                                                      ...formIndicatorConfiguration,
+                                                                                                      marginOfErrorIndicator:
+                                                                                                            event.target
+                                                                                                                  .value
+                                                                                                }
+                                                                                          );
+                                                                                    }}
+                                                                                    optionFilterProp="label"
+                                                                                    showSearch
+                                                                              />
+                                                                        </div>
+                                                                  </Col>
+                                                                  <Col md={12} xs={24}>
+                                                                        <div>
+                                                                              <div
+                                                                                    style={{
+                                                                                          marginBottom: '5px'
+                                                                                    }}
+                                                                              >
+                                                                                    {translate('Recoupement_MOE')}
+                                                                              </div>
+
+                                                                              <Input
+                                                                                    min={0}
+                                                                                    type="number"
+                                                                                    placeholder={translate(
+                                                                                          'Recoupement_MOE'
+                                                                                    )}
+                                                                                    style={{
+                                                                                          width: '100%'
+                                                                                    }}
+                                                                                    value={
+                                                                                          formIndicatorConfiguration?.marginOfErrorRecoupement
+                                                                                    }
+                                                                                    onChange={event => {
+                                                                                          setFormIndicatorConfiguration(
+                                                                                                {
+                                                                                                      ...formIndicatorConfiguration,
+                                                                                                      marginOfErrorIndicator:
+                                                                                                            event.target
+                                                                                                                  .value
+                                                                                                }
+                                                                                          );
+                                                                                    }}
+                                                                                    optionFilterProp="label"
+                                                                                    showSearch
+                                                                              />
+                                                                        </div>
+                                                                  </Col>
+                                                            </Row>
                                                       </div>
                                                 </Col>
                                           )}

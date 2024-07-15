@@ -274,6 +274,7 @@
     "Venant_Du_DHIS2": "From DHIS2 ",
     "Venant_Du_Group": "From Indicator Group",
     "Indicators_Recoupements": "Indicators and Cross checks",
-    "Margin_Of_Errors":"Margin of errors"
-
+    "Margin_Of_Errors": "Margin of errors",
+    "Indicator_MOE": "Indicator Margin of error",
+    "Recoupement_MOE": "Cross Check Margin of error"
 }
