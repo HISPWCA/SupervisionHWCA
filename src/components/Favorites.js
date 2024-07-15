@@ -44,10 +44,7 @@ const Favorites = ({ me }) => {
       const [selectedProgramStage, setSelectedProgramStage] = useState(null);
       const [selectedDataElement, setSelectedDataElement] = useState(null);
       const [selectedMetaDatas, setSelectedMetaDatas] = useState([]);
-      const [selectedDataElementGroup, setSelectedDataElementGroup] = useState(null);
       const [inputFavorisNameForBackgroundInforation, setInputFavoritNameForBackgroundInforation] = useState('');
-      const [inputDataSourceDisplayName, setInputDataSourceDisplayName] = useState('');
-      const [inputDataSourceID, setInputDataSourceID] = useState(null);
       const [loadingSaveFavoritBackgroundInformations, setLoadingSaveFavoritBackgroundInformations] = useState(false);
       const [loadingDeleteFavoritBackgroundInformations, setLoadingDeleteFavoritBackgroundInformations] =
             useState(false);
@@ -86,9 +83,21 @@ const Favorites = ({ me }) => {
             setSelectedDataElement(null);
       };
 
+      const cleanIndicatorRecoupementState = () => {
+            setFormIndicatorConfiguration({
+                  selectedIndicator: { dataElement: null, source: null },
+                  selectedRecoupements: [],
+                  isIndicator: true,
+                  currentElement: null,
+                  marginOfErrorIndicator: null,
+                  marginOfErrorRecoupement: null
+            });
+      };
+
       const handleClickSupervisionItem = sup => {
-            setSelectedDataElement(null);
             setMappingConfigs([]);
+            setSelectedBackgroundInformationFavorit(null);
+            cleanIndicatorRecoupementState();
 
             loadProgramStages(sup.program?.id);
             setSelectedProgram(sup);
@@ -155,7 +164,6 @@ const Favorites = ({ me }) => {
       };
 
       const handleOkAnalyticComponentModal = () => {
-            console.log('selectedMetaDatas: ', selectedMetaDatas);
             formIndicatorConfiguration?.isIndicator &&
                   setFormIndicatorConfiguration({
                         ...formIndicatorConfiguration,
@@ -166,21 +174,21 @@ const Favorites = ({ me }) => {
                         }
                   });
 
-            !formIndicatorConfiguration?.isIndicator &&
-                  setFormIndicatorConfiguration({
-                        ...formIndicatorConfiguration,
-                        currentElement: null,
-                        selectedRecoupements: formIndicatorConfiguration?.selectedRecoupements?.map(rec => {
-                              if (rec.dataElement?.id === formIndicatorConfiguration?.currentElement?.dataElement?.id) {
-                                    return {
-                                          ...formIndicatorConfiguration?.currentElement,
-                                          source: selectedMetaDatas[0]
-                                    };
-                              }
+            // !formIndicatorConfiguration?.isIndicator &&
+            //       setFormIndicatorConfiguration({
+            //             ...formIndicatorConfiguration,
+            //             currentElement: null,
+            //             selectedRecoupements: formIndicatorConfiguration?.selectedRecoupements?.map(rec => {
+            //                   if (rec.dataElement?.id === formIndicatorConfiguration?.currentElement?.dataElement?.id) {
+            //                         return {
+            //                               ...formIndicatorConfiguration?.currentElement,
+            //                               source: selectedMetaDatas[0]
+            //                         };
+            //                   }
 
-                              return rec;
-                        })
-                  });
+            //                   return rec;
+            //             })
+            //       });
 
             setSelectedMetaDatas([]);
             setVisibleAnalyticComponentModal(false);
@@ -195,7 +203,6 @@ const Favorites = ({ me }) => {
             const found_indicators = selectedProgram?.programStageConfigurations[0]?.indicatorsFieldsConfigs.find(
                   dataElement => dataElement.value?.id === value
             );
-            console.log('found_indicators:', found_indicators);
 
             if (found_indicators) {
                   setFormIndicatorConfiguration({
@@ -208,16 +215,20 @@ const Favorites = ({ me }) => {
 
                         selectedRecoupements:
                               found_indicators.recoupements?.map(rec => ({ source: null, dataElement: rec.value })) ||
-                              []
+                              [],
+
+                        marginOfErrorIndicator: {
+                              dataElement: found_indicators.indicatorMargin,
+                              source: null
+                        },
+
+                        marginOfErrorRecoupement: {
+                              dataElement: found_indicators.recoupementMargin,
+                              source: null
+                        }
                   });
             }
       };
-
-      // const handleSelectedDataElementFromWhere = ({ value }) => {
-      //       setSelectedDataElement(null);
-      //       setSelectedDataElementFromWhere(value);
-      //       if (value === ALL) setSelectedDataElementGroup(null);
-      // };
 
       const RenderSelectedSupervisionTypeList = () => (
             <>
@@ -306,16 +317,6 @@ const Favorites = ({ me }) => {
                         inputFavorisNameForBackgroundInforation?.trim()?.length === 0
                   )
                         throw new Error(translate('Nom_Obligatoire'));
-
-                  // if (
-                  //       !selectedBackgroundInformationFavorit &&
-                  //       selectedBackgroundInformationTypeConfiguration === DIRECTE &&
-                  //       favoritBackgroundInformationList
-                  //             .map(f => f.name?.trim())
-                  //             .includes(inputFavorisNameForBackgroundInforation?.trim())
-                  // ) {
-                  //       throw new Error(translate('Favorit_Exist_Deja'));
-                  // }
 
                   let payload = {
                         name: inputFavorisNameForBackgroundInforation,
@@ -452,21 +453,6 @@ const Favorites = ({ me }) => {
       const handleSaveNewMappingConfig = async () => {
             try {
                   setLoadingSaveDateElementMappingConfig(true);
-                  // if (!selectedDataElement) throw new Error(translate('Element_De_Donner_Obligatoire'));
-
-                  // if (!inputDataSourceDisplayName || inputDataSourceDisplayName?.trim().length === 0)
-                  //       throw new Error(translate('Donne_Source_Obligatoire'));
-
-                  // if (!selectedProgramStage) throw new Error(translate('Programme_Stage_Obligatoire'));
-
-                  // if (selectedDataElement && selectedProgramStage) {
-                  //       const existingConfig = mappingConfigs.find(
-                  //             mapping =>
-                  //                   mapping.dataElement?.id === selectedDataElement.id &&
-                  //                   mapping.programStage?.id === selectedProgramStage.id
-                  //       );
-
-                  //       if (!existingConfig) {
 
                   const newMappingList = [];
 
@@ -488,12 +474,59 @@ const Favorites = ({ me }) => {
                   });
 
                   for (let rec of formIndicatorConfiguration.selectedRecoupements) {
+                        if (rec.source && rec.dataElement) {
+                              newMappingList.push({
+                                    id: uuid(),
+                                    dataElement: rec.dataElement,
+                                    indicator: {
+                                          displayName: rec.source?.name,
+                                          id: rec.source?.id
+                                    },
+                                    programStage: {
+                                          id: selectedProgram?.programStageConfigurations[0]?.programStage?.id,
+                                          displayName:
+                                                selectedProgram?.programStageConfigurations[0]?.programStage
+                                                      ?.displayName
+                                    },
+                                    program: {
+                                          id: selectedProgram?.program?.id,
+                                          displayName: selectedProgram?.program?.displayName
+                                    }
+                              });
+                        }
+                  }
+
+                  if (
+                        selectedProgram?.configurationType === 'DQR' &&
+                        formIndicatorConfiguration?.marginOfErrorIndicator?.source &&
+                        formIndicatorConfiguration?.marginOfErrorIndicator?.dataElement &&
+                        formIndicatorConfiguration?.marginOfErrorRecoupement?.source &&
+                        formIndicatorConfiguration?.marginOfErrorRecoupement?.dataElement
+                  ) {
                         newMappingList.push({
                               id: uuid(),
-                              dataElement: rec.dataElement,
+                              dataElement: formIndicatorConfiguration?.marginOfErrorIndicator?.dataElement,
                               indicator: {
-                                    displayName: rec.source?.name,
-                                    id: rec.source?.id
+                                    displayName: formIndicatorConfiguration?.marginOfErrorIndicator?.source?.name,
+                                    id: formIndicatorConfiguration?.marginOfErrorIndicator?.source?.id
+                              },
+                              programStage: {
+                                    id: selectedProgram?.programStageConfigurations[0]?.programStage?.id,
+                                    displayName:
+                                          selectedProgram?.programStageConfigurations[0]?.programStage?.displayName
+                              },
+                              program: {
+                                    id: selectedProgram?.program?.id,
+                                    displayName: selectedProgram?.program?.displayName
+                              }
+                        });
+
+                        newMappingList.push({
+                              id: uuid(),
+                              dataElement: formIndicatorConfiguration?.marginOfErrorRecoupement?.dataElement,
+                              indicator: {
+                                    displayName: formIndicatorConfiguration?.marginOfErrorRecoupement?.source?.name,
+                                    id: formIndicatorConfiguration?.marginOfErrorRecoupement?.source?.id
                               },
                               programStage: {
                                     id: selectedProgram?.programStageConfigurations[0]?.programStage?.id,
@@ -507,32 +540,45 @@ const Favorites = ({ me }) => {
                         });
                   }
 
+                  for (let newL of newMappingList) {
+                        const existingConfig = mappingConfigs.find(
+                              mapping => mapping.dataElement?.id === newL.dataElement?.id
+                        );
+
+                        if (existingConfig) throw new Error(translate('Configuration_Deja_Ajoutee'));
+                  }
+
                   const newList = [...mappingConfigs, ...newMappingList];
-                  setMappingConfigs(newList);
+
+                  if (newList.length === 0) return null;
+
+                  console.log('new mapping: ', newMappingList);
+
+                  console.log('mappingConfigs  length : ', mappingConfigs.length);
+                  console.log('newMappingList  length : ', newMappingList.length);
+                  console.log('newList  length : ', newList.length);
+
+                  setMappingConfigs([...newList]);
                   setSelectedDataElement(null);
-                  setInputDataSourceDisplayName('');
                   setInputFavoritNameForBackgroundInforation('');
-                  setInputDataSourceID(null);
-                  setSelectedProgramStage(null);
                   setNotification({
                         show: true,
                         type: NOTIFICATION_SUCCESS,
                         message: translate('Configuration_Ajoutee')
                   });
                   setLoadingSaveDateElementMappingConfig(false);
-                  // } else {
-                  //       throw new Error(translate('Configuration_Deja_Ajoutee'));
-                  // }
-                  // }
-                  selectedCrosscheck(null);
+                  setSelectedCrosscheck(null);
                   setSelectedCrosscheckChild(null);
                   setFormIndicatorConfiguration({
                         selectedIndicator: { dataElement: null, source: null },
                         selectedRecoupements: [],
                         isIndicator: true,
-                        currentElement: null
+                        currentElement: null,
+                        marginOfErrorIndicator: null,
+                        marginOfErrorRecoupement: null
                   });
             } catch (err) {
+                  console.log(err);
                   setNotification({
                         show: true,
                         type: NOTIFICATION_CRITICAL,
@@ -666,6 +712,7 @@ const Favorites = ({ me }) => {
                               <hr style={{ margin: '10px auto' }} />
 
                               <Table
+                                    bordered
                                     dataSource={mappingConfigs.map(mapConf => ({
                                           ...mapConf,
                                           programStageName: mapConf.programStage?.displayName,
@@ -675,14 +722,14 @@ const Favorites = ({ me }) => {
                                           action: { id: mapConf.id }
                                     }))}
                                     columns={[
-                                          {
-                                                title: translate('Programme'),
-                                                dataIndex: 'programName'
-                                          },
-                                          {
-                                                title: translate('Programme_Stage'),
-                                                dataIndex: 'programStageName'
-                                          },
+                                          // {
+                                          //       title: translate('Programme'),
+                                          //       dataIndex: 'programName'
+                                          // },
+                                          // {
+                                          //       title: translate('Programme_Stage'),
+                                          //       dataIndex: 'programStageName'
+                                          // },
                                           {
                                                 title: translate('Form_Field'),
                                                 dataIndex: 'dataElementName'
@@ -1181,119 +1228,104 @@ const Favorites = ({ me }) => {
                                           </Col>
                                     )} */}
 
-                                    {console.log('formIndicatorConfiguration: ', formIndicatorConfiguration)}
-
-                                    {selectedBackgroundInformationTypeConfiguration === DIRECTE && (
-                                          <Col md={24}>
-                                                <div>
-                                                      <div
-                                                            style={{
-                                                                  fontWeight: 'bold',
-                                                                  marginBottom: '10px'
-                                                            }}
-                                                      >
-                                                            {translate('Indicators_Recoupements')}
-                                                      </div>
-                                                      <Row gutter={[10, 10]}>
-                                                            <Col md={12} xs={24}>
-                                                                  <div>
-                                                                        <div
-                                                                              style={{
-                                                                                    marginBottom: '5px'
-                                                                              }}
-                                                                        >
-                                                                              {translate('Indicateurs')}
-                                                                        </div>
-
-                                                                        <Select
-                                                                              options={
-                                                                                    selectedProgram?.programStageConfigurations[0]?.indicatorsFieldsConfigs?.map(
-                                                                                          indic => ({
-                                                                                                label: indic.value
-                                                                                                      ?.displayName,
-                                                                                                value: indic.value?.id
-                                                                                          })
-                                                                                    ) || []
-                                                                              }
-                                                                              placeholder={translate('Indicateurs')}
-                                                                              style={{
-                                                                                    width: '100%'
-                                                                              }}
-                                                                              onChange={handleSelectDataElement}
-                                                                              value={selectedDataElement?.id}
-                                                                              optionFilterProp="label"
-                                                                              showSearch
-                                                                        />
-                                                                  </div>
-                                                            </Col>
-
-                                                            <Col md={10} xs={24}>
-                                                                  <div>
-                                                                        <div
-                                                                              style={{
-                                                                                    marginBottom: '5px'
-                                                                              }}
-                                                                        >
-                                                                              {translate('Source_De_Donnee')}
-                                                                        </div>
-                                                                        <Input
-                                                                              placeholder={translate(
-                                                                                    'Source_De_Donnee'
-                                                                              )}
-                                                                              disabled
-                                                                              style={{ width: '100%' }}
-                                                                              value={
-                                                                                    formIndicatorConfiguration
-                                                                                          ?.selectedIndicator?.source
-                                                                                          ?.name
-                                                                              }
-                                                                              onChange={event => {
-                                                                                    setInputDataSourceDisplayName(
-                                                                                          ''.concat(event.target.value)
-                                                                                    );
-                                                                              }}
-                                                                        />
-                                                                  </div>
-                                                            </Col>
-
-                                                            <Col md={2} xs={24}>
-                                                                  <div style={{ marginTop: '28px' }}>
-                                                                        <Button
-                                                                              small
-                                                                              primary
-                                                                              disabled={
-                                                                                    formIndicatorConfiguration
-                                                                                          ?.selectedIndicator
-                                                                                          ?.dataElement
-                                                                                          ? false
-                                                                                          : true
-                                                                              }
-                                                                              icon={
-                                                                                    <TbSelect
-                                                                                          style={{
-                                                                                                fontSize: '18px',
-                                                                                                color: '#fff'
-                                                                                          }}
-                                                                                    />
-                                                                              }
-                                                                              onClick={() => {
-                                                                                    setVisibleAnalyticComponentModal(
-                                                                                          true
-                                                                                    );
-                                                                                    setFormIndicatorConfiguration({
-                                                                                          ...formIndicatorConfiguration,
-                                                                                          currentElement:
-                                                                                                formIndicatorConfiguration?.selectedIndicator,
-                                                                                          isIndicator: true
-                                                                                    });
-                                                                              }}
-                                                                        ></Button>
-                                                                  </div>
-                                                            </Col>
-                                                      </Row>
+                                    <Col md={24}>
+                                          <div>
+                                                <div
+                                                      style={{
+                                                            fontWeight: 'bold',
+                                                            marginBottom: '10px'
+                                                      }}
+                                                >
+                                                      {translate('Indicators_Recoupements')}
                                                 </div>
-                                          </Col>
-                                    )}
+                                                <Row gutter={[10, 10]}>
+                                                      <Col md={12} xs={24}>
+                                                            <div>
+                                                                  <div
+                                                                        style={{
+                                                                              marginBottom: '5px'
+                                                                        }}
+                                                                  >
+                                                                        {translate('Indicateurs')}
+                                                                  </div>
+
+                                                                  <Select
+                                                                        options={
+                                                                              selectedProgram?.programStageConfigurations[0]?.indicatorsFieldsConfigs?.map(
+                                                                                    indic => ({
+                                                                                          label: indic.value
+                                                                                                ?.displayName,
+                                                                                          value: indic.value?.id
+                                                                                    })
+                                                                              ) || []
+                                                                        }
+                                                                        placeholder={translate('Indicateurs')}
+                                                                        style={{
+                                                                              width: '100%'
+                                                                        }}
+                                                                        onChange={handleSelectDataElement}
+                                                                        value={selectedDataElement?.id}
+                                                                        optionFilterProp="label"
+                                                                        showSearch
+                                                                  />
+                                                            </div>
+                                                      </Col>
+
+                                                      <Col md={10} xs={24}>
+                                                            <div>
+                                                                  <div
+                                                                        style={{
+                                                                              marginBottom: '5px'
+                                                                        }}
+                                                                  >
+                                                                        {translate('Source_De_Donnee')}
+                                                                  </div>
+                                                                  <Input
+                                                                        placeholder={translate('Source_De_Donnee')}
+                                                                        disabled
+                                                                        style={{ width: '100%' }}
+                                                                        value={
+                                                                              formIndicatorConfiguration
+                                                                                    ?.selectedIndicator?.source?.name
+                                                                        }
+                                                                  />
+                                                            </div>
+                                                      </Col>
+
+                                                      <Col md={2} xs={24}>
+                                                            <div style={{ marginTop: '28px' }}>
+                                                                  <Button
+                                                                        small
+                                                                        primary
+                                                                        disabled={
+                                                                              formIndicatorConfiguration
+                                                                                    ?.selectedIndicator?.dataElement
+                                                                                    ? false
+                                                                                    : true
+                                                                        }
+                                                                        icon={
+                                                                              <TbSelect
+                                                                                    style={{
+                                                                                          fontSize: '18px',
+                                                                                          color: '#fff'
+                                                                                    }}
+                                                                              />
+                                                                        }
+                                                                        onClick={() => {
+                                                                              setVisibleAnalyticComponentModal(true);
+                                                                              setFormIndicatorConfiguration({
+                                                                                    ...formIndicatorConfiguration,
+                                                                                    currentElement:
+                                                                                          formIndicatorConfiguration?.selectedIndicator,
+                                                                                    isIndicator: true
+                                                                              });
+                                                                        }}
+                                                                  ></Button>
+                                                            </div>
+                                                      </Col>
+                                                </Row>
+                                          </div>
+                                    </Col>
 
                                     {formIndicatorConfiguration?.selectedIndicator?.source &&
                                           formIndicatorConfiguration?.selectedRecoupements?.map((rec, recIndex) => (
@@ -1457,15 +1489,26 @@ const Favorites = ({ me }) => {
                                                                                           width: '100%'
                                                                                     }}
                                                                                     value={
-                                                                                          formIndicatorConfiguration?.marginOfErrorIndicator
+                                                                                          formIndicatorConfiguration
+                                                                                                ?.marginOfErrorIndicator
+                                                                                                ?.source?.id
                                                                                     }
                                                                                     onChange={event => {
                                                                                           setFormIndicatorConfiguration(
                                                                                                 {
                                                                                                       ...formIndicatorConfiguration,
                                                                                                       marginOfErrorIndicator:
-                                                                                                            event.target
-                                                                                                                  .value
+                                                                                                            {
+                                                                                                                  ...formIndicatorConfiguration?.marginOfErrorIndicator,
+                                                                                                                  source: {
+                                                                                                                        id: event
+                                                                                                                              .target
+                                                                                                                              .value,
+                                                                                                                        name: event
+                                                                                                                              .target
+                                                                                                                              .value
+                                                                                                                  }
+                                                                                                            }
                                                                                                 }
                                                                                           );
                                                                                     }}
@@ -1494,15 +1537,26 @@ const Favorites = ({ me }) => {
                                                                                           width: '100%'
                                                                                     }}
                                                                                     value={
-                                                                                          formIndicatorConfiguration?.marginOfErrorRecoupement
+                                                                                          formIndicatorConfiguration
+                                                                                                ?.marginOfErrorRecoupement
+                                                                                                ?.source?.id
                                                                                     }
                                                                                     onChange={event => {
                                                                                           setFormIndicatorConfiguration(
                                                                                                 {
                                                                                                       ...formIndicatorConfiguration,
-                                                                                                      marginOfErrorIndicator:
-                                                                                                            event.target
-                                                                                                                  .value
+                                                                                                      marginOfErrorRecoupement:
+                                                                                                            {
+                                                                                                                  ...formIndicatorConfiguration?.marginOfErrorRecoupement,
+                                                                                                                  source: {
+                                                                                                                        id: event
+                                                                                                                              .target
+                                                                                                                              .value,
+                                                                                                                        name: event
+                                                                                                                              .target
+                                                                                                                              .value
+                                                                                                                  }
+                                                                                                            }
                                                                                                 }
                                                                                           );
                                                                                     }}

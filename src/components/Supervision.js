@@ -1784,16 +1784,16 @@ const Supervision = ({ me }) => {
                               eventPayload.status = 'ACTIVE';
                               eventPayload.eventDate = payload.period
                                     ? dayjs(payload.period).format('YYYY-MM-DD')
-                                    : dayjs().format('YYYY-MM-DD');
+                                    : dayjs().format('YYYY-MM-DD')
                               eventPayload.dueDate = payload.period
                                     ? dayjs(payload.period).format('YYYY-MM-DD')
-                                    : dayjs().format('YYYY-MM-DD');
+                                    : dayjs().format('YYYY-MM-DD')
                               eventPayload.dataValues = mappingConfigs
                                     .filter(ev => ev.programStage?.id === payload.programStage?.id)
                                     .map(ev => ({
                                           dataElement: ev.dataElement?.id,
                                           value: ev.indicator?.displayName
-                                    }));
+                                    }))
                         } else {
                               eventPayload.status = 'SCHEDULE';
                               eventPayload.dueDate = payload.period
@@ -2309,7 +2309,7 @@ const Supervision = ({ me }) => {
                                           ou => ou.id === item.organisationUnit?.id
                                     );
 
-                                    const is_ok =
+                                    let is_ok =
                                           (found_organisationUnit &&
                                                 progStageConfig?.programStage &&
                                                 found_organisationUnit.organisationUnitGroups
@@ -2317,10 +2317,14 @@ const Supervision = ({ me }) => {
                                                       .includes(progStageConfig?.organisationUnitGroup?.id)) ||
                                           false;
 
-                                    /*
-                                     * Nous allons vérifier s'il y a un program stage selectionné. S'il en a , alors on vérifier si c'ette organisation unit appartient au group
-                                     */
+                                    if (selectedProgram?.configurationType === 'DQR') {
+                                          is_ok = true;
+                                    }
+
                                     if (is_ok) {
+                                          /*    
+                                           * Nous allons vérifier s'il y a un program stage selectionné. S'il en a , alors on vérifier si c'ette organisation unit appartient au group
+                                           */
                                           const payload = {
                                                 ...item,
                                                 orgUnit: item.organisationUnit?.id,
@@ -2667,18 +2671,18 @@ const Supervision = ({ me }) => {
 
                   const newDataStoreSupervisions = await loadDataStoreSupervisions();
 
-                  if (
-                        selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
-                        selectedProgram.generationType === TYPE_GENERATION_AS_TEI
-                  )
-                        await saveSupervisionAsTEIStrategy(inputFields, newDataStoreSupervisions);
+                  // if (
+                  //       selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
+                  //       selectedProgram.generationType === TYPE_GENERATION_AS_TEI
+                  // )
+                  //       await saveSupervisionAsTEIStrategy(inputFields, newDataStoreSupervisions);
 
-                  if (
-                        selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
-                        selectedProgram.generationType === TYPE_GENERATION_AS_ENROLMENT
-                  ) {
-                        await saveSupervisionAsEnrollmentStrategy(inputFields, newDataStoreSupervisions);
-                  }
+                  // if (
+                  //       selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
+                  //       selectedProgram.generationType === TYPE_GENERATION_AS_ENROLMENT
+                  // ) {
+                  //       await saveSupervisionAsEnrollmentStrategy(inputFields, newDataStoreSupervisions);
+                  // }
 
                   if (
                         selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
