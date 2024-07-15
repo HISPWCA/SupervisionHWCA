@@ -1620,7 +1620,31 @@ const Favorites = ({ me }) => {
                                     >
                                           {translate('Annuler')}
                                     </Button>
-                                    <Button primary onClick={() => {}} icon={<FiSave style={{ fontSize: '18px' }} />}>
+                                    <Button
+                                          primary
+                                          onClick={() => {
+                                                setFormIndicatorConfiguration({
+                                                      ...formIndicatorConfiguration,
+                                                      selectedRecoupements:
+                                                            formIndicatorConfiguration?.selectedRecoupements?.map(
+                                                                  rec => {
+                                                                        if (
+                                                                              formIndicatorConfiguration?.currentElement
+                                                                                    ?.dataElement?.id ===
+                                                                              rec?.dataElement?.id
+                                                                        ) {
+                                                                              return {
+                                                                                    ...rec,
+                                                                                    source: selectedCrosscheckChild
+                                                                              };
+                                                                        }
+                                                                        return rec;
+                                                                  }
+                                                            )
+                                                });
+                                          }}
+                                          icon={<FiSave style={{ fontSize: '18px' }} />}
+                                    >
                                           {translate('Enregistrer')}
                                     </Button>
                               </ButtonStrip>
