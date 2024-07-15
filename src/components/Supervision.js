@@ -2687,12 +2687,12 @@ const Supervision = ({ me }) => {
                         await saveSupervisionAsEventStrategy(inputFields, newDataStoreSupervisions);
                   }
 
-                  if (
-                        selectedSupervisionType === TYPE_SUPERVISION_AGENT &&
-                        selectedProgram.generationType === TYPE_GENERATION_AS_EVENT
-                  ) {
-                        await saveSupervisionAsEventStrategy(inputFields, newDataStoreSupervisions);
-                  }
+                  // if (
+                  //       selectedSupervisionType === TYPE_SUPERVISION_AGENT &&
+                  //       selectedProgram.generationType === TYPE_GENERATION_AS_EVENT
+                  // ) {
+                  //       await saveSupervisionAsEventStrategy(inputFields, newDataStoreSupervisions);
+                  // }
 
                   const missionList = (await loadDataStore(process.env.REACT_APP_MISSIONS_KEY, null, null, [])) || [];
                   const newMissionList = [
@@ -4615,8 +4615,6 @@ const Supervision = ({ me }) => {
                                           </div>
                                           <div style={{ padding: '10px' }}>
                                                 <Row gutter={[10, 10]}>
-       
-
                                                       <Col sm={24} md={24}>
                                                             <div>
                                                                   <div style={{ marginBottom: '5px' }}>
@@ -6919,9 +6917,7 @@ const Supervision = ({ me }) => {
                                     <Col sm={24} md={8}>
                                           {RenderSupervisionTypeContent()}
                                           {selectedSupervisionType && RenderSelectedSupervisionTypeList()}
-                                          {selectedProgram &&
-                                                selectedProgram?.isRDQAConfigCase &&
-                                                RenderDataElementConfigContent()}
+                                          {selectedProgram && RenderDataElementConfigContent()}
                                     </Col>
                                     <Col sm={24} md={16}>
                                           {selectedProgram &&

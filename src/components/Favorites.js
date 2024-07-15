@@ -60,7 +60,9 @@ const Favorites = ({ me }) => {
 
       const [formIndicatorConfiguration, setFormIndicatorConfiguration] = useState({
             selectedIndicator: { dataElement: null, source: null },
-            selectedRecoupements: []
+            selectedRecoupements: [],
+            isIndicator: true,
+            currentElement: null
       });
 
       const [notification, setNotification] = useState({
@@ -71,15 +73,21 @@ const Favorites = ({ me }) => {
 
       const [selectedTypeSource, setSelectedTypeSource] = useState('DHIS2');
 
+      const [dataStoreCrosschecks, setDataStoreCrosschecks] = useState([]);
+      const [selectedCrosscheck, setSelectedCrosscheck] = useState(null);
+      const [selectedCrosscheckChild, setSelectedCrosscheckChild] = useState(null);
+      const [visibleAnalyticComponentModalForCrossCheck, setVisibleAnalyticComponentModalForCrossCheck] =
+            useState(false);
+
       const handleSelectProgramStage = value => {
             setSelectedProgramStage(programStages.find(pstage => pstage.id === value));
             setSelectedDataElement(null);
       };
 
-      const handleSelectedDataElementGroup = value => {
-            setSelectedDataElementGroup(dataElementGroups.find(dxGroup => dxGroup.id === value));
-            setSelectedDataElement(null);
-      };
+      // const handleSelectedDataElementGroup = value => {
+      //       setSelectedDataElementGroup(dataElementGroups.find(dxGroup => dxGroup.id === value));
+      //       setSelectedDataElement(null);
+      // };
 
       const handleClickSupervisionItem = sup => {
             setSelectedDataElement(null);
@@ -150,18 +158,35 @@ const Favorites = ({ me }) => {
       };
 
       const handleOkAnalyticComponentModal = () => {
-            // setInputDataSourceDisplayName(selectedMetaDatas[0]?.name);
-            // setInputDataSourceID(selectedMetaDatas[0]?.id);
+            console.log('selectedMetaDatas: ', selectedMetaDatas);
+            formIndicatorConfiguration?.isIndicator &&
+                  setFormIndicatorConfiguration({
+                        ...formIndicatorConfiguration,
+                        currentElement: null,
+                        selectedIndicator: formIndicatorConfiguration?.selectedIndicator && {
+                              ...formIndicatorConfiguration.selectedIndicator,
+                              source: selectedMetaDatas[0]
+                        }
+                  });
+
+            !formIndicatorConfiguration?.isIndicator &&
+                  setFormIndicatorConfiguration({
+                        ...formIndicatorConfiguration,
+                        currentElement: null,
+                        selectedRecoupements: formIndicatorConfiguration?.selectedRecoupements?.map(rec => {
+                              if (rec.dataElement?.id === formIndicatorConfiguration?.currentElement?.dataElement?.id) {
+                                    return {
+                                          ...formIndicatorConfiguration?.currentElement,
+                                          source: selectedMetaDatas[0]
+                                    };
+                              }
+
+                              return rec;
+                        })
+                  });
+
             setSelectedMetaDatas([]);
             setVisibleAnalyticComponentModal(false);
-
-            setFormIndicatorConfiguration({
-                  ...formIndicatorConfiguration,
-                  selectedIndicator: formIndicatorConfiguration?.selectedIndicator && {
-                        ...formIndicatorConfiguration.selectedIndicator,
-                        source: selectedMetaDatas[0]
-                  }
-            });
       };
 
       const handleCancelAnalyticComponentModal = () => {
@@ -178,7 +203,11 @@ const Favorites = ({ me }) => {
             if (found_indicators) {
                   setFormIndicatorConfiguration({
                         ...formIndicatorConfiguration,
-                        selectedIndicator: found_indicators.value,
+                        selectedIndicator: {
+                              ...formIndicatorConfiguration?.selectedIndicator,
+                              dataElement: found_indicators.value,
+                              source: null
+                        },
 
                         selectedRecoupements:
                               found_indicators.recoupements?.map(rec => ({ source: null, dataElement: rec.value })) ||
@@ -281,15 +310,15 @@ const Favorites = ({ me }) => {
                   )
                         throw new Error(translate('Nom_Obligatoire'));
 
-                  if (
-                        !selectedBackgroundInformationFavorit &&
-                        selectedBackgroundInformationTypeConfiguration === DIRECTE &&
-                        favoritBackgroundInformationList
-                              .map(f => f.name?.trim())
-                              .includes(inputFavorisNameForBackgroundInforation?.trim())
-                  ) {
-                        throw new Error(translate('Favorit_Exist_Deja'));
-                  }
+                  // if (
+                  //       !selectedBackgroundInformationFavorit &&
+                  //       selectedBackgroundInformationTypeConfiguration === DIRECTE &&
+                  //       favoritBackgroundInformationList
+                  //             .map(f => f.name?.trim())
+                  //             .includes(inputFavorisNameForBackgroundInforation?.trim())
+                  // ) {
+                  //       throw new Error(translate('Favorit_Exist_Deja'));
+                  // }
 
                   let payload = {
                         name: inputFavorisNameForBackgroundInforation,
@@ -426,54 +455,78 @@ const Favorites = ({ me }) => {
       const handleSaveNewMappingConfig = async () => {
             try {
                   setLoadingSaveDateElementMappingConfig(true);
-                  if (!selectedDataElement) throw new Error(translate('Element_De_Donner_Obligatoire'));
+                  // if (!selectedDataElement) throw new Error(translate('Element_De_Donner_Obligatoire'));
 
-                  if (!inputDataSourceDisplayName || inputDataSourceDisplayName?.trim().length === 0)
-                        throw new Error(translate('Donne_Source_Obligatoire'));
+                  // if (!inputDataSourceDisplayName || inputDataSourceDisplayName?.trim().length === 0)
+                  //       throw new Error(translate('Donne_Source_Obligatoire'));
 
-                  if (!selectedProgramStage) throw new Error(translate('Programme_Stage_Obligatoire'));
+                  // if (!selectedProgramStage) throw new Error(translate('Programme_Stage_Obligatoire'));
 
-                  if (selectedDataElement && selectedProgramStage) {
-                        const existingConfig = mappingConfigs.find(
-                              mapping =>
-                                    mapping.dataElement?.id === selectedDataElement.id &&
-                                    mapping.programStage?.id === selectedProgramStage.id
-                        );
+                  // if (selectedDataElement && selectedProgramStage) {
+                  //       const existingConfig = mappingConfigs.find(
+                  //             mapping =>
+                  //                   mapping.dataElement?.id === selectedDataElement.id &&
+                  //                   mapping.programStage?.id === selectedProgramStage.id
+                  //       );
 
-                        if (!existingConfig) {
-                              const payload = {
-                                    id: uuid(),
-                                    dataElement: selectedDataElement,
-                                    indicator: {
-                                          displayName: inputDataSourceDisplayName,
-                                          id: inputDataSourceID
-                                    },
-                                    programStage: {
-                                          id: selectedProgramStage.id,
-                                          displayName: selectedProgramStage.displayName
-                                    },
-                                    program: {
-                                          id: selectedProgram?.program?.id,
-                                          displayName: selectedProgram?.program?.displayName
-                                    }
-                              };
-                              const newList = [...mappingConfigs, payload];
-                              setMappingConfigs(newList);
-                              setSelectedDataElement(null);
-                              setInputDataSourceDisplayName('');
-                              setInputFavoritNameForBackgroundInforation('');
-                              setInputDataSourceID(null);
-                              setSelectedProgramStage(null);
-                              setNotification({
-                                    show: true,
-                                    type: NOTIFICATION_SUCCESS,
-                                    message: translate('Configuration_Ajoutee')
-                              });
-                              setLoadingSaveDateElementMappingConfig(false);
-                        } else {
-                              throw new Error(translate('Configuration_Deja_Ajoutee'));
+                  //       if (!existingConfig) {
+
+                  const newMappingList = [];
+
+                  newMappingList.push({
+                        id: uuid(),
+                        dataElement: formIndicatorConfiguration.selectedIndicator?.dataElement,
+                        indicator: {
+                              displayName: formIndicatorConfiguration.selectedIndicator?.source?.name,
+                              id: formIndicatorConfiguration.selectedIndicator?.source?.id
+                        },
+                        programStage: {
+                              id: selectedProgram?.programStageConfigurations[0]?.programStage?.id,
+                              displayName: selectedProgram?.programStageConfigurations[0]?.programStage?.displayName
+                        },
+                        program: {
+                              id: selectedProgram?.program?.id,
+                              displayName: selectedProgram?.program?.displayName
                         }
+                  });
+
+                  for (let rec of formIndicatorConfiguration.selectedRecoupements) {
+                        newMappingList.push({
+                              id: uuid(),
+                              dataElement: rec.dataElement,
+                              indicator: {
+                                    displayName: rec.source?.name,
+                                    id: rec.source?.id
+                              },
+                              programStage: {
+                                    id: selectedProgram?.programStageConfigurations[0]?.programStage?.id,
+                                    displayName:
+                                          selectedProgram?.programStageConfigurations[0]?.programStage?.displayName
+                              },
+                              program: {
+                                    id: selectedProgram?.program?.id,
+                                    displayName: selectedProgram?.program?.displayName
+                              }
+                        });
                   }
+
+                  const newList = [...mappingConfigs, ...newMappingList];
+                  setMappingConfigs(newList);
+                  setSelectedDataElement(null);
+                  setInputDataSourceDisplayName('');
+                  setInputFavoritNameForBackgroundInforation('');
+                  setInputDataSourceID(null);
+                  setSelectedProgramStage(null);
+                  setNotification({
+                        show: true,
+                        type: NOTIFICATION_SUCCESS,
+                        message: translate('Configuration_Ajoutee')
+                  });
+                  setLoadingSaveDateElementMappingConfig(false);
+                  // } else {
+                  //       throw new Error(translate('Configuration_Deja_Ajoutee'));
+                  // }
+                  // }
             } catch (err) {
                   setNotification({
                         show: true,
@@ -691,6 +744,14 @@ const Favorites = ({ me }) => {
             }
       };
 
+      const loadDataStoreCrosschecks = async () => {
+            try {
+                  const response = await loadDataStore(process.env.REACT_APP_CROSS_CUT_KEY, null, null, []);
+
+                  setDataStoreCrosschecks(response);
+            } catch (err) {}
+      };
+
       const loadDataStoreBackgroundInformationFavoritsConfigs = async () => {
             try {
                   setLoadingBackgroundInformationFavoritsConfigs(true);
@@ -759,7 +820,7 @@ const Favorites = ({ me }) => {
                                           <hr style={{ margin: '10px auto', color: '#ccc' }} />
                                     </Col>
 
-                                    {/* {selectedBackgroundInformationTypeConfiguration === FAVORIS && (
+                                    {selectedBackgroundInformationTypeConfiguration === FAVORIS && (
                                           <Col md={24}>
                                                 <div>
                                                       <div style={{ marginBottom: '5px' }}>
@@ -788,7 +849,7 @@ const Favorites = ({ me }) => {
                                           </Col>
                                     )}
 
-                                    {selectedBackgroundInformationTypeConfiguration === FAVORIS &&
+                                    {/* {selectedBackgroundInformationTypeConfiguration === FAVORIS &&
                                           selectedBackgroundInformationFavorit && (
                                                 <Col md={24}>
                                                       <div style={{ marginTop: '10px' }}>
@@ -1117,8 +1178,6 @@ const Favorites = ({ me }) => {
 
                                     {console.log('formIndicatorConfiguration: ', formIndicatorConfiguration)}
 
-                                    {/* <pre>{JSON.stringify(formIndicatorConfiguration, null, 4)}</pre> */}
-
                                     {selectedBackgroundInformationTypeConfiguration === DIRECTE && (
                                           <Col md={24}>
                                                 <div>
@@ -1212,11 +1271,17 @@ const Favorites = ({ me }) => {
                                                                                           }}
                                                                                     />
                                                                               }
-                                                                              onClick={() =>
+                                                                              onClick={() => {
                                                                                     setVisibleAnalyticComponentModal(
                                                                                           true
-                                                                                    )
-                                                                              }
+                                                                                    );
+                                                                                    setFormIndicatorConfiguration({
+                                                                                          ...formIndicatorConfiguration,
+                                                                                          currentElement:
+                                                                                                formIndicatorConfiguration?.selectedIndicator,
+                                                                                          isIndicator: true
+                                                                                    });
+                                                                              }}
                                                                         ></Button>
                                                                   </div>
                                                             </Col>
@@ -1225,115 +1290,152 @@ const Favorites = ({ me }) => {
                                           </Col>
                                     )}
 
-                                    {formIndicatorConfiguration?.selectedRecoupements?.map((rec, recIndex) => (
-                                          <Col md={24}>
-                                                <div>
-                                                      <Row gutter={[10, 10]}>
-                                                            <Col md={12} xs={24}>
-                                                                  <div>
-                                                                        <div
-                                                                              style={{
-                                                                                    marginBottom: '5px'
-                                                                              }}
-                                                                        >
-                                                                              {`${translate('Recoupements')} ${
-                                                                                    recIndex + 1
-                                                                              }`}
-                                                                        </div>
+                                    {formIndicatorConfiguration?.selectedIndicator?.source &&
+                                          formIndicatorConfiguration?.selectedRecoupements?.map((rec, recIndex) => (
+                                                <Col md={24}>
+                                                      <div>
+                                                            <Row gutter={[10, 10]}>
+                                                                  <Col md={12} xs={24}>
+                                                                        <div>
+                                                                              <div
+                                                                                    style={{
+                                                                                          marginBottom: '5px'
+                                                                                    }}
+                                                                              >
+                                                                                    {`${translate('Recoupements')} ${
+                                                                                          recIndex + 1
+                                                                                    }`}
+                                                                              </div>
 
-                                                                        <Input
-                                                                              disabled
-                                                                              placeholder={`${translate(
-                                                                                    'Recoupements'
-                                                                              )} ${recIndex + 1}`}
-                                                                              style={{
-                                                                                    width: '100%'
-                                                                              }}
-                                                                              value={rec?.dataElement?.displayName}
-                                                                              optionFilterProp="label"
-                                                                              showSearch
-                                                                        />
-                                                                  </div>
-                                                            </Col>
-
-                                                            <Col md={10} xs={24}>
-                                                                  <div>
-                                                                        <div
-                                                                              style={{
-                                                                                    marginBottom: '5px'
-                                                                              }}
-                                                                        >
-                                                                              {`${translate('Source_De_Donnee')} ${
-                                                                                    recIndex + 1
-                                                                              }`}
+                                                                              <Input
+                                                                                    disabled
+                                                                                    placeholder={`${translate(
+                                                                                          'Recoupements'
+                                                                                    )} ${recIndex + 1}`}
+                                                                                    style={{
+                                                                                          width: '100%'
+                                                                                    }}
+                                                                                    value={rec?.dataElement?.name}
+                                                                                    optionFilterProp="label"
+                                                                                    showSearch
+                                                                              />
                                                                         </div>
-                                                                        <Input
-                                                                              placeholder={`${translate(
-                                                                                    'Source_De_Donnee'
-                                                                              )} ${recIndex + 1}`}
-                                                                              disabled
-                                                                              style={{ width: '100%' }}
-                                                                              value={
-                                                                                    formIndicatorConfiguration
-                                                                                          ?.selectedIndicator?.source
-                                                                                          ?.name
-                                                                              }
-                                                                              onChange={event => {
-                                                                                    setInputDataSourceDisplayName(
-                                                                                          ''.concat(event.target.value)
-                                                                                    );
-                                                                              }}
-                                                                        />
-                                                                  </div>
-                                                            </Col>
-                                                            <Col md={2} xs={24}>
-                                                                  <div style={{ marginTop: '28px' }}>
-                                                                        <Button
-                                                                              small
-                                                                              primary
-                                                                              disabled={
-                                                                                    formIndicatorConfiguration?.selectedIndicator
-                                                                                          ? false
-                                                                                          : true
-                                                                              }
-                                                                              icon={
-                                                                                    <TbSelect
-                                                                                          style={{
-                                                                                                fontSize: '18px',
-                                                                                                color: '#fff'
-                                                                                          }}
-                                                                                    />
-                                                                              }
-                                                                              onClick={() =>
-                                                                                    setVisibleAnalyticComponentModal(
-                                                                                          true
-                                                                                    )
-                                                                              }
-                                                                        ></Button>
-                                                                  </div>
-                                                            </Col>
-                                                      </Row>
-                                                </div>
-                                          </Col>
-                                    ))}
+                                                                  </Col>
+
+                                                                  <Col md={10} xs={24}>
+                                                                        <div>
+                                                                              <div
+                                                                                    style={{
+                                                                                          marginBottom: '5px'
+                                                                                    }}
+                                                                              >
+                                                                                    {`${translate(
+                                                                                          'Source_De_Donnee'
+                                                                                    )} ${recIndex + 1}`}
+                                                                              </div>
+                                                                              <Input
+                                                                                    placeholder={`${translate(
+                                                                                          'Source_De_Donnee'
+                                                                                    )} ${recIndex + 1}`}
+                                                                                    style={{ width: '100%' }}
+                                                                                    value={rec.source?.name}
+                                                                                    onChange={event => {
+                                                                                          formIndicatorConfiguration &&
+                                                                                                setFormIndicatorConfiguration(
+                                                                                                      {
+                                                                                                            ...formIndicatorConfiguration,
+                                                                                                            selectedRecoupements:
+                                                                                                                  formIndicatorConfiguration?.selectedRecoupements.map(
+                                                                                                                        (
+                                                                                                                              rec,
+                                                                                                                              index
+                                                                                                                        ) => {
+                                                                                                                              if (
+                                                                                                                                    recIndex ===
+                                                                                                                                    index
+                                                                                                                              ) {
+                                                                                                                                    return {
+                                                                                                                                          ...rec,
+                                                                                                                                          source: {
+                                                                                                                                                id: null,
+                                                                                                                                                name: ''.concat(
+                                                                                                                                                      event
+                                                                                                                                                            .target
+                                                                                                                                                            .value
+                                                                                                                                                )
+                                                                                                                                          }
+                                                                                                                                    };
+                                                                                                                              }
+                                                                                                                              return rec;
+                                                                                                                        }
+                                                                                                                  )
+                                                                                                      }
+                                                                                                );
+                                                                                    }}
+                                                                              />
+                                                                        </div>
+                                                                  </Col>
+                                                                  <Col md={2} xs={24}>
+                                                                        <div style={{ marginTop: '28px' }}>
+                                                                              <Button
+                                                                                    small
+                                                                                    primary
+                                                                                    disabled={
+                                                                                          formIndicatorConfiguration?.selectedIndicator
+                                                                                                ? false
+                                                                                                : true
+                                                                                    }
+                                                                                    icon={
+                                                                                          <TbSelect
+                                                                                                style={{
+                                                                                                      fontSize: '18px',
+                                                                                                      color: '#fff'
+                                                                                                }}
+                                                                                          />
+                                                                                    }
+                                                                                    onClick={() => {
+                                                                                          setVisibleAnalyticComponentModalForCrossCheck(
+                                                                                                true
+                                                                                          );
+
+                                                                                          // setFormIndicatorConfiguration(
+                                                                                          //       {
+                                                                                          //             ...formIndicatorConfiguration,
+                                                                                          //             currentElement:
+                                                                                          //                   rec,
+                                                                                          //             isIndicator: false
+                                                                                          //       }
+                                                                                          // );
+                                                                                    }}
+                                                                              ></Button>
+                                                                        </div>
+                                                                  </Col>
+                                                            </Row>
+                                                      </div>
+                                                </Col>
+                                          ))}
 
                                     <Col md={24}>
                                           <hr style={{ margin: '10px auto', color: '#ccc' }} />
                                     </Col>
 
-                                    {formIndicatorConfiguration?.selectedIndicator?.dataElement && (
-                                          <Col md={24}>
-                                                <div
-                                                      style={{
-                                                            fontWeight: 'bold',
-                                                            marginBottom: '10px'
-                                                      }}
-                                                >
-                                                      {translate('Margin_Of_Errors')}
-                                                </div>
-                                                <div>List des marges d'erreur pour l'indicateurs et le recoupement</div>
-                                          </Col>
-                                    )}
+                                    {selectedProgram?.configurationType === 'DQR' &&
+                                          formIndicatorConfiguration?.selectedIndicator?.dataElement && (
+                                                <Col md={24}>
+                                                      <div
+                                                            style={{
+                                                                  fontWeight: 'bold',
+                                                                  marginBottom: '10px'
+                                                            }}
+                                                      >
+                                                            {translate('Margin_Of_Errors')}
+                                                      </div>
+                                                      <div>
+                                                            Listes des marges d'erreur pour l'indicateurs et le
+                                                            recoupement
+                                                      </div>
+                                                </Col>
+                                          )}
 
                                     <Col md={24} xs={24}>
                                           <div style={{ marginTop: '18px' }}>
@@ -1378,51 +1480,55 @@ const Favorites = ({ me }) => {
                               </div>
                         </ModalTitle>
                         <ModalContent>
-                              <div style={{ padding: '20px', border: '1px solid #ccc' }}>
-                                    <div style={{ marginBottom: '20px' }}>
-                                          <div>
-                                                <Radio
-                                                      label={translate('Venant_Du_DHIS2')}
-                                                      className="cursor-pointer"
-                                                      onChange={() => {
-                                                            setSelectedTypeSource('DHIS2');
+                              {!formIndicatorConfiguration?.currentElement && <div>Error no data </div>}
+
+                              {formIndicatorConfiguration?.currentElement && (
+                                    <div style={{ padding: '20px', border: '1px solid #ccc' }}>
+                                          {/* <div style={{ marginBottom: '20px' }}>
+                                                <div>
+                                                      <Radio
+                                                            label={translate('Venant_Du_DHIS2')}
+                                                            className="cursor-pointer"
+                                                            onChange={() => {
+                                                                  setSelectedTypeSource('DHIS2');
+                                                            }}
+                                                            value={'DHIS2'}
+                                                            checked={selectedTypeSource === 'DHIS2'}
+                                                      />
+                                                </div>
+                                                <div>
+                                                      <Radio
+                                                            label={translate('Venant_Du_Group') + ' ? '}
+                                                            className="cursor-pointer"
+                                                            onChange={() => {
+                                                                  setSelectedTypeSource('GROUPS');
+                                                            }}
+                                                            value={'GROUPS'}
+                                                            checked={selectedTypeSource === 'GROUPS'}
+                                                      />
+                                                </div>
+                                          </div> */}
+
+                                          {selectedTypeSource === 'DHIS2' && (
+                                                <DataDimension
+                                                      selectedDimensions={selectedMetaDatas.map(it => ({
+                                                            ...it,
+                                                            isDeactivated: true
+                                                      }))}
+                                                      onSelect={value => {
+                                                            setSelectedMetaDatas(
+                                                                  value?.items?.length > 0 ? [value.items[0]] : []
+                                                            );
                                                       }}
-                                                      value={'DHIS2'}
-                                                      checked={selectedTypeSource === 'DHIS2'}
+                                                      displayNameProp="displayName"
                                                 />
-                                          </div>
-                                          <div>
-                                                <Radio
-                                                      label={translate('Venant_Du_Group') + ' ? '}
-                                                      className="cursor-pointer"
-                                                      onChange={() => {
-                                                            setSelectedTypeSource('GROUPS');
-                                                      }}
-                                                      value={'GROUPS'}
-                                                      checked={selectedTypeSource === 'GROUPS'}
-                                                />
-                                          </div>
+                                          )}
+
+                                          {selectedTypeSource === 'GROUPS' && (
+                                                <div>Donc on affiche la liste venant du data store</div>
+                                          )}
                                     </div>
-
-                                    {selectedTypeSource === 'DHIS2' && (
-                                          <DataDimension
-                                                selectedDimensions={selectedMetaDatas.map(it => ({
-                                                      ...it,
-                                                      isDeactivated: true
-                                                }))}
-                                                onSelect={value => {
-                                                      setSelectedMetaDatas(
-                                                            value?.items?.length > 0 ? [value.items[0]] : []
-                                                      );
-                                                }}
-                                                displayNameProp="displayName"
-                                          />
-                                    )}
-
-                                    {selectedTypeSource === 'GROUPS' && (
-                                          <div>Donc on affiche la liste venant du data store</div>
-                                    )}
-                              </div>
+                              )}
                         </ModalContent>
                         <ModalActions>
                               <ButtonStrip end>
@@ -1447,8 +1553,86 @@ const Favorites = ({ me }) => {
                   <></>
             );
 
+      const RenderAnalyticComponentModalForRecoupement = () =>
+            visibleAnalyticComponentModalForCrossCheck ? (
+                  <Modal onClose={() => handleCancelAnalyticComponentModal()} large>
+                        <ModalTitle>
+                              <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
+                                    {translate('Source_De_Donnee')}
+                              </div>
+                        </ModalTitle>
+                        <ModalContent>
+                              <div>
+                                    <div style={{ marginBottom: '5px' }}>Indicator groups</div>
+                                    <Select
+                                          placeholder="Indicator groups"
+                                          options={dataStoreCrosschecks?.map(cross => ({
+                                                label: cross.name,
+                                                value: cross.name
+                                          }))}
+                                          onChange={value =>
+                                                setSelectedCrosscheck(
+                                                      dataStoreCrosschecks?.find(cross => cross.name === value)
+                                                )
+                                          }
+                                          value={selectedCrosscheck?.name}
+                                          style={{ width: '100%' }}
+                                          optionFilterProp="label"
+                                          showSearch
+                                    />
+                              </div>
+                              {selectedCrosscheck && (
+                                    <div style={{ marginTop: '10px' }}>
+                                          <div style={{ marginBottom: '5px' }}>Cross cut</div>
+                                          <Select
+                                                placeholder="Cross cut"
+                                                options={selectedCrosscheck?.children?.map(cross => ({
+                                                      label: cross.name,
+                                                      value: cross.name
+                                                }))}
+                                                onChange={value =>
+                                                      setSelectedCrosscheckChild(
+                                                            selectedCrosscheck?.children?.find(
+                                                                  cross => cross.name === value
+                                                            )
+                                                      )
+                                                }
+                                                value={selectedCrosscheckChild?.name}
+                                                style={{ width: '100%' }}
+                                                optionFilterProp="label"
+                                                showSearch
+                                          />
+                                    </div>
+                              )}
+
+                              <pre>{JSON.stringify(formIndicatorConfiguration, null, 2)}</pre>
+                        </ModalContent>
+                        <ModalActions>
+                              <ButtonStrip end>
+                                    <Button
+                                          destructive
+                                          onClick={() => {
+                                                setVisibleAnalyticComponentModalForCrossCheck(false);
+                                                setSelectedCrosscheckChild(null);
+                                                setSelectedCrosscheck(null);
+                                          }}
+                                          icon={<CgCloseO style={{ fontSize: '18px' }} />}
+                                    >
+                                          {translate('Annuler')}
+                                    </Button>
+                                    <Button primary onClick={() => {}} icon={<FiSave style={{ fontSize: '18px' }} />}>
+                                          {translate('Enregistrer')}
+                                    </Button>
+                              </ButtonStrip>
+                        </ModalActions>
+                  </Modal>
+            ) : (
+                  <></>
+            );
+
       useEffect(() => {
             loadDataStoreSupervisionConfigs();
+            loadDataStoreCrosschecks();
             loadDataElementGroups();
             loadDataStoreBackgroundInformationFavoritsConfigs();
       }, []);
@@ -1457,6 +1641,7 @@ const Favorites = ({ me }) => {
                   {RenderContent()}
                   {RenderAddFavoritBackgroundInformationModal()}
                   {RenderAnalyticComponentModal()}
+                  {RenderAnalyticComponentModalForRecoupement()}
                   <MyNotification notification={notification} setNotification={setNotification} />
             </>
       );
