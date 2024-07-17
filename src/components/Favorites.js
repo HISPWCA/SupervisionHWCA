@@ -456,22 +456,28 @@ const Favorites = ({ me }) => {
 
                   const newMappingList = [];
 
-                  newMappingList.push({
-                        id: uuid(),
-                        dataElement: formIndicatorConfiguration.selectedIndicator?.dataElement,
-                        indicator: {
-                              displayName: formIndicatorConfiguration.selectedIndicator?.source?.name,
-                              id: formIndicatorConfiguration.selectedIndicator?.source?.id
-                        },
-                        programStage: {
-                              id: selectedProgram?.programStageConfigurations[0]?.programStage?.id,
-                              displayName: selectedProgram?.programStageConfigurations[0]?.programStage?.displayName
-                        },
-                        program: {
-                              id: selectedProgram?.program?.id,
-                              displayName: selectedProgram?.program?.displayName
-                        }
-                  });
+                  if (
+                        formIndicatorConfiguration?.selectedIndicator?.dataElement &&
+                        formIndicatorConfiguration?.selectedIndicator?.source
+                  ) {
+                        newMappingList.push({
+                              id: uuid(),
+                              dataElement: formIndicatorConfiguration.selectedIndicator?.dataElement,
+                              indicator: {
+                                    displayName: formIndicatorConfiguration.selectedIndicator?.source?.name,
+                                    id: formIndicatorConfiguration.selectedIndicator?.source?.id
+                              },
+                              programStage: {
+                                    id: selectedProgram?.programStageConfigurations[0]?.programStage?.id,
+                                    displayName:
+                                          selectedProgram?.programStageConfigurations[0]?.programStage?.displayName
+                              },
+                              program: {
+                                    id: selectedProgram?.program?.id,
+                                    displayName: selectedProgram?.program?.displayName
+                              }
+                        });
+                  }
 
                   for (let rec of formIndicatorConfiguration.selectedRecoupements) {
                         if (rec.source && rec.dataElement) {
@@ -551,7 +557,6 @@ const Favorites = ({ me }) => {
                   const newList = [...mappingConfigs, ...newMappingList];
 
                   if (newList.length === 0) return null;
-
 
                   setMappingConfigs([...newList]);
                   setSelectedDataElement(null);
@@ -1258,7 +1263,10 @@ const Favorites = ({ me }) => {
                                                                               width: '100%'
                                                                         }}
                                                                         onChange={handleSelectDataElement}
-                                                                        value={selectedDataElement?.id}
+                                                                        value={
+                                                                              formIndicatorConfiguration
+                                                                                    ?.selectedIndicator?.dataElement?.id
+                                                                        }
                                                                         optionFilterProp="label"
                                                                         showSearch
                                                                   />
