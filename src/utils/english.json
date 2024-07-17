@@ -276,5 +276,6 @@
     "Indicators_Recoupements": "Indicators and Cross checks",
     "Margin_Of_Errors": "Margin of errors",
     "Indicator_MOE": "Indicator Margin of error",
-    "Recoupement_MOE": "Cross Check Margin of error"
+    "Recoupement_MOE": "Cross Check Margin of error",
+    "Please_Configure_At_least_One_Indicator": "Please configure at least one indicator"
 }

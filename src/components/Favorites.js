@@ -556,7 +556,9 @@ const Favorites = ({ me }) => {
 
                   const newList = [...mappingConfigs, ...newMappingList];
 
-                  if (newList.length === 0) return null;
+                  if (newList.length === 0) {
+                        throw new Error(translate('Please_Configure_At_least_One_Indicator'));
+                  }
 
                   setMappingConfigs([...newList]);
                   setSelectedDataElement(null);
