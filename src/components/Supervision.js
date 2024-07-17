@@ -303,7 +303,6 @@ const Supervision = ({ me }) => {
                         type: NOTIFICATION_SUCCESS
                   });
             } catch (err) {
-                  console.log(err);
                   return setNotification({
                         show: true,
                         message: translate('Operation_Failed'),
@@ -1784,22 +1783,34 @@ const Supervision = ({ me }) => {
                               eventPayload.status = 'ACTIVE';
                               eventPayload.eventDate = payload.period
                                     ? dayjs(payload.period).format('YYYY-MM-DD')
-                                    : dayjs().format('YYYY-MM-DD')
+                                    : dayjs().format('YYYY-MM-DD');
                               eventPayload.dueDate = payload.period
                                     ? dayjs(payload.period).format('YYYY-MM-DD')
                                     : dayjs().format('YYYY-MM-DD')
-                              eventPayload.dataValues = mappingConfigs
-                                    .filter(ev => ev.programStage?.id === payload.programStage?.id)
-                                    .map(ev => ({
-                                          dataElement: ev.dataElement?.id,
-                                          value: ev.indicator?.displayName
-                                    }))
+
+                              eventPayload.dataValues =
+                                    selectedProgram?.configurationType === 'DQR'
+                                          ? mappingConfigs
+                                                  .filter(ev => ev.programStage?.id === payload.programStage?.id)
+                                                  .map(ev => ({
+                                                        dataElement: ev.dataElement?.id,
+                                                        value: ev.indicator?.displayName
+                                                  }))
+                                          : mappingConfigs
+                                                  .map(ev => ({
+                                                        dataElement: ev.dataElement?.id,
+                                                        value: ev.indicator?.displayName
+                                                  }));
                         } else {
                               eventPayload.status = 'SCHEDULE';
                               eventPayload.dueDate = payload.period
                                     ? dayjs(payload.period).format('YYYY-MM-DD')
                                     : dayjs().format('YYYY-MM-DD');
                         }
+
+                         console.log('---------------------------------------------------');
+                         console.log('program Stage  ', payload.programStage);
+                         console.log('event :', eventPayload);
 
                         // Ajoute des dataValues superviseurs
                         if (payload.programStageConfig?.supervisorField?.length > 0) {
@@ -2322,7 +2333,7 @@ const Supervision = ({ me }) => {
                                     }
 
                                     if (is_ok) {
-                                          /*    
+                                          /*
                                            * Nous allons vérifier s'il y a un program stage selectionné. S'il en a , alors on vérifier si c'ette organisation unit appartient au group
                                            */
                                           const payload = {
@@ -2423,18 +2434,29 @@ const Supervision = ({ me }) => {
                               eventPayload.dueDate = payload.period
                                     ? dayjs(payload.period).format('YYYY-MM-DD')
                                     : dayjs().format('YYYY-MM-DD');
-                              eventPayload.dataValues = mappingConfigs
-                                    .filter(ev => ev.programStage?.id === stage)
-                                    .map(ev => ({
-                                          dataElement: ev.dataElement?.id,
-                                          value: ev.indicator?.displayName
-                                    }));
+                              eventPayload.dataValues =
+                                    selectedProgram?.configurationType === 'DQR'
+                                          ? mappingConfigs
+                                                  .filter(ev => ev.programStage?.id === stage)
+                                                  .map(ev => ({
+                                                        dataElement: ev.dataElement?.id,
+                                                        value: ev.indicator?.displayName
+                                                  }))
+                                          : mappingConfigs
+                                                  //   .filter(ev => ev.programStage?.id === stage)
+                                                  .map(ev => ({
+                                                        dataElement: ev.dataElement?.id,
+                                                        value: ev.indicator?.displayName
+                                                  }));
                         } else {
                               eventPayload.status = 'SCHEDULE';
                               eventPayload.dueDate = payload.period
                                     ? dayjs(payload.period).format('YYYY-MM-DD')
                                     : dayjs().format('YYYY-MM-DD');
                         }
+
+
+                       
 
                         // Ajoute des dataValues superviseurs
                         if (

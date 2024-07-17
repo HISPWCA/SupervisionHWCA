@@ -676,7 +676,6 @@ const Setting = () => {
                         mapping => mapping.program?.id === selectedTEIProgram.id
                   );
 
-                  console.log('response sUP : ', responseSupervisionTracker);
 
                   if (
                         !isFieldEditingMode &&
@@ -688,7 +687,6 @@ const Setting = () => {
                         throw new Error(translate('ProgramStage_Already_Configured'));
                   }
 
-                  console.log('Current program statge : ', currentProgramstageConfiguration);
 
                   const newProgramStageConfigurations = existingConfig
                         ? isFieldEditingMode && currentProgramstageConfiguration

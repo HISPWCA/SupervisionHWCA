@@ -552,11 +552,6 @@ const Favorites = ({ me }) => {
 
                   if (newList.length === 0) return null;
 
-                  console.log('new mapping: ', newMappingList);
-
-                  console.log('mappingConfigs  length : ', mappingConfigs.length);
-                  console.log('newMappingList  length : ', newMappingList.length);
-                  console.log('newList  length : ', newList.length);
 
                   setMappingConfigs([...newList]);
                   setSelectedDataElement(null);
@@ -578,7 +573,6 @@ const Favorites = ({ me }) => {
                         marginOfErrorRecoupement: null
                   });
             } catch (err) {
-                  console.log(err);
                   setNotification({
                         show: true,
                         type: NOTIFICATION_CRITICAL,
