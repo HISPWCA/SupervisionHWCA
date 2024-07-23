@@ -82,6 +82,7 @@ const Setting = () => {
       const [dataStoreVisualizations, setDataStoreVisualizations] = useState([]);
       const [currentVisualizationProgram, setCurrentVisualizationProgram] = useState(null);
       const [indicatorsFieldsConfigs, setIndicatorsFieldsConfigs] = useState([]);
+      const [dataStoreGlobalSettings, setDataStoreGlobalSettings] = useState(null);
 
       const [visualizations, setVisualizations] = useState([]);
       const [maps, setMaps] = useState([]);
@@ -384,6 +385,14 @@ const Setting = () => {
                   throw err;
             }
       };
+      const loadDataStoreGlobalSettings = async () => {
+            try {
+                  const response = await loadDataStore(process.env.REACT_APP_GLOBAL_SETTING_KEY, null, null, null);
+                  setDataStoreGlobalSettings(response);
+            } catch (err) {
+                  throw err;
+            }
+      };
 
       const initIndicatorConfigStates = async () => {
             try {
@@ -676,7 +685,6 @@ const Setting = () => {
                         mapping => mapping.program?.id === selectedTEIProgram.id
                   );
 
-
                   if (
                         !isFieldEditingMode &&
                         existingConfig &&
@@ -686,7 +694,6 @@ const Setting = () => {
                   ) {
                         throw new Error(translate('ProgramStage_Already_Configured'));
                   }
-
 
                   const newProgramStageConfigurations = existingConfig
                         ? isFieldEditingMode && currentProgramstageConfiguration
@@ -3343,7 +3350,7 @@ const Setting = () => {
                                     </div>
                               </div>
                         </Col>
-                        <Col md={20} sm={24}>
+                        <Col md={20} sm={24}>{ console.log("global settings : ", dataStoreGlobalSettings)}
                               {selectedTypeSupervisionPage === PAGE_CONFIG_INDICATORS && RenderPageIndicatorConfig()}
                               {selectedTypeSupervisionPage === PAGE_CONFIG_SUPERVISION && RenderPageSupervisionConfig()}
                               {selectedTypeSupervisionPage === PAGE_CONFIG_VISUALIZATION &&
@@ -3385,6 +3392,7 @@ const Setting = () => {
             loadMaps();
             loadVisualizations();
             loadDataStoreVisualizations();
+            loadDataStoreGlobalSettings();
             selectedTypeSupervisionPage === PAGE_CONFIG_INDICATORS && initIndicatorConfigStates();
             selectedTypeSupervisionPage === PAGE_CONFIG_SUPERVISION && initSupConfigStates();
             selectedTypeSupervisionPage === PAGE_CONFIG_ANALYSE && initAnalyseConfigStates();

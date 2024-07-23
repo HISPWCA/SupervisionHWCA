@@ -50,6 +50,10 @@ export const Body = () => {
                   await loadDataStore(process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY, null, null, []);
                   await loadDataStore(process.env.REACT_APP_MISSIONS_KEY, null, null, []);
                   await loadDataStore(process.env.REACT_APP_VISUALIZATION_KEY, null, null, []);
+                  await loadDataStore(process.env.REACT_APP_GLOBAL_SETTING_KEY, null, null, {
+                        DQR: { nbrIndicator: 3, nbrRecoupement: 3 },
+                        ERDQ: { nbrIndicator: 3, nbrRecoupement: 3 }
+                  });
                   await loadMe();
                   setDataStoreInitialized(true);
                   setLoadingDataStoreInitialization(false);
