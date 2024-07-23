@@ -50,6 +50,7 @@ export const Body = () => {
                   await loadDataStore(process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY, null, null, []);
                   await loadDataStore(process.env.REACT_APP_MISSIONS_KEY, null, null, []);
                   await loadDataStore(process.env.REACT_APP_VISUALIZATION_KEY, null, null, []);
+                 
                   await loadMe();
                   setDataStoreInitialized(true);
                   setLoadingDataStoreInitialization(false);
