@@ -15,6 +15,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                           <th
                                                 style={{
                                                       padding: '2px 5px',
+                                                      verticalAlign: 'top',
                                                       textAlign: 'center',
                                                       border: '1px solid #00000070',
                                                       width: '50%'
@@ -25,6 +26,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                           <th
                                                 style={{
                                                       padding: '2px 5px',
+                                                      verticalAlign: 'top',
                                                       textAlign: 'center',
                                                       border: '1px solid #00000070',
                                                       width: '50%'
@@ -41,6 +43,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                       style={{
                                                             border: '1px solid #00000070',
                                                             padding: '2px 5px',
+                                                            verticalAlign: 'top',
                                                             width: '50%'
                                                       }}
                                                 >
@@ -98,6 +101,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                       style={{
                                                             border: '1px solid #00000070',
                                                             padding: '2px 5px',
+                                                            verticalAlign: 'top',
                                                             width: '50%'
                                                       }}
                                                 >
@@ -173,6 +177,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                           <th
                                                 style={{
                                                       padding: '2px 5px',
+                                                      verticalAlign: 'top',
                                                       textAlign: 'center',
                                                       border: '1px solid #00000070',
                                                       width: '50%'
@@ -183,6 +188,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                           <th
                                                 style={{
                                                       padding: '2px 5px',
+                                                      verticalAlign: 'top',
                                                       textAlign: 'center',
                                                       border: '1px solid #00000070',
                                                       width: '50%'
@@ -199,6 +205,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                       style={{
                                                             border: '1px solid #00000070',
                                                             padding: '2px 5px',
+                                                            verticalAlign: 'top',
                                                             width: '50%'
                                                       }}
                                                 >
@@ -327,6 +334,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                       style={{
                                                             border: '1px solid #00000070',
                                                             padding: '2px 5px',
+                                                            verticalAlign: 'top',
                                                             width: '50%'
                                                       }}
                                                 >
@@ -401,6 +409,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                           <th
                                                 style={{
                                                       padding: '2px 5px',
+                                                      verticalAlign: 'top',
                                                       textAlign: 'center',
                                                       border: '1px solid #00000070',
                                                       width: '50%'
@@ -411,6 +420,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                           <th
                                                 style={{
                                                       padding: '2px 5px',
+                                                      verticalAlign: 'top',
                                                       textAlign: 'center',
                                                       border: '1px solid #00000070',
                                                       width: '50%'
@@ -427,6 +437,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                       style={{
                                                             border: '1px solid #00000070',
                                                             padding: '2px 5px',
+                                                            verticalAlign: 'top',
                                                             width: '50%'
                                                       }}
                                                 >
@@ -492,6 +503,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                       style={{
                                                             border: '1px solid #00000070',
                                                             padding: '2px 5px',
+                                                            verticalAlign: 'top',
                                                             width: '50%'
                                                       }}
                                                 >
@@ -566,6 +578,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                           <th
                                                 style={{
                                                       padding: '2px 5px',
+                                                      verticalAlign: 'top',
                                                       textAlign: 'center',
                                                       border: '1px solid #00000070',
                                                       width: '33%'
@@ -576,6 +589,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                           <th
                                                 style={{
                                                       padding: '2px 5px',
+                                                      verticalAlign: 'top',
                                                       textAlign: 'center',
                                                       border: '1px solid #00000070',
                                                       width: '33%'
@@ -586,6 +600,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                           <th
                                                 style={{
                                                       padding: '2px 5px',
+                                                      verticalAlign: 'top',
                                                       textAlign: 'center',
                                                       border: '1px solid #00000070',
                                                       width: '33%'
@@ -601,6 +616,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                 style={{
                                                       border: '1px solid #00000070',
                                                       padding: '2px 5px',
+                                                      verticalAlign: 'top',
                                                       width: '33%'
                                                 }}
                                           >
@@ -671,6 +687,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                 style={{
                                                       border: '1px solid #00000070',
                                                       padding: '2px 5px',
+                                                      verticalAlign: 'top',
                                                       width: '33%'
                                                 }}
                                           >
@@ -741,8 +758,8 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                 style={{
                                                       border: '1px solid #00000070',
                                                       padding: '2px 5px',
-                                                      width: '33%',
-                                                      verticalAlign:'top'
+                                                      verticalAlign: 'top',
+                                                      width: '33%'
                                                 }}
                                           >
                                                 <div>
