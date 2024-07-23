@@ -157,6 +157,7 @@ const Favorites = ({ me }) => {
       const handleSelectBackgroundInformationFavorit = value => {
             const currentFav = favoritBackgroundInformationList.find(b => b.id === value);
             if (currentFav) {
+                  cleanIndicatorRecoupementState()
                   setSelectedBackgroundInformationFavorit(currentFav);
                   setInputFavoritNameForBackgroundInforation(currentFav.name);
                   setMappingConfigs(currentFav.configs);
