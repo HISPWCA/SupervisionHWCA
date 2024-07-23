@@ -50,8 +50,19 @@ export const Body = () => {
                   await loadDataStore(process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY, null, null, []);
                   await loadDataStore(process.env.REACT_APP_MISSIONS_KEY, null, null, []);
                   await loadDataStore(process.env.REACT_APP_VISUALIZATION_KEY, null, null, []);
+
+                  await loadDataStore(process.env.REACT_APP_CROSS_CUT_KEY, null, null, []);
+                  await loadDataStore(process.env.REACT_APP_INDICATORS_KEY, null, null, []);
+                  await loadDataStore(process.env.REACT_APP_DE_COMPLETNESS_KEY, null, null, []);
+                  await loadDataStore(process.env.REACT_APP_DS_COMPLETNESS_KEY, null, null, []);
                   await loadDataStore(process.env.REACT_APP_GLOBAL_SETTING_KEY, null, null, {
-                        DQR: { nbrIndicator: 3, nbrRecoupement: 3 },
+                        DQR: {
+                              nbrIndicator: 5,
+                              nbrRecoupement: 3,
+                              nbrConsistencyOverTime: 1,
+                              nbrDataElementCompleteness: 6,
+                              nbrSourceDocumentCompleteness: 7
+                        },
                         ERDQ: { nbrIndicator: 3, nbrRecoupement: 3 }
                   });
                   await loadMe();

@@ -17,7 +17,9 @@ import {
       TYPE_ANALYSE_INDICATOR,
       ORGANISATION_UNIT,
       AGENT,
-      PAGE_CONFIG_VISUALIZATION
+      PAGE_CONFIG_VISUALIZATION,
+      DQR,
+      ERDQ
 } from '../utils/constants';
 import { Card, Checkbox, Col, Divider, Input, InputNumber, Popconfirm, Row, Select, Table } from 'antd';
 import {
@@ -45,6 +47,7 @@ import { BLUE } from '../utils/couleurs';
 import MyNotification from './MyNotification';
 import translate from '../utils/translator';
 import GenerateIndicatorsFieldsList from './GenerateIndicatorsFields';
+import GenerateIndicatorsFieldsDQR from './GenerateIndicatorsFieldsDQR';
 
 const numberList = [
       { value: 1, label: '1' },
@@ -149,6 +152,87 @@ const Setting = () => {
       const [loadingSaveVisualizationInDatastore, setLoadingSaveVisualizationInDatastore] = useState(false);
       const [loadingDataStoreVisualizations, setLoadingDataStoreVisualizations] = useState(false);
 
+      const [formState, setFormState] = useState({
+            selectedConfigurationType: DQR,
+            selectedSupervisionGenerationType: TYPE_GENERATION_AS_EVENT,
+            selectedPlanificationType: ORGANISATION_UNIT,
+            selectedProgramStageForConfiguration: null,
+            selectedOrganisationUnitGroup: null,
+            selectedTEIProgram: null,
+            selectedSupervisorDataElements: [],
+            selectedStatusSupervisionDataElement: null,
+            indicators: [],
+            recoupements: [],
+            completeness: { dataElements: [], sourceDocuments: [], margin: null },
+            consistencyOvertimes: [],
+            isFieldEditingMode: false
+      });
+
+      const initFields = () => {
+            if (dataStoreGlobalSettings[DQR] && formState?.selectedConfigurationType === DQR) {
+                  const dqrConfig = dataStoreGlobalSettings[DQR];
+                  const newIndicators = [];
+                  const newRecoupements = [];
+                  const newConsistencyOverTimes = [];
+                  const newDataElementCompleteness = [];
+                  const newSourceDocumentCompleteness = [];
+
+                  for (let i = 1; i <= +dqrConfig.nbrIndicator; i++) {
+                        newIndicators.push({
+                              id: uuid(),
+                              position: i,
+                              value: null,
+                              margin: null
+                        });
+                  }
+
+                  for (let i = 1; i <= +dqrConfig.nbrRecoupement; i++) {
+                        newRecoupements.push({
+                              id: uuid(),
+                              position: i,
+                              primaryValue: null,
+                              secondaryValue: null,
+                              margin: null
+                        });
+                  }
+
+                  for (let i = 1; i <= +dqrConfig.nbrConsistencyOverTime; i++) {
+                        newConsistencyOverTimes.push({
+                              id: uuid(),
+                              position: i,
+                              value: null,
+                              margin: null
+                        });
+                  }
+                  for (let i = 1; i <= +dqrConfig.nbrDataElementCompleteness; i++) {
+                        newDataElementCompleteness.push({
+                              id: uuid(),
+                              position: i,
+                              value: null
+                        });
+                  }
+                  for (let i = 1; i <= +dqrConfig.nbrSourceDocumentCompleteness; i++) {
+                        newSourceDocumentCompleteness.push({
+                              id: uuid(),
+                              position: i,
+                              value: null
+                        });
+                  }
+
+                  setFormState({
+                        ...formState,
+                        indicators: newIndicators,
+                        recoupements: newRecoupements,
+                        consistencyOvertimes: newConsistencyOverTimes,
+                        completeness: {
+                              ...formState.completeness,
+                              dataElements: newDataElementCompleteness,
+                              sourceDocuments: newSourceDocumentCompleteness
+                        }
+                  });
+            }
+      };
+
       const loadPrograms = async () => {
             try {
                   setLoadingPrograms(true);
@@ -249,7 +333,10 @@ const Setting = () => {
 
                   setProgramStages(response.data?.programStages);
                   if (response.data?.programStages.length === 1) {
-                        selectedProgramStageForConfiguration(response.data?.programStages[0]);
+                        setFormState({
+                              ...formState,
+                              selectedProgramStageForConfiguration: response.data?.programStages[0]
+                        });
                   }
                   setLoadingProgramStages(false);
                   return response.data.programStages;
@@ -300,7 +387,11 @@ const Setting = () => {
             setSelectedAttributesToDisplay([]);
             setSelectedAttributeNameForAgent(null);
             setSelectedAttributeFirstNameForAgent(null);
-            setSelectedTEIProgram(programs.find(p => p.id === value));
+
+            setFormState({
+                  ...formState,
+                  selectedTEIProgram: programs.find(p => p.id === value)
+            });
             loadProgramStages(value);
       };
 
@@ -328,11 +419,11 @@ const Setting = () => {
       };
 
       const handleSupervisionGenerationType = ({ value }) => {
-            setSelectedSupervisionGenerationType(value);
+            setFormState({ ...formState, selectedSupervisionGenerationType: value });
       };
 
       const handleSupervisionPlanificationType = ({ value }) => {
-            setSelectedPlanificationType(value);
+            setFormState({ ...formState, selectedPlanificationType: value });
       };
 
       const handleDeleteConfigItem = async value => {
@@ -651,27 +742,28 @@ const Setting = () => {
       };
 
       const handleCancelSupConfig = () => {
-            setFieldEditingMode(false);
-            setCurrentProgramstageConfiguration(null);
-            setSelectedStatusSupervisionDataElement(null);
-            setSelectedSupervisorDataElements([]);
-            setSelectedProgramStageForConfiguration(null);
-            setIndicatorsFieldsConfigs([]);
-            setSelectedOrganisationUnitGroup(null);
+            // setFieldEditingMode(false);
+            // setCurrentProgramstageConfiguration(null);
+            // setSelectedStatusSupervisionDataElement(null);
+            // setSelectedSupervisorDataElements([]);
+            // setSelectedProgramStageForConfiguration(null);
+            // setIndicatorsFieldsConfigs([]);
+            // setSelectedOrganisationUnitGroup(null);
       };
 
       const handleSaveSupConfig = async () => {
             try {
                   setLoadingSaveSupervionsConfig(true);
 
-                  if (!selectedTEIProgram) throw new Error(translate('Veuillez_Selectionner_Un_Programme'));
+                  if (!formState?.selectedTEIProgram) throw new Error(translate('Veuillez_Selectionner_Un_Programme'));
 
-                  if (!selectedProgramStageForConfiguration) throw new Error(translate('Please_Select_Program_Stage'));
+                  if (!formState?.selectedProgramStageForConfiguration)
+                        throw new Error(translate('Please_Select_Program_Stage'));
 
-                  if (!selectedOrganisationUnitGroup && selectedConfigurationType === 'ERDQ')
+                  if (!formState?.selectedOrganisationUnitGroup && formState?.selectedConfigurationType === ERDQ)
                         throw new Error(translate('Please_Select_Organisation_Unit_Group'));
 
-                  if (selectedSupervisorDataElements.length === 0)
+                  if (formState?.selectedSupervisorDataElements?.length === 0)
                         throw new Error(translate('Please_Select_Supervisor_Fields'));
 
                   const responseSupervisionTracker = await loadDataStore(
@@ -682,32 +774,33 @@ const Setting = () => {
                   );
 
                   const existingConfig = responseSupervisionTracker.find(
-                        mapping => mapping.program?.id === selectedTEIProgram.id
+                        mapping => mapping.program?.id === formState?.selectedTEIProgram?.id
                   );
 
                   if (
-                        !isFieldEditingMode &&
+                        !formState?.isFieldEditingMode &&
                         existingConfig &&
                         existingConfig.programStageConfigurations
                               .map(p => p.programStage?.id)
-                              .includes(selectedProgramStageForConfiguration?.id)
+                              .includes(formState?.selectedProgramStageForConfiguration?.id)
                   ) {
                         throw new Error(translate('ProgramStage_Already_Configured'));
                   }
 
                   const newProgramStageConfigurations = existingConfig
-                        ? isFieldEditingMode && currentProgramstageConfiguration
+                        ? formState?.isFieldEditingMode && currentProgramstageConfiguration
                               ? programStageConfigurations.map(p => {
                                       if (p.programStage?.id === currentProgramstageConfiguration?.programStage?.id) {
                                             return {
-                                                  programStage: selectedProgramStageForConfiguration,
-                                                  organisationUnitGroup: selectedOrganisationUnitGroup,
-                                                  supervisorField: selectedSupervisorDataElements,
-                                                  statusSupervisionField: selectedStatusSupervisionDataElement,
-
-                                                  indicatorsFieldsConfigs: indicatorsFieldsConfigs || [],
-                                                  numberOfIndicators: selectedNumberOfIndicators,
-                                                  numberOfRecoupements: selectedNumberOfRecoupements
+                                                  programStage: formState?.selectedProgramStageForConfiguration,
+                                                  organisationUnitGroup: formState?.selectedOrganisationUnitGroup,
+                                                  supervisorField: formState?.selectedSupervisorDataElements,
+                                                  statusSupervisionField:
+                                                        formState?.selectedStatusSupervisionDataElement,
+                                                  indicators: formState.indicators,
+                                                  recoupements: formState.recoupements,
+                                                  completeness: formState.completeness,
+                                                  consistencyOvertimes: formState.consistencyOvertimes
                                             };
                                       }
 
@@ -716,45 +809,37 @@ const Setting = () => {
                               : [
                                       ...existingConfig.programStageConfigurations,
                                       {
-                                            programStage: selectedProgramStageForConfiguration,
-                                            organisationUnitGroup: selectedOrganisationUnitGroup,
-                                            supervisorField: selectedSupervisorDataElements,
-                                            statusSupervisionField: selectedStatusSupervisionDataElement,
-
-                                            indicatorsFieldsConfigs: indicatorsFieldsConfigs || [],
-                                            numberOfIndicators: selectedNumberOfIndicators,
-                                            numberOfRecoupements: selectedNumberOfRecoupements
+                                            programStage: formState?.selectedProgramStageForConfiguration,
+                                            organisationUnitGroup: formState?.selectedOrganisationUnitGroup,
+                                            supervisorField: formState?.selectedSupervisorDataElements,
+                                            statusSupervisionField: formState?.selectedStatusSupervisionDataElement,
+                                            indicators: formState.indicators,
+                                            recoupements: formState.recoupements,
+                                            completeness: formState.completeness,
+                                            consistencyOvertimes: formState.consistencyOvertimes
                                       }
                                 ]
                         : [
                                 {
-                                      programStage: selectedProgramStageForConfiguration,
-                                      organisationUnitGroup: selectedOrganisationUnitGroup,
-                                      supervisorField: selectedSupervisorDataElements,
-                                      statusSupervisionField: selectedStatusSupervisionDataElement,
-                                      indicatorsFieldsConfigs: indicatorsFieldsConfigs || [],
-
-                                      numberOfIndicators: selectedNumberOfIndicators,
-                                      numberOfRecoupements: selectedNumberOfRecoupements
+                                      programStage: formState?.selectedProgramStageForConfiguration,
+                                      organisationUnitGroup: formState?.selectedOrganisationUnitGroup,
+                                      supervisorField: formState?.selectedSupervisorDataElements,
+                                      statusSupervisionField: formState?.selectedStatusSupervisionDataElement,
+                                      indicators: formState.indicators,
+                                      recoupements: formState.recoupements,
+                                      completeness: formState.completeness,
+                                      consistencyOvertimes: formState.consistencyOvertimes
                                 }
                           ];
 
                   const payload = {
-                        generationType: selectedSupervisionGenerationType,
-                        planificationType: selectedPlanificationType,
-                        configurationType: selectedConfigurationType,
+                        generationType: formState.selectedSupervisionGenerationType,
+                        planificationType: formState.selectedPlanificationType,
+                        configurationType: formState.selectedConfigurationType,
                         program: {
-                              id: selectedTEIProgram.id,
-                              displayName: selectedTEIProgram.displayName
+                              id: formState.selectedTEIProgram.id,
+                              displayName: formState.selectedTEIProgram.displayName
                         },
-                        attributesToDisplay: (selectedPlanificationType === AGENT && selectedAttributesToDisplay) || [],
-                        attributeName: selectedPlanificationType === AGENT && selectedAttributeNameForAgent,
-                        attributeFirstName: selectedPlanificationType === AGENT && selectedAttributeFirstNameForAgent,
-                        isRDQAConfigCase: selectedPlanificationIndicatorRDQeCase,
-                        fieldConfig: null,
-                        statusSupervision: null,
-                        statusPayment: null,
-                        paymentConfigs: paymentConfigList,
                         programStageConfigurations: newProgramStageConfigurations.map(p => ({
                               ...p,
                               programStage: p.programStage && {
@@ -765,31 +850,31 @@ const Setting = () => {
                         }))
                   };
 
-                  if (selectedProgramStage && selectedDataElements.length > 0) {
+                  if (formState.selectedProgramStageForConfiguration && formState.selectedSupervisorDataElements?.length > 0) {
                         payload.fieldConfig = {
                               supervisor: {
                                     programStage: {
-                                          id: selectedProgramStage.id,
-                                          displayName: selectedProgramStage.displayName
+                                          id: formState.selectedProgramStageForConfiguration.id,
+                                          displayName: formState.selectedProgramStageForConfiguration.displayName
                                     },
-                                    dataElements: selectedDataElements
+                                    dataElements: formState.selectedSupervisorDataElements
                               }
                         };
                   }
 
-                  if (selectedSupervisionProgramStage && selectedStatutSupervisionDataElement) {
+                  if (formState.selectedProgramStageForConfiguration && formState.selectedStatusSupervisionDataElement) {
                         payload.statusSupervision = {
                               programStage: {
-                                    id: selectedSupervisionProgramStage.id,
-                                    displayName: selectedSupervisionProgramStage.displayName
+                                    id: formState.selectedProgramStageForConfiguration.id,
+                                    displayName: formState.selectedProgramStageForConfiguration.displayName
                               },
-                              dataElement: selectedStatutSupervisionDataElement
+                              dataElement: selectedStatusSupervisionDataElement
                         };
                   }
 
                   let newList = [];
 
-                  if (isFieldEditingMode || existingConfig) {
+                  if (formState.isFieldEditingMode || existingConfig) {
                         newList = mappingConfigSupervisions.map(m => {
                               if (m.id === existingConfig?.id) {
                                     return { ...m, ...payload };
@@ -809,21 +894,27 @@ const Setting = () => {
                         null
                   );
 
-                  setIndicatorsFieldsConfigs([]);
                   setMappingConfigSupervisions(newList);
                   setProgramStageConfigurations(newProgramStageConfigurations);
-
-                  setSelectedStatusSupervisionProgramStage(null);
-                  setSelectedStatutSupervisionDataElement(null);
-                  setSelectedPlanificationIndicatorRDQeCase(false);
-                  setSelectedProgramStage(null);
-                  setFieldEditingMode(false);
-                  setSelectedDataElements([]);
-                  setSelectedOrganisationUnitGroup(null);
-                  setSelectedSupervisorDataElements([]);
-                  setSelectedStatusSupervisionDataElement(null);
-                  setSelectedAttributesToDisplay([]);
+                  setFormState({
+                        ...formState,
+                        selectedProgramStageForConfiguration: null,
+                        isFieldEditingMode: false
+                  });
                   setCurrentProgramstageConfiguration(null);
+                  initFields()
+                  
+                  // setIndicatorsFieldsConfigs([]);
+                  // setSelectedStatusSupervisionProgramStage(null);
+                  // setSelectedStatutSupervisionDataElement(null);
+                  // setSelectedPlanificationIndicatorRDQeCase(false);
+                  // setSelectedProgramStage(null);
+                  // setFieldEditingMode(false);
+                  // setSelectedDataElements([]);
+                  // setSelectedOrganisationUnitGroup(null);
+                  // setSelectedSupervisorDataElements([]);
+                  // setSelectedStatusSupervisionDataElement(null);
+                  // setSelectedAttributesToDisplay([]);
 
                   setLoadingSaveSupervionsConfig(false);
                   generateIndicatorsConfigFieldsList();
@@ -1045,32 +1136,38 @@ const Setting = () => {
       };
 
       const handleSelectDataElements = values => {
-            setSelectedSupervisorDataElements(
-                  values.map(value =>
-                        selectedProgramStageForConfiguration.programStageDataElements
+            setFormState({
+                  ...formState,
+                  selectedSupervisorDataElements: values.map(value =>
+                        formState?.selectedProgramStageForConfiguration.programStageDataElements
                               ?.map(p => p.dataElement)
                               .find(dataElement => dataElement.id === value)
                   )
-            );
+            });
       };
 
       const handleSelectStatutSupervisionDataElement = value => {
-            const statusDataElement = selectedProgramStageForConfiguration.programStageDataElements
+            const statusDataElement = formState?.selectedProgramStageForConfiguration?.programStageDataElements
                   ?.map(p => p.dataElement)
                   .find(dataElement => dataElement.id === value);
-            setSelectedStatusSupervisionDataElement(statusDataElement);
+            setFormState({
+                  ...formState,
+                  selectedStatusSupervisionDataElement: statusDataElement
+            });
       };
 
       const handleSelectProgramStageForConfiguration = value => {
-            setSelectedProgramStageForConfiguration(programStages.find(pstage => pstage.id === value));
-
-            setSelectedStatusSupervisionDataElement(null);
-            setSelectedSupervisorDataElements([]);
-            setIndicatorsFieldsConfigs([]);
+            setFormState({
+                  ...formState,
+                  selectedProgramStageForConfiguration: programStages.find(pstage => pstage.id === value)
+            });
       };
 
       const handleSelectOrganisationUnitGroupProgramStage = value => {
-            setSelectedOrganisationUnitGroup(organisationUnitGroups.find(orgUnitGroup => orgUnitGroup.id === value));
+            setFormState({
+                  ...formState,
+                  selectedOrganisationUnitGroup: organisationUnitGroups.find(orgUnitGroup => orgUnitGroup.id === value)
+            });
       };
 
       const handleSelectStatutPaymentDataElement = value => {
@@ -1110,7 +1207,7 @@ const Setting = () => {
                                     style={{ width: '100%' }}
                                     optionFilterProp="label"
                                     onChange={handleSelectedTEIProgram}
-                                    value={selectedTEIProgram?.id}
+                                    value={formState?.selectedTEIProgram?.id}
                                     allowClear
                               />
                         </div>
@@ -1120,7 +1217,9 @@ const Setting = () => {
                                           label={translate('Generer_Supervision_Comme_TEI')}
                                           onChange={handleSupervisionGenerationType}
                                           value={TYPE_GENERATION_AS_TEI}
-                                          checked={selectedSupervisionGenerationType === TYPE_GENERATION_AS_TEI}
+                                          checked={
+                                                formState?.selectedSupervisionGenerationType === TYPE_GENERATION_AS_TEI
+                                          }
                                           disabled={true}
                                     />
                               </div>
@@ -1129,7 +1228,10 @@ const Setting = () => {
                                           label={translate('Generer_Supervision_Comme_EN')}
                                           onChange={handleSupervisionGenerationType}
                                           value={TYPE_GENERATION_AS_ENROLMENT}
-                                          checked={selectedSupervisionGenerationType === TYPE_GENERATION_AS_ENROLMENT}
+                                          checked={
+                                                formState?.selectedSupervisionGenerationType ===
+                                                TYPE_GENERATION_AS_ENROLMENT
+                                          }
                                           disabled={true}
                                     />
                               </div>
@@ -1138,11 +1240,14 @@ const Setting = () => {
                                           label={translate('Generer_Supervision_Comme_EV')}
                                           onChange={handleSupervisionGenerationType}
                                           value={TYPE_GENERATION_AS_EVENT}
-                                          checked={selectedSupervisionGenerationType === TYPE_GENERATION_AS_EVENT}
+                                          checked={
+                                                formState?.selectedSupervisionGenerationType ===
+                                                TYPE_GENERATION_AS_EVENT
+                                          }
                                     />
                               </div>
                         </div>
-                        {selectedTEIProgram && (
+                        {formState?.selectedTEIProgram && (
                               <div>
                                     <Divider style={{ margin: '20px 0px' }} />
                                     <div style={{ fontWeight: 'bold' }}>
@@ -1154,7 +1259,9 @@ const Setting = () => {
                                                       label={translate('Unite_Organisation')}
                                                       onChange={handleSupervisionPlanificationType}
                                                       value={ORGANISATION_UNIT}
-                                                      checked={selectedPlanificationType === ORGANISATION_UNIT}
+                                                      checked={
+                                                            formState?.selectedPlanificationType === ORGANISATION_UNIT
+                                                      }
                                                 />
                                           </div>
                                           <div>
@@ -1162,7 +1269,7 @@ const Setting = () => {
                                                       label={translate('Agent')}
                                                       onChange={handleSupervisionPlanificationType}
                                                       value={AGENT}
-                                                      checked={selectedPlanificationType === AGENT}
+                                                      checked={formState?.selectedPlanificationType === AGENT}
                                                       disabled={true}
                                                 />
                                           </div>
@@ -1170,7 +1277,7 @@ const Setting = () => {
                               </div>
                         )}
 
-                        {selectedTEIProgram && (
+                        {formState?.selectedTEIProgram && (
                               <div>
                                     <Divider style={{ margin: '20px 0px' }} />
 
@@ -1178,17 +1285,27 @@ const Setting = () => {
                                           <div style={{ marginTop: '5px' }}>
                                                 <Radio
                                                       label={translate('Configuration_RDQe_Case')}
-                                                      onChange={({ value }) => setSelectedConfigurationType(value)}
-                                                      value="ERDQ"
-                                                      checked={selectedConfigurationType === 'ERDQ'}
+                                                      onChange={({ value }) =>
+                                                            setFormState({
+                                                                  ...formState,
+                                                                  selectedConfigurationType: value
+                                                            })
+                                                      }
+                                                      value={ERDQ}
+                                                      checked={formState?.selectedConfigurationType === ERDQ}
                                                 />
                                           </div>
                                           <div style={{ marginTop: '5px' }}>
                                                 <Radio
                                                       label={translate('Configuration_DQe_Case')}
-                                                      onChange={({ value }) => setSelectedConfigurationType(value)}
-                                                      value="DQR"
-                                                      checked={selectedConfigurationType === 'DQR'}
+                                                      onChange={({ value }) =>
+                                                            setFormState({
+                                                                  ...formState,
+                                                                  selectedConfigurationType: value
+                                                            })
+                                                      }
+                                                      value={DQR}
+                                                      checked={formState?.selectedConfigurationType === DQR}
                                                 />
                                           </div>
                                     </div>
@@ -1200,21 +1317,16 @@ const Setting = () => {
 
       const handleEditProgramSup = async prog => {
             try {
-                  setSelectedTEIProgram(programs.find(p => p.id === prog.program?.id));
+                  setFormState({
+                        ...formState,
+                        selectedTEIProgram: programs.find(p => p.id === prog.program?.id),
+                        selectedSupervisionGenerationType: prog?.generationType,
+                        selectedPlanificationType: prog.planificationType,
+                        selectedConfigurationType: prog.configurationType,
+                        isFieldEditingMode: true
+                  });
                   await loadProgramStages(prog?.program?.id);
-                  // setProgramStages(programStageList);
 
-                  setSelectedStatutSupervisionDataElement(null);
-                  setIndicatorsFieldsConfigs([]);
-                  setSelectedProgramStageForConfiguration(null);
-                  setSelectedSupervisorDataElements([]);
-                  setCurrentProgramstageConfiguration(null);
-
-                  setSelectedSupervisionGenerationType(prog?.generationType);
-                  setSelectedPlanificationType(prog.planificationType);
-                  setSelectedConfigurationType(prog.configurationType);
-
-                  setFieldEditingMode(true);
                   setProgramStageConfigurations(prog.programStageConfigurations || []);
             } catch (err) {
                   console.log('edit error : ', err);
@@ -1348,21 +1460,20 @@ const Setting = () => {
                   const foundProgramStage = programStages.find(p => p.id === value.programStage?.id);
                   if (!foundProgramStage) throw new Error('No program stage found ');
 
-                  setSelectedProgramStageForConfiguration(foundProgramStage);
-                  setSelectedOrganisationUnitGroup(
-                        organisationUnitGroups.find(orgG => orgG.id === value.organisationUnitGroup?.id)
-                  );
-
-                  setSelectedSupervisorDataElements(value.supervisorField);
-                  setSelectedStatusSupervisionDataElement(value.statusSupervisionField);
-
-                  setSelectedNumberOfIndicators(value.numberOfIndicators);
-                  setSelectedNumberOfRecoupements(value.numberOfRecoupements);
-                  setSelectedNumberOfRecoupements(value.numberOfRecoupements);
-
+                  setFormState({
+                        ...formState,
+                        selectedProgramStageForConfiguration: foundProgramStage,
+                        selectedOrganisationUnitGroup: organisationUnitGroups.find(
+                              orgG => orgG.id === value.organisationUnitGroup?.id
+                        ),
+                        selectedSupervisorDataElements: value.supervisorField || [],
+                        selectedStatusSupervisionDataElement: value.statusSupervisionField,
+                        isFieldEditingMode: true 
+                  });
                   setCurrentProgramstageConfiguration(value);
-                  setFieldEditingMode(true);
-                  setIndicatorsFieldsConfigs(value.indicatorsFieldsConfigs);
+
+
+                  // setIndicatorsFieldsConfigs(value.indicatorsFieldsConfigs);
             } catch (err) {
                   setNotification({
                         show: true,
@@ -1395,7 +1506,7 @@ const Setting = () => {
                                                             placeholder={translate('Programmes_Stage')}
                                                             style={{ width: '100%' }}
                                                             optionFilterProp="label"
-                                                            value={selectedProgramStageForConfiguration?.id}
+                                                            value={formState?.selectedProgramStageForConfiguration?.id}
                                                             onChange={handleSelectProgramStageForConfiguration}
                                                             showSearch
                                                             allowClear
@@ -1405,7 +1516,7 @@ const Setting = () => {
                                                 </div>
                                           </Col>
 
-                                          {selectedConfigurationType === 'ERDQ' && (
+                                          {formState?.selectedConfigurationType === ERDQ && (
                                                 <Col md={12} sm={24}>
                                                       <div>
                                                             <div style={{ marginBottom: '5px' }}>
@@ -1421,7 +1532,7 @@ const Setting = () => {
                                                                   placeholder={translate('Groupe_Unite_Organisation')}
                                                                   style={{ width: '100%' }}
                                                                   optionFilterProp="label"
-                                                                  value={selectedOrganisationUnitGroup?.id}
+                                                                  value={formState?.selectedOrganisationUnitGroup?.id}
                                                                   onChange={
                                                                         handleSelectOrganisationUnitGroupProgramStage
                                                                   }
@@ -1434,14 +1545,14 @@ const Setting = () => {
                                                 </Col>
                                           )}
 
-                                          {selectedProgramStageForConfiguration && (
+                                          {formState?.selectedProgramStageForConfiguration && (
                                                 <Col md={12}>
                                                       <div>
                                                             <div style={{ marginBottom: '5px' }}>
                                                                   {translate('Supervisor_Fields')}
                                                             </div>
                                                             <Select
-                                                                  options={selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                  options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
                                                                         progStageDE => ({
                                                                               label: progStageDE.dataElement
                                                                                     ?.displayName,
@@ -1455,20 +1566,22 @@ const Setting = () => {
                                                                   style={{ width: '100%' }}
                                                                   mode="multiple"
                                                                   onChange={handleSelectDataElements}
-                                                                  value={selectedSupervisorDataElements?.map(s => s.id)}
+                                                                  value={formState?.selectedSupervisorDataElements?.map(
+                                                                        s => s.id
+                                                                  )}
                                                             />
                                                       </div>
                                                 </Col>
                                           )}
 
-                                          {selectedProgramStageForConfiguration && (
+                                          {formState?.selectedProgramStageForConfiguration && (
                                                 <Col md={12}>
                                                       <div>
                                                             <div style={{ marginBottom: '5px' }}>
                                                                   {translate('Supervision_Status_fields')}
                                                             </div>
                                                             <Select
-                                                                  options={selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                  options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
                                                                         progStageDE => ({
                                                                               label: progStageDE.dataElement
                                                                                     ?.displayName,
@@ -1478,7 +1591,10 @@ const Setting = () => {
                                                                   placeholder={translate('Elements_De_Donnees')}
                                                                   style={{ width: '100%' }}
                                                                   onChange={handleSelectStatutSupervisionDataElement}
-                                                                  value={selectedStatusSupervisionDataElement?.id}
+                                                                  value={
+                                                                        formState?.selectedStatusSupervisionDataElement
+                                                                              ?.id
+                                                                  }
                                                                   optionFilterProp="label"
                                                                   showSearch
                                                                   allowClear
@@ -1982,68 +2098,30 @@ const Setting = () => {
       };
 
       const RenderIndicatorAndRecoupementConfigFields = () =>
-            selectedProgramStageForConfiguration && (
+            formState?.selectedProgramStageForConfiguration && (
                   <div style={{ marginTop: '20px' }}>
                         <Card className="my-shadow" size="small">
                               <div>
-                                    <div style={{ fontWeight: 'bold' }}>
-                                          {translate(
-                                                'Program_Stage_Configuration_Fields_For_Recoupement_And_Indicator'
+                                    <div style={{ margin: '20px 0px' }}>
+                                          {formState?.selectedConfigurationType === ERDQ ? (
+                                                <>
+                                                      {/* <GenerateIndicatorsFieldsList
+                                                            selectedProgramStageForConfiguration={
+                                                                  selectedProgramStageForConfiguration
+                                                            }
+                                                            indicatorsFieldsConfigs={indicatorsFieldsConfigs}
+                                                            setIndicatorsFieldsConfigs={setIndicatorsFieldsConfigs}
+                                                            selectedConfigurationType={selectedConfigurationType}
+                                                      /> */}
+                                                </>
+                                          ) : (
+                                                <>
+                                                      <GenerateIndicatorsFieldsDQR
+                                                            formState={formState}
+                                                            setFormState={setFormState}
+                                                      />
+                                                </>
                                           )}
-                                    </div>
-                                    <div
-                                          style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                width: '100%',
-                                                marginTop: '10px'
-                                          }}
-                                    >
-                                          <div style={{ width: '100%' }}>
-                                                <div style={{ marginBottom: '5px' }}>
-                                                      {translate('NumberOfIndicators')}
-                                                </div>
-                                                <Select
-                                                      options={numberList}
-                                                      placeholder={translate('NumberOfIndicators')}
-                                                      style={{ width: '100%' }}
-                                                      optionFilterProp="label"
-                                                      value={selectedNumberOfIndicators}
-                                                      onChange={value => {
-                                                            setSelectedNumberOfIndicators(value);
-                                                      }}
-                                                      showSearch
-                                                />
-                                          </div>
-                                          <div style={{ width: '100%' }}>
-                                                <div style={{ marginBottom: '5px' }}>
-                                                      {translate('NumberOfRecoupements')}
-                                                </div>
-                                                <Select
-                                                      options={numberList}
-                                                      placeholder={translate('NumberOfRecoupements')}
-                                                      style={{ width: '100%' }}
-                                                      optionFilterProp="label"
-                                                      value={selectedNumberOfRecoupements}
-                                                      onChange={value => {
-                                                            setSelectedNumberOfRecoupements(value);
-                                                      }}
-                                                      showSearch
-                                                />
-                                          </div>
-                                    </div>
-
-                                    <div style={{ margin: '10px 0px' }}>
-                                          <>
-                                                <GenerateIndicatorsFieldsList
-                                                      selectedProgramStageForConfiguration={
-                                                            selectedProgramStageForConfiguration
-                                                      }
-                                                      indicatorsFieldsConfigs={indicatorsFieldsConfigs}
-                                                      setIndicatorsFieldsConfigs={setIndicatorsFieldsConfigs}
-                                                      selectedConfigurationType={selectedConfigurationType}
-                                                />
-                                          </>
                                     </div>
                               </div>
                         </Card>
@@ -2064,7 +2142,7 @@ const Setting = () => {
                         </div>
                   )}
                   <Button
-                        disabled={selectedProgramStageForConfiguration ? false : true}
+                        disabled={formState?.selectedProgramStageForConfiguration ? false : true}
                         primary
                         onClick={handleSaveSupConfig}
                         loading={loadingSaveSupervionsConfig}
@@ -2083,7 +2161,7 @@ const Setting = () => {
                         <Col md={12} sm={24}>
                               <div>
                                     {RenderSupervisionConfiguration()}
-                                    {selectedTEIProgram && (
+                                    {formState?.selectedTEIProgram && (
                                           <div>
                                                 {RenderProgramStageConfiguration()}
                                                 {RenderIndicatorAndRecoupementConfigFields()}
@@ -3350,7 +3428,9 @@ const Setting = () => {
                                     </div>
                               </div>
                         </Col>
-                        <Col md={20} sm={24}>{ console.log("global settings : ", dataStoreGlobalSettings)}
+                        <Col md={20} sm={24}>
+                              {console.log('global settings : ', dataStoreGlobalSettings)}
+                              {console.log('formState : ', formState)}
                               {selectedTypeSupervisionPage === PAGE_CONFIG_INDICATORS && RenderPageIndicatorConfig()}
                               {selectedTypeSupervisionPage === PAGE_CONFIG_SUPERVISION && RenderPageSupervisionConfig()}
                               {selectedTypeSupervisionPage === PAGE_CONFIG_VISUALIZATION &&
@@ -3397,6 +3477,12 @@ const Setting = () => {
             selectedTypeSupervisionPage === PAGE_CONFIG_SUPERVISION && initSupConfigStates();
             selectedTypeSupervisionPage === PAGE_CONFIG_ANALYSE && initAnalyseConfigStates();
       }, []);
+
+      useEffect(() => {
+            if (dataStoreGlobalSettings) {
+                  initFields();
+            }
+      }, [dataStoreGlobalSettings, formState?.selectedConfigurationType]);
 
       useEffect(() => {
             if (

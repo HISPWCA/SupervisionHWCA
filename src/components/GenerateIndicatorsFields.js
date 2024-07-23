@@ -1,7 +1,6 @@
 import { Input, Select } from 'antd';
 import translate from '../utils/translator';
 import { v4 as uuid } from 'uuid';
-import { useState } from 'react';
 
 const GenerateIndicatorsConfigFieldsList = ({
       indicatorsFieldsConfigs,
