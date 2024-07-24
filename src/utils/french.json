@@ -288,5 +288,9 @@
 
     "ConsistencyOverTime": "Cohérence dans le temps",
     "Data_Element": "Element de donnée",
-    "Source_Document": "Document Source"
+    "Source_Document": "Document Source",
+    "Program_Area": "Domaine de programme",
+
+    "Primary_Source": "Source Primaire",
+    "Secondary_Source": "Source Secondaire"
 }

@@ -47,54 +47,120 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                             width: '50%'
                                                       }}
                                                 >
-                                                      <div
-                                                            style={{
-                                                                  marginBottom: '5px'
-                                                            }}
-                                                      >
-                                                            {`${translate('Indicateurs')} ${indexInd + 1}`}
-                                                      </div>
                                                       <div>
-                                                            <Select
-                                                                  placeholder={`${translate('Indicateurs')} ${
-                                                                        indexInd + 1
-                                                                  }`}
+                                                            <div
                                                                   style={{
-                                                                        width: '307px'
+                                                                        marginBottom: '5px'
                                                                   }}
-                                                                  options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
-                                                                        progStageDE => ({
-                                                                              label: progStageDE.dataElement
-                                                                                    ?.displayName,
-                                                                              value: progStageDE.dataElement?.id
-                                                                        })
-                                                                  )}
-                                                                  showSearch
-                                                                  allowClear
-                                                                  optionFilterProp="label"
-                                                                  value={ind?.value?.id}
-                                                                  onChange={value => {
-                                                                        setFormState({
-                                                                              ...formState,
-                                                                              indicators:
-                                                                                    formState?.indicators?.map(i => {
-                                                                                          if (i.id === ind.id) {
-                                                                                                return {
-                                                                                                      ...i,
-                                                                                                      value: formState?.selectedProgramStageForConfiguration?.programStageDataElements?.find(
-                                                                                                            p =>
-                                                                                                                  p
-                                                                                                                        .dataElement
-                                                                                                                        .id ===
-                                                                                                                  value
-                                                                                                      )?.dataElement
-                                                                                                };
-                                                                                          }
-                                                                                          return i;
-                                                                                    }) || []
-                                                                        });
+                                                            >
+                                                                  {`${translate('Program_Area')} ${indexInd + 1}`}
+                                                            </div>
+                                                            <div>
+                                                                  <Select
+                                                                        placeholder={`${translate('Program_Area')} ${
+                                                                              indexInd + 1
+                                                                        }`}
+                                                                        style={{
+                                                                              width: '307px'
+                                                                        }}
+                                                                        options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                              progStageDE => ({
+                                                                                    label: progStageDE.dataElement
+                                                                                          ?.displayName,
+                                                                                    value: progStageDE.dataElement?.id
+                                                                              })
+                                                                        )}
+                                                                        showSearch
+                                                                        allowClear
+                                                                        optionFilterProp="label"
+                                                                        value={ind?.programArea?.id}
+                                                                        onChange={value => {
+                                                                              setFormState({
+                                                                                    ...formState,
+                                                                                    indicators:
+                                                                                          formState?.indicators?.map(
+                                                                                                i => {
+                                                                                                      if (
+                                                                                                            i.id ===
+                                                                                                            ind.id
+                                                                                                      ) {
+                                                                                                            return {
+                                                                                                                  ...i,
+                                                                                                                  programArea:
+                                                                                                                        formState?.selectedProgramStageForConfiguration?.programStageDataElements?.find(
+                                                                                                                              p =>
+                                                                                                                                    p
+                                                                                                                                          .dataElement
+                                                                                                                                          .id ===
+                                                                                                                                    value
+                                                                                                                        )
+                                                                                                                              ?.dataElement
+                                                                                                            };
+                                                                                                      }
+                                                                                                      return i;
+                                                                                                }
+                                                                                          ) || []
+                                                                              });
+                                                                        }}
+                                                                  />
+                                                            </div>
+                                                      </div>
+                                                      <div style={{ marginTop: '5px' }}>
+                                                            <div
+                                                                  style={{
+                                                                        marginBottom: '5px'
                                                                   }}
-                                                            />
+                                                            >
+                                                                  {`${translate('Indicateurs')} ${indexInd + 1}`}
+                                                            </div>
+                                                            <div>
+                                                                  <Select
+                                                                        placeholder={`${translate('Indicateurs')} ${
+                                                                              indexInd + 1
+                                                                        }`}
+                                                                        style={{
+                                                                              width: '307px'
+                                                                        }}
+                                                                        options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                              progStageDE => ({
+                                                                                    label: progStageDE.dataElement
+                                                                                          ?.displayName,
+                                                                                    value: progStageDE.dataElement?.id
+                                                                              })
+                                                                        )}
+                                                                        showSearch
+                                                                        allowClear
+                                                                        optionFilterProp="label"
+                                                                        value={ind?.value?.id}
+                                                                        onChange={value => {
+                                                                              setFormState({
+                                                                                    ...formState,
+                                                                                    indicators:
+                                                                                          formState?.indicators?.map(
+                                                                                                i => {
+                                                                                                      if (
+                                                                                                            i.id ===
+                                                                                                            ind.id
+                                                                                                      ) {
+                                                                                                            return {
+                                                                                                                  ...i,
+                                                                                                                  value: formState?.selectedProgramStageForConfiguration?.programStageDataElements?.find(
+                                                                                                                        p =>
+                                                                                                                              p
+                                                                                                                                    .dataElement
+                                                                                                                                    .id ===
+                                                                                                                              value
+                                                                                                                  )
+                                                                                                                        ?.dataElement
+                                                                                                            };
+                                                                                                      }
+                                                                                                      return i;
+                                                                                                }
+                                                                                          ) || []
+                                                                              });
+                                                                        }}
+                                                                  />
+                                                            </div>
                                                       </div>
                                                 </td>
                                                 <td
@@ -210,6 +276,64 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                       }}
                                                 >
                                                       <div>
+                                                            <div
+                                                                  style={{
+                                                                        marginBottom: '5px'
+                                                                  }}
+                                                            >
+                                                                  {`${translate('Program_Area')} ${indexRec + 1}`}
+                                                            </div>
+                                                            <div>
+                                                                  <Select
+                                                                        placeholder={`${translate('Program_Area')} ${
+                                                                              indexRec + 1
+                                                                        }`}
+                                                                        style={{
+                                                                              width: '307px'
+                                                                        }}
+                                                                        options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                              progStageDE => ({
+                                                                                    label: progStageDE.dataElement
+                                                                                          ?.displayName,
+                                                                                    value: progStageDE.dataElement?.id
+                                                                              })
+                                                                        )}
+                                                                        showSearch
+                                                                        allowClear
+                                                                        optionFilterProp="label"
+                                                                        value={rec?.programArea?.id}
+                                                                        onChange={value => {
+                                                                              setFormState({
+                                                                                    ...formState,
+                                                                                    recoupements:
+                                                                                          formState?.recoupements?.map(
+                                                                                                i => {
+                                                                                                      if (
+                                                                                                            i.id ===
+                                                                                                            rec.id
+                                                                                                      ) {
+                                                                                                            return {
+                                                                                                                  ...i,
+                                                                                                                  programArea:
+                                                                                                                        formState?.selectedProgramStageForConfiguration?.programStageDataElements?.find(
+                                                                                                                              p =>
+                                                                                                                                    p
+                                                                                                                                          .dataElement
+                                                                                                                                          .id ===
+                                                                                                                                    value
+                                                                                                                        )
+                                                                                                                              ?.dataElement
+                                                                                                            };
+                                                                                                      }
+                                                                                                      return i;
+                                                                                                }
+                                                                                          ) || []
+                                                                              });
+                                                                        }}
+                                                                  />
+                                                            </div>
+                                                      </div>
+                                                      <div style={{ marginTop: '5px' }}>
                                                             <div
                                                                   style={{
                                                                         marginBottom: '5px'
@@ -447,6 +571,62 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                                         marginBottom: '5px'
                                                                   }}
                                                             >
+                                                                  {`${translate('Program_Area')}`}
+                                                            </div>
+                                                            <div>
+                                                                  <Select
+                                                                        placeholder={`${translate('Program_Area')} `}
+                                                                        style={{
+                                                                              width: '307px'
+                                                                        }}
+                                                                        options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                              progStageDE => ({
+                                                                                    label: progStageDE.dataElement
+                                                                                          ?.displayName,
+                                                                                    value: progStageDE.dataElement?.id
+                                                                              })
+                                                                        )}
+                                                                        showSearch
+                                                                        allowClear
+                                                                        optionFilterProp="label"
+                                                                        value={item?.programArea?.id}
+                                                                        onChange={value => {
+                                                                              setFormState({
+                                                                                    ...formState,
+                                                                                    consistencyOvertimes:
+                                                                                          formState?.consistencyOvertimes?.map(
+                                                                                                i => {
+                                                                                                      if (
+                                                                                                            i.id ===
+                                                                                                            item.id
+                                                                                                      ) {
+                                                                                                            return {
+                                                                                                                  ...i,
+                                                                                                                  programArea:
+                                                                                                                        formState?.selectedProgramStageForConfiguration?.programStageDataElements?.find(
+                                                                                                                              p =>
+                                                                                                                                    p
+                                                                                                                                          .dataElement
+                                                                                                                                          .id ===
+                                                                                                                                    value
+                                                                                                                        )
+                                                                                                                              ?.dataElement
+                                                                                                            };
+                                                                                                      }
+                                                                                                      return i;
+                                                                                                }
+                                                                                          ) || []
+                                                                              });
+                                                                        }}
+                                                                  />
+                                                            </div>
+                                                      </div>
+                                                      <div style={{ marginTop: '5px' }}>
+                                                            <div
+                                                                  style={{
+                                                                        marginBottom: '5px'
+                                                                  }}
+                                                            >
                                                                   {`${translate('ConsistencyOverTime')}`}
                                                             </div>
                                                             <div>
@@ -620,6 +800,49 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                       width: '33%'
                                                 }}
                                           >
+                                                <div>
+                                                      <div
+                                                            style={{
+                                                                  marginBottom: '5px'
+                                                            }}
+                                                      >
+                                                            {`${translate('Program_Area')}`}
+                                                      </div>
+                                                      <div>
+                                                            <Select
+                                                                  placeholder={`${translate('Program_Area')} `}
+                                                                  style={{
+                                                                        width: '207px'
+                                                                  }}
+                                                                  options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                        progStageDE => ({
+                                                                              label: progStageDE.dataElement
+                                                                                    ?.displayName,
+                                                                              value: progStageDE.dataElement?.id
+                                                                        })
+                                                                  )}
+                                                                  showSearch
+                                                                  allowClear
+                                                                  optionFilterProp="label"
+                                                                  value={formState?.completeness?.programAreaDE?.id}
+                                                                  onChange={value => {
+                                                                        setFormState({
+                                                                              ...formState,
+                                                                              completeness: {
+                                                                                    ...formState?.completeness,
+                                                                                    programAreaDE:
+                                                                                          formState?.selectedProgramStageForConfiguration?.programStageDataElements?.find(
+                                                                                                p =>
+                                                                                                      p.dataElement
+                                                                                                            .id ===
+                                                                                                      value
+                                                                                          )?.dataElement
+                                                                              }
+                                                                        });
+                                                                  }}
+                                                            />
+                                                      </div>
+                                                </div>
                                                 {formState?.completeness?.dataElements?.map((item, indexItem) => (
                                                       <div style={{ marginTop: '5px' }}>
                                                             <div
@@ -691,6 +914,49 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                       width: '33%'
                                                 }}
                                           >
+                                                <div>
+                                                      <div
+                                                            style={{
+                                                                  marginBottom: '5px'
+                                                            }}
+                                                      >
+                                                            {`${translate('Program_Area')}`}
+                                                      </div>
+                                                      <div>
+                                                            <Select
+                                                                  placeholder={`${translate('Program_Area')} `}
+                                                                  style={{
+                                                                        width: '207px'
+                                                                  }}
+                                                                  options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                        progStageDE => ({
+                                                                              label: progStageDE.dataElement
+                                                                                    ?.displayName,
+                                                                              value: progStageDE.dataElement?.id
+                                                                        })
+                                                                  )}
+                                                                  showSearch
+                                                                  allowClear
+                                                                  optionFilterProp="label"
+                                                                  value={formState?.completeness?.programAreaDOC?.id}
+                                                                  onChange={value => {
+                                                                        setFormState({
+                                                                              ...formState,
+                                                                              completeness: {
+                                                                                    ...formState?.completeness,
+                                                                                    programAreaDOC:
+                                                                                          formState?.selectedProgramStageForConfiguration?.programStageDataElements?.find(
+                                                                                                p =>
+                                                                                                      p.dataElement
+                                                                                                            .id ===
+                                                                                                      value
+                                                                                          )?.dataElement
+                                                                              }
+                                                                        });
+                                                                  }}
+                                                            />
+                                                      </div>
+                                                </div>
                                                 {formState?.completeness?.sourceDocuments?.map((item, indexItem) => (
                                                       <div style={{ marginTop: '5px' }}>
                                                             <div

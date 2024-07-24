@@ -281,10 +281,14 @@
     "Cross_check_Configuration": "Cross checks configuration",
     "ConsistencyOverTime_Configuration": "Consistency Over time configuration",
     "Data_Element_&_Source_Documentation_Configurations": "Data Elements & Source documents Completeness configuration ",
-    "Recoupement_Primary":"Cross Check Primary",
-    "Recoupement_Secondary":"Cross Check Secondary",
+    "Recoupement_Primary": "Cross Check Primary",
+    "Recoupement_Secondary": "Cross Check Secondary",
+    "ConsistencyOverTime": "Consistency Over Time",
+    "Data_Element": "Data Element",
+    "Source_Document": "Source Document",
+    "Program_Area": "Program Area",
 
-    "ConsistencyOverTime":"Consistency Over Time",
-    "Data_Element":"Data Element",
-    "Source_Document":"Source Document"
+    "Primary_Source":"Primary Source",
+    "Secondary_Source":"Secondary Source"
+
 }

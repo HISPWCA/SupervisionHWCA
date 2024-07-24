@@ -38,6 +38,7 @@ import {
       DAY,
       DESCENDANTS,
       DIRECTE,
+      DQR,
       ELEMENT_GROUP,
       FAVORIS,
       INDICATOR,
@@ -1535,14 +1536,14 @@ const Supervision = ({ me }) => {
                   );
                   if (!currentProgram.data) throw new Error(translate('Programme_Non_Trouver'));
 
-                  const generatedCode = await generatedAutoCode(
-                        currentProgram.data.programTrackedEntityAttributes[0]?.trackedEntityAttribute?.id
-                  );
+                  // const generatedCode = await generatedAutoCode(
+                  //       currentProgram.data.programTrackedEntityAttributes[0]?.trackedEntityAttribute?.id
+                  // );
 
                   const tei = {
                         trackedEntityType: currentProgram.data.trackedEntityType.id,
                         orgUnit: payload.orgUnit,
-                        attributes: [{ attribute: generatedCode.ownerUid, value: generatedCode.value }]
+                        // attributes: [{ attribute: generatedCode.ownerUid, value: generatedCode.value }]
                   };
 
                   const createdTEI = await createTei(tei);
@@ -1786,21 +1787,20 @@ const Supervision = ({ me }) => {
                                     : dayjs().format('YYYY-MM-DD');
                               eventPayload.dueDate = payload.period
                                     ? dayjs(payload.period).format('YYYY-MM-DD')
-                                    : dayjs().format('YYYY-MM-DD')
+                                    : dayjs().format('YYYY-MM-DD');
 
                               eventPayload.dataValues =
-                                    selectedProgram?.configurationType === 'DQR'
+                                    selectedProgram?.configurationType === DQR
                                           ? mappingConfigs
                                                   .filter(ev => ev.programStage?.id === payload.programStage?.id)
                                                   .map(ev => ({
                                                         dataElement: ev.dataElement?.id,
                                                         value: ev.indicator?.displayName
                                                   }))
-                                          : mappingConfigs
-                                                  .map(ev => ({
-                                                        dataElement: ev.dataElement?.id,
-                                                        value: ev.indicator?.displayName
-                                                  }));
+                                          : mappingConfigs.map(ev => ({
+                                                  dataElement: ev.dataElement?.id,
+                                                  value: ev.indicator?.displayName
+                                            }));
                         } else {
                               eventPayload.status = 'SCHEDULE';
                               eventPayload.dueDate = payload.period
@@ -1808,9 +1808,9 @@ const Supervision = ({ me }) => {
                                     : dayjs().format('YYYY-MM-DD');
                         }
 
-                         console.log('---------------------------------------------------');
-                         console.log('program Stage  ', payload.programStage);
-                         console.log('event :', eventPayload);
+                        console.log('---------------------------------------------------');
+                        console.log('program Stage  ', payload.programStage);
+                        console.log('event :', eventPayload);
 
                         // Ajoute des dataValues superviseurs
                         if (payload.programStageConfig?.supervisorField?.length > 0) {
@@ -2264,50 +2264,50 @@ const Supervision = ({ me }) => {
             }
       };
 
-      const saveSupervisionAsTEIStrategy = async (inputFieldsList, newDataStoreSupervisions) => {
-            try {
-                  if (inputFieldsList.length > 0) {
-                        const supervisionsList = [];
+      // const saveSupervisionAsTEIStrategy = async (inputFieldsList, newDataStoreSupervisions) => {
+      //       try {
+      //             if (inputFieldsList.length > 0) {
+      //                   const supervisionsList = [];
 
-                        for (let item of inputFieldsList) {
-                              const payload = {
-                                    ...item,
-                                    orgUnit: item.organisationUnit?.id,
-                                    period: item.period,
-                                    program: item.program?.id,
-                                    fieldConfig: item.fieldConfig
-                              };
+      //                   for (let item of inputFieldsList) {
+      //                         const payload = {
+      //                               ...item,
+      //                               orgUnit: item.organisationUnit?.id,
+      //                               period: item.period,
+      //                               program: item.program?.id,
+      //                               fieldConfig: item.fieldConfig
+      //                         };
 
-                              const createdTEIObject = await generateTeiWithEnrollmentWithEvents(payload);
+      //                         const createdTEIObject = await generateTeiWithEnrollmentWithEvents(payload);
 
-                              if (createdTEIObject) {
-                                    supervisionsList.push({
-                                          ...item,
-                                          id: uuid(),
-                                          planificationType: selectedPlanificationType,
-                                          indicators: selectedIndicators,
-                                          orgUnit: item.organisationUnit?.id,
-                                          period: item.period,
-                                          program: item.program,
-                                          fieldConfig: item.fieldConfig,
-                                          tei: createdTEIObject
-                                    });
-                              }
-                        }
-                        let planificationPayload = {
-                              id: uuid(),
-                              program: selectedProgram,
-                              dataSources: mappingConfigs,
-                              supervisions: supervisionsList
-                        };
+      //                         if (createdTEIObject) {
+      //                               supervisionsList.push({
+      //                                     ...item,
+      //                                     id: uuid(),
+      //                                     planificationType: selectedPlanificationType,
+      //                                     indicators: selectedIndicators,
+      //                                     orgUnit: item.organisationUnit?.id,
+      //                                     period: item.period,
+      //                                     program: item.program,
+      //                                     fieldConfig: item.fieldConfig,
+      //                                     tei: createdTEIObject
+      //                               });
+      //                         }
+      //                   }
+      //                   let planificationPayload = {
+      //                         id: uuid(),
+      //                         program: selectedProgram,
+      //                         dataSources: mappingConfigs,
+      //                         supervisions: supervisionsList
+      //                   };
 
-                        const newDataStoreSupervisionsPayload = [...newDataStoreSupervisions, planificationPayload];
-                        await savePanificationToDataStore(newDataStoreSupervisionsPayload);
-                  }
-            } catch (err) {
-                  throw err;
-            }
-      };
+      //                   const newDataStoreSupervisionsPayload = [...newDataStoreSupervisions, planificationPayload];
+      //                   await savePanificationToDataStore(newDataStoreSupervisionsPayload);
+      //             }
+      //       } catch (err) {
+      //             throw err;
+      //       }
+      // };
 
       const saveSupervisionAsEventStrategy = async (inputFieldsList, newDataStoreSupervisions) => {
             try {
@@ -2328,7 +2328,7 @@ const Supervision = ({ me }) => {
                                                       .includes(progStageConfig?.organisationUnitGroup?.id)) ||
                                           false;
 
-                                    if (selectedProgram?.configurationType === 'DQR') {
+                                    if (selectedProgram?.configurationType === DQR) {
                                           is_ok = true;
                                     }
 
@@ -2454,9 +2454,6 @@ const Supervision = ({ me }) => {
                                     ? dayjs(payload.period).format('YYYY-MM-DD')
                                     : dayjs().format('YYYY-MM-DD');
                         }
-
-
-                       
 
                         // Ajoute des dataValues superviseurs
                         if (
@@ -2720,26 +2717,6 @@ const Supervision = ({ me }) => {
                   //       await saveSupervisionAsEventStrategy(inputFields, newDataStoreSupervisions);
                   // }
 
-                  const missionList = (await loadDataStore(process.env.REACT_APP_MISSIONS_KEY, null, null, [])) || [];
-                  const newMissionList = [
-                        ...missionList,
-                        {
-                              id: uuid(),
-                              name: inputMissionName,
-                              program: inputFields[0]?.program,
-                              output: inputFields?.map(inp => ({
-                                    ...inp,
-                                    period: dayjs(inp.period).format('YYYY-MM-DD HH:mm:ss'),
-                                    supervisors: inp.supervisors?.map(sup => ({
-                                          id: sup.id,
-                                          displayName: sup.displayName
-                                    }))
-                              })),
-                              createdAt: dayjs().format('YYYY-MM-DD HH:mm:ss')
-                        }
-                  ];
-                  await saveDataToDataStore(process.env.REACT_APP_MISSIONS_KEY, newMissionList);
-
                   loadDataStoreSupervisionConfigs(organisationUnits);
                   loadDataStorePerformanceFavoritsConfigs();
                   loadDataStoreSupervisions();
@@ -2754,9 +2731,6 @@ const Supervision = ({ me }) => {
                   setEditionMode(false);
                   setEquipeList([]);
                   cleanAllNewSupervisionState();
-
-                  setVisibleMissionName(false);
-                  setInputMissionName('');
             } catch (err) {
                   setLoadingSupervisionPlanification(false);
                   setNotification({
@@ -2987,15 +2961,8 @@ const Supervision = ({ me }) => {
                                           <div style={{ marginTop: '15px' }}>
                                                 {selectedPlanificationType === ORGANISATION_UNIT && (
                                                       <Popconfirm
-                                                            title={translate('Confirmation')}
-                                                            description={translate(
-                                                                  'Confirmation_Planification_Message'
-                                                            )}
-                                                            onConfirm={() => {
-                                                                  setInputMissionName('');
-                                                                  setVisibleMissionName(true);
-                                                            }}
-                                                            okButtonProps={{ loading: loadingSupervisionPlanification }}
+                                                            title={translate('Confirmation_Planification_Message')}
+                                                            onConfirm={handleSupervisionPlanificationSaveBtn}
                                                       >
                                                             <Button
                                                                   icon={
@@ -3009,6 +2976,7 @@ const Supervision = ({ me }) => {
                                                                   primary
                                                                   disabled={loadingSupervisionPlanification}
                                                                   loading={loadingSupervisionPlanification}
+                                                                  // onClick={handleSupervisionPlanificationSaveBtn}
                                                             >
                                                                   {translate('Planifier_Supervision')}
                                                             </Button>
@@ -3522,76 +3490,6 @@ const Supervision = ({ me }) => {
                                                       {translate('Enregistrer')}
                                                 </Button>
                                           )}
-                                    </ButtonStrip>
-                              </ModalActions>
-                        </Modal>
-                  </>
-            );
-
-      const RenderAddMissionNameModal = () =>
-            visibleMissionName && (
-                  <>
-                        <Modal
-                              onClose={() => {
-                                    setVisibleMissionName(false);
-                                    setInputMissionName('');
-                              }}
-                        >
-                              <ModalTitle>{translate('Nom_De_La_Mission')}</ModalTitle>
-                              <ModalContent>
-                                    <div
-                                          style={{
-                                                margin: '10px'
-                                          }}
-                                    >
-                                          <NoticeBox>{translate('Help_Mission_Text')}</NoticeBox>
-                                    </div>
-
-                                    {dataStoreMissions?.map(m => m.name)?.includes(inputMissionName) && (
-                                          <div
-                                                style={{
-                                                      margin: '10px'
-                                                }}
-                                          >
-                                                <NoticeBox error>{translate('Help_Mission_Text')}</NoticeBox>
-                                          </div>
-                                    )}
-                                    <div
-                                          style={{
-                                                padding: '10px'
-                                          }}
-                                    >
-                                          <Input
-                                                placeholder={translate('Nom_De_La_Mission')}
-                                                style={{ width: '100%' }}
-                                                value={inputMissionName}
-                                                onChange={event => setInputMissionName(event.target.value)}
-                                          />
-                                    </div>
-                              </ModalContent>
-                              <ModalActions>
-                                    <ButtonStrip end>
-                                          <Button
-                                                destructive
-                                                onClick={() => {
-                                                      setVisibleMissionName(false);
-                                                      setInputMissionName('');
-                                                }}
-                                                icon={<CgCloseO style={{ fontSize: '18px' }} />}
-                                          >
-                                                {translate('Annuler')}
-                                          </Button>
-                                          <Button
-                                                disabled={dataStoreMissions
-                                                      ?.map(m => m.name)
-                                                      ?.includes(inputMissionName)}
-                                                loading={loadingSupervisionPlanification}
-                                                primary
-                                                onClick={handleSupervisionPlanificationSaveBtn}
-                                                icon={<FiSave style={{ fontSize: '18px' }} />}
-                                          >
-                                                {translate('Enregistrer')}
-                                          </Button>
                                     </ButtonStrip>
                               </ModalActions>
                         </Modal>
@@ -5552,10 +5450,10 @@ const Supervision = ({ me }) => {
                                           action: { id: mapConf.id }
                                     }))}
                                     columns={[
-                                          {
-                                                title: translate('Programme'),
-                                                dataIndex: 'programName'
-                                          },
+                                          // {
+                                          //       title: translate('Programme'),
+                                          //       dataIndex: 'programName'
+                                          // },
                                           {
                                                 title: translate('Programme_Stage'),
                                                 dataIndex: 'programStageName'
@@ -7165,7 +7063,6 @@ const Supervision = ({ me }) => {
                   loadOrganisationUnits();
                   loadOrganisationUnitGroups();
                   loadDataStoreSupervisions();
-                  loadDataStoreMissions();
                   loadDataStorePerformanceFavoritsConfigs();
                   loadDataStoreBackgroundInformationFavoritsConfigs();
                   loadDataStoreIndicators();
@@ -7197,7 +7094,6 @@ const Supervision = ({ me }) => {
                         </>
                   )}
 
-                  {RenderAddMissionNameModal()}
                   {RenderAddEquipeModal()}
                   {RenderAnalyticComponenPerformancetModal()}
                   {RenderAddFavoritPerformanceModal()}

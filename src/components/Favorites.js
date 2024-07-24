@@ -26,33 +26,26 @@ import { DataDimension } from '@dhis2/analytics';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import dayjs from 'dayjs';
+import FavoriteGenerateIndicatorsFieldsDQR from './FavoriteGenerateIndicatorsFieldsDQR';
 
 const Favorites = ({ me }) => {
-      const [dataStoreSupervisionConfigs, setDataStoreSupervisionConfigs] = useState([]);
       const [programStages, setProgramStages] = useState([]);
-      const [isNewMappingMode, setIsNewMappingMode] = useState(false);
       const [mappingConfigs, setMappingConfigs] = useState([]);
-      const [dataElementGroups, setDataElementGroups] = useState([]);
       const [favoritBackgroundInformationList, setFavoritBackgroundInformationList] = useState([]);
       const [visibleAnalyticComponentModal, setVisibleAnalyticComponentModal] = useState(false);
       const [visibleAddFavoritBackgroundInformationModal, setVisibleAddFavoritBackgroundInformationModal] =
             useState(false);
-      const [selectedBackgroundInformationTypeConfiguration, setSelectedBackgroundInformationTypeConfiguration] =
-            useState(DIRECTE);
+
       const [selectedBackgroundInformationFavorit, setSelectedBackgroundInformationFavorit] = useState(null);
       const [selectedProgram, setSelectedProgram] = useState(null);
-      const [selectedProgramStage, setSelectedProgramStage] = useState(null);
-      const [selectedDataElement, setSelectedDataElement] = useState(null);
       const [selectedMetaDatas, setSelectedMetaDatas] = useState([]);
       const [inputFavorisNameForBackgroundInforation, setInputFavoritNameForBackgroundInforation] = useState('');
       const [loadingSaveFavoritBackgroundInformations, setLoadingSaveFavoritBackgroundInformations] = useState(false);
       const [loadingDeleteFavoritBackgroundInformations, setLoadingDeleteFavoritBackgroundInformations] =
             useState(false);
       const [loadingProgramStages, setLoadingProgramStages] = useState(false);
-      const [loadingSaveDateElementMappingConfig, setLoadingSaveDateElementMappingConfig] = useState(false);
       const [loadingBackgroundInformationFavoritsConfigs, setLoadingBackgroundInformationFavoritsConfigs] =
             useState(false);
-      const [loadingDataElementGroups, setLoadingDataElementGroups] = useState(false);
       const [loadingDataStoreSupervisionConfigs, setLoadingDataStoreSupervisionConfigs] = useState(false);
 
       const [formIndicatorConfiguration, setFormIndicatorConfiguration] = useState({
@@ -73,35 +66,138 @@ const Favorites = ({ me }) => {
       const [selectedTypeSource, setSelectedTypeSource] = useState('DHIS2');
 
       const [dataStoreCrosschecks, setDataStoreCrosschecks] = useState([]);
+      const [dataStoreIndicators, setDataStoreIndicators] = useState([]);
+      const [dataStoreDECompletness, setDataStoreDECompletness] = useState([]);
+      const [dataStoreDSCompletness, setDataStoreDSCompletness] = useState([]);
+      const [dataStoreSupervisionConfigs, setDataStoreSupervisionConfigs] = useState([]);
+
       const [selectedCrosscheck, setSelectedCrosscheck] = useState(null);
       const [selectedCrosscheckChild, setSelectedCrosscheckChild] = useState(null);
       const [visibleAnalyticComponentModalForCrossCheck, setVisibleAnalyticComponentModalForCrossCheck] =
             useState(false);
 
-      const handleSelectProgramStage = value => {
-            setSelectedProgramStage(programStages.find(pstage => pstage.id === value));
-            setSelectedDataElement(null);
-      };
+      const [formState, setFormState] = useState({
+            selectedProgram: null,
+            selectedProgramStage: null,
+            selectedBackgroundInformationTypeConfiguration: DIRECTE,
+            selectedBackgroundInformationFavorit: null,
+            inputFavorisNameForBackgroundInforation: '',
+            indicators: [],
+            recoupements: [],
+            consistencyOvertimes: [],
+            completeness: {
+                  dataElements: [],
+                  sourceDocuments: []
+            }
+      });
 
-      const cleanIndicatorRecoupementState = () => {
-            setFormIndicatorConfiguration({
-                  selectedIndicator: { dataElement: null, source: null },
-                  selectedRecoupements: [],
-                  isIndicator: true,
-                  currentElement: null,
-                  marginOfErrorIndicator: null,
-                  marginOfErrorRecoupement: null
+      const handleSelectProgramStage = value => {
+            setFormState({
+                  ...formState,
+                  selectedProgramStage: programStages.find(pstage => pstage.id === value)
             });
       };
 
-      const handleClickSupervisionItem = sup => {
-            setMappingConfigs([]);
-            setSelectedBackgroundInformationFavorit(null);
-            cleanIndicatorRecoupementState();
+      const initFields = () => {
+            const currStage = formState.selectedProgram?.programStageConfigurations?.find(
+                  pstage => pstage.programStage?.id === formState.selectedProgramStage?.id
+            );
+            const existingFormState = formState?.selectedBackgroundInformationFavorit?.formState;
 
+            console.log('existingFormState : ', existingFormState);
+            if (currStage) {
+                  setFormState({
+                        ...formState,
+                        indicators:
+                              currStage.indicators
+                                    ?.filter(ind => ind.value && ind.programArea)
+                                    ?.map((ind, index) => ({
+                                          ...ind,
+                                          selectedSourceProgramArea:
+                                                existingFormState?.indicators[index]?.selectedSourceProgramArea || null,
+                                          selectedSourceIndicator:
+                                                existingFormState?.indicators[index]?.selectedSourceIndicator || null,
+                                          selectedSourceMargin:
+                                                existingFormState?.indicators[index]?.selectedSourceMargin || null
+                                    })) || [],
+                        recoupements:
+                              currStage.recoupements
+                                    ?.filter(rec => rec.primaryValue && rec.secondaryValue && rec.programArea)
+                                    ?.map((ind, index) => ({
+                                          ...ind,
+                                          selectedSourceProgramArea:
+                                                existingFormState?.recoupements[index]?.selectedSourceProgramArea ||
+                                                null,
+                                          selectedSourcePrimary:
+                                                existingFormState?.recoupements[index]?.selectedSourcePrimary || null,
+                                          selectedSourceSecondary:
+                                                existingFormState?.recoupements[index]?.selectedSourceSecondary || null,
+                                          selectedSourceMargin:
+                                                existingFormState?.recoupements[index]?.selectedSourceMargin || null
+                                    })) || [],
+
+                        consistencyOvertimes:
+                              currStage.consistencyOvertimes
+                                    ?.filter(ind => ind.value && ind.programArea)
+                                    ?.map((ind, index) => ({
+                                          ...ind,
+                                          selectedSourceProgramArea:
+                                                existingFormState?.consistencyOvertimes[index]
+                                                      ?.selectedSourceProgramArea || null,
+                                          selectedSourceConsistency:
+                                                existingFormState?.consistencyOvertimes[index]
+                                                      ?.selectedSourceConsistency || null,
+                                          selectedSourceMargin:
+                                                existingFormState?.consistencyOvertimes[index]?.selectedSourceMargin ||
+                                                null
+                                    })) || [],
+
+                        completeness: {
+                              ...currStage.completeness,
+                              dataElements:
+                                    (currStage.completeness?.programAreaDE &&
+                                          currStage.completeness?.dataElements
+                                                ?.filter(ind => ind.value)
+                                                ?.map((ind, index) => ({
+                                                      ...ind,
+                                                      selectedSourceDE:
+                                                            existingFormState?.completeness?.dataElements[index]
+                                                                  ?.selectedSourceDE || null
+                                                }))) ||
+                                    [],
+                              sourceDocuments:
+                                    (currStage.completeness?.sourceDocuments &&
+                                          currStage.completeness?.sourceDocuments
+                                                ?.filter(ind => ind.value)
+                                                ?.map((ind, index) => ({
+                                                      ...ind,
+                                                      selectedSourceDS:
+                                                            existingFormState?.completeness?.sourceDocuments[index]
+                                                                  ?.selectedSourceDS || null
+                                                }))) ||
+                                    [],
+                              selectedSourceMargin: existingFormState?.completeness?.selectedSourceMargin || null,
+                              selectedSourceProgramAreaDE:
+                                    existingFormState?.completeness?.selectedSourceProgramAreaDE || null,
+                              selectedSourceProgramAreaDS:
+                                    existingFormState?.completeness?.selectedSourceProgramAreaDS || null
+                        }
+                  });
+            }
+      };
+
+      const handleClickSupervisionItem = sup => {
+            setFormState({
+                  ...formState,
+                  selectedProgram: sup,
+                  selectedProgramStage:
+                        sup.programStageConfigurations?.length === 0
+                              ? programStages.find(
+                                      pstage => pstage.id === sup.programStageConfigurations[0]?.programStage?.id
+                                )
+                              : null
+            });
             loadProgramStages(sup.program?.id);
-            setSelectedProgram(sup);
-            handleSelectProgramStage(sup.programStageConfigurations[0]?.programStage?.id);
       };
 
       const loadProgramStages = async (programID, setState = null) => {
@@ -117,17 +213,6 @@ const Favorites = ({ me }) => {
                   setLoadingProgramStages(false);
             } catch (err) {
                   setLoadingProgramStages(false);
-            }
-      };
-
-      const loadDataElementGroups = async () => {
-            try {
-                  setLoadingDataElementGroups(true);
-                  const response = await axios.get(`${DATA_ELEMENT_GROUPS_ROUTE}?paging=false&fields=id,displayName`);
-                  setDataElementGroups(response.data?.dataElementGroups);
-                  setLoadingDataElementGroups(false);
-            } catch (err) {
-                  setLoadingDataElementGroups(false);
             }
       };
 
@@ -147,20 +232,23 @@ const Favorites = ({ me }) => {
       };
 
       const handleChangeSelectionTypeConfigurationForBackgroundInformation = ({ value }) => {
-            setSelectedProgramStage(null);
-            setMappingConfigs([]);
-            setSelectedBackgroundInformationFavorit(null);
-
-            setSelectedBackgroundInformationTypeConfiguration(value);
+            setFormState({
+                  ...formState,
+                  selectedBackgroundInformationTypeConfiguration: value,
+                  selectedProgramStage: null,
+                  selectedBackgroundInformationFavorit: null
+            });
       };
 
       const handleSelectBackgroundInformationFavorit = value => {
             const currentFav = favoritBackgroundInformationList.find(b => b.id === value);
             if (currentFav) {
-                  cleanIndicatorRecoupementState()
-                  setSelectedBackgroundInformationFavorit(currentFav);
-                  setInputFavoritNameForBackgroundInforation(currentFav.name);
-                  setMappingConfigs(currentFav.configs);
+                  setFormState({
+                        ...formState,
+                        selectedProgramStage: currentFav.formState?.selectedProgramStage,
+                        selectedBackgroundInformationFavorit: currentFav,
+                        inputFavorisNameForBackgroundInforation: currentFav.name
+                  });
             }
       };
 
@@ -175,22 +263,6 @@ const Favorites = ({ me }) => {
                         }
                   });
 
-            // !formIndicatorConfiguration?.isIndicator &&
-            //       setFormIndicatorConfiguration({
-            //             ...formIndicatorConfiguration,
-            //             currentElement: null,
-            //             selectedRecoupements: formIndicatorConfiguration?.selectedRecoupements?.map(rec => {
-            //                   if (rec.dataElement?.id === formIndicatorConfiguration?.currentElement?.dataElement?.id) {
-            //                         return {
-            //                               ...formIndicatorConfiguration?.currentElement,
-            //                               source: selectedMetaDatas[0]
-            //                         };
-            //                   }
-
-            //                   return rec;
-            //             })
-            //       });
-
             setSelectedMetaDatas([]);
             setVisibleAnalyticComponentModal(false);
       };
@@ -198,37 +270,6 @@ const Favorites = ({ me }) => {
       const handleCancelAnalyticComponentModal = () => {
             setSelectedMetaDatas([]);
             setVisibleAnalyticComponentModal(false);
-      };
-
-      const handleSelectDataElement = value => {
-            const found_indicators = selectedProgram?.programStageConfigurations[0]?.indicatorsFieldsConfigs.find(
-                  dataElement => dataElement.value?.id === value
-            );
-
-            if (found_indicators) {
-                  setFormIndicatorConfiguration({
-                        ...formIndicatorConfiguration,
-                        selectedIndicator: {
-                              ...formIndicatorConfiguration?.selectedIndicator,
-                              dataElement: found_indicators.value,
-                              source: null
-                        },
-
-                        selectedRecoupements:
-                              found_indicators.recoupements?.map(rec => ({ source: null, dataElement: rec.value })) ||
-                              [],
-
-                        marginOfErrorIndicator: {
-                              dataElement: found_indicators.indicatorMargin,
-                              source: null
-                        },
-
-                        marginOfErrorRecoupement: {
-                              dataElement: found_indicators.recoupementMargin,
-                              source: null
-                        }
-                  });
-            }
       };
 
       const RenderSelectedSupervisionTypeList = () => (
@@ -255,7 +296,7 @@ const Favorites = ({ me }) => {
                                                 <div
                                                       key={index}
                                                       className={`supervision-item ${
-                                                            selectedProgram?.id === sup.id ? 'active' : ''
+                                                            formState?.selectedProgram?.id === sup.id ? 'active' : ''
                                                       }`}
                                                       onClick={() => handleClickSupervisionItem(sup)}
                                                 >
@@ -301,6 +342,217 @@ const Favorites = ({ me }) => {
             setVisibleAddFavoritBackgroundInformationModal(false);
       };
 
+      const getEachDataElements = () => {
+            let newList = [];
+
+            const programStage = {
+                  id: formState?.selectedProgramStage?.id,
+                  displayName: formState?.selectedProgramStage?.displayName
+            };
+            const program = {
+                  id: formState?.selectedProgram?.program?.id,
+                  displayName: formState?.selectedProgram?.program?.displayName
+            };
+
+            // Indicator
+            for (let indicator of formState?.indicators) {
+                  let payloadIndicator = {
+                        dataElement: indicator?.value,
+                        indicator: indicator?.selectedSourceIndicator && {
+                              id: indicator?.selectedSourceIndicator?.name,
+                              displayName: indicator?.selectedSourceIndicator?.name
+                        },
+                        programStage,
+                        program
+                  };
+
+                  let payloadProgramArea = {
+                        dataElement: indicator?.programArea,
+                        indicator: indicator?.selectedSourceProgramArea && {
+                              id: indicator.selectedSourceProgramArea.name,
+                              displayName: indicator.selectedSourceProgramArea.name
+                        },
+                        program,
+                        programStage
+                  };
+
+                  let payloadMargin = {
+                        dataElement: indicator?.margin,
+                        indicator: indicator?.selectedSourceMargin && {
+                              id: indicator.selectedSourceMargin,
+                              displayName: indicator.selectedSourceMargin
+                        },
+                        program,
+                        programStage
+                  };
+
+                  if (payloadProgramArea.dataElement && payloadProgramArea.indicator) newList.push(payloadProgramArea);
+                  if (payloadIndicator.dataElement && payloadIndicator.indicator) newList.push(payloadIndicator);
+                  if (payloadMargin.dataElement && payloadMargin.indicator) newList.push(payloadMargin);
+            }
+
+            // Recoupements
+            for (let recoupement of formState?.recoupements) {
+                  let payloadProgramArea = {
+                        dataElement: recoupement?.programArea,
+                        indicator: recoupement?.selectedSourceProgramArea && {
+                              id: recoupement?.selectedSourceProgramArea?.name,
+                              displayName: recoupement?.selectedSourceProgramArea?.name
+                        },
+                        programStage,
+                        program
+                  };
+
+                  let payloadPrimary = {
+                        dataElement: recoupement?.primaryValue,
+                        indicator: recoupement?.selectedSourcePrimary && {
+                              id: recoupement?.selectedSourcePrimary?.name,
+                              displayName: recoupement?.selectedSourcePrimary?.name
+                        },
+                        programStage,
+                        program
+                  };
+
+                  let payloadSecondary = {
+                        dataElement: recoupement?.secondaryValue,
+                        indicator: recoupement?.selectedSourceSecondary && {
+                              id: recoupement?.selectedSourceSecondary?.name,
+                              displayName: recoupement?.selectedSourceSecondary?.name
+                        },
+                        programStage,
+                        program
+                  };
+                  let payloadMargin = {
+                        dataElement: recoupement?.margin,
+                        indicator: recoupement?.selectedSourceMargin && {
+                              id: recoupement?.selectedSourceMargin,
+                              displayName: recoupement?.selectedSourceMargin
+                        },
+                        programStage,
+                        program
+                  };
+
+                  if (payloadProgramArea.dataElement && payloadProgramArea.indicator) newList.push(payloadProgramArea);
+                  if (payloadPrimary.dataElement && payloadPrimary.indicator) newList.push(payloadPrimary);
+                  if (payloadSecondary.dataElement && payloadSecondary.indicator) newList.push(payloadSecondary);
+                  if (payloadMargin.dataElement && payloadMargin.indicator) newList.push(payloadMargin);
+            }
+
+            // consistencyOvertime
+            for (let consistencyOvertime of formState?.consistencyOvertimes) {
+                  let payloadConsistency = {
+                        dataElement: consistencyOvertime?.value,
+                        indicator: consistencyOvertime?.selectedSourceConsistency && {
+                              id: consistencyOvertime?.selectedSourceConsistency?.name,
+                              displayName: consistencyOvertime?.selectedSourceConsistency?.name
+                        },
+                        programStage,
+                        program
+                  };
+
+                  let payloadProgramArea = {
+                        dataElement: consistencyOvertime?.programArea,
+                        indicator: consistencyOvertime?.selectedSourceProgramArea && {
+                              id: consistencyOvertime.selectedSourceProgramArea.name,
+                              displayName: consistencyOvertime.selectedSourceProgramArea.name
+                        },
+                        program,
+                        programStage
+                  };
+
+                  let payloadMargin = {
+                        dataElement: consistencyOvertime?.margin,
+                        indicator: consistencyOvertime?.selectedSourceMargin && {
+                              id: consistencyOvertime.selectedSourceMargin,
+                              displayName: consistencyOvertime.selectedSourceMargin
+                        },
+                        program,
+                        programStage
+                  };
+
+                  if (payloadConsistency.dataElement && payloadConsistency.indicator) newList.push(payloadConsistency);
+                  if (payloadMargin.dataElement && payloadMargin.indicator) newList.push(payloadMargin);
+                  if (payloadProgramArea.dataElement && payloadProgramArea.indicator) newList.push(payloadProgramArea);
+            }
+
+            //data element et source document completness
+            if (formState?.completeness) {
+                  if (formState?.completeness?.programAreaDE && formState?.completeness?.selectedSourceProgramAreaDE) {
+                        let payloadProgramAreaDE = {
+                              dataElement: formState?.completeness?.programAreaDE,
+                              indicator: formState?.completeness?.selectedSourceProgramAreaDE && {
+                                    id: formState?.completeness?.selectedSourceProgramAreaDE?.name,
+                                    displayName: formState?.completeness?.selectedSourceProgramAreaDE?.name
+                              },
+                              programStage,
+                              program
+                        };
+
+                        if (payloadProgramAreaDE.dataElement && payloadProgramAreaDE.indicator)
+                              newList.push(payloadProgramAreaDE);
+                  }
+
+                  if (formState?.completeness?.programAreaDOC && formState?.completeness?.selectedSourceProgramAreaDS) {
+                        let payloadProgramAreaDS = {
+                              dataElement: formState?.completeness?.programAreaDOC,
+                              indicator: formState?.completeness?.selectedSourceProgramAreaDS && {
+                                    id: formState?.completeness?.selectedSourceProgramAreaDS?.name,
+                                    displayName: formState?.completeness?.selectedSourceProgramAreaDS?.name
+                              },
+                              programStage,
+                              program
+                        };
+
+                        if (payloadProgramAreaDS.dataElement && payloadProgramAreaDS.indicator)
+                              newList.push(payloadProgramAreaDS);
+                  }
+
+                  if (formState?.completeness?.margin && formState?.completeness?.selectedSourceMargin) {
+                        let payloadMargin = {
+                              dataElement: formState?.completeness?.margin,
+                              indicator: formState?.completeness?.selectedSourceMargin && {
+                                    id: formState?.completeness?.selectedSourceMargin,
+                                    displayName: formState?.completeness?.selectedSourceMargin
+                              },
+                              programStage,
+                              program
+                        };
+
+                        if (payloadMargin.dataElement && payloadMargin.indicator) newList.push(payloadMargin);
+                  }
+
+                  for (let de of formState?.completeness?.dataElements) {
+                        let payloadDE = {
+                              dataElement: de?.value,
+                              indicator: de?.selectedSourceDE && {
+                                    id: de?.selectedSourceDE?.name,
+                                    displayName: de?.selectedSourceDE?.name
+                              },
+                              programStage,
+                              program
+                        };
+
+                        if (payloadDE.dataElement && payloadDE.indicator) newList.push(payloadDE);
+                  }
+
+                  for (let doc of formState?.completeness?.sourceDocuments) {
+                        let payloadDOC = {
+                              dataElement: doc?.value,
+                              indicator: doc?.selectedSourceDS && {
+                                    id: doc?.selectedSourceDS?.name,
+                                    displayName: doc?.selectedSourceDS?.name
+                              },
+                              programStage,
+                              program
+                        };
+
+                        if (payloadDOC.dataElement && payloadDOC.indicator) newList.push(payloadDOC);
+                  }
+            }
+
+            return newList;
+      };
+
       const handleAddFavoritBackgroundInformationSave = async () => {
             try {
                   setLoadingSaveFavoritBackgroundInformations(true);
@@ -314,30 +566,26 @@ const Favorites = ({ me }) => {
                   );
 
                   if (
-                        !inputFavorisNameForBackgroundInforation ||
-                        inputFavorisNameForBackgroundInforation?.trim()?.length === 0
+                        !formState?.inputFavorisNameForBackgroundInforation ||
+                        formState?.inputFavorisNameForBackgroundInforation?.trim()?.length === 0
                   )
                         throw new Error(translate('Nom_Obligatoire'));
 
                   let payload = {
-                        name: inputFavorisNameForBackgroundInforation,
-                        configs: mappingConfigs,
-                        program: selectedProgram?.program,
+                        name: formState?.inputFavorisNameForBackgroundInforation,
+                        configs: getEachDataElements(),
+                        program: formState?.selectedProgram?.program,
+                        formState,
                         createdAt: dayjs(),
                         updatedAt: dayjs()
                   };
 
-                  if (
-                        selectedBackgroundInformationTypeConfiguration === FAVORIS &&
-                        selectedBackgroundInformationFavorit &&
-                        backgroundInfoList
-                  ) {
+                  if (formState?.selectedBackgroundInformationFavorit && backgroundInfoList) {
                         backgroundInformationConfigList = backgroundInfoList.map(favo => {
-                              if (favo.id === selectedBackgroundInformationFavorit?.id) {
+                              if (favo.id === formState?.selectedBackgroundInformationFavorit?.id) {
                                     return {
                                           ...favo,
-                                          ...payload,
-                                          updatedAt: dayjs()
+                                          ...payload
                                     };
                               }
                               return favo;
@@ -351,7 +599,6 @@ const Favorites = ({ me }) => {
                         process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY,
                         backgroundInformationConfigList
                   );
-                  setFavoritBackgroundInformationList(backgroundInformationConfigList);
 
                   setVisibleAddFavoritBackgroundInformationModal(false);
                   setNotification({
@@ -360,10 +607,13 @@ const Favorites = ({ me }) => {
                         type: NOTIFICATION_SUCCESS
                   });
                   setLoadingSaveFavoritBackgroundInformations(false);
-
-                  if (selectedBackgroundInformationTypeConfiguration === DIRECTE) {
-                        setInputFavoritNameForBackgroundInforation('');
-                  }
+                  setFormState({
+                        ...formState,
+                        inputFavorisNameForBackgroundInforation: '',
+                        selectedBackgroundInformationFavorit: null,
+                        selectedProgramStage: null
+                  });
+                  loadDataStoreBackgroundInformationFavoritsConfigs()
             } catch (err) {
                   setNotification({
                         show: true,
@@ -387,7 +637,7 @@ const Favorites = ({ me }) => {
                               <ModalContent>
                                     <div
                                           style={{
-                                                padding: '10px',
+                                                padding: '20px',
                                                 border: '1px solid #ccc'
                                           }}
                                     >
@@ -407,11 +657,13 @@ const Favorites = ({ me }) => {
                                                 <Input
                                                       placeholder={translate('Nom')}
                                                       style={{ width: '100%' }}
-                                                      value={inputFavorisNameForBackgroundInforation}
+                                                      value={formState?.inputFavorisNameForBackgroundInforation}
                                                       onChange={event =>
-                                                            setInputFavoritNameForBackgroundInforation(
-                                                                  event.target.value
-                                                            )
+                                                            setFormState({
+                                                                  ...formState,
+                                                                  inputFavorisNameForBackgroundInforation:
+                                                                        event.target.value
+                                                            })
                                                       }
                                                 />
                                           </div>
@@ -432,7 +684,8 @@ const Favorites = ({ me }) => {
                                                 primary
                                                 loading={loadingSaveFavoritBackgroundInformations}
                                                 disabled={
-                                                      inputFavorisNameForBackgroundInforation?.trim()?.length > 0
+                                                      formState?.inputFavorisNameForBackgroundInforation?.trim()
+                                                            ?.length > 0
                                                             ? false
                                                             : true
                                                 }
@@ -449,145 +702,6 @@ const Favorites = ({ me }) => {
 
       const handleSaveAsFavoritesForBackgroundInformations = () => {
             setVisibleAddFavoritBackgroundInformationModal(true);
-      };
-
-      const handleSaveNewMappingConfig = async () => {
-            try {
-                  setLoadingSaveDateElementMappingConfig(true);
-
-                  const newMappingList = [];
-
-                  if (
-                        formIndicatorConfiguration?.selectedIndicator?.dataElement &&
-                        formIndicatorConfiguration?.selectedIndicator?.source
-                  ) {
-                        newMappingList.push({
-                              id: uuid(),
-                              dataElement: formIndicatorConfiguration.selectedIndicator?.dataElement,
-                              indicator: {
-                                    displayName: formIndicatorConfiguration.selectedIndicator?.source?.name,
-                                    id: formIndicatorConfiguration.selectedIndicator?.source?.id
-                              },
-                              programStage: {
-                                    id: selectedProgram?.programStageConfigurations[0]?.programStage?.id,
-                                    displayName:
-                                          selectedProgram?.programStageConfigurations[0]?.programStage?.displayName
-                              },
-                              program: {
-                                    id: selectedProgram?.program?.id,
-                                    displayName: selectedProgram?.program?.displayName
-                              }
-                        });
-                  }
-
-                  for (let rec of formIndicatorConfiguration.selectedRecoupements) {
-                        if (rec.source && rec.dataElement) {
-                              newMappingList.push({
-                                    id: uuid(),
-                                    dataElement: rec.dataElement,
-                                    indicator: {
-                                          displayName: rec.source?.name,
-                                          id: rec.source?.id
-                                    },
-                                    programStage: {
-                                          id: selectedProgram?.programStageConfigurations[0]?.programStage?.id,
-                                          displayName:
-                                                selectedProgram?.programStageConfigurations[0]?.programStage
-                                                      ?.displayName
-                                    },
-                                    program: {
-                                          id: selectedProgram?.program?.id,
-                                          displayName: selectedProgram?.program?.displayName
-                                    }
-                              });
-                        }
-                  }
-
-                  if (
-                        selectedProgram?.configurationType === 'DQR' &&
-                        formIndicatorConfiguration?.marginOfErrorIndicator?.source &&
-                        formIndicatorConfiguration?.marginOfErrorIndicator?.dataElement &&
-                        formIndicatorConfiguration?.marginOfErrorRecoupement?.source &&
-                        formIndicatorConfiguration?.marginOfErrorRecoupement?.dataElement
-                  ) {
-                        newMappingList.push({
-                              id: uuid(),
-                              dataElement: formIndicatorConfiguration?.marginOfErrorIndicator?.dataElement,
-                              indicator: {
-                                    displayName: formIndicatorConfiguration?.marginOfErrorIndicator?.source?.name,
-                                    id: formIndicatorConfiguration?.marginOfErrorIndicator?.source?.id
-                              },
-                              programStage: {
-                                    id: selectedProgram?.programStageConfigurations[0]?.programStage?.id,
-                                    displayName:
-                                          selectedProgram?.programStageConfigurations[0]?.programStage?.displayName
-                              },
-                              program: {
-                                    id: selectedProgram?.program?.id,
-                                    displayName: selectedProgram?.program?.displayName
-                              }
-                        });
-
-                        newMappingList.push({
-                              id: uuid(),
-                              dataElement: formIndicatorConfiguration?.marginOfErrorRecoupement?.dataElement,
-                              indicator: {
-                                    displayName: formIndicatorConfiguration?.marginOfErrorRecoupement?.source?.name,
-                                    id: formIndicatorConfiguration?.marginOfErrorRecoupement?.source?.id
-                              },
-                              programStage: {
-                                    id: selectedProgram?.programStageConfigurations[0]?.programStage?.id,
-                                    displayName:
-                                          selectedProgram?.programStageConfigurations[0]?.programStage?.displayName
-                              },
-                              program: {
-                                    id: selectedProgram?.program?.id,
-                                    displayName: selectedProgram?.program?.displayName
-                              }
-                        });
-                  }
-
-                  for (let newL of newMappingList) {
-                        const existingConfig = mappingConfigs.find(
-                              mapping => mapping.dataElement?.id === newL.dataElement?.id
-                        );
-
-                        if (existingConfig) throw new Error(translate('Configuration_Deja_Ajoutee'));
-                  }
-
-                  const newList = [...mappingConfigs, ...newMappingList];
-
-                  if (newList.length === 0) {
-                        throw new Error(translate('Please_Configure_At_least_One_Indicator'));
-                  }
-
-                  setMappingConfigs([...newList]);
-                  setSelectedDataElement(null);
-                  setInputFavoritNameForBackgroundInforation('');
-                  setNotification({
-                        show: true,
-                        type: NOTIFICATION_SUCCESS,
-                        message: translate('Configuration_Ajoutee')
-                  });
-                  setLoadingSaveDateElementMappingConfig(false);
-                  setSelectedCrosscheck(null);
-                  setSelectedCrosscheckChild(null);
-                  setFormIndicatorConfiguration({
-                        selectedIndicator: { dataElement: null, source: null },
-                        selectedRecoupements: [],
-                        isIndicator: true,
-                        currentElement: null,
-                        marginOfErrorIndicator: null,
-                        marginOfErrorRecoupement: null
-                  });
-            } catch (err) {
-                  setNotification({
-                        show: true,
-                        type: NOTIFICATION_CRITICAL,
-                        message: err.response?.data?.message || err.message
-                  });
-                  setLoadingSaveDateElementMappingConfig(false);
-            }
       };
 
       const handleDeleteFavoritesForBackgroundInformations = async () => {
@@ -633,151 +747,6 @@ const Favorites = ({ me }) => {
             }
       };
 
-      const RenderDataElementConfigList = () => (
-            <>
-                  {mappingConfigs.length > 0 && (
-                        <div
-                              className="my-shadow"
-                              style={{
-                                    padding: '10px',
-                                    background: '#FFF',
-                                    marginBottom: '2px',
-                                    borderRadius: '8px',
-                                    marginTop: '10px'
-                              }}
-                        >
-                              <div
-                                    style={{
-                                          display: 'flex',
-                                          justifyContent: 'space-between',
-                                          alignItems: 'center'
-                                    }}
-                              >
-                                    <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
-                                          {translate('Liste_Configuration_Element_De_Donnees')}
-                                    </div>
-                                    <div>
-                                          {mappingConfigs.length > 0 && (
-                                                <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                      {selectedBackgroundInformationTypeConfiguration === FAVORIS && (
-                                                            <div style={{ marginRight: '10px' }}>
-                                                                  <Button
-                                                                        small
-                                                                        destructive
-                                                                        loading={
-                                                                              loadingDeleteFavoritBackgroundInformations
-                                                                        }
-                                                                        disabled={
-                                                                              mappingConfigs.length > 0 ? false : true
-                                                                        }
-                                                                        onClick={
-                                                                              handleDeleteFavoritesForBackgroundInformations
-                                                                        }
-                                                                        icon={
-                                                                              <MdStars
-                                                                                    style={{
-                                                                                          fontSize: '20px',
-                                                                                          cursor: 'pointer'
-                                                                                    }}
-                                                                              />
-                                                                        }
-                                                                  >
-                                                                        {translate('Delete_Favorite')}
-                                                                  </Button>
-                                                            </div>
-                                                      )}
-                                                      <Button
-                                                            small
-                                                            primary
-                                                            loading={loadingSaveFavoritBackgroundInformations}
-                                                            disabled={mappingConfigs.length > 0 ? false : true}
-                                                            onClick={handleSaveAsFavoritesForBackgroundInformations}
-                                                            icon={
-                                                                  <MdStars
-                                                                        style={{
-                                                                              color: 'white',
-                                                                              fontSize: '20px',
-                                                                              cursor: 'pointer'
-                                                                        }}
-                                                                  />
-                                                            }
-                                                      >
-                                                            {selectedBackgroundInformationTypeConfiguration === DIRECTE
-                                                                  ? translate('Enregistrer_Comme_Favorites')
-                                                                  : translate('Mise_A_Jour')}
-                                                      </Button>
-                                                </div>
-                                          )}
-                                    </div>
-                              </div>
-
-                              <hr style={{ margin: '10px auto' }} />
-
-                              <Table
-                                    bordered
-                                    dataSource={mappingConfigs.map(mapConf => ({
-                                          ...mapConf,
-                                          programStageName: mapConf.programStage?.displayName,
-                                          indicatorName: mapConf.indicator?.displayName,
-                                          dataElementName: mapConf.dataElement?.displayName,
-                                          programName: mapConf.program?.displayName,
-                                          action: { id: mapConf.id }
-                                    }))}
-                                    columns={[
-                                          // {
-                                          //       title: translate('Programme'),
-                                          //       dataIndex: 'programName'
-                                          // },
-                                          // {
-                                          //       title: translate('Programme_Stage'),
-                                          //       dataIndex: 'programStageName'
-                                          // },
-                                          {
-                                                title: translate('Form_Field'),
-                                                dataIndex: 'dataElementName'
-                                          },
-                                          {
-                                                title: translate('Source_De_Donnée'),
-                                                dataIndex: 'indicatorName'
-                                          },
-                                          {
-                                                title: translate('Actions'),
-                                                dataIndex: 'action',
-                                                width: '80px',
-                                                render: value => (
-                                                      <Popconfirm
-                                                            title={translate('Suppression')}
-                                                            description={translate(
-                                                                  'Confirmation_Suppression_Configuration'
-                                                            )}
-                                                            icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
-                                                            onConfirm={() => handleDeleteConfigItem(value)}
-                                                      >
-                                                            <div
-                                                                  style={{
-                                                                        display: 'flex',
-                                                                        justifyContent: 'center'
-                                                                  }}
-                                                            >
-                                                                  <RiDeleteBinLine
-                                                                        style={{
-                                                                              color: 'red',
-                                                                              fontSize: '20px',
-                                                                              cursor: 'pointer'
-                                                                        }}
-                                                                  />
-                                                            </div>
-                                                      </Popconfirm>
-                                                )
-                                          }
-                                    ]}
-                                    size="small"
-                              />
-                        </div>
-                  )}
-            </>
-      );
-
       const RenderTitle = () => (
             <div
                   style={{
@@ -790,19 +759,28 @@ const Favorites = ({ me }) => {
             </div>
       );
 
-      const handleAddNewMappingConfig = () => {
-            setIsNewMappingMode(!isNewMappingMode);
-
-            if (!isNewMappingMode) {
-                  setSelectedDataElement(null);
-            }
-      };
-
       const loadDataStoreCrosschecks = async () => {
             try {
                   const response = await loadDataStore(process.env.REACT_APP_CROSS_CUT_KEY, null, null, []);
-
                   setDataStoreCrosschecks(response);
+            } catch (err) {}
+      };
+      const loadDataStoreIndicators = async () => {
+            try {
+                  const response = await loadDataStore(process.env.REACT_APP_CROSS_CUT_KEY, null, null, []);
+                  setDataStoreIndicators(response);
+            } catch (err) {}
+      };
+      const loadDataStoreDECompletness = async () => {
+            try {
+                  const response = await loadDataStore(process.env.REACT_APP_DE_COMPLETNESS_KEY, null, null, []);
+                  setDataStoreDECompletness(response);
+            } catch (err) {}
+      };
+      const loadDataStoreDSCompletness = async () => {
+            try {
+                  const response = await loadDataStore(process.env.REACT_APP_DS_COMPLETNESS_KEY, null, null, []);
+                  setDataStoreDSCompletness(response);
             } catch (err) {}
       };
 
@@ -849,7 +827,7 @@ const Favorites = ({ me }) => {
                                                             }
                                                             value={FAVORIS}
                                                             checked={
-                                                                  selectedBackgroundInformationTypeConfiguration ===
+                                                                  formState?.selectedBackgroundInformationTypeConfiguration ===
                                                                   FAVORIS
                                                             }
                                                       />
@@ -863,7 +841,7 @@ const Favorites = ({ me }) => {
                                                             }
                                                             value={DIRECTE}
                                                             checked={
-                                                                  selectedBackgroundInformationTypeConfiguration ===
+                                                                  formState?.selectedBackgroundInformationTypeConfiguration ===
                                                                   DIRECTE
                                                             }
                                                       />
@@ -874,7 +852,7 @@ const Favorites = ({ me }) => {
                                           <hr style={{ margin: '10px auto', color: '#ccc' }} />
                                     </Col>
 
-                                    {selectedBackgroundInformationTypeConfiguration === FAVORIS && (
+                                    {formState?.selectedBackgroundInformationTypeConfiguration === FAVORIS && (
                                           <Col md={24}>
                                                 <div>
                                                       <div style={{ marginBottom: '5px' }}>
@@ -885,7 +863,7 @@ const Favorites = ({ me }) => {
                                                                   .filter(
                                                                         f =>
                                                                               f.program?.id ===
-                                                                              selectedProgram?.program?.id
+                                                                              formState?.selectedProgram?.program?.id
                                                                   )
                                                                   .map(favorit => ({
                                                                         label: favorit.name,
@@ -895,7 +873,7 @@ const Favorites = ({ me }) => {
                                                             style={{ width: '100%' }}
                                                             optionFilterProp="label"
                                                             loading={loadingBackgroundInformationFavoritsConfigs}
-                                                            value={selectedBackgroundInformationFavorit?.id}
+                                                            value={formState?.selectedBackgroundInformationFavorit?.id}
                                                             onChange={handleSelectBackgroundInformationFavorit}
                                                             showSearch
                                                       />
@@ -903,687 +881,63 @@ const Favorites = ({ me }) => {
                                           </Col>
                                     )}
 
-                                    {/* {selectedBackgroundInformationTypeConfiguration === FAVORIS &&
-                                          selectedBackgroundInformationFavorit && (
-                                                <Col md={24}>
-                                                      <div style={{ marginTop: '10px' }}>
-                                                            <Button
-                                                                  small
-                                                                  icon={
-                                                                        isNewMappingMode && (
-                                                                              <ImCancelCircle
-                                                                                    style={{
-                                                                                          color: '#fff',
-                                                                                          fontSize: '18px'
-                                                                                    }}
-                                                                              />
-                                                                        )
-                                                                  }
-                                                                  primary={!isNewMappingMode ? true : false}
-                                                                  destructive={isNewMappingMode ? true : false}
-                                                                  onClick={handleAddNewMappingConfig}
-                                                            >
-                                                                  {!isNewMappingMode && (
-                                                                        <span>
-                                                                              + {translate('Ajouter_Nouveau_Mapping')}
-                                                                        </span>
-                                                                  )}
-                                                                  {isNewMappingMode && (
-                                                                        <span>{translate('Annuler_Le_Mapping')}</span>
-                                                                  )}
-                                                            </Button>
-                                                      </div>
-                                                      {isNewMappingMode && (
-                                                            <div style={{ marginTop: '10px' }}>
-                                                                  <div style={{ marginBottom: '5px' }}>
-                                                                        {translate('Programmes_Stage')}
-                                                                  </div>
-                                                                  <Select
-                                                                        options={programStages.map(program => ({
-                                                                              label: program.displayName,
-                                                                              value: program.id
-                                                                        }))}
-                                                                        placeholder={translate('Programmes_Stage')}
-                                                                        style={{ width: '100%' }}
-                                                                        optionFilterProp="label"
-                                                                        value={selectedProgramStage?.id}
-                                                                        onChange={handleSelectProgramStage}
-                                                                        showSearch
-                                                                        loading={loadingProgramStages}
-                                                                        disabled={loadingProgramStages}
-                                                                  />
-                                                            </div>
-                                                      )}
-                                                </Col>
-                                          )} */}
-
-                                    {/* {selectedBackgroundInformationTypeConfiguration === DIRECTE && (
-                                          <Col md={24}>
-                                                <div>
-                                                      <div style={{ marginBottom: '5px' }}>
-                                                            {translate('Programmes_Stage')}
-                                                      </div>
-                                                      <Select
-                                                            options={programStages.map(program => ({
-                                                                  label: program.displayName,
-                                                                  value: program.id
-                                                            }))}
-                                                            placeholder={translate('Programmes_Stage')}
-                                                            style={{ width: '100%' }}
-                                                            optionFilterProp="label"
-                                                            value={selectedProgramStage?.id}
-                                                            onChange={handleSelectProgramStage}
-                                                            showSearch
-                                                            loading={loadingProgramStages}
-                                                            disabled={loadingProgramStages}
-                                                      />
-                                                </div>
-                                                <Divider style={{ margin: '10px auto' }} />
-                                                {selectedProgramStage && (
-                                                      <Button
-                                                            small
-                                                            icon={
-                                                                  isNewMappingMode && (
-                                                                        <ImCancelCircle
-                                                                              style={{
-                                                                                    color: '#fff',
-                                                                                    fontSize: '18px'
-                                                                              }}
-                                                                        />
-                                                                  )
-                                                            }
-                                                            primary={!isNewMappingMode ? true : false}
-                                                            destructive={isNewMappingMode ? true : false}
-                                                            onClick={handleAddNewMappingConfig}
-                                                      >
-                                                            {!isNewMappingMode && (
-                                                                  <span>+ {translate('Ajouter_Nouveau_Mapping')}</span>
-                                                            )}
-                                                            {isNewMappingMode && (
-                                                                  <span>{translate('Annuler_Le_Mapping')}</span>
-                                                            )}
-                                                      </Button>
-                                                )}
-                                          </Col>
-                                    )}
-
-                                    {selectedProgramStage && (
-                                          <Col md={24} xs={24}>
-                                                {isNewMappingMode && (
-                                                      <div style={{ marginTop: '20px' }}>
-                                                            <div>
-                                                                  <div>
-                                                                        <Radio
-                                                                              label={translate(
-                                                                                    'Choisir_Element_Donne_De_Group'
-                                                                              )}
-                                                                              className="cursor-pointer"
-                                                                              onChange={
-                                                                                    handleSelectedDataElementFromWhere
-                                                                              }
-                                                                              value={ELEMENT_GROUP}
-                                                                              checked={
-                                                                                    selectedDataElementFromWhere ===
-                                                                                    ELEMENT_GROUP
-                                                                              }
-                                                                        />
-                                                                  </div>
-                                                                  <div>
-                                                                        <Radio
-                                                                              label={translate(
-                                                                                    'Element_Donne_A_Partie_De_Liste'
-                                                                              )}
-                                                                              className="cursor-pointer"
-                                                                              onChange={
-                                                                                    handleSelectedDataElementFromWhere
-                                                                              }
-                                                                              value={ALL}
-                                                                              checked={
-                                                                                    selectedDataElementFromWhere === ALL
-                                                                              }
-                                                                        />
-                                                                  </div>
-                                                            </div>
-
-                                                            <div style={{ marginTop: '20px' }}>
-                                                                  <Row gutter={[10, 10]}>
-                                                                        {selectedProgramStage &&
-                                                                              selectedDataElementFromWhere ===
-                                                                                    ELEMENT_GROUP && (
-                                                                                    <Col md={24}>
-                                                                                          <div
-                                                                                                style={{
-                                                                                                      marginBottom:
-                                                                                                            '5px'
-                                                                                                }}
-                                                                                          >
-                                                                                                {translate(
-                                                                                                      'Group_Element_Donnee'
-                                                                                                )}
-                                                                                          </div>
-                                                                                          <Select
-                                                                                                options={dataElementGroups.map(
-                                                                                                      elGroup => ({
-                                                                                                            label: elGroup.displayName,
-                                                                                                            value: elGroup.id
-                                                                                                      })
-                                                                                                )}
-                                                                                                placeholder={translate(
-                                                                                                      'Group_Element_Donnee'
-                                                                                                )}
-                                                                                                style={{
-                                                                                                      width: '100%'
-                                                                                                }}
-                                                                                                optionFilterProp="label"
-                                                                                                value={
-                                                                                                      selectedDataElementGroup?.id
-                                                                                                }
-                                                                                                onChange={
-                                                                                                      handleSelectedDataElementGroup
-                                                                                                }
-                                                                                                showSearch
-                                                                                                loading={
-                                                                                                      loadingDataElementGroups
-                                                                                                }
-                                                                                                disabled={
-                                                                                                      loadingDataElementGroups
-                                                                                                }
-                                                                                                allowClear
-                                                                                          />
-                                                                                    </Col>
-                                                                              )}
-
-                                                                        {selectedProgramStage && (
-                                                                              <Col md={12} xs={24}>
-                                                                                    <div>
-                                                                                          <div
-                                                                                                style={{
-                                                                                                      marginBottom:
-                                                                                                            '5px'
-                                                                                                }}
-                                                                                          >
-                                                                                                {translate(
-                                                                                                      'Form_Field'
-                                                                                                )}
-                                                                                          </div>
-                                                                                          <Select
-                                                                                                options={
-                                                                                                      selectedProgramStage?.programStageDataElements
-                                                                                                            ?.filter(
-                                                                                                                  progStageDE =>
-                                                                                                                        selectedDataElementFromWhere ===
-                                                                                                                              ELEMENT_GROUP &&
-                                                                                                                        selectedDataElementGroup
-                                                                                                                              ? progStageDE.dataElement?.dataElementGroups
-                                                                                                                                      ?.map(
-                                                                                                                                            gp =>
-                                                                                                                                                  gp.id
-                                                                                                                                      )
-                                                                                                                                      ?.includes(
-                                                                                                                                            selectedDataElementGroup?.id
-                                                                                                                                      )
-                                                                                                                              : true
-                                                                                                            )
-                                                                                                            ?.map(
-                                                                                                                  progStageDE => ({
-                                                                                                                        label: progStageDE
-                                                                                                                              .dataElement
-                                                                                                                              ?.displayName,
-                                                                                                                        value: progStageDE
-                                                                                                                              .dataElement
-                                                                                                                              ?.id
-                                                                                                                  })
-                                                                                                            ) || []
-                                                                                                }
-                                                                                                placeholder={translate(
-                                                                                                      'Form_Field'
-                                                                                                )}
-                                                                                                style={{
-                                                                                                      width: '100%'
-                                                                                                }}
-                                                                                                onChange={
-                                                                                                      handleSelectDataElement
-                                                                                                }
-                                                                                                value={
-                                                                                                      selectedDataElement?.id
-                                                                                                }
-                                                                                                optionFilterProp="label"
-                                                                                                showSearch
-                                                                                          />
-                                                                                    </div>
-                                                                              </Col>
-                                                                        )}
-
-                                                                        <Col md={10} xs={24}>
-                                                                              <div>
-                                                                                    <div
-                                                                                          style={{
-                                                                                                marginBottom: '5px'
-                                                                                          }}
-                                                                                    >
-                                                                                          {translate(
-                                                                                                'Source_De_Donnee'
-                                                                                          )}
-                                                                                    </div>
-                                                                                    <Input
-                                                                                          placeholder={translate(
-                                                                                                'Source_De_Donnee'
-                                                                                          )}
-                                                                                          style={{ width: '100%' }}
-                                                                                          value={
-                                                                                                inputDataSourceDisplayName
-                                                                                          }
-                                                                                          onChange={event => {
-                                                                                                setInputDataSourceDisplayName(
-                                                                                                      ''.concat(
-                                                                                                            event.target
-                                                                                                                  .value
-                                                                                                      )
-                                                                                                );
-                                                                                          }}
-                                                                                    />
-                                                                              </div>
-                                                                        </Col>
-                                                                        <Col md={2} xs={24}>
-                                                                              <div style={{ marginTop: '28px' }}>
-                                                                                    <Button
-                                                                                          small
-                                                                                          primary
-                                                                                          icon={
-                                                                                                <TbSelect
-                                                                                                      style={{
-                                                                                                            fontSize: '18px',
-                                                                                                            color: '#fff'
-                                                                                                      }}
-                                                                                                />
-                                                                                          }
-                                                                                          onClick={() =>
-                                                                                                setVisibleAnalyticComponentModal(
-                                                                                                      true
-                                                                                                )
-                                                                                          }
-                                                                                    ></Button>
-                                                                              </div>
-                                                                        </Col>
-                                                                        <Col md={24} xs={24}>
-                                                                              <div style={{ marginTop: '18px' }}>
-                                                                                    <Button
-                                                                                          loading={
-                                                                                                loadingSaveDateElementMappingConfig
-                                                                                          }
-                                                                                          disabled={
-                                                                                                loadingSaveDateElementMappingConfig
-                                                                                          }
-                                                                                          primary
-                                                                                          onClick={
-                                                                                                handleSaveNewMappingConfig
-                                                                                          }
-                                                                                    >
-                                                                                          + {translate('Ajouter')}
-                                                                                    </Button>
-                                                                              </div>
-                                                                        </Col>
-                                                                  </Row>
-                                                            </div>
-                                                      </div>
-                                                )}
-                                          </Col>
-                                    )} */}
-
                                     <Col md={24}>
                                           <div>
-                                                <div
-                                                      style={{
-                                                            fontWeight: 'bold',
-                                                            marginBottom: '10px'
-                                                      }}
-                                                >
-                                                      {translate('Indicators_Recoupements')}
+                                                <div style={{ marginBottom: '5px' }}>
+                                                      {translate('Programmes_Stage')}
                                                 </div>
-                                                <Row gutter={[10, 10]}>
-                                                      <Col md={12} xs={24}>
-                                                            <div>
-                                                                  <div
-                                                                        style={{
-                                                                              marginBottom: '5px'
-                                                                        }}
-                                                                  >
-                                                                        {translate('Indicateurs')}
-                                                                  </div>
-
-                                                                  <Select
-                                                                        options={
-                                                                              selectedProgram?.programStageConfigurations[0]?.indicatorsFieldsConfigs?.map(
-                                                                                    indic => ({
-                                                                                          label: indic.value
-                                                                                                ?.displayName,
-                                                                                          value: indic.value?.id
-                                                                                    })
-                                                                              ) || []
-                                                                        }
-                                                                        placeholder={translate('Indicateurs')}
-                                                                        style={{
-                                                                              width: '100%'
-                                                                        }}
-                                                                        onChange={handleSelectDataElement}
-                                                                        value={
-                                                                              formIndicatorConfiguration
-                                                                                    ?.selectedIndicator?.dataElement?.id
-                                                                        }
-                                                                        optionFilterProp="label"
-                                                                        showSearch
-                                                                  />
-                                                            </div>
-                                                      </Col>
-
-                                                      <Col md={10} xs={24}>
-                                                            <div>
-                                                                  <div
-                                                                        style={{
-                                                                              marginBottom: '5px'
-                                                                        }}
-                                                                  >
-                                                                        {translate('Source_De_Donnee')}
-                                                                  </div>
-                                                                  <Input
-                                                                        placeholder={translate('Source_De_Donnee')}
-                                                                        disabled
-                                                                        style={{ width: '100%' }}
-                                                                        value={
-                                                                              formIndicatorConfiguration
-                                                                                    ?.selectedIndicator?.source?.name
-                                                                        }
-                                                                  />
-                                                            </div>
-                                                      </Col>
-
-                                                      <Col md={2} xs={24}>
-                                                            <div style={{ marginTop: '28px' }}>
-                                                                  <Button
-                                                                        small
-                                                                        primary
-                                                                        disabled={
-                                                                              formIndicatorConfiguration
-                                                                                    ?.selectedIndicator?.dataElement
-                                                                                    ? false
-                                                                                    : true
-                                                                        }
-                                                                        icon={
-                                                                              <TbSelect
-                                                                                    style={{
-                                                                                          fontSize: '18px',
-                                                                                          color: '#fff'
-                                                                                    }}
-                                                                              />
-                                                                        }
-                                                                        onClick={() => {
-                                                                              setVisibleAnalyticComponentModal(true);
-                                                                              setFormIndicatorConfiguration({
-                                                                                    ...formIndicatorConfiguration,
-                                                                                    currentElement:
-                                                                                          formIndicatorConfiguration?.selectedIndicator,
-                                                                                    isIndicator: true
-                                                                              });
-                                                                        }}
-                                                                  ></Button>
-                                                            </div>
-                                                      </Col>
-                                                </Row>
+                                                <Select
+                                                      options={programStages
+                                                            .filter(p =>
+                                                                  formState?.selectedProgram
+                                                                        ? formState?.selectedProgram?.programStageConfigurations
+                                                                                ?.map(f => f.programStage?.id)
+                                                                                ?.includes(p.id)
+                                                                        : true
+                                                            )
+                                                            .map(programStage => ({
+                                                                  label: programStage.displayName,
+                                                                  value: programStage.id
+                                                            }))}
+                                                      placeholder={translate('Programmes_Stage')}
+                                                      style={{ width: '100%' }}
+                                                      optionFilterProp="label"
+                                                      value={formState?.selectedProgramStage?.id}
+                                                      onChange={handleSelectProgramStage}
+                                                      showSearch
+                                                      allowClear
+                                                      loading={loadingProgramStages}
+                                                      disabled={
+                                                            formState?.selectedBackgroundInformationTypeConfiguration ===
+                                                            FAVORIS
+                                                                  ? true
+                                                                  : loadingProgramStages
+                                                      }
+                                                />
                                           </div>
                                     </Col>
-
-                                    {formIndicatorConfiguration?.selectedIndicator?.source &&
-                                          formIndicatorConfiguration?.selectedRecoupements?.map((rec, recIndex) => (
-                                                <Col md={24}>
-                                                      <div>
-                                                            <Row gutter={[10, 10]}>
-                                                                  <Col md={12} xs={24}>
-                                                                        <div>
-                                                                              <div
-                                                                                    style={{
-                                                                                          marginBottom: '5px'
-                                                                                    }}
-                                                                              >
-                                                                                    {`${translate('Recoupements')} ${
-                                                                                          recIndex + 1
-                                                                                    }`}
-                                                                              </div>
-
-                                                                              <Input
-                                                                                    disabled
-                                                                                    placeholder={`${translate(
-                                                                                          'Recoupements'
-                                                                                    )} ${recIndex + 1}`}
-                                                                                    style={{
-                                                                                          width: '100%'
-                                                                                    }}
-                                                                                    value={rec?.dataElement?.name}
-                                                                                    optionFilterProp="label"
-                                                                                    showSearch
-                                                                              />
-                                                                        </div>
-                                                                  </Col>
-
-                                                                  <Col md={10} xs={24}>
-                                                                        <div>
-                                                                              <div
-                                                                                    style={{
-                                                                                          marginBottom: '5px'
-                                                                                    }}
-                                                                              >
-                                                                                    {`${translate(
-                                                                                          'Source_De_Donnee'
-                                                                                    )} ${recIndex + 1}`}
-                                                                              </div>
-                                                                              <Input
-                                                                                    placeholder={`${translate(
-                                                                                          'Source_De_Donnee'
-                                                                                    )} ${recIndex + 1}`}
-                                                                                    style={{ width: '100%' }}
-                                                                                    value={rec.source?.name}
-                                                                                    onChange={event => {
-                                                                                          formIndicatorConfiguration &&
-                                                                                                setFormIndicatorConfiguration(
-                                                                                                      {
-                                                                                                            ...formIndicatorConfiguration,
-                                                                                                            selectedRecoupements:
-                                                                                                                  formIndicatorConfiguration?.selectedRecoupements.map(
-                                                                                                                        (
-                                                                                                                              rec,
-                                                                                                                              index
-                                                                                                                        ) => {
-                                                                                                                              if (
-                                                                                                                                    recIndex ===
-                                                                                                                                    index
-                                                                                                                              ) {
-                                                                                                                                    return {
-                                                                                                                                          ...rec,
-                                                                                                                                          source: {
-                                                                                                                                                id: null,
-                                                                                                                                                name: ''.concat(
-                                                                                                                                                      event
-                                                                                                                                                            .target
-                                                                                                                                                            .value
-                                                                                                                                                )
-                                                                                                                                          }
-                                                                                                                                    };
-                                                                                                                              }
-                                                                                                                              return rec;
-                                                                                                                        }
-                                                                                                                  )
-                                                                                                      }
-                                                                                                );
-                                                                                    }}
-                                                                              />
-                                                                        </div>
-                                                                  </Col>
-                                                                  <Col md={2} xs={24}>
-                                                                        <div style={{ marginTop: '28px' }}>
-                                                                              <Button
-                                                                                    small
-                                                                                    primary
-                                                                                    disabled={
-                                                                                          formIndicatorConfiguration?.selectedIndicator
-                                                                                                ? false
-                                                                                                : true
-                                                                                    }
-                                                                                    icon={
-                                                                                          <TbSelect
-                                                                                                style={{
-                                                                                                      fontSize: '18px',
-                                                                                                      color: '#fff'
-                                                                                                }}
-                                                                                          />
-                                                                                    }
-                                                                                    onClick={() => {
-                                                                                          setVisibleAnalyticComponentModalForCrossCheck(
-                                                                                                true
-                                                                                          );
-
-                                                                                          setFormIndicatorConfiguration(
-                                                                                                {
-                                                                                                      ...formIndicatorConfiguration,
-                                                                                                      currentElement:
-                                                                                                            rec,
-                                                                                                      isIndicator: false
-                                                                                                }
-                                                                                          );
-                                                                                    }}
-                                                                              ></Button>
-                                                                        </div>
-                                                                  </Col>
-                                                            </Row>
-                                                      </div>
-                                                </Col>
-                                          ))}
-
-                                    <Col md={24}>
-                                          <hr style={{ margin: '10px auto', color: '#ccc' }} />
-                                    </Col>
-
-                                    {selectedProgram?.configurationType === 'DQR' &&
-                                          formIndicatorConfiguration?.selectedIndicator?.source && (
-                                                <Col md={24}>
-                                                      <div
-                                                            style={{
-                                                                  fontWeight: 'bold',
-                                                                  marginBottom: '10px'
-                                                            }}
-                                                      >
-                                                            {translate('Margin_Of_Errors')}
-                                                      </div>
-                                                      <div>
-                                                            <Row gutter={[10, 10]}>
-                                                                  <Col md={12} xs={24}>
-                                                                        <div>
-                                                                              <div
-                                                                                    style={{
-                                                                                          marginBottom: '5px'
-                                                                                    }}
-                                                                              >
-                                                                                    {translate('Indicator_MOE')}
-                                                                              </div>
-
-                                                                              <Input
-                                                                                    min={0}
-                                                                                    type="number"
-                                                                                    placeholder={translate(
-                                                                                          'Indicator_MOE'
-                                                                                    )}
-                                                                                    style={{
-                                                                                          width: '100%'
-                                                                                    }}
-                                                                                    value={
-                                                                                          formIndicatorConfiguration
-                                                                                                ?.marginOfErrorIndicator
-                                                                                                ?.source?.id
-                                                                                    }
-                                                                                    onChange={event => {
-                                                                                          setFormIndicatorConfiguration(
-                                                                                                {
-                                                                                                      ...formIndicatorConfiguration,
-                                                                                                      marginOfErrorIndicator:
-                                                                                                            {
-                                                                                                                  ...formIndicatorConfiguration?.marginOfErrorIndicator,
-                                                                                                                  source: {
-                                                                                                                        id: event
-                                                                                                                              .target
-                                                                                                                              .value,
-                                                                                                                        name: event
-                                                                                                                              .target
-                                                                                                                              .value
-                                                                                                                  }
-                                                                                                            }
-                                                                                                }
-                                                                                          );
-                                                                                    }}
-                                                                                    optionFilterProp="label"
-                                                                                    showSearch
-                                                                              />
-                                                                        </div>
-                                                                  </Col>
-                                                                  <Col md={12} xs={24}>
-                                                                        <div>
-                                                                              <div
-                                                                                    style={{
-                                                                                          marginBottom: '5px'
-                                                                                    }}
-                                                                              >
-                                                                                    {translate('Recoupement_MOE')}
-                                                                              </div>
-
-                                                                              <Input
-                                                                                    min={0}
-                                                                                    type="number"
-                                                                                    placeholder={translate(
-                                                                                          'Recoupement_MOE'
-                                                                                    )}
-                                                                                    style={{
-                                                                                          width: '100%'
-                                                                                    }}
-                                                                                    value={
-                                                                                          formIndicatorConfiguration
-                                                                                                ?.marginOfErrorRecoupement
-                                                                                                ?.source?.id
-                                                                                    }
-                                                                                    onChange={event => {
-                                                                                          setFormIndicatorConfiguration(
-                                                                                                {
-                                                                                                      ...formIndicatorConfiguration,
-                                                                                                      marginOfErrorRecoupement:
-                                                                                                            {
-                                                                                                                  ...formIndicatorConfiguration?.marginOfErrorRecoupement,
-                                                                                                                  source: {
-                                                                                                                        id: event
-                                                                                                                              .target
-                                                                                                                              .value,
-                                                                                                                        name: event
-                                                                                                                              .target
-                                                                                                                              .value
-                                                                                                                  }
-                                                                                                            }
-                                                                                                }
-                                                                                          );
-                                                                                    }}
-                                                                                    optionFilterProp="label"
-                                                                                    showSearch
-                                                                              />
-                                                                        </div>
-                                                                  </Col>
-                                                            </Row>
-                                                      </div>
-                                                </Col>
-                                          )}
 
                                     <Col md={24} xs={24}>
                                           <div style={{ marginTop: '18px' }}>
                                                 <Button
-                                                      loading={loadingSaveDateElementMappingConfig}
-                                                      disabled={loadingSaveDateElementMappingConfig}
+                                                      small
                                                       primary
-                                                      onClick={handleSaveNewMappingConfig}
+                                                      loading={loadingSaveFavoritBackgroundInformations}
+                                                      onClick={handleSaveAsFavoritesForBackgroundInformations}
+                                                      icon={
+                                                            <MdStars
+                                                                  style={{
+                                                                        color: 'white',
+                                                                        fontSize: '20px',
+                                                                        cursor: 'pointer'
+                                                                  }}
+                                                            />
+                                                      }
                                                 >
-                                                      + {translate('Ajouter')}
+                                                      {formState?.selectedBackgroundInformationTypeConfiguration ===
+                                                      DIRECTE
+                                                            ? translate('Enregistrer_Comme_Favorites')
+                                                            : translate('Mise_A_Jour')}
                                                 </Button>
                                           </div>
                                     </Col>
@@ -1598,12 +952,24 @@ const Favorites = ({ me }) => {
                   {RenderTitle()}
                   <div style={{ marginTop: '10px', padding: '10px' }}>
                         <Row gutter={[12, 12]}>
-                              <Col sm={24} md={8}>
-                                    {RenderSelectedSupervisionTypeList()}
-                                    {selectedProgram && RenderDataElementConfigContent()}
+                              <Col sm={24} md={6}>
+                                    <div style={{ position: 'sticky', top: 0 }}>
+                                          {RenderSelectedSupervisionTypeList()}
+                                          {formState?.selectedProgram && RenderDataElementConfigContent()}
+                                    </div>
                               </Col>
-                              <Col sm={24} md={16}>
-                                    {selectedProgram && RenderDataElementConfigList()}
+                              <Col sm={24} md={18}>
+                                    {formState?.selectedProgramStage && (
+                                          <FavoriteGenerateIndicatorsFieldsDQR
+                                                formState={formState}
+                                                setFormState={setFormState}
+                                                dataStoreIndicators={dataStoreIndicators}
+                                                dataStoreCrosschecks={dataStoreCrosschecks}
+                                                dataStoreDECompletness={dataStoreDECompletness}
+                                                dataStoreDSCompletness={dataStoreDSCompletness}
+                                          />
+                                    )}
+                                    {/* {selectedProgram && RenderDataElementConfigList()} */}
                               </Col>
                         </Row>
                   </div>
@@ -1622,31 +988,6 @@ const Favorites = ({ me }) => {
 
                               {formIndicatorConfiguration?.currentElement && (
                                     <div style={{ padding: '20px', border: '1px solid #ccc' }}>
-                                          {/* <div style={{ marginBottom: '20px' }}>
-                                                <div>
-                                                      <Radio
-                                                            label={translate('Venant_Du_DHIS2')}
-                                                            className="cursor-pointer"
-                                                            onChange={() => {
-                                                                  setSelectedTypeSource('DHIS2');
-                                                            }}
-                                                            value={'DHIS2'}
-                                                            checked={selectedTypeSource === 'DHIS2'}
-                                                      />
-                                                </div>
-                                                <div>
-                                                      <Radio
-                                                            label={translate('Venant_Du_Group') + ' ? '}
-                                                            className="cursor-pointer"
-                                                            onChange={() => {
-                                                                  setSelectedTypeSource('GROUPS');
-                                                            }}
-                                                            value={'GROUPS'}
-                                                            checked={selectedTypeSource === 'GROUPS'}
-                                                      />
-                                                </div>
-                                          </div> */}
-
                                           {selectedTypeSource === 'DHIS2' && (
                                                 <DataDimension
                                                       selectedDimensions={selectedMetaDatas.map(it => ({
@@ -1797,11 +1138,21 @@ const Favorites = ({ me }) => {
       useEffect(() => {
             loadDataStoreSupervisionConfigs();
             loadDataStoreCrosschecks();
-            loadDataElementGroups();
+            loadDataStoreIndicators();
+            loadDataStoreDECompletness();
+            loadDataStoreDSCompletness();
             loadDataStoreBackgroundInformationFavoritsConfigs();
       }, []);
+
+      useEffect(() => {
+            if (formState?.selectedProgramStage) {
+                  initFields();
+            }
+      }, [formState?.selectedProgramStage]);
+
       return (
             <>
+                  {console.log('formState:', formState)}
                   {RenderContent()}
                   {RenderAddFavoritBackgroundInformationModal()}
                   {RenderAnalyticComponentModal()}

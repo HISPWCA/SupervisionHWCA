@@ -134,9 +134,6 @@ const Setting = () => {
       const [selectedMaps, setSelectedMaps] = useState([]);
       const [selectedVisualizations, setSelectedVisualizations] = useState([]);
 
-      const [selectedNumberOfRecoupements, setSelectedNumberOfRecoupements] = useState(2);
-      const [selectedNumberOfIndicators, setSelectedNumberOfIndicators] = useState(3);
-
       const [inputLibellePayment, setInputLibellePayment] = useState('');
       const [inputMontantConstantPayment, setInputMontantConstantPayment] = useState(0);
       const [inputFraisMobileMoneyPayment, setInputFraisMobileMoneyPayment] = useState(0);
@@ -163,13 +160,24 @@ const Setting = () => {
             selectedStatusSupervisionDataElement: null,
             indicators: [],
             recoupements: [],
-            completeness: { dataElements: [], sourceDocuments: [], margin: null },
+            completeness: {
+                  dataElements: [],
+                  sourceDocuments: [],
+                  margin: null,
+                  programAreaDOC: null,
+                  programAreaDE: null
+            },
             consistencyOvertimes: [],
             isFieldEditingMode: false
       });
 
       const initFields = () => {
-            if (dataStoreGlobalSettings[DQR] && formState?.selectedConfigurationType === DQR) {
+            if (
+                  dataStoreGlobalSettings[DQR] &&
+                  formState?.selectedConfigurationType === DQR &&
+                  !formState?.isFieldEditingMode &&
+                  !currentProgramstageConfiguration
+            ) {
                   const dqrConfig = dataStoreGlobalSettings[DQR];
                   const newIndicators = [];
                   const newRecoupements = [];
@@ -182,7 +190,8 @@ const Setting = () => {
                               id: uuid(),
                               position: i,
                               value: null,
-                              margin: null
+                              margin: null,
+                              programArea: null
                         });
                   }
 
@@ -192,7 +201,8 @@ const Setting = () => {
                               position: i,
                               primaryValue: null,
                               secondaryValue: null,
-                              margin: null
+                              margin: null,
+                              programArea: null
                         });
                   }
 
@@ -201,7 +211,8 @@ const Setting = () => {
                               id: uuid(),
                               position: i,
                               value: null,
-                              margin: null
+                              margin: null,
+                              programArea: null
                         });
                   }
                   for (let i = 1; i <= +dqrConfig.nbrDataElementCompleteness; i++) {
@@ -332,12 +343,12 @@ const Setting = () => {
                   const response = await axios.get(route);
 
                   setProgramStages(response.data?.programStages);
-                  if (response.data?.programStages.length === 1) {
-                        setFormState({
-                              ...formState,
-                              selectedProgramStageForConfiguration: response.data?.programStages[0]
-                        });
-                  }
+                  // if (response.data?.programStages.length === 1) {
+                  //       setFormState({
+                  //             ...formState,
+                  //             selectedProgramStageForConfiguration: response.data?.programStages[0]
+                  //       });
+                  // }
                   setLoadingProgramStages(false);
                   return response.data.programStages;
             } catch (err) {
@@ -365,33 +376,16 @@ const Setting = () => {
       };
 
       const handleSelectedTEIProgram = value => {
-            setSelectedProgramStageForConfiguration(null);
-            setSelectedStatutSupervisionDataElement(null);
-            setIndicatorsFieldsConfigs([]);
-            setProgramStageConfigurations([]);
-            setCurrentProgramstageConfiguration(null);
-            setFieldEditingMode(false);
-
-            setSelectedIndicatorGroup(null);
-            setIndicatorGroups([]);
-            setSelectedProgramStage(null);
-            setSelectedDataElements([]);
-            setSelectedStatusSupervisionProgramStage(null);
-            setSelectedStatutPaymentProgramStage(null);
-            setSelectedStatutPaymentDataElement(null);
-            setSelectedAttributesToDisplay([]);
-            setPaymentConfigList([]);
-            setCurrentPaymentConfig(null);
-            setSelectedPlanificationType(ORGANISATION_UNIT);
-            setSelectedPlanificationIndicatorRDQeCase(false);
-            setSelectedAttributesToDisplay([]);
-            setSelectedAttributeNameForAgent(null);
-            setSelectedAttributeFirstNameForAgent(null);
-
             setFormState({
                   ...formState,
+                  selectedProgramStageForConfiguration: null,
+                  selectedStatusSupervisionDataElement: null,
+                  selectedSupervisorDataElements: [],
+                  isFieldEditingMode: false,
                   selectedTEIProgram: programs.find(p => p.id === value)
             });
+            setProgramStageConfigurations([]);
+            setCurrentProgramstageConfiguration(null);
             loadProgramStages(value);
       };
 
@@ -577,40 +571,6 @@ const Setting = () => {
             setCurrentPaymentConfig(null);
       };
 
-      const generateIndicatorsConfigFieldsList = () => {
-            if (!currentProgramstageConfiguration) {
-                  const newList = [];
-                  for (let i = 1; i <= selectedNumberOfIndicators; i++) {
-                        const recoupements = [];
-
-                        for (let j = 1; j <= selectedNumberOfRecoupements; j++) {
-                              const recoupementPayload = {
-                                    id: uuid(),
-                                    name: `${translate('Recoupements')} ${j}`,
-                                    position: j,
-                                    value: null,
-                                    indicatorMargin: null,
-                                    recoupementMargin: null
-                              };
-
-                              recoupements.push(recoupementPayload);
-                        }
-
-                        const indicatorsPayload = {
-                              id: uuid(),
-                              name: `${translate('Indicateurs')} ${i}`,
-                              position: i,
-                              value: null,
-                              recoupements
-                        };
-
-                        newList.push(indicatorsPayload);
-                  }
-
-                  setIndicatorsFieldsConfigs(newList);
-            }
-      };
-
       const handleDeleteSupervisionConfig = async item => {
             try {
                   if (item) {
@@ -628,25 +588,8 @@ const Setting = () => {
                               message: translate('Suppression_Effectuee'),
                               type: NOTIFICATION_SUCCESS
                         });
-
-                        setFieldEditingMode(false);
+                        handleCancelSupConfig();
                         setCurrentProgramstageConfiguration(null);
-                        setSelectedProgramStageForConfiguration(null);
-                        setIndicatorsFieldsConfigs([]);
-                        setSelectedTEIProgram(null);
-                        setSelectedProgramStage(null);
-                        setSelectedDataElements([]);
-                        setSelectedStatusSupervisionProgramStage(null);
-                        setSelectedStatutSupervisionDataElement(null);
-                        setSelectedStatutPaymentProgramStage(null);
-                        setSelectedStatutPaymentDataElement(null);
-                        setSelectedSupervisionGenerationType(TYPE_GENERATION_AS_EVENT);
-                        setSelectedPlanificationType(ORGANISATION_UNIT);
-                        setSelectedPlanificationIndicatorRDQeCase(false);
-                        setSelectedAttributesToDisplay([]);
-                        setSelectedAttributeNameForAgent(null);
-                        setSelectedAttributeFirstNameForAgent(null);
-                        cleanPaymentConfigState();
                   }
             } catch (err) {
                   setNotification({
@@ -742,13 +685,21 @@ const Setting = () => {
       };
 
       const handleCancelSupConfig = () => {
-            // setFieldEditingMode(false);
-            // setCurrentProgramstageConfiguration(null);
-            // setSelectedStatusSupervisionDataElement(null);
-            // setSelectedSupervisorDataElements([]);
-            // setSelectedProgramStageForConfiguration(null);
-            // setIndicatorsFieldsConfigs([]);
-            // setSelectedOrganisationUnitGroup(null);
+            setFormState({
+                  ...formState,
+                  selectedProgramStageForConfiguration: null,
+                  selectedTEIProgram: null,
+                  selectedSupervisorDataElements: [],
+                  selectedStatusSupervisionDataElement: null,
+                  selectedOrganisationUnitGroup: null,
+                  completeness: null,
+                  consistencyOvertimes: [],
+                  indicators: [],
+                  isFieldEditingMode: false,
+                  recoupements: []
+            });
+            setCurrentProgramstageConfiguration(null);
+            setProgramStageConfigurations([]);
       };
 
       const handleSaveSupConfig = async () => {
@@ -821,6 +772,7 @@ const Setting = () => {
                                 ]
                         : [
                                 {
+                                      id: uuid(),
                                       programStage: formState?.selectedProgramStageForConfiguration,
                                       organisationUnitGroup: formState?.selectedOrganisationUnitGroup,
                                       supervisorField: formState?.selectedSupervisorDataElements,
@@ -850,7 +802,10 @@ const Setting = () => {
                         }))
                   };
 
-                  if (formState.selectedProgramStageForConfiguration && formState.selectedSupervisorDataElements?.length > 0) {
+                  if (
+                        formState.selectedProgramStageForConfiguration &&
+                        formState.selectedSupervisorDataElements?.length > 0
+                  ) {
                         payload.fieldConfig = {
                               supervisor: {
                                     programStage: {
@@ -862,7 +817,10 @@ const Setting = () => {
                         };
                   }
 
-                  if (formState.selectedProgramStageForConfiguration && formState.selectedStatusSupervisionDataElement) {
+                  if (
+                        formState.selectedProgramStageForConfiguration &&
+                        formState.selectedStatusSupervisionDataElement
+                  ) {
                         payload.statusSupervision = {
                               programStage: {
                                     id: formState.selectedProgramStageForConfiguration.id,
@@ -902,22 +860,9 @@ const Setting = () => {
                         isFieldEditingMode: false
                   });
                   setCurrentProgramstageConfiguration(null);
-                  initFields()
-                  
-                  // setIndicatorsFieldsConfigs([]);
-                  // setSelectedStatusSupervisionProgramStage(null);
-                  // setSelectedStatutSupervisionDataElement(null);
-                  // setSelectedPlanificationIndicatorRDQeCase(false);
-                  // setSelectedProgramStage(null);
-                  // setFieldEditingMode(false);
-                  // setSelectedDataElements([]);
-                  // setSelectedOrganisationUnitGroup(null);
-                  // setSelectedSupervisorDataElements([]);
-                  // setSelectedStatusSupervisionDataElement(null);
-                  // setSelectedAttributesToDisplay([]);
+                  initFields();
 
                   setLoadingSaveSupervionsConfig(false);
-                  generateIndicatorsConfigFieldsList();
                   setNotification({
                         show: true,
                         type: NOTIFICATION_SUCCESS,
@@ -1157,8 +1102,16 @@ const Setting = () => {
       };
 
       const handleSelectProgramStageForConfiguration = value => {
+            console.log(
+                  'value pg : ',
+                  programStages.find(pstage => pstage.id === value)
+            );
+            console.log(value);
+            console.log(programStages);
             setFormState({
                   ...formState,
+                  selectedStatusSupervisionDataElement: null,
+                  selectedSupervisorDataElements: [],
                   selectedProgramStageForConfiguration: programStages.find(pstage => pstage.id === value)
             });
       };
@@ -1168,19 +1121,6 @@ const Setting = () => {
                   ...formState,
                   selectedOrganisationUnitGroup: organisationUnitGroups.find(orgUnitGroup => orgUnitGroup.id === value)
             });
-      };
-
-      const handleSelectStatutPaymentDataElement = value => {
-            setSelectedStatutPaymentDataElement(
-                  selectedStatutPaymentProgramStage.programStageDataElements
-                        ?.map(p => p.dataElement)
-                        .find(dataElement => dataElement.id === value)
-            );
-      };
-
-      const handleSelectStatutPaymentProgramStage = value => {
-            setSelectedStatutPaymentProgramStage(programStages.find(pstage => pstage.id === value));
-            setSelectedStatutPaymentDataElement(null);
       };
 
       const RenderSupervisionConfiguration = () => (
@@ -1468,12 +1408,13 @@ const Setting = () => {
                         ),
                         selectedSupervisorDataElements: value.supervisorField || [],
                         selectedStatusSupervisionDataElement: value.statusSupervisionField,
-                        isFieldEditingMode: true 
+                        isFieldEditingMode: true,
+                        indicators: value.indicators,
+                        recoupements: value.recoupements,
+                        completeness: value.completeness,
+                        consistencyOvertimes: value.consistencyOvertimes
                   });
                   setCurrentProgramstageConfiguration(value);
-
-
-                  // setIndicatorsFieldsConfigs(value.indicatorsFieldsConfigs);
             } catch (err) {
                   setNotification({
                         show: true,
@@ -1615,7 +1556,7 @@ const Setting = () => {
                         p => p.programStage?.id !== value.programStage?.id
                   );
                   const newList = mappingConfigSupervisions.map(mappingConf => {
-                        if (mappingConf.program?.id === selectedTEIProgram?.id) {
+                        if (mappingConf.program?.id === formState?.selectedTEIProgram?.id) {
                               return {
                                     ...mappingConf,
                                     programStageConfigurations: filteredProgramStages
@@ -1634,15 +1575,16 @@ const Setting = () => {
 
                   setProgramStageConfigurations(filteredProgramStages);
                   setMappingConfigSupervisions(newList);
-                  setIndicatorsFieldsConfigs([]);
-                  setSelectedOrganisationUnitGroup(null);
-                  setSelectedSupervisorDataElements([]);
-                  setSelectedStatutSupervisionDataElement(null);
-                  setSelectedStatusSupervisionDataElement(null);
-                  setFieldEditingMode(false);
+                  setFormState({
+                        ...formState,
+                        selectedProgramStageForConfiguration: null,
+                        selectedOrganisationUnitGroup: null,
+                        selectedStatusSupervisionDataElement: null,
+                        selectedSupervisorDataElements: [],
+                        isFieldEditingMode: false
+                  });
                   setCurrentProgramstageConfiguration(null);
 
-                  generateIndicatorsConfigFieldsList();
                   setNotification({
                         show: true,
                         type: NOTIFICATION_SUCCESS,
@@ -1674,7 +1616,7 @@ const Setting = () => {
                                                 border: '1px solid orange'
                                           }}
                                     >
-                                          {selectedTEIProgram?.displayName}
+                                          {formState?.selectedTEIProgram?.displayName}
                                     </span>
                               </div>
                               <Table
@@ -1685,7 +1627,7 @@ const Setting = () => {
                                           action: p
                                     }))}
                                     columns={
-                                          selectedConfigurationType === 'ERDQ'
+                                          formState?.selectedConfigurationType === ERDQ
                                                 ? [
                                                         {
                                                               title: translate('Program_Stage'),
@@ -1797,28 +1739,28 @@ const Setting = () => {
                                                                                       />
                                                                                 }
                                                                                 onConfirm={() => {
-                                                                                      setSelectedProgramStageForConfiguration(
-                                                                                            null
-                                                                                      );
-                                                                                      setSelectedOrganisationUnitGroup(
-                                                                                            null
-                                                                                      );
-                                                                                      setSelectedSupervisorDataElements(
-                                                                                            []
-                                                                                      );
-                                                                                      setSelectedStatusSupervisionDataElement(
-                                                                                            null
-                                                                                      );
-                                                                                      setProgramStageConfigurations(
-                                                                                            programStageConfigurations.filter(
-                                                                                                  p =>
-                                                                                                        p.programStage
-                                                                                                              ?.id !==
-                                                                                                        value
-                                                                                                              .programStage
-                                                                                                              ?.id
-                                                                                            )
-                                                                                      );
+                                                                                      //   setSelectedProgramStageForConfiguration(
+                                                                                      //         null
+                                                                                      //   );
+                                                                                      //   setSelectedOrganisationUnitGroup(
+                                                                                      //         null
+                                                                                      //   );
+                                                                                      //   setSelectedSupervisorDataElements(
+                                                                                      //         []
+                                                                                      //   );
+                                                                                      //   setSelectedStatusSupervisionDataElement(
+                                                                                      //         null
+                                                                                      //   );
+                                                                                      //   setProgramStageConfigurations(
+                                                                                      //         programStageConfigurations.filter(
+                                                                                      //               p =>
+                                                                                      //                     p.programStage
+                                                                                      //                           ?.id !==
+                                                                                      //                     value
+                                                                                      //                           .programStage
+                                                                                      //                           ?.id
+                                                                                      //         )
+                                                                                      //   );
                                                                                 }}
                                                                           >
                                                                                 <div>
@@ -1895,135 +1837,6 @@ const Setting = () => {
                   });
             }
       };
-
-      const RenderStatusPaymentDataElementToUse = () => (
-            <div style={{ marginTop: '20px' }}>
-                  <Card className="my-shadow" size="small">
-                        <div>
-                              <div style={{ fontWeight: 'bold' }}>{translate('Configuration_Des_Paiements')}</div>
-                              <div>
-                                    <Row gutter={[10, 10]}>
-                                          <Col md={24}>
-                                                <Divider style={{ margin: '5px 0px' }} />
-                                          </Col>
-                                          <Col md={24}>
-                                                <div style={{ fontWeight: 'bold' }}>{translate('Status_Paiement')}</div>
-                                                <div
-                                                      style={{
-                                                            marginTop: '5px',
-                                                            color: '#00000070',
-                                                            fontSize: '13px'
-                                                      }}
-                                                >
-                                                      {translate('Aide_Configuration_Paiement')}
-                                                </div>
-                                          </Col>
-                                          <Col md={12}>
-                                                <div>
-                                                      <div style={{ marginBottom: '5px' }}>
-                                                            {translate('Programmes_Stage')}
-                                                      </div>
-                                                      <Select
-                                                            options={programStages.map(programStage => ({
-                                                                  label: programStage.displayName,
-                                                                  value: programStage.id
-                                                            }))}
-                                                            placeholder={translate('Programmes_Stage')}
-                                                            style={{ width: '100%' }}
-                                                            optionFilterProp="label"
-                                                            value={selectedStatutPaymentProgramStage?.id}
-                                                            onChange={handleSelectStatutPaymentProgramStage}
-                                                            showSearch
-                                                            allowClear
-                                                            loading={loadingProgramStages}
-                                                            disabled={loadingProgramStages}
-                                                      />
-                                                </div>
-                                          </Col>
-                                          {selectedStatutPaymentProgramStage && (
-                                                <Col md={12} xs={24}>
-                                                      <div>
-                                                            <div style={{ marginBottom: '5px' }}>
-                                                                  {translate('Elements_De_Donnees')}
-                                                            </div>
-                                                            <Select
-                                                                  options={selectedStatutPaymentProgramStage?.programStageDataElements?.map(
-                                                                        progStageDE => ({
-                                                                              label: progStageDE.dataElement
-                                                                                    ?.displayName,
-                                                                              value: progStageDE.dataElement?.id
-                                                                        })
-                                                                  )}
-                                                                  placeholder={translate('Element_De_Donnee')}
-                                                                  style={{ width: '100%' }}
-                                                                  onChange={handleSelectStatutPaymentDataElement}
-                                                                  value={selectedStatutPaymentDataElement?.id}
-                                                                  optionFilterProp="label"
-                                                                  showSearch
-                                                                  allowClear
-                                                            />
-                                                      </div>
-                                                </Col>
-                                          )}
-                                          <Col md={24}>
-                                                <Divider style={{ margin: '5px 0px' }} />
-                                          </Col>
-                                          <Col md={24}>
-                                                <div style={{ fontWeight: 'bold' }}>{translate('Paiement')}</div>
-                                          </Col>
-                                          <Col sm={24} md={8}>
-                                                <div>{translate('Libelle')}</div>
-                                                <div style={{ marginTop: '2px' }}>
-                                                      <Input
-                                                            value={inputLibellePayment}
-                                                            onChange={event =>
-                                                                  setInputLibellePayment(event.target.value)
-                                                            }
-                                                            placeholder={translate('Libelle')}
-                                                            style={{ width: '100%' }}
-                                                      />
-                                                </div>
-                                          </Col>
-
-                                          <Col sm={24} md={6}>
-                                                <div>{translate('Montant_Constant')}</div>
-                                                <div style={{ marginTop: '2px' }}>
-                                                      <InputNumber
-                                                            value={inputMontantConstantPayment}
-                                                            onChange={value => setInputMontantConstantPayment(value)}
-                                                            placeholder={translate('Montant_Constant')}
-                                                            style={{ width: '100%' }}
-                                                      />
-                                                </div>
-                                          </Col>
-                                          <Col sm={24} md={6}>
-                                                <div>{translate('Frais_Mobile_Money')}</div>
-                                                <div style={{ marginTop: '2px' }}>
-                                                      <InputNumber
-                                                            onChange={value =>
-                                                                  setInputFraisMobileMoneyPayment(value || 0)
-                                                            }
-                                                            value={inputFraisMobileMoneyPayment}
-                                                            placeholder="Frais Mobile Money"
-                                                            style={{ width: '100%' }}
-                                                      />
-                                                </div>
-                                          </Col>
-                                          <Col sm={24} md={4}>
-                                                <div style={{ marginTop: '25px' }}>
-                                                      <Button small primary onClick={handleAddPaymentConfig}>
-                                                            {!isEditModePayment
-                                                                  ? `+ ${translate('Ajouter')}`
-                                                                  : translate('Mise_A_Jour')}
-                                                      </Button>
-                                                </div>
-                                          </Col>
-                                    </Row>
-                              </div>
-                        </div>
-                  </Card>
-            </div>
-      );
 
       const handleEditPaymentConfig = config => {
             setInputFraisMobileMoneyPayment(config.fraisMobileMoney);
@@ -2130,7 +1943,7 @@ const Setting = () => {
 
       const RenderSaveConfigurationButton = () => (
             <div style={{ marginTop: '22px', display: 'flex', alignItems: 'center' }}>
-                  {isFieldEditingMode && (
+                  {formState?.isFieldEditingMode && (
                         <div style={{ marginRight: '10px' }}>
                               <Button
                                     destructive
@@ -3482,17 +3295,11 @@ const Setting = () => {
             if (dataStoreGlobalSettings) {
                   initFields();
             }
-      }, [dataStoreGlobalSettings, formState?.selectedConfigurationType]);
-
-      useEffect(() => {
-            if (
-                  selectedNumberOfIndicators > 0 &&
-                  selectedNumberOfRecoupements > 0 &&
-                  selectedProgramStageForConfiguration
-            ) {
-                  generateIndicatorsConfigFieldsList();
-            }
-      }, [selectedNumberOfIndicators, selectedNumberOfRecoupements, selectedProgramStageForConfiguration]);
+      }, [
+            dataStoreGlobalSettings,
+            formState?.selectedConfigurationType,
+            formState?.selectedProgramStageForConfiguration
+      ]);
 
       useEffect(() => {
             currentItem && initUpdateIndicatorConfigStage();
