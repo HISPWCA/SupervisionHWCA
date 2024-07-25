@@ -194,6 +194,9 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                   <Input
                                                                         placeholder={`${translate('Marge')} `}
                                                                         style={{ width: '100%' }}
+                                                                        min={0}
+                                                                        type="number"
+                                                                        onChange={event => console.log(event)}
                                                                   />
                                                             </div>
                                                       </td>
@@ -447,6 +450,9 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                   <Input
                                                                         placeholder={`${translate('Marge')} `}
                                                                         style={{ width: '100%' }}
+                                                                        min={0}
+                                                                        type="number"
+                                                                        onChange={event => console.log(event)}
                                                                   />
                                                             </div>
                                                       </td>
@@ -633,6 +639,9 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                   <Input
                                                                         placeholder={`${translate('Marge')} `}
                                                                         style={{ width: '100%' }}
+                                                                        min={0}
+                                                                        type="number"
+                                                                        onChange={event => console.log(event)}
                                                                   />
                                                             </div>
                                                       </td>
@@ -900,6 +909,9 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                             <Input
                                                                   placeholder={`${translate('Marge')} `}
                                                                   style={{ width: '100%' }}
+                                                                  min={0}
+                                                                  type="number"
+                                                                  onChange={event => console.log(event)}
                                                             />
                                                       </div>
                                                 </td>
