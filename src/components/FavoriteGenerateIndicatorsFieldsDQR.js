@@ -1,6 +1,27 @@
 import { Card, Input, Select } from 'antd';
 import translate from '../utils/translator';
 import { v4 as uuid } from 'uuid';
+import { useEffect, useState } from 'react';
+
+const MyInput = ({ onChange, initValue }) => {
+      const [value, setValue] = useState(initValue);
+
+      // useEffect(() => {}, []);
+
+      return (
+            <Input
+                  placeholder={`${translate('Marge')} `}
+                  style={{ width: '100%' }}
+                  min={0}
+                  type="number"
+                  value={value}
+                  onChange={event => {
+                        onChange(event.target.value);
+                        setValue(event.target.value);
+                  }}
+            />
+      );
+};
 
 const FavoriteGenerateIndicatorsFieldsDQR = ({
       formState,
@@ -139,7 +160,9 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                       >
                                                             <div>
                                                                   <Select
-                                                                        placeholder={`${translate('Program_Area')} `}
+                                                                        placeholder={`${translate(
+                                                                              'Source_De_Donnée'
+                                                                        )} `}
                                                                         style={{
                                                                               width: '100%'
                                                                         }}
@@ -906,12 +929,19 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                       }}
                                                 >
                                                       <div>
-                                                            <Input
-                                                                  placeholder={`${translate('Marge')} `}
-                                                                  style={{ width: '100%' }}
-                                                                  min={0}
-                                                                  type="number"
-                                                                  onChange={event => console.log(event)}
+                                                            <MyInput
+                                                                  onChange={value => {
+                                                                        setFormState({
+                                                                              ...formState,
+                                                                              completeness: {
+                                                                                    ...formState?.completeness,
+                                                                                    selectedSourceMargin: value
+                                                                              }
+                                                                        });
+                                                                  }}
+                                                                  initValue={
+                                                                        formState?.completeness?.selectedSourceMargin
+                                                                  }
                                                             />
                                                       </div>
                                                 </td>

@@ -1538,12 +1538,14 @@ const Supervision = ({ me }) => {
 
                   // const generatedCode = await generatedAutoCode(
                   //       currentProgram.data.programTrackedEntityAttributes[0]?.trackedEntityAttribute?.id
-                  // );
+                  // ); 
+                  
+                  const generatedCode = await generatedAutoCode('WzghGqeASL5');
 
                   const tei = {
                         trackedEntityType: currentProgram.data.trackedEntityType.id,
                         orgUnit: payload.orgUnit,
-                        // attributes: [{ attribute: generatedCode.ownerUid, value: generatedCode.value }]
+                        attributes: [{ attribute: generatedCode.ownerUid, value: generatedCode.value }]
                   };
 
                   const createdTEI = await createTei(tei);
