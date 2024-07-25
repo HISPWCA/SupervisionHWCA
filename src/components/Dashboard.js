@@ -3,8 +3,21 @@ import { Col, DatePicker, Row, Select } from 'antd';
 import { dayjsLocalizer } from 'react-big-calendar';
 import ReactDOMServer from 'react-dom/server';
 import axios from 'axios';
-import { ORGANISATION_UNITS_LEVELS_ROUTE, ORGANISATION_UNITS_ROUTE, SERVER_URL } from '../utils/api.routes';
-import { NOTICE_BOX_DEFAULT, NOTIFICATION_CRITICAL, NA, SCHEDULED, MES_PLANIFICATIONS } from '../utils/constants';
+import {
+      ORGANISATION_UNITS_LEVELS_ROUTE,
+      ORGANISATION_UNITS_ROUTE,
+      SERVER_URL,
+      TRACKED_ENTITY_INSTANCES_ROUTE
+} from '../utils/api.routes';
+import {
+      NOTICE_BOX_DEFAULT,
+      NOTIFICATION_CRITICAL,
+      NA,
+      SCHEDULED,
+      MES_PLANIFICATIONS,
+      DESCENDANTS,
+      TYPE_GENERATION_AS_EVENT
+} from '../utils/constants';
 import { loadDataStore } from '../utils/functions';
 import MyNotification from './MyNotification';
 import { Button } from '@dhis2/ui';
@@ -17,6 +30,8 @@ import translate from '../utils/translator';
 import VisualizationItem from './VisualizationItem';
 import MyFrame from './MyFrame';
 import { ImPrinter } from 'react-icons/im';
+import OrganisationUnitsTree from './OrganisationUnitsTree';
+import { FaSearch } from 'react-icons/fa';
 
 const quarterOfYear = require('dayjs/plugin/quarterOfYear');
 const weekOfYear = require('dayjs/plugin/weekOfYear');
@@ -34,6 +49,7 @@ export const getDefaultStatusPaymentIfStatusIsNull = _ => NA.value;
 export const Dashboard = ({ me }) => {
       const [organisationUnits, setOrganisationUnits] = useState([]);
       const [organisationUnitLevels, setOrganisationUnitLevels] = useState([]);
+      const [teiList, setTeiList] = useState([]);
 
       const [dataStoreSupervisionsConfigs, setDataStoreSupervisionsConfigs] = useState([]);
       const [dataStoreMissions, setDataStoreMissions] = useState([]);
@@ -49,6 +65,7 @@ export const Dashboard = ({ me }) => {
       const [selectedOrganisationUnit, setSelectedOrganisationUnit] = useState(null);
       const [selectedLevel, setSelectedLevel] = useState(null);
       const [selectedPeriod, setSelectedPeriod] = useState(dayjs(new Date()));
+      const [selectedPeriods, setSelectedPeriods] = useState([dayjs().startOf('month'), dayjs()]);
       const [selectedProgram, setSelectedProgram] = useState(null);
 
       const [loadingOrganisationUnits, setLoadingOrganisationUnits] = useState(false);
@@ -57,6 +74,7 @@ export const Dashboard = ({ me }) => {
       const [loadingInjection, setLoadingInjection] = useState(false);
 
       const [loadingDataStoreMissions, setLoadingDataStoreMissions] = useState(false);
+      const [loadingTeiList, setLoadingTeiList] = useState(false);
       const [loadingOrganisationUnitLevels, setLoadingOrganisationUnitLevels] = useState(false);
 
       const loadDataStoreMissions = async () => {
@@ -88,20 +106,21 @@ export const Dashboard = ({ me }) => {
                   setLoadingOrganisationUnits(true);
                   const response = await axios.get(ORGANISATION_UNITS_ROUTE);
                   const orgUnits = response.data.organisationUnits;
-                  const progs = await loadDataStoreSupervisionsConfigs();
+                  // const progs = await loadDataStoreSupervisionsConfigs();
 
                   setOrganisationUnits(orgUnits);
-                  if (progs.length > 0) {
-                        const currentProgram = progs[0];
-                        const currentOrgUnit = orgUnits.find(ou => ou.id === me?.organisationUnits?.[0]?.id);
-                        const currentPeriod = dayjs();
+                  // if (progs.length > 0) {
+                  //       const currentProgram = progs[0];
+                  //       const currentOrgUnit = orgUnits.find(ou => ou.id === me?.organisationUnits?.[0]?.id);
+                  //       const currentPeriod = dayjs();
 
-                        if (currentProgram) {
-                              setSelectedProgram(currentProgram);
-                              setSelectedOrganisationUnit(currentOrgUnit);
-                              setSelectedPeriod(currentPeriod);
-                        }
-                  }
+                  //       if (currentProgram) {
+                  //             setSelectedProgram(currentProgram);
+                  //             setSelectedOrganisationUnit(currentOrgUnit);
+                  //             setSelectedPeriod(currentPeriod);
+                  //       }
+                  // }
+
                   setLoadingOrganisationUnits(false);
             } catch (err) {
                   setLoadingOrganisationUnits(false);
@@ -145,8 +164,8 @@ export const Dashboard = ({ me }) => {
             }
       };
 
-      const handleSelectedPeriod = period => {
-            setSelectedPeriod(dayjs(period));
+      const handleSelectPeriodRange = (_, periodString) => {
+            setSelectedPeriods(periodString);
       };
 
       const printReportAsPDF = async () => {
@@ -202,6 +221,60 @@ export const Dashboard = ({ me }) => {
             }
       };
 
+      const handleSearch = () => {
+            if (selectedPeriods.length > 0 && selectedOrganisationUnit && selectedProgram && selectedLevel) {
+                  loadTEIS(selectedProgram.program?.id, selectedOrganisationUnit.id);
+            }
+      };
+
+      const filterAndGetPlanfications = () =>
+            teiList
+                  .reduce((prev, current) => {
+                        if (selectedProgram.generationType === TYPE_GENERATION_AS_EVENT) {
+                              const eventList = [];
+                              const currentEnrollment = current.enrollments?.filter(
+                                    en => en.program === selectedProgram?.program?.id
+                              )[0];
+
+                              for (let event of currentEnrollment?.events || []) {
+                                    if (event.eventDate) {
+                                          if (
+                                                (dayjs(event.eventDate).isAfter(dayjs(selectedPeriods[0])) &&
+                                                      dayjs(event.eventDate).isBefore(dayjs(selectedPeriods[1]))) ||
+                                                (dayjs(event.eventDate).isSame(dayjs(selectedPeriods[0])) &&
+                                                      dayjs(event.eventDate).isSame(dayjs(selectedPeriods[1])))
+                                          )
+                                                eventList.push(event);
+                                    }
+                              }
+
+                              return [
+                                    ...prev,
+                                    ...eventList.map(ev => ({
+                                          trackedEntityInstance: currentEnrollment?.trackedEntityInstance,
+                                          period: ev.eventDate,
+                                          orgUnit: currentEnrollment?.orgUnit
+                                    }))
+                              ];
+                        }
+
+                        return prev;
+                  }, [])
+                  .filter(planification => {
+                        if (selectedPlanification === MES_PLANIFICATIONS)
+                              return planification.superviseurs?.includes(me?.displayName);
+
+                        if (selectedPlanification === PLANIFICATION_PAR_MOI)
+                              return me?.username?.toLowerCase() === planification.storedBy?.toLowerCase();
+
+                        if (selectedPlanification === PLANIFICATION_PAR_TOUS) return true;
+
+                        if (selectedPlanification === PLANIFICATION_PAR_UN_USER) return false;
+
+                        return true;
+                  })
+                  .sort((a, b) => parseInt(dayjs(b.period).valueOf()) - parseInt(dayjs(a.period).valueOf()));
+                  
       const RenderFilters = () => (
             <>
                   <div
@@ -235,30 +308,19 @@ export const Dashboard = ({ me }) => {
 
                               {selectedProgram && (
                                     <Col sm={24} md={5}>
-                                          <div style={{ marginBottom: '2px' }}>{translate('Missions')}</div>
-                                          <Select
-                                                placeholder={translate('Missions')}
-                                                onChange={handleSelectMission}
-                                                value={selectedMission?.id}
-                                                style={{ width: '100%' }}
-                                                options={dataStoreMissions
-                                                      .filter(
-                                                            m =>
-                                                                  (selectedProgram &&
-                                                                        m.program?.id ===
-                                                                              selectedProgram?.program?.id) ||
-                                                                  false
-                                                      )
-                                                      .map(d => ({
-                                                            value: d.id,
-                                                            label: d.name
-                                                      }))}
-                                                loading={loadingDataStoreMissions}
+                                          <div style={{ marginBottom: '2px' }}>{translate('Unite_Organisation')}</div>
+                                          <OrganisationUnitsTree
+                                                meOrgUnitId={me?.organisationUnits[0]?.id}
+                                                orgUnits={organisationUnits}
+                                                currentOrgUnits={selectedOrganisationUnit}
+                                                setCurrentOrgUnits={setSelectedOrganisationUnit}
+                                                loadingOrganisationUnits={loadingOrganisationUnits}
+                                                setLoadingOrganisationUnits={setLoadingOrganisationUnits}
                                           />
                                     </Col>
                               )}
 
-                              <Col sm={24} md={5}>
+                              <Col sm={24} md={3}>
                                     <div style={{ marginBottom: '2px' }}>{translate('Level')}</div>
                                     <Select
                                           placeholder={translate('Level')}
@@ -273,27 +335,46 @@ export const Dashboard = ({ me }) => {
                                     />
                               </Col>
 
-                              <Col sm={24} md={3}>
+                              <Col sm={24} md={5}>
                                     <div style={{ marginBottom: '2px' }}>{translate('Periode')}</div>
-                                    <DatePicker
-                                          picker="month"
+                                    <DatePicker.RangePicker
+                                          picker="date"
                                           style={{ width: '100%' }}
                                           placeholder={translate('Periode')}
-                                          onChange={handleSelectedPeriod}
-                                          value={selectedPeriod}
+                                          onChange={handleSelectPeriodRange}
+                                          value={selectedPeriods}
                                           allowClear={false}
                                     />
                               </Col>
 
-                              <Col sm={24} md={5}>
-                                    <div style={{ marginTop: '20px' }}>
-                                          <Button
-                                                onClick={printReportAsPDF}
-                                                primary
-                                                icon={<ImPrinter style={{ fontSize: '20px' }} />}
-                                          >
-                                                {translate('Print_Dashboard')}
-                                          </Button>
+                              <Col sm={24} md={7}>
+                                    <div style={{ marginTop: '20px', display: 'flex' }}>
+                                          <div style={{ marginRight: '20px' }}>
+                                                <Button
+                                                      onClick={handleSearch}
+                                                      icon={<FaSearch style={{ fontSize: '20px' }} />}
+                                                      loading={loadingTeiList}
+                                                      disabled={
+                                                            selectedLevel?.level &&
+                                                            selectedOrganisationUnit &&
+                                                            selectedPeriods.length > 0 &&
+                                                            selectedProgram
+                                                                  ? false
+                                                                  : true
+                                                      }
+                                                >
+                                                      {translate('Recherche')}
+                                                </Button>
+                                          </div>
+                                          <div>
+                                                <Button
+                                                      onClick={printReportAsPDF}
+                                                      primary
+                                                      icon={<ImPrinter style={{ fontSize: '20px' }} />}
+                                                >
+                                                      {translate('Print_Dashboard')}
+                                                </Button>
+                                          </div>
                                     </div>
                               </Col>
                         </Row>
@@ -424,6 +505,18 @@ export const Dashboard = ({ me }) => {
             );
       };
 
+      const loadTEIS = async (program_id, orgUnit_id, ouMode = DESCENDANTS) => {
+            try {
+                  setLoadingTeiList(true);
+                  const response = await axios.get(
+                        `${TRACKED_ENTITY_INSTANCES_ROUTE}.json?program=${program_id}&ou=${orgUnit_id}&ouMode=${ouMode}&order=created:DESC&fields=trackedEntityInstance,created,program,orgUnit,enrollments[*],attributes&pageSize=100000`
+                  );
+                  const trackedEntityInstances = response.data.trackedEntityInstances;
+                  setTeiList(trackedEntityInstances);
+                  setLoadingTeiList(false);
+            } catch (err) {}
+      };
+
       const RenderVisualizations = () =>
             selectedMission &&
             selectedLevel && (
@@ -517,8 +610,8 @@ export const Dashboard = ({ me }) => {
             if (me) {
                   loadDataStoreSupervisionsConfigs();
                   loadDataStoreVisualizations();
-                  loadDataStoreMissions();
                   loadOrganisationUnitLevels();
+                  loadOrganisationUnits();
             }
       }, [me]);
 
@@ -532,7 +625,8 @@ export const Dashboard = ({ me }) => {
             <>
                   <div style={{ padding: '10px', width: '100%' }}>
                         {RenderFilters()}
-                        {RenderVisualizations()}
+                        <pre>{JSON.stringify(teiList, null, 4)}</pre>
+                        {/* {RenderVisualizations()} */}
                         <MyNotification notification={notification} setNotification={setNotification} />
                   </div>
             </>
