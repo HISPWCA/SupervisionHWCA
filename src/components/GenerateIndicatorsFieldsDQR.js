@@ -539,7 +539,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                       width: '50%'
                                                 }}
                                           >
-                                                {translate('ConsistencyOverTime_Configuration')}
+                                                {translate('Indicateurs')}
                                           </th>
                                           <th
                                                 style={{
