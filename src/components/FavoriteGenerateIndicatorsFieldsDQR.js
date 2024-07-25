@@ -1,27 +1,10 @@
 import { Card, Input, Select } from 'antd';
 import translate from '../utils/translator';
 import { v4 as uuid } from 'uuid';
-import { useEffect, useState } from 'react';
 
-const MyInput = ({ onChange, initValue }) => {
-      const [value, setValue] = useState(initValue);
-
-      // useEffect(() => {}, []);
-
-      return (
-            <Input
-                  placeholder={`${translate('Marge')} `}
-                  style={{ width: '100%' }}
-                  min={0}
-                  type="number"
-                  value={value}
-                  onChange={event => {
-                        onChange(event.target.value);
-                        setValue(event.target.value);
-                  }}
-            />
-      );
-};
+// const MyInput = ()=> {
+//       const inputRef = React.createRef();
+// }
 
 const FavoriteGenerateIndicatorsFieldsDQR = ({
       formState,
@@ -31,12 +14,40 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
       dataStoreDECompletness,
       dataStoreDSCompletness
 }) => {
+      const getNumberIndicatorsToShow = () => {
+            let newArray = [];
+            for (let i = 1; i <= formState?.indicators?.length || 0; i++) {
+                  newArray.push({ value: i, label: i });
+            }
+            return newArray;
+      };
+
       return (
             <>
                   <Card className="my-shadow my-scrollable" bodyStyle={{ padding: '10px' }} size="small">
                         <div>
                               <div style={{ marginBottom: '10px', fontWeight: 'bold' }}>
                                     {translate('Indicators_Configuration')}
+                              </div>
+                              <div
+                                    style={{
+                                          justifyContent: 'center',
+                                          width: '100%',
+                                          display: 'flex',
+                                          alignItems: 'center'
+                                    }}
+                              >
+                                    <span style={{ fontWeight: 'bold' }}>{translate('How_Many_Indicators')}</span>
+                                    <span style={{ marginLeft: '10px' }}>
+                                          <Select
+                                                style={{ width: '100px' }}
+                                                options={getNumberIndicatorsToShow()}
+                                                value={formState?.nbrIndicatorsToShow}
+                                                onChange={value => {
+                                                      setFormState({ ...formState, nbrIndicatorsToShow: value });
+                                                }}
+                                          />
+                                    </span>
                               </div>
                               <table style={{ borderCollapse: 'collapse', width: '100%' }}>
                                     <thead>
@@ -69,7 +80,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                             border: '1px solid #00000070'
                                                       }}
                                                 >
-                                                      {translate('Source_De_Donnée')}
+                                                      {translate('Indicator_Name')}
                                                 </th>
                                                 <th
                                                       style={{
@@ -84,147 +95,182 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                           </tr>
                                     </thead>
                                     <tbody>
-                                          {formState?.indicators?.map((indicator, indIndex) => (
-                                                <tr key={uuid()}>
-                                                      <td
-                                                            style={{
-                                                                  padding: '2px 5px',
-                                                                  verticalAlign: 'center',
-                                                                  textAlign: 'center',
-                                                                  border: '1px solid #00000070'
-                                                            }}
-                                                      >
-                                                            {indicator?.value?.displayName}
-                                                      </td>
-                                                      <td
-                                                            style={{
-                                                                  padding: '2px 5px',
-                                                                  verticalAlign: 'top',
-                                                                  textAlign: 'center',
-                                                                  border: '1px solid #00000070'
-                                                            }}
-                                                      >
-                                                            <div>
-                                                                  <Select
-                                                                        placeholder={`${translate('Program_Area')} `}
-                                                                        style={{
-                                                                              width: '100%'
-                                                                        }}
-                                                                        options={dataStoreIndicators?.map(ind => ({
-                                                                              label: ind.name,
-                                                                              value: ind.name
-                                                                        }))}
-                                                                        showSearch
-                                                                        allowClear
-                                                                        optionFilterProp="label"
-                                                                        value={
-                                                                              indicator?.selectedSourceProgramArea?.name
-                                                                        }
-                                                                        onChange={value => {
-                                                                              setFormState({
-                                                                                    ...formState,
-                                                                                    indicators:
-                                                                                          formState?.indicators?.map(
-                                                                                                (i, iIndex) => {
-                                                                                                      if (
-                                                                                                            iIndex ===
-                                                                                                            indIndex
-                                                                                                      ) {
-                                                                                                            return {
-                                                                                                                  ...i,
-                                                                                                                  selectedSourceIndicator:
-                                                                                                                        null,
-                                                                                                                  selectedSourceProgramArea:
-                                                                                                                        dataStoreIndicators.find(
-                                                                                                                              d =>
-                                                                                                                                    d.name ===
-                                                                                                                                    value
-                                                                                                                        )
-                                                                                                            };
+                                          {formState?.indicators
+                                                ?.slice(0, formState?.nbrIndicatorsToShow)
+                                                ?.map((indicator, indIndex) => (
+                                                      <tr key={uuid()}>
+                                                            <td
+                                                                  style={{
+                                                                        padding: '2px 5px',
+                                                                        verticalAlign: 'center',
+                                                                        textAlign: 'center',
+                                                                        border: '1px solid #00000070'
+                                                                  }}
+                                                            >
+                                                                  {indicator?.value?.displayName}
+                                                            </td>
+                                                            <td
+                                                                  style={{
+                                                                        padding: '2px 5px',
+                                                                        verticalAlign: 'top',
+                                                                        textAlign: 'center',
+                                                                        border: '1px solid #00000070'
+                                                                  }}
+                                                            >
+                                                                  <div>
+                                                                        <Select
+                                                                              placeholder={`${translate(
+                                                                                    'Program_Area'
+                                                                              )} `}
+                                                                              style={{
+                                                                                    width: '100%'
+                                                                              }}
+                                                                              options={dataStoreIndicators?.map(
+                                                                                    ind => ({
+                                                                                          label: ind.name,
+                                                                                          value: ind.name
+                                                                                    })
+                                                                              )}
+                                                                              showSearch
+                                                                              allowClear
+                                                                              optionFilterProp="label"
+                                                                              value={
+                                                                                    indicator?.selectedSourceProgramArea
+                                                                                          ?.name
+                                                                              }
+                                                                              onChange={value => {
+                                                                                    setFormState({
+                                                                                          ...formState,
+                                                                                          indicators:
+                                                                                                formState?.indicators?.map(
+                                                                                                      (i, iIndex) => {
+                                                                                                            if (
+                                                                                                                  iIndex ===
+                                                                                                                  indIndex
+                                                                                                            ) {
+                                                                                                                  return {
+                                                                                                                        ...i,
+                                                                                                                        selectedSourceIndicator:
+                                                                                                                              null,
+                                                                                                                        selectedSourceProgramArea:
+                                                                                                                              dataStoreIndicators.find(
+                                                                                                                                    d =>
+                                                                                                                                          d.name ===
+                                                                                                                                          value
+                                                                                                                              )
+                                                                                                                  };
+                                                                                                            }
+                                                                                                            return i;
                                                                                                       }
-                                                                                                      return i;
-                                                                                                }
-                                                                                          )
-                                                                              });
-                                                                        }}
-                                                                  />
-                                                            </div>
-                                                      </td>
-                                                      <td
-                                                            style={{
-                                                                  padding: '2px 5px',
-                                                                  verticalAlign: 'top',
-                                                                  textAlign: 'center',
-                                                                  border: '1px solid #00000070'
-                                                            }}
-                                                      >
-                                                            <div>
-                                                                  <Select
-                                                                        placeholder={`${translate(
-                                                                              'Source_De_Donnée'
-                                                                        )} `}
-                                                                        style={{
-                                                                              width: '100%'
-                                                                        }}
-                                                                        options={indicator.selectedSourceProgramArea?.children?.map(
-                                                                              ind => ({
-                                                                                    label: ind.name,
-                                                                                    value: ind.name
-                                                                              })
-                                                                        )}
-                                                                        disabled={!indicator.selectedSourceProgramArea}
-                                                                        showSearch
-                                                                        allowClear
-                                                                        optionFilterProp="label"
-                                                                        value={indicator?.selectedSourceIndicator?.name}
-                                                                        onChange={value => {
-                                                                              setFormState({
-                                                                                    ...formState,
-                                                                                    indicators:
-                                                                                          formState?.indicators?.map(
-                                                                                                (i, iIndex) => {
-                                                                                                      if (
-                                                                                                            iIndex ===
-                                                                                                            indIndex
-                                                                                                      ) {
-                                                                                                            return {
-                                                                                                                  ...i,
-                                                                                                                  selectedSourceIndicator:
-                                                                                                                        indicator.selectedSourceProgramArea?.children?.find(
-                                                                                                                              d =>
-                                                                                                                                    d.name ===
-                                                                                                                                    value
-                                                                                                                        )
-                                                                                                            };
+                                                                                                )
+                                                                                    });
+                                                                              }}
+                                                                        />
+                                                                  </div>
+                                                            </td>
+                                                            <td
+                                                                  style={{
+                                                                        padding: '2px 5px',
+                                                                        verticalAlign: 'top',
+                                                                        textAlign: 'center',
+                                                                        border: '1px solid #00000070'
+                                                                  }}
+                                                            >
+                                                                  <div>
+                                                                        <Select
+                                                                              placeholder={`${translate(
+                                                                                    'Indicator_Name'
+                                                                              )} `}
+                                                                              style={{
+                                                                                    width: '100%'
+                                                                              }}
+                                                                              options={indicator.selectedSourceProgramArea?.children?.map(
+                                                                                    ind => ({
+                                                                                          label: ind.name,
+                                                                                          value: ind.name
+                                                                                    })
+                                                                              )}
+                                                                              disabled={
+                                                                                    !indicator.selectedSourceProgramArea
+                                                                              }
+                                                                              showSearch
+                                                                              allowClear
+                                                                              optionFilterProp="label"
+                                                                              value={
+                                                                                    indicator?.selectedSourceIndicator
+                                                                                          ?.name
+                                                                              }
+                                                                              onChange={value => {
+                                                                                    setFormState({
+                                                                                          ...formState,
+                                                                                          indicators:
+                                                                                                formState?.indicators?.map(
+                                                                                                      (i, iIndex) => {
+                                                                                                            if (
+                                                                                                                  iIndex ===
+                                                                                                                  indIndex
+                                                                                                            ) {
+                                                                                                                  return {
+                                                                                                                        ...i,
+                                                                                                                        selectedSourceIndicator:
+                                                                                                                              indicator.selectedSourceProgramArea?.children?.find(
+                                                                                                                                    d =>
+                                                                                                                                          d.name ===
+                                                                                                                                          value
+                                                                                                                              )
+                                                                                                                  };
+                                                                                                            }
+                                                                                                            return i;
                                                                                                       }
-                                                                                                      return i;
-                                                                                                }
-                                                                                          )
-                                                                              });
-                                                                        }}
-                                                                  />
-                                                            </div>
-                                                      </td>
-                                                      <td
-                                                            style={{
-                                                                  padding: '2px 5px',
-                                                                  verticalAlign: 'top',
-                                                                  textAlign: 'center',
-                                                                  border: '1px solid #00000070'
-                                                            }}
-                                                      >
-                                                            <div>
-                                                                  <Input
-                                                                        placeholder={`${translate('Marge')} `}
-                                                                        style={{ width: '100%' }}
-                                                                        min={0}
-                                                                        type="number"
-                                                                        onChange={event => console.log(event)}
-                                                                  />
-                                                            </div>
-                                                      </td>
-                                                </tr>
-                                          ))}
+                                                                                                )
+                                                                                    });
+                                                                              }}
+                                                                        />
+                                                                  </div>
+                                                            </td>
+                                                            <td
+                                                                  style={{
+                                                                        padding: '2px 5px',
+                                                                        verticalAlign: 'top',
+                                                                        textAlign: 'center',
+                                                                        border: '1px solid #00000070'
+                                                                  }}
+                                                            >
+                                                                  <div>
+                                                                        <Input
+                                                                              placeholder={`${translate('Marge')} `}
+                                                                              style={{ width: '100%' }}
+                                                                              min={0}
+                                                                              type="number"
+                                                                              value={indicator?.selectedSourceMargin}
+                                                                              onChange={event => {
+                                                                                    setFormState({
+                                                                                          ...formState,
+                                                                                          indicators:
+                                                                                                formState?.indicators?.map(
+                                                                                                      (i, iIndex) => {
+                                                                                                            if (
+                                                                                                                  iIndex ===
+                                                                                                                  indIndex
+                                                                                                            ) {
+                                                                                                                  return {
+                                                                                                                        ...i,
+                                                                                                                        selectedSourceMargin:
+                                                                                                                              event
+                                                                                                                                    .target
+                                                                                                                                    .value
+                                                                                                                  };
+                                                                                                            }
+                                                                                                            return i;
+                                                                                                      }
+                                                                                                )
+                                                                                    });
+                                                                              }}
+                                                                        />
+                                                                  </div>
+                                                            </td>
+                                                      </tr>
+                                                ))}
                                     </tbody>
                               </table>
                         </div>
@@ -475,7 +521,30 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                         style={{ width: '100%' }}
                                                                         min={0}
                                                                         type="number"
-                                                                        onChange={event => console.log(event)}
+                                                                        value={rec?.selectedSourceMargin}
+                                                                        onChange={event => {
+                                                                              setFormState({
+                                                                                    ...formState,
+                                                                                    recoupements:
+                                                                                          formState?.recoupements?.map(
+                                                                                                (i, iIndex) => {
+                                                                                                      if (
+                                                                                                            iIndex ===
+                                                                                                            recIndex
+                                                                                                      ) {
+                                                                                                            return {
+                                                                                                                  ...i,
+                                                                                                                  selectedSourceMargin:
+                                                                                                                        event
+                                                                                                                              .target
+                                                                                                                              .value
+                                                                                                            };
+                                                                                                      }
+                                                                                                      return i;
+                                                                                                }
+                                                                                          )
+                                                                              });
+                                                                        }}
                                                                   />
                                                             </div>
                                                       </td>
@@ -520,7 +589,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                             border: '1px solid #00000070'
                                                       }}
                                                 >
-                                                      {translate('Source_De_Donnée')}
+                                                      {translate('Indicator_Name')}
                                                 </th>
                                                 <th
                                                       style={{
@@ -607,7 +676,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                       >
                                                             <div>
                                                                   <Select
-                                                                        placeholder={`${translate('Program_Area')} `}
+                                                                        placeholder={`${translate('Indicator_Name')} `}
                                                                         style={{
                                                                               width: '100%'
                                                                         }}
@@ -664,7 +733,30 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                         style={{ width: '100%' }}
                                                                         min={0}
                                                                         type="number"
-                                                                        onChange={event => console.log(event)}
+                                                                        value={cons?.selectedSourceMargin}
+                                                                        onChange={event => {
+                                                                              setFormState({
+                                                                                    ...formState,
+                                                                                    consistencyOvertimes:
+                                                                                          formState?.consistencyOvertimes?.map(
+                                                                                                (i, iIndex) => {
+                                                                                                      if (
+                                                                                                            iIndex ===
+                                                                                                            consIndex
+                                                                                                      ) {
+                                                                                                            return {
+                                                                                                                  ...i,
+                                                                                                                  selectedSourceMargin:
+                                                                                                                        event
+                                                                                                                              .target
+                                                                                                                              .value
+                                                                                                            };
+                                                                                                      }
+                                                                                                      return i;
+                                                                                                }
+                                                                                          )
+                                                                              });
+                                                                        }}
                                                                   />
                                                             </div>
                                                       </td>
@@ -929,20 +1021,37 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                       }}
                                                 >
                                                       <div>
-                                                            <MyInput
-                                                                  onChange={value => {
+                                                            <Input
+                                                                  placeholder={`${translate('Marge')} `}
+                                                                  style={{ width: '100%' }}
+                                                                  min={0}
+                                                                  type="number"
+                                                                  value={formState?.completeness?.selectedSourceMargin}
+                                                                  onChange={event => {
                                                                         setFormState({
                                                                               ...formState,
                                                                               completeness: {
                                                                                     ...formState?.completeness,
-                                                                                    selectedSourceMargin: value
+                                                                                    selectedSourceMargin:
+                                                                                          event.target.value
                                                                               }
                                                                         });
                                                                   }}
-                                                                  initValue={
-                                                                        formState?.completeness?.selectedSourceMargin
-                                                                  }
                                                             />
+
+                                                            {/* <MyInput
+                                                                  value={formState?.completeness?.selectedSourceMargin}
+                                                                  onChange={event => {
+                                                                        setFormState({
+                                                                              ...formState,
+                                                                              completeness: {
+                                                                                    ...formState?.completeness,
+                                                                                    selectedSourceMargin:
+                                                                                          event
+                                                                              }
+                                                                        });
+                                                                  }}
+                                                            /> */}
                                                       </div>
                                                 </td>
                                           </tr>

@@ -278,19 +278,17 @@
     "Indicator_MOE": "Indicateur Marge d'erreur ",
     "Recoupement_MOE": "Recoupement Marge d'erreur ",
     "Please_Configure_At_least_One_Indicator": "Veuillez configurer au moins un indicateur s'il vous plait !",
-
-    
     "Cross_check_Configuration": "Configuration des recoupements",
     "ConsistencyOverTime_Configuration": "Cohérence dans le temps",
     "Data_Element_&_Source_Documentation_Configurations": "Element de données et document sources ",
     "Recoupement_Primary": "Recoupement primaire",
     "Recoupement_Secondary": "Recoupement secondaire",
-
     "ConsistencyOverTime": "Cohérence dans le temps",
     "Data_Element": "Element de donnée",
     "Source_Document": "Document Source",
     "Program_Area": "Domaine de programme",
-
     "Primary_Source": "Source Primaire",
-    "Secondary_Source": "Source Secondaire"
+    "Secondary_Source": "Source Secondaire",
+    "Indicator_Name": "Nom de l'indicateur ",
+    "How_Many_Indicators": "Combient d'indicateurs ? "
 }

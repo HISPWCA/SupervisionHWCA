@@ -288,5 +288,7 @@
     "Source_Document": "Source Document Completeness",
     "Program_Area": "Program Area",
     "Primary_Source": "Primary Source",
-    "Secondary_Source": "Secondary Source"
+    "Secondary_Source": "Secondary Source",
+    "Indicator_Name":"Indicator name",
+    "How_Many_Indicators":"How many indicators ? "
 }

@@ -82,6 +82,7 @@ const Favorites = ({ me }) => {
             selectedBackgroundInformationTypeConfiguration: DIRECTE,
             selectedBackgroundInformationFavorit: null,
             inputFavorisNameForBackgroundInforation: '',
+            nbrIndicatorsToShow: 0,
             indicators: [],
             recoupements: [],
             consistencyOvertimes: [],
@@ -104,10 +105,11 @@ const Favorites = ({ me }) => {
             );
             const existingFormState = formState?.selectedBackgroundInformationFavorit?.formState;
 
-            console.log('existingFormState : ', existingFormState);
             if (currStage) {
                   setFormState({
                         ...formState,
+                        nbrIndicatorsToShow:
+                              currStage.indicators?.filter(ind => ind.value && ind.programArea)?.length || 0,
                         indicators:
                               currStage.indicators
                                     ?.filter(ind => ind.value && ind.programArea)
@@ -355,7 +357,7 @@ const Favorites = ({ me }) => {
             };
 
             // Indicator
-            for (let indicator of formState?.indicators) {
+            for (let indicator of formState?.indicators.slice(0, formState?.nbrIndicatorsToShow)) {
                   let payloadIndicator = {
                         dataElement: indicator?.value,
                         indicator: indicator?.selectedSourceIndicator && {
@@ -613,7 +615,7 @@ const Favorites = ({ me }) => {
                         selectedBackgroundInformationFavorit: null,
                         selectedProgramStage: null
                   });
-                  loadDataStoreBackgroundInformationFavoritsConfigs()
+                  loadDataStoreBackgroundInformationFavoritsConfigs();
             } catch (err) {
                   setNotification({
                         show: true,
@@ -707,7 +709,7 @@ const Favorites = ({ me }) => {
       const handleDeleteFavoritesForBackgroundInformations = async () => {
             try {
                   setLoadingDeleteFavoritBackgroundInformations(true);
-                  if (selectedBackgroundInformationFavorit) {
+                  if (formState?.selectedBackgroundInformationFavorit) {
                         let newFavoritList = [];
                         const backgroundInfoList = await loadDataStore(
                               process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY,
@@ -717,7 +719,7 @@ const Favorites = ({ me }) => {
                         );
 
                         newFavoritList = backgroundInfoList.filter(
-                              fav => fav.id !== selectedBackgroundInformationFavorit.id
+                              fav => fav.id !== formState?.selectedBackgroundInformationFavorit.id
                         );
 
                         await saveDataToDataStore(
@@ -726,9 +728,15 @@ const Favorites = ({ me }) => {
                         );
 
                         setFavoritBackgroundInformationList(newFavoritList);
+                        setFormState({
+                              ...formState,
+                              selectedBackgroundInformationFavorit: null,
+                              inputFavorisNameForBackgroundInforation: '',
+                              selectedProgramStage: null,
+                              selectedBackgroundInformationTypeConfiguration: DIRECTE
+                        });
+                        // setMappingConfigs([]);
                         setSelectedBackgroundInformationFavorit(null);
-                        setMappingConfigs([]);
-                        setInputFavoritNameForBackgroundInforation('');
 
                         setNotification({
                               show: true,
@@ -767,16 +775,18 @@ const Favorites = ({ me }) => {
       };
       const loadDataStoreIndicators = async () => {
             try {
-                  const response = await loadDataStore(process.env.REACT_APP_CROSS_CUT_KEY, null, null, []);
+                  const response = await loadDataStore(process.env.REACT_APP_INDICATORS_KEY, null, null, []);
                   setDataStoreIndicators(response);
             } catch (err) {}
       };
+
       const loadDataStoreDECompletness = async () => {
             try {
                   const response = await loadDataStore(process.env.REACT_APP_DE_COMPLETNESS_KEY, null, null, []);
                   setDataStoreDECompletness(response);
             } catch (err) {}
       };
+
       const loadDataStoreDSCompletness = async () => {
             try {
                   const response = await loadDataStore(process.env.REACT_APP_DS_COMPLETNESS_KEY, null, null, []);
@@ -918,27 +928,76 @@ const Favorites = ({ me }) => {
                                     </Col>
 
                                     <Col md={24} xs={24}>
-                                          <div style={{ marginTop: '18px' }}>
-                                                <Button
-                                                      small
-                                                      primary
-                                                      loading={loadingSaveFavoritBackgroundInformations}
-                                                      onClick={handleSaveAsFavoritesForBackgroundInformations}
-                                                      icon={
-                                                            <MdStars
-                                                                  style={{
-                                                                        color: 'white',
-                                                                        fontSize: '20px',
-                                                                        cursor: 'pointer'
-                                                                  }}
-                                                            />
-                                                      }
-                                                >
-                                                      {formState?.selectedBackgroundInformationTypeConfiguration ===
-                                                      DIRECTE
-                                                            ? translate('Enregistrer_Comme_Favorites')
-                                                            : translate('Mise_A_Jour')}
-                                                </Button>
+                                          <div style={{ marginTop: '18px', display: 'flex' }}>
+                                                {formState?.selectedBackgroundInformationTypeConfiguration ===
+                                                      FAVORIS && (
+                                                      <div style={{ marginRight: '10px' }}>
+                                                            <Popconfirm
+                                                                  title={translate(
+                                                                        'Confirmation_Suppression_Configuration'
+                                                                  )}
+                                                                  onConfirm={
+                                                                        handleDeleteFavoritesForBackgroundInformations
+                                                                  }
+                                                            >
+                                                                  <Button
+                                                                        destructive
+                                                                        loading={
+                                                                              loadingDeleteFavoritBackgroundInformations
+                                                                        }
+                                                                        icon={
+                                                                              <RiDeleteBinLine
+                                                                                    style={{
+                                                                                          color: 'white',
+                                                                                          fontSize: '20px',
+                                                                                          cursor: 'pointer'
+                                                                                    }}
+                                                                              />
+                                                                        }
+                                                                        disabled={
+                                                                              formState?.selectedBackgroundInformationTypeConfiguration ===
+                                                                              FAVORIS
+                                                                                    ? formState?.selectedBackgroundInformationFavorit
+                                                                                          ? false
+                                                                                          : true
+                                                                                    : false
+                                                                        }
+                                                                  >
+                                                                        {translate('Suppression')}
+                                                                  </Button>
+                                                            </Popconfirm>
+                                                      </div>
+                                                )}
+
+                                                <div>
+                                                      <Button
+                                                            primary
+                                                            loading={loadingSaveFavoritBackgroundInformations}
+                                                            onClick={handleSaveAsFavoritesForBackgroundInformations}
+                                                            icon={
+                                                                  <MdStars
+                                                                        style={{
+                                                                              color: 'white',
+                                                                              fontSize: '20px',
+                                                                              cursor: 'pointer'
+                                                                        }}
+                                                                  />
+                                                            }
+                                                            disabled={
+                                                                  formState?.selectedBackgroundInformationTypeConfiguration ===
+                                                                  FAVORIS
+                                                                        ? formState?.selectedBackgroundInformationFavorit
+                                                                              ? false
+                                                                              : true
+                                                                        : false
+                                                            }
+                                                      >
+                                                            {formState?.selectedBackgroundInformationTypeConfiguration ===
+                                                            DIRECTE
+                                                                  ? translate('Enregistrer_Comme_Favorites')
+                                                                  : translate('Mise_A_Jour')}
+                                                      </Button>
+                                                </div>
                                           </div>
                                     </Col>
                               </Row>
@@ -1152,7 +1211,6 @@ const Favorites = ({ me }) => {
 
       return (
             <>
-                  {console.log('formState:', formState)}
                   {RenderContent()}
                   {RenderAddFavoritBackgroundInformationModal()}
                   {RenderAnalyticComponentModal()}
