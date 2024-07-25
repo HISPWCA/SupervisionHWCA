@@ -290,5 +290,9 @@
     "Primary_Source": "Source Primaire",
     "Secondary_Source": "Source Secondaire",
     "Indicator_Name": "Nom de l'indicateur ",
-    "How_Many_Indicators": "Combient d'indicateurs ? "
+    "How_Many_Indicators": "Combient d'indicateurs ? ",
+
+    "Other_Fields": "Autre champs",
+    "System_Auto_Generate_Attribute_ID": "Attribut Supervision autogénérer ID",
+    "NbrIndicatorsToShow": "Nombre d'indicateur a afficher"
 }

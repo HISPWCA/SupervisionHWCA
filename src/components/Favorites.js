@@ -108,8 +108,11 @@ const Favorites = ({ me }) => {
             if (currStage) {
                   setFormState({
                         ...formState,
-                        nbrIndicatorsToShow:
-                              currStage.indicators?.filter(ind => ind.value && ind.programArea)?.length || 0,
+                        selectedNbrIndicatorsToShow: currStage.selectedNbrIndicatorsToShow,
+                        nbrIndicatorsToShow: existingFormState?.nbrIndicatorsToShow
+                              ? existingFormState?.nbrIndicatorsToShow
+                              : currStage.indicators?.filter(ind => ind.value && ind.programArea)?.length || 0,
+
                         indicators:
                               currStage.indicators
                                     ?.filter(ind => ind.value && ind.programArea)
@@ -550,6 +553,21 @@ const Favorites = ({ me }) => {
 
                         if (payloadDOC.dataElement && payloadDOC.indicator) newList.push(payloadDOC);
                   }
+            }
+
+            if (formState?.nbrIndicatorsToShow && formState?.selectedNbrIndicatorsToShow) {
+                  let payloadIndicatorToShow = {
+                        dataElement: formState?.selectedNbrIndicatorsToShow,
+                        indicator: formState?.nbrIndicatorsToShow && {
+                              id: formState?.nbrIndicatorsToShow,
+                              displayName: formState?.nbrIndicatorsToShow
+                        },
+                        programStage,
+                        program
+                  };
+
+                  if (payloadIndicatorToShow.dataElement && payloadIndicatorToShow.indicator)
+                        newList.push(payloadIndicatorToShow);
             }
 
             return newList;
@@ -1211,6 +1229,7 @@ const Favorites = ({ me }) => {
 
       return (
             <>
+                  {console.log('formState', formState)}
                   {RenderContent()}
                   {RenderAddFavoritBackgroundInformationModal()}
                   {RenderAnalyticComponentModal()}

@@ -158,6 +158,8 @@ const Setting = () => {
             selectedTEIProgram: null,
             selectedSupervisorDataElements: [],
             selectedStatusSupervisionDataElement: null,
+            selectedSupervisionAutoGenerateID: null,
+            selectedNbrIndicatorsToShow: null,
             indicators: [],
             recoupements: [],
             completeness: {
@@ -343,12 +345,6 @@ const Setting = () => {
                   const response = await axios.get(route);
 
                   setProgramStages(response.data?.programStages);
-                  // if (response.data?.programStages.length === 1) {
-                  //       setFormState({
-                  //             ...formState,
-                  //             selectedProgramStageForConfiguration: response.data?.programStages[0]
-                  //       });
-                  // }
                   setLoadingProgramStages(false);
                   return response.data.programStages;
             } catch (err) {
@@ -748,6 +744,7 @@ const Setting = () => {
                                                   supervisorField: formState?.selectedSupervisorDataElements,
                                                   statusSupervisionField:
                                                         formState?.selectedStatusSupervisionDataElement,
+                                                  selectedNbrIndicatorsToShow: formState.selectedNbrIndicatorsToShow,
                                                   indicators: formState.indicators,
                                                   recoupements: formState.recoupements,
                                                   completeness: formState.completeness,
@@ -764,6 +761,7 @@ const Setting = () => {
                                             organisationUnitGroup: formState?.selectedOrganisationUnitGroup,
                                             supervisorField: formState?.selectedSupervisorDataElements,
                                             statusSupervisionField: formState?.selectedStatusSupervisionDataElement,
+                                            selectedNbrIndicatorsToShow: formState.selectedNbrIndicatorsToShow,
                                             indicators: formState.indicators,
                                             recoupements: formState.recoupements,
                                             completeness: formState.completeness,
@@ -776,6 +774,7 @@ const Setting = () => {
                                       programStage: formState?.selectedProgramStageForConfiguration,
                                       organisationUnitGroup: formState?.selectedOrganisationUnitGroup,
                                       supervisorField: formState?.selectedSupervisorDataElements,
+                                      selectedNbrIndicatorsToShow: formState.selectedNbrIndicatorsToShow,
                                       statusSupervisionField: formState?.selectedStatusSupervisionDataElement,
                                       indicators: formState.indicators,
                                       recoupements: formState.recoupements,
@@ -788,6 +787,7 @@ const Setting = () => {
                         generationType: formState.selectedSupervisionGenerationType,
                         planificationType: formState.selectedPlanificationType,
                         configurationType: formState.selectedConfigurationType,
+                        selectedSupervisionAutoGenerateID: formState.selectedSupervisionAutoGenerateID,
                         program: {
                               id: formState.selectedTEIProgram.id,
                               displayName: formState.selectedTEIProgram.displayName
@@ -1102,15 +1102,10 @@ const Setting = () => {
       };
 
       const handleSelectProgramStageForConfiguration = value => {
-            console.log(
-                  'value pg : ',
-                  programStages.find(pstage => pstage.id === value)
-            );
-            console.log(value);
-            console.log(programStages);
             setFormState({
                   ...formState,
                   selectedStatusSupervisionDataElement: null,
+                  selectedNbrIndicatorsToShow: null,
                   selectedSupervisorDataElements: [],
                   selectedProgramStageForConfiguration: programStages.find(pstage => pstage.id === value)
             });
@@ -1263,6 +1258,7 @@ const Setting = () => {
                         selectedSupervisionGenerationType: prog?.generationType,
                         selectedPlanificationType: prog.planificationType,
                         selectedConfigurationType: prog.configurationType,
+                        selectedSupervisionAutoGenerateID: prog.selectedSupervisionAutoGenerateID,
                         isFieldEditingMode: true
                   });
                   await loadProgramStages(prog?.program?.id);
@@ -1408,6 +1404,7 @@ const Setting = () => {
                         ),
                         selectedSupervisorDataElements: value.supervisorField || [],
                         selectedStatusSupervisionDataElement: value.statusSupervisionField,
+                        selectedNbrIndicatorsToShow: value.selectedNbrIndicatorsToShow,
                         isFieldEditingMode: true,
                         indicators: value.indicators,
                         recoupements: value.recoupements,
@@ -1543,6 +1540,151 @@ const Setting = () => {
                                                       </div>
                                                 </Col>
                                           )}
+
+                                          <Col md={24}>
+                                                <div style={{ marginTop: '20px' }}>
+                                                      <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+                                                            <thead>
+                                                                  <tr style={{ background: '#ccc' }}>
+                                                                        <th
+                                                                              style={{
+                                                                                    padding: '2px 5px',
+                                                                                    textAlign: 'center',
+                                                                                    border: '1px solid #00000070'
+                                                                              }}
+                                                                              colSpan={2}
+                                                                        >
+                                                                              {translate('Other_Fields')}
+                                                                        </th>
+                                                                  </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                  <tr>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top',
+                                                                                    width: '50%'
+                                                                              }}
+                                                                        >
+                                                                              {translate(
+                                                                                    'System_Auto_Generate_Attribute_ID'
+                                                                              )}
+                                                                        </td>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top'
+                                                                              }}
+                                                                        >
+                                                                              <Select
+                                                                                    options={formState?.selectedTEIProgram?.programTrackedEntityAttributes?.map(
+                                                                                          program => ({
+                                                                                                label: program
+                                                                                                      .trackedEntityAttribute
+                                                                                                      ?.displayName,
+                                                                                                value: program
+                                                                                                      .trackedEntityAttribute
+                                                                                                      ?.id
+                                                                                          })
+                                                                                    )}
+                                                                                    placeholder={translate(
+                                                                                          'System_Auto_Generate_Attribute_ID'
+                                                                                    )}
+                                                                                    style={{ width: '100%' }}
+                                                                                    onChange={value => {
+                                                                                          setFormState({
+                                                                                                ...formState,
+                                                                                                selectedSupervisionAutoGenerateID:
+                                                                                                      formState?.selectedTEIProgram?.programTrackedEntityAttributes
+                                                                                                            ?.map(
+                                                                                                                  p =>
+                                                                                                                        p.trackedEntityAttribute
+                                                                                                            )
+                                                                                                            .find(
+                                                                                                                  attribute =>
+                                                                                                                        attribute.id ===
+                                                                                                                        value
+                                                                                                            )
+                                                                                          });
+                                                                                    }}
+                                                                                    value={
+                                                                                          formState
+                                                                                                ?.selectedSupervisionAutoGenerateID
+                                                                                                ?.id
+                                                                                    }
+                                                                                    optionFilterProp="label"
+                                                                                    showSearch
+                                                                                    allowClear
+                                                                              />
+                                                                        </td>
+                                                                  </tr>
+
+                                                                  <tr>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top',
+                                                                                    width: '50%'
+                                                                              }}
+                                                                        >
+                                                                              {translate('How_Many_Indicators')}
+                                                                        </td>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top'
+                                                                              }}
+                                                                        >
+                                                                              <Select
+                                                                                    options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                                          progStageDE => ({
+                                                                                                label: progStageDE
+                                                                                                      .dataElement
+                                                                                                      ?.displayName,
+                                                                                                value: progStageDE
+                                                                                                      .dataElement?.id
+                                                                                          })
+                                                                                    )}
+                                                                                    placeholder={translate(
+                                                                                          'How_Many_Indicators'
+                                                                                    )}
+                                                                                    style={{ width: '100%' }}
+                                                                                    onChange={value => {
+                                                                                          setFormState({
+                                                                                                ...formState,
+                                                                                                selectedNbrIndicatorsToShow:
+                                                                                                      formState?.selectedProgramStageForConfiguration?.programStageDataElements
+                                                                                                            ?.map(
+                                                                                                                  p =>
+                                                                                                                        p.dataElement
+                                                                                                            )
+                                                                                                            .find(
+                                                                                                                  dataElement =>
+                                                                                                                        dataElement.id ===
+                                                                                                                        value
+                                                                                                            )
+                                                                                          });
+                                                                                    }}
+                                                                                    value={
+                                                                                          formState
+                                                                                                ?.selectedNbrIndicatorsToShow
+                                                                                                ?.id
+                                                                                    }
+                                                                                    optionFilterProp="label"
+                                                                                    showSearch
+                                                                                    allowClear
+                                                                              />
+                                                                        </td>
+                                                                  </tr>
+                                                            </tbody>
+                                                      </table>
+                                                </div>
+                                          </Col>
                                     </Row>
                               </div>
                         </div>
