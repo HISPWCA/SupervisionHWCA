@@ -284,11 +284,9 @@
     "Recoupement_Primary": "Cross Check Primary",
     "Recoupement_Secondary": "Cross Check Secondary",
     "ConsistencyOverTime": "Consistency Over Time",
-    "Data_Element": "Data Element",
+    "Data_Element": "Data Element Completeness",
     "Source_Document": "Source Document",
     "Program_Area": "Program Area",
-
-    "Primary_Source":"Primary Source",
-    "Secondary_Source":"Secondary Source"
-
+    "Primary_Source": "Primary Source",
+    "Secondary_Source": "Secondary Source"
 }
