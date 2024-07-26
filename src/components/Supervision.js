@@ -116,6 +116,7 @@ const Supervision = ({ me }) => {
       const [dataStoreSupervisionConfigs, setDataStoreSupervisionConfigs] = useState([]);
       const [dataStoreSupervisions, setDataStoreSupervisions] = useState([]);
       const [dataStoreIndicatorConfigs, setDataStoreIndicatorConfigs] = useState([]);
+      const [dataStoreIndicatorsMapping, setDataStoreIndicatorsMapping] = useState([]);
 
       const [isEditionMode, setEditionMode] = useState(false);
       const [noticeBox, setNoticeBox] = useState({
@@ -929,6 +930,13 @@ const Supervision = ({ me }) => {
             } catch (err) {}
       };
 
+      const loadDataStoreIndicatorsMapping = async () => {
+            try {
+                  const response = await loadDataStore(process.env.REACT_APP_INDICATORS_MAPPING_KEY, null, null, null);
+                  setDataStoreIndicatorsMapping(response);
+            } catch (err) {}
+      };
+
       const loadDataStoreIndicators = async () => {
             try {
                   setLoadingDataStoreIndicatorConfigs(true);
@@ -939,7 +947,6 @@ const Supervision = ({ me }) => {
                   setLoadingDataStoreIndicatorConfigs(false);
             }
       };
-
       const handleSelectDataElement = value => {
             setSelectedDataElement(
                   selectedProgramStage.programStageDataElements
@@ -1538,8 +1545,8 @@ const Supervision = ({ me }) => {
 
                   // const generatedCode = await generatedAutoCode(
                   //       currentProgram.data.programTrackedEntityAttributes[0]?.trackedEntityAttribute?.id
-                  // ); 
-                  
+                  // );
+
                   const generatedCode = await generatedAutoCode('WzghGqeASL5');
 
                   const tei = {
@@ -1810,10 +1817,6 @@ const Supervision = ({ me }) => {
                                     : dayjs().format('YYYY-MM-DD');
                         }
 
-                        console.log('---------------------------------------------------');
-                        console.log('program Stage  ', payload.programStage);
-                        console.log('event :', eventPayload);
-
                         // Ajoute des dataValues superviseurs
                         if (payload.programStageConfig?.supervisorField?.length > 0) {
                               const newDataValues = [];
@@ -1923,10 +1926,76 @@ const Supervision = ({ me }) => {
                                     }
                               }
 
+                              // insertAnalyticValues
+
                               if (newDataValues.length > 0) {
                                     eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValues];
                               }
                         }
+
+                        let newDataValueList = [];
+                        if (payload.programStageConfig?.indicators?.length > 0) {
+                              const indicatorsList = payload.programStageConfig?.indicators;
+                              for (let dv of eventPayload.dataValues) {
+                                    const foundInd = indicatorsList.find(ind => ind.value?.id === dv.dataElement);
+                                    if (foundInd) {
+                                          const foundAggrageMappingElement = dataStoreIndicatorsMapping?.find(
+                                                d => d.indicator === dv.value
+                                          ).dhis2;
+                                          if (foundAggrageMappingElement) {
+                                                const elementMONTH_1 = foundInd.DHIS2MonthlyValue1;
+                                                const elementMONTH_2 = foundInd.DHIS2MonthlyValue2;
+                                                const elementMONTH_3 = foundInd.DHIS2MonthlyValue3;
+
+                                                if (elementMONTH_1) {
+                                                      const period = dayjs(eventPayload.eventDate)
+                                                            .subtract(1, 'month')
+                                                            .format('YYYYMM');
+                                                      const orgUnitId = eventPayload.orgUnit;
+                                                      const dx = foundAggrageMappingElement.id;
+                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                      if (value) {
+                                                            newDataValueList.push({
+                                                                  dataElement: elementMONTH_1.id,
+                                                                  value: value
+                                                            });
+                                                      }
+                                                }
+                                                if (elementMONTH_2) {
+                                                      const period = dayjs(eventPayload.eventDate)
+                                                            .subtract(2, 'month')
+                                                            .format('YYYYMM');
+                                                      const orgUnitId = eventPayload.orgUnit;
+                                                      const dx = foundAggrageMappingElement.id;
+                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                      if (value) {
+                                                            newDataValueList.push({
+                                                                  dataElement: elementMONTH_2.id,
+                                                                  value: value
+                                                            });
+                                                      }
+                                                }
+                                                if (elementMONTH_3) {
+                                                      const period = dayjs(eventPayload.eventDate)
+                                                            .subtract(3, 'month')
+                                                            .format('YYYYMM');
+                                                      const orgUnitId = eventPayload.orgUnit;
+                                                      const dx = foundAggrageMappingElement.id;
+                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                      if (value) {
+                                                            newDataValueList.push({
+                                                                  dataElement: elementMONTH_3.id,
+                                                                  value: value
+                                                            });
+                                                      }
+                                                }
+                                          }
+                                    }
+                              }
+                        }
+                        eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValueList];
+
+                        console.log('eventPayload : ', eventPayload);
 
                         if (!newEventsList.map(ev => ev.programStage).includes(payload.programStage?.id)) {
                               newEventsList.push(eventPayload);
@@ -2351,7 +2420,6 @@ const Supervision = ({ me }) => {
                                           let createdTEIObject = null;
 
                                           if (selectedSupervisionType === TYPE_SUPERVISION_AGENT) {
-                                                // createdTEIObject = await generateEventsForAgent(payload);
                                           } else {
                                                 createdTEIObject = await generateEventsAsNewSupervision(payload);
                                           }
@@ -2682,6 +2750,18 @@ const Supervision = ({ me }) => {
                               throw new Error(translate('Veuillez_Remplire_Champ_Obligatoire'));
                   }
             });
+      };
+
+      const getAnalyticValue = async (period, orgUnit, dx) => {
+            try {
+                  const response = await axios.get(
+                        `${ANALYTICS_ROUTE}/dataValueSet.json?dimension=ou:${orgUnit}&dimension=dx:${dx}&dimension=pe:${period}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=true&includeNumDen=true&skipRounding=false&completedOnly=false`
+                  );
+                  console.log('analytic value:', response.data);
+                  return response.data?.dataValues[0]?.value || 100;
+            } catch (error) {
+                  console.log('Error getting analytic value : ', error);
+            }
       };
 
       const handleSupervisionPlanificationSaveBtn = async () => {
@@ -7068,6 +7148,7 @@ const Supervision = ({ me }) => {
                   loadDataStorePerformanceFavoritsConfigs();
                   loadDataStoreBackgroundInformationFavoritsConfigs();
                   loadDataStoreIndicators();
+                  loadDataStoreIndicatorsMapping();
                   loadDataElementGroups();
                   loadUsers(me?.organisationUnits?.[0]?.id);
             }
