@@ -15,7 +15,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                           <th
                                                 style={{
                                                       padding: '2px 5px',
-                                                      verticalAlign: 'top',
+                                                      verticalAlign: 'center',
                                                       textAlign: 'center',
                                                       border: '1px solid #00000070',
                                                       width: '50%'
@@ -26,7 +26,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                           <th
                                                 style={{
                                                       padding: '2px 5px',
-                                                      verticalAlign: 'top',
+                                                      verticalAlign: 'center',
                                                       textAlign: 'center',
                                                       border: '1px solid #00000070',
                                                       width: '50%'
@@ -105,6 +105,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                                   />
                                                             </div>
                                                       </div>
+
                                                       <div style={{ marginTop: '5px' }}>
                                                             <div
                                                                   style={{
@@ -145,6 +146,181 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                                                                             return {
                                                                                                                   ...i,
                                                                                                                   value: formState?.selectedProgramStageForConfiguration?.programStageDataElements?.find(
+                                                                                                                        p =>
+                                                                                                                              p
+                                                                                                                                    .dataElement
+                                                                                                                                    .id ===
+                                                                                                                              value
+                                                                                                                  )
+                                                                                                                        ?.dataElement
+                                                                                                            };
+                                                                                                      }
+                                                                                                      return i;
+                                                                                                }
+                                                                                          ) || []
+                                                                              });
+                                                                        }}
+                                                                  />
+                                                            </div>
+                                                      </div>
+
+                                                      <div style={{ marginTop: '5px' }}>
+                                                            <div
+                                                                  style={{
+                                                                        marginBottom: '5px'
+                                                                  }}
+                                                            >
+                                                                  {`${translate('DHIS2_monthly_value')} 1`}
+                                                            </div>
+                                                            <div>
+                                                                  <Select
+                                                                        placeholder={`${translate(
+                                                                              'DHIS2_monthly_value'
+                                                                        )} 1`}
+                                                                        style={{
+                                                                              width: '307px'
+                                                                        }}
+                                                                        options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                              progStageDE => ({
+                                                                                    label: progStageDE.dataElement
+                                                                                          ?.displayName,
+                                                                                    value: progStageDE.dataElement?.id
+                                                                              })
+                                                                        )}
+                                                                        showSearch
+                                                                        allowClear
+                                                                        optionFilterProp="label"
+                                                                        value={ind?.DHIS2MonthlyValue1?.id}
+                                                                        onChange={value => {
+                                                                              setFormState({
+                                                                                    ...formState,
+                                                                                    indicators:
+                                                                                          formState?.indicators?.map(
+                                                                                                i => {
+                                                                                                      if (
+                                                                                                            i.id ===
+                                                                                                            ind.id
+                                                                                                      ) {
+                                                                                                            return {
+                                                                                                                  ...i,
+                                                                                                                  DHIS2MonthlyValue1:
+                                                                                                                        formState?.selectedProgramStageForConfiguration?.programStageDataElements?.find(
+                                                                                                                              p =>
+                                                                                                                                    p
+                                                                                                                                          .dataElement
+                                                                                                                                          .id ===
+                                                                                                                                    value
+                                                                                                                        )
+                                                                                                                              ?.dataElement
+                                                                                                            };
+                                                                                                      }
+                                                                                                      return i;
+                                                                                                }
+                                                                                          ) || []
+                                                                              });
+                                                                        }}
+                                                                  />
+                                                            </div>
+                                                      </div>
+
+                                                      <div style={{ marginTop: '5px' }}>
+                                                            <div
+                                                                  style={{
+                                                                        marginBottom: '5px'
+                                                                  }}
+                                                            >
+                                                                  {`${translate('DHIS2_monthly_value')} 2`}
+                                                            </div>
+                                                            <div>
+                                                                  <Select
+                                                                        placeholder={`${translate(
+                                                                              'DHIS2_monthly_value'
+                                                                        )} 2`}
+                                                                        style={{
+                                                                              width: '307px'
+                                                                        }}
+                                                                        options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                              progStageDE => ({
+                                                                                    label: progStageDE.dataElement
+                                                                                          ?.displayName,
+                                                                                    value: progStageDE.dataElement?.id
+                                                                              })
+                                                                        )}
+                                                                        showSearch
+                                                                        allowClear
+                                                                        optionFilterProp="label"
+                                                                        value={ind?.DHIS2MonthlyValue2?.id}
+                                                                        onChange={value => {
+                                                                              setFormState({
+                                                                                    ...formState,
+                                                                                    indicators:
+                                                                                          formState?.indicators?.map(
+                                                                                                i => {
+                                                                                                      if (
+                                                                                                            i.id ===
+                                                                                                            ind.id
+                                                                                                      ) {
+                                                                                                            return {
+                                                                                                                  ...i,
+                                                                                                                  DHIS2MonthlyValue2: formState?.selectedProgramStageForConfiguration?.programStageDataElements?.find(
+                                                                                                                        p =>
+                                                                                                                              p
+                                                                                                                                    .dataElement
+                                                                                                                                    .id ===
+                                                                                                                              value
+                                                                                                                  )
+                                                                                                                        ?.dataElement
+                                                                                                            };
+                                                                                                      }
+                                                                                                      return i;
+                                                                                                }
+                                                                                          ) || []
+                                                                              });
+                                                                        }}
+                                                                  />
+                                                            </div>
+                                                      </div>
+
+                                                      <div style={{ marginTop: '5px' }}>
+                                                            <div
+                                                                  style={{
+                                                                        marginBottom: '5px'
+                                                                  }}
+                                                            >
+                                                                  {`${translate('DHIS2_monthly_value')} 3`}
+                                                            </div>
+                                                            <div>
+                                                                  <Select
+                                                                        placeholder={`${translate(
+                                                                              'DHIS2_monthly_value'
+                                                                        )} 3`}
+                                                                        style={{
+                                                                              width: '307px'
+                                                                        }}
+                                                                        options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                              progStageDE => ({
+                                                                                    label: progStageDE.dataElement
+                                                                                          ?.displayName,
+                                                                                    value: progStageDE.dataElement?.id
+                                                                              })
+                                                                        )}
+                                                                        showSearch
+                                                                        allowClear
+                                                                        optionFilterProp="label"
+                                                                        value={ind?.DHIS2MonthlyValue3?.id}
+                                                                        onChange={value => {
+                                                                              setFormState({
+                                                                                    ...formState,
+                                                                                    indicators:
+                                                                                          formState?.indicators?.map(
+                                                                                                i => {
+                                                                                                      if (
+                                                                                                            i.id ===
+                                                                                                            ind.id
+                                                                                                      ) {
+                                                                                                            return {
+                                                                                                                  ...i,
+                                                                                                                  DHIS2MonthlyValue3: formState?.selectedProgramStageForConfiguration?.programStageDataElements?.find(
                                                                                                                         p =>
                                                                                                                               p
                                                                                                                                     .dataElement

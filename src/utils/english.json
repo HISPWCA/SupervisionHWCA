@@ -289,10 +289,14 @@
     "Program_Area": "Program Area",
     "Primary_Source": "Primary Source",
     "Secondary_Source": "Secondary Source",
-    "Indicator_Name":"Indicator name",
-    "How_Many_Indicators":"How many indicators ? ",
-
+    "Indicator_Name": "Indicator name",
+    "How_Many_Indicators": "How many indicators ? ",
     "Other_Fields": "Other fields",
     "System_Auto_Generate_Attribute_ID": "Supervision Attribute auto generate ID",
-    "NbrIndicatorsToShow":"Number of indicators to show"
+    "NbrIndicatorsToShow": "Number of indicators to show",
+    "Indicators_Mapping": "Indicators Mapping",
+
+    "Indicator_Group":"Indicator type",
+    "Indicator_From_Dhis2":"Indicator From DHIS2",
+    "DHIS2_monthly_value" : "DHIS2 monthly value"
 }

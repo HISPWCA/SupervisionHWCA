@@ -19,7 +19,8 @@ import {
       AGENT,
       PAGE_CONFIG_VISUALIZATION,
       DQR,
-      ERDQ
+      ERDQ,
+      PAGE_INDICATORS_MAPPING
 } from '../utils/constants';
 import { Card, Checkbox, Col, Divider, Input, InputNumber, Popconfirm, Row, Select, Table } from 'antd';
 import {
@@ -48,6 +49,7 @@ import MyNotification from './MyNotification';
 import translate from '../utils/translator';
 import GenerateIndicatorsFieldsList from './GenerateIndicatorsFields';
 import GenerateIndicatorsFieldsDQR from './GenerateIndicatorsFieldsDQR';
+import SettingIndicatorsMapping from './SettingIndicatorsMapping';
 
 const numberList = [
       { value: 1, label: '1' },
@@ -193,6 +195,9 @@ const Setting = () => {
                               position: i,
                               value: null,
                               margin: null,
+                              DHIS2MonthlyValue1: null,
+                              DHIS2MonthlyValue2: null,
+                              DHIS2MonthlyValue3: null,
                               programArea: null
                         });
                   }
@@ -1740,7 +1745,6 @@ const Setting = () => {
                   });
             }
       };
-
       const RenderConfigurationForEachProgramStageList = () =>
             programStageConfigurations.length > 0 && (
                   <div style={{ marginTop: '20px', position: 'sticky', top: 5 }}>
@@ -1927,58 +1931,6 @@ const Setting = () => {
                         </Card>
                   </div>
             );
-
-      const handleAddPaymentConfig = () => {
-            try {
-                  if (!inputLibellePayment) throw new Error(translate('Libelle_Obligatoire'));
-
-                  if (
-                        !isEditModePayment &&
-                        paymentConfigList
-                              .map(conf => conf.libelle?.trim()?.toLowerCase())
-                              .includes(inputLibellePayment?.trim()?.toLowerCase())
-                  )
-                        throw new Error(translate('Configuration_Deja_Ajoutee'));
-
-                  let payload = {
-                        libelle: inputLibellePayment,
-                        fraisMobileMoney: inputFraisMobileMoneyPayment,
-                        montantConstant: inputMontantConstantPayment,
-                        program: {
-                              id: selectedTEIProgram?.id,
-                              displayName: selectedTEIProgram?.displayName
-                        }
-                  };
-
-                  if (isEditModePayment && currentPaymentConfig) {
-                        setPaymentConfigList(
-                              paymentConfigList.map(paiement =>
-                                    paiement.id === currentPaymentConfig.id ? payload : paiement
-                              )
-                        );
-                  } else {
-                        payload.id = uuid();
-                        setPaymentConfigList([...paymentConfigList, payload]);
-                  }
-
-                  setCurrentPaymentConfig(null);
-                  setEditModePayment(false);
-                  setInputFraisMobileMoneyPayment(0);
-                  setInputMontantConstantPayment(0);
-                  setInputLibellePayment('');
-                  setNotification({
-                        show: true,
-                        message: isEditModePayment ? translate('Paiement_Mise_A_Jour') : translate('Paiement_Ajouter'),
-                        type: NOTIFICATION_SUCCESS
-                  });
-            } catch (err) {
-                  setNotification({
-                        show: true,
-                        message: err.message,
-                        type: NOTIFICATION_CRITICAL
-                  });
-            }
-      };
 
       const handleEditPaymentConfig = config => {
             setInputFraisMobileMoneyPayment(config.fraisMobileMoney);
@@ -3350,11 +3302,25 @@ const Setting = () => {
             </>
       );
 
+      const RenderPageIndicatorsMapping = () => (
+            <div>
+                  <SettingIndicatorsMapping />
+            </div>
+      );
+
       const RenderTypeSupervisionContent = () => (
             <div>
                   <Row gutter={[8, 8]}>
                         <Col md={4} sm={24}>
                               <div style={{ marginBottom: '2px', position: 'sticky', top: 30 }}>
+                                    <div
+                                          className={`setting-menu-item ${
+                                                selectedTypeSupervisionPage === PAGE_INDICATORS_MAPPING ? 'active' : ''
+                                          }`}
+                                          onClick={() => handleClickConfigMenu(PAGE_INDICATORS_MAPPING)}
+                                    >
+                                          {translate('Indicators_Mapping')}
+                                    </div>
                                     <div
                                           className={`setting-menu-item ${
                                                 selectedTypeSupervisionPage === PAGE_CONFIG_SUPERVISION ? 'active' : ''
@@ -3388,6 +3354,7 @@ const Setting = () => {
                               {console.log('formState : ', formState)}
                               {selectedTypeSupervisionPage === PAGE_CONFIG_INDICATORS && RenderPageIndicatorConfig()}
                               {selectedTypeSupervisionPage === PAGE_CONFIG_SUPERVISION && RenderPageSupervisionConfig()}
+                              {selectedTypeSupervisionPage === PAGE_INDICATORS_MAPPING && RenderPageIndicatorsMapping()}
                               {selectedTypeSupervisionPage === PAGE_CONFIG_VISUALIZATION &&
                                     RenderPageVisualizationsConfig()}
                               {selectedTypeSupervisionPage === PAGE_CONFIG_ANALYSE && RenderPageAnalyseConfig()}
