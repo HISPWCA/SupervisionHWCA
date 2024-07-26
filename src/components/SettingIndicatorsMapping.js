@@ -58,7 +58,9 @@ const SettingIndicatorsMapping = () => {
                               curr.children?.map(child => ({
                                     group: curr.name,
                                     indicator: child.name,
-                                    dhis2: null
+                                    dhis2: dataStoreIndicatorsMapping?.find(
+                                          it => it.indicator === child.name && it.group === curr.name
+                                    )?.dhis2
                               })) || [];
 
                         prev = [...prev, ...newList];
