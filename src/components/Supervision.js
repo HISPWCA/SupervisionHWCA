@@ -1995,8 +1995,6 @@ const Supervision = ({ me }) => {
                         }
                         eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValueList];
 
-                        console.log('eventPayload : ', eventPayload);
-
                         if (!newEventsList.map(ev => ev.programStage).includes(payload.programStage?.id)) {
                               newEventsList.push(eventPayload);
                         }
@@ -2757,7 +2755,6 @@ const Supervision = ({ me }) => {
                   const response = await axios.get(
                         `${ANALYTICS_ROUTE}/dataValueSet.json?dimension=ou:${orgUnit}&dimension=dx:${dx}&dimension=pe:${period}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=true&includeNumDen=true&skipRounding=false&completedOnly=false`
                   );
-                  console.log('analytic value:', response.data);
                   return response.data?.dataValues[0]?.value || 100;
             } catch (error) {
                   console.log('Error getting analytic value : ', error);

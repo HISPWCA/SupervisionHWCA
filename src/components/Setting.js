@@ -876,7 +876,6 @@ const Setting = () => {
                               : translate('Configuration_Added_For_Program_stage')
                   });
             } catch (err) {
-                  console.log('err:r ', err);
                   setNotification({
                         show: true,
                         type: NOTIFICATION_CRITICAL,
@@ -1270,7 +1269,6 @@ const Setting = () => {
 
                   setProgramStageConfigurations(prog.programStageConfigurations || []);
             } catch (err) {
-                  console.log('edit error : ', err);
                   setNotification({
                         show: true,
                         message: err.response?.data?.message || err.message,
@@ -3350,8 +3348,6 @@ const Setting = () => {
                               </div>
                         </Col>
                         <Col md={20} sm={24}>
-                              {console.log('global settings : ', dataStoreGlobalSettings)}
-                              {console.log('formState : ', formState)}
                               {selectedTypeSupervisionPage === PAGE_CONFIG_INDICATORS && RenderPageIndicatorConfig()}
                               {selectedTypeSupervisionPage === PAGE_CONFIG_SUPERVISION && RenderPageSupervisionConfig()}
                               {selectedTypeSupervisionPage === PAGE_INDICATORS_MAPPING && RenderPageIndicatorsMapping()}

@@ -1229,7 +1229,6 @@ const Favorites = ({ me }) => {
 
       return (
             <>
-                  {console.log('formState', formState)}
                   {RenderContent()}
                   {RenderAddFavoritBackgroundInformationModal()}
                   {RenderAnalyticComponentModal()}
