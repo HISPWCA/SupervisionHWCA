@@ -274,7 +274,7 @@ export const Dashboard = ({ me }) => {
                         return true;
                   })
                   .sort((a, b) => parseInt(dayjs(b.period).valueOf()) - parseInt(dayjs(a.period).valueOf()));
-                  
+
       const RenderFilters = () => (
             <>
                   <div
@@ -625,7 +625,7 @@ export const Dashboard = ({ me }) => {
             <>
                   <div style={{ padding: '10px', width: '100%' }}>
                         {RenderFilters()}
-                        <pre>{JSON.stringify(teiList, null, 4)}</pre>
+                        {/* <pre>{JSON.stringify(teiList, null, 4)}</pre> */}
                         {/* {RenderVisualizations()} */}
                         <MyNotification notification={notification} setNotification={setNotification} />
                   </div>

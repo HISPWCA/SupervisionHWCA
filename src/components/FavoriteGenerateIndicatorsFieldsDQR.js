@@ -1,6 +1,7 @@
 import { Card, Input, Select } from 'antd';
 import translate from '../utils/translator';
 import { v4 as uuid } from 'uuid';
+import { getLetter } from '../utils/functions';
 
 // const MyInput = ()=> {
 //       const inputRef = React.createRef();
@@ -345,7 +346,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                   border: '1px solid #00000070'
                                                             }}
                                                       >
-                                                            {`${translate('Recoupements')} ${recIndex + 1}`}
+                                                            {`${translate('Recoupements')} ${getLetter(recIndex + 1)}`}
                                                       </td>
                                                       <td
                                                             style={{
