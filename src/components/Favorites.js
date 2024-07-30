@@ -202,7 +202,6 @@ const Favorites = ({ me }) => {
                                 )
                               : null
             });
-            loadProgramStages(sup.program?.id);
       };
 
       const loadProgramStages = async (programID, setState = null) => {
@@ -214,6 +213,12 @@ const Favorites = ({ me }) => {
 
                   const response = await axios.get(route);
 
+                  if (response.data?.programStages?.length === 0) {
+                        setFormState({
+                              ...formState,
+                              selectedProgramStage: response.data?.programStages[0]
+                        });
+                  }
                   setProgramStages(response.data?.programStages || []);
                   setLoadingProgramStages(false);
             } catch (err) {
@@ -1220,6 +1225,12 @@ const Favorites = ({ me }) => {
             loadDataStoreDSCompletness();
             loadDataStoreBackgroundInformationFavoritsConfigs();
       }, []);
+
+      useEffect(() => {
+            if (formState?.selectedProgram?.program) {
+                  loadProgramStages(formState.selectedProgram.program?.id);
+            }
+      }, [formState?.selectedProgram?.program]);
 
       useEffect(() => {
             if (formState?.selectedProgramStage) {
