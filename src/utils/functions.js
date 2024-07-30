@@ -59,8 +59,9 @@ export const createDataToDataStore = async (key_string, payload) => {
 };
 
 export const getLetter = nbr => {
-      // if (+nbr === 1) return 'A';
-      // if (+nbr === 2) return 'B';
-      // if (+nbr === 3) return 'C';
+      if (+nbr === 1) return 'A';
+      if (+nbr === 2) return 'B';
+      if (+nbr === 3) return 'C';
+      if (+nbr === 4) return 'D';
       return nbr;
 };
