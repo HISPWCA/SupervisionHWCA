@@ -50,6 +50,7 @@ export const Dashboard = ({ me }) => {
       const [organisationUnits, setOrganisationUnits] = useState([]);
       const [organisationUnitLevels, setOrganisationUnitLevels] = useState([]);
       const [teiList, setTeiList] = useState([]);
+      const [concerningOUs, setConcerningOUs] = useState([]);
 
       const [dataStoreSupervisionsConfigs, setDataStoreSupervisionsConfigs] = useState([]);
       const [dataStoreMissions, setDataStoreMissions] = useState([]);
@@ -227,54 +228,49 @@ export const Dashboard = ({ me }) => {
             }
       };
 
-      const filterAndGetPlanfications = () =>
-            teiList
-                  .reduce((prev, current) => {
-                        if (selectedProgram.generationType === TYPE_GENERATION_AS_EVENT) {
-                              const eventList = [];
-                              const currentEnrollment = current.enrollments?.filter(
-                                    en => en.program === selectedProgram?.program?.id
-                              )[0];
+      const filterAndGetConcerningOrgUnits = () => {
+            const RightOUList = teiList.reduce((prev, current) => {
+                  if (selectedProgram.generationType === TYPE_GENERATION_AS_EVENT) {
+                        const eventList = [];
+                        const currentEnrollment = current.enrollments?.filter(
+                              en => en.program === selectedProgram?.program?.id
+                        )[0];
 
-                              for (let event of currentEnrollment?.events || []) {
-                                    if (event.eventDate) {
-                                          if (
-                                                (dayjs(event.eventDate).isAfter(dayjs(selectedPeriods[0])) &&
-                                                      dayjs(event.eventDate).isBefore(dayjs(selectedPeriods[1]))) ||
-                                                (dayjs(event.eventDate).isSame(dayjs(selectedPeriods[0])) &&
-                                                      dayjs(event.eventDate).isSame(dayjs(selectedPeriods[1])))
-                                          )
-                                                eventList.push(event);
-                                    }
+                        for (let event of currentEnrollment?.events || []) {
+                              if (event.eventDate) {
+                                    if (
+                                          (dayjs(event.eventDate).isAfter(dayjs(selectedPeriods[0])) &&
+                                                dayjs(event.eventDate).isBefore(dayjs(selectedPeriods[1]))) ||
+                                          (dayjs(event.eventDate).isSame(dayjs(selectedPeriods[0])) &&
+                                                dayjs(event.eventDate).isSame(dayjs(selectedPeriods[1])))
+                                    )
+                                          eventList.push(event);
                               }
-
-                              return [
-                                    ...prev,
-                                    ...eventList.map(ev => ({
-                                          trackedEntityInstance: currentEnrollment?.trackedEntityInstance,
-                                          period: ev.eventDate,
-                                          orgUnit: currentEnrollment?.orgUnit
-                                    }))
-                              ];
                         }
 
-                        return prev;
-                  }, [])
-                  .filter(planification => {
-                        if (selectedPlanification === MES_PLANIFICATIONS)
-                              return planification.superviseurs?.includes(me?.displayName);
+                        return [
+                              ...prev,
+                              ...eventList.map(ev => ({
+                                    trackedEntityInstance: currentEnrollment?.trackedEntityInstance,
+                                    period: ev.eventDate,
+                                    orgUnit: currentEnrollment?.orgUnit
+                              }))
+                        ];
+                  }
 
-                        if (selectedPlanification === PLANIFICATION_PAR_MOI)
-                              return me?.username?.toLowerCase() === planification.storedBy?.toLowerCase();
+                  return prev;
+            }, []);
 
-                        if (selectedPlanification === PLANIFICATION_PAR_TOUS) return true;
+            const ouWithoutDuplicationObject = RightOUList.reduce((prev, current) => {
+                  if (!prev[current.orgUnit]) {
+                        prev[current.orgUnit] = current;
+                  }
+                  return prev;
+            }, {});
 
-                        if (selectedPlanification === PLANIFICATION_PAR_UN_USER) return false;
-
-                        return true;
-                  })
-                  .sort((a, b) => parseInt(dayjs(b.period).valueOf()) - parseInt(dayjs(a.period).valueOf()));
-
+            console.log('ouWithoutDuplicationObject: ', ouWithoutDuplicationObject);
+           return Object.keys(ouWithoutDuplicationObject)
+      };
       const RenderFilters = () => (
             <>
                   <div
@@ -518,8 +514,9 @@ export const Dashboard = ({ me }) => {
       };
 
       const RenderVisualizations = () =>
-            selectedMission &&
-            selectedLevel && (
+            selectedProgram &&
+            selectedLevel &&
+            selectedOrganisationUnit && (
                   <div id="visualizations-container">
                         {RenderVisualizationForEachStructure()}
                         {RenderVisualizationForGlobalStructure()}
@@ -587,7 +584,7 @@ export const Dashboard = ({ me }) => {
                                                       width: '100%',
                                                       height: '450px'
                                                 }}
-                                                periods={[selectedPeriod.format('YYYYMM')].join(',')}
+                                                // periods={[selectedPeriod.format('YYYYMM')].join(',')}
                                                 orgUnitIDs={rightOUs.map(r => r.id).join(',')}
                                           />
                                     );
@@ -616,17 +613,15 @@ export const Dashboard = ({ me }) => {
       }, [me]);
 
       useEffect(() => {
-            if (dataStoreVisualizations.length > 0 && selectedPeriod && selectedLevel && selectedLevel) {
-                  loadAndInjectVisualizations();
-            }
-      }, [selectedPeriod, selectedProgram, selectedLevel, selectedMission, dataStoreVisualizations]);
+            if (selectedPeriods.length > 0 && selectedProgram && selectedLevel) filterAndGetConcerningOrgUnits();
+      }, [teiList]);
 
       return (
             <>
                   <div style={{ padding: '10px', width: '100%' }}>
                         {RenderFilters()}
-                        {/* <pre>{JSON.stringify(teiList, null, 4)}</pre> */}
-                        {/* {RenderVisualizations()} */}
+                        <pre>{JSON.stringify(concerningOUs, null, 4)}</pre>
+                        {RenderVisualizations()}
                         <MyNotification notification={notification} setNotification={setNotification} />
                   </div>
             </>

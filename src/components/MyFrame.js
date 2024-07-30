@@ -125,7 +125,7 @@ const MyFrame = ({ base_url, id, orgUnitIDs, periods, style = {}, type = MAP }) 
                               loadVisualizationV2({
                                  el: '${id}',
                                 ou: '${orgUnitIDs}'.split(','),
-                                pe: '${periods}'.split(','),
+                                pe: ${periods} ?  '${periods}'.split(',') : [],
                                })
 
                             /* ***********  FIN du Block de Travail  ******************** */
