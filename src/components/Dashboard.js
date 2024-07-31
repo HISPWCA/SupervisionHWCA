@@ -268,7 +268,16 @@ export const Dashboard = ({ me }) => {
             console.log('ouWithoutDuplicationObject: ', ouWithoutDuplicationObject);
             console.log('keys : ', Object.keys(ouWithoutDuplicationObject));
             setConcerningOUs(
-                  Object.keys(ouWithoutDuplicationObject).map(ou => organisationUnits.find(o => o.id === ou))
+                  Object.keys(ouWithoutDuplicationObject).map(ou => {
+                        const currO = organisationUnits.find(o => o.id === ou);
+                        return {
+                              id: currO?.id,
+                              displayName: currO?.displayName,
+                              name: currO?.name,
+                              level: currO?.level,
+                              path: currO?.path
+                        };
+                  })
             );
       };
       const RenderFilters = () => (

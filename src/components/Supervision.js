@@ -99,6 +99,7 @@ import { DataDimension } from '@dhis2/analytics';
 import { IoMdOpen } from 'react-icons/io';
 import { MdStars, MdCancel } from 'react-icons/md';
 import shuffle from 'shuffle-array';
+import {     } from 'react-icons/tb';
 
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
@@ -530,11 +531,11 @@ const Supervision = ({ me }) => {
                                                               icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
                                                               onConfirm={() => handleCancelEvent(row.original)}
                                                         >
-                                                              <MdCancel
+                                                              <TbRestore
                                                                     title={translate('Annuler_Planification')}
                                                                     style={{
                                                                           fontSize: '20px',
-                                                                          color: RED,
+                                                                          color: ORANGE,
                                                                           cursor: 'pointer'
                                                                     }}
                                                               />
@@ -2887,7 +2888,6 @@ const Supervision = ({ me }) => {
                         <Card size="small" className="my-shadow">
                               <Row gutter={[10, 10]}>
                                     <Col md={6}>
-                                          {/* <div style={{ marginBottom: '2px' }}>Programme</div> */}
                                           <Select
                                                 placeholder={translate('Programme')}
                                                 onChange={handleSelectSupervisionProgramConfigForTracker}
