@@ -274,7 +274,7 @@ const Setting = () => {
       const loadVisualizations = async () => {
             try {
                   const response = await axios.get(
-                        `${VISUALIZATIONS_ROUTE}?pageSize=50&fields=id,displayName,name,type`
+                        `${VISUALIZATIONS_ROUTE}?pageSize=100000&fields=id,displayName,name,type`
                   );
                   setVisualizations(response.data.visualizations || []);
             } catch (err) {}
