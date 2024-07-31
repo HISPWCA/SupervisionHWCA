@@ -213,7 +213,7 @@ const Favorites = ({ me }) => {
 
                   const response = await axios.get(route);
 
-                  if (response.data?.programStages?.length === 0) {
+                  if (response.data?.programStages?.length === 1) {
                         setFormState({
                               ...formState,
                               selectedProgramStage: response.data?.programStages[0]

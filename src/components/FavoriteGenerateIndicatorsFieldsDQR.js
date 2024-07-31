@@ -3,10 +3,6 @@ import translate from '../utils/translator';
 import { v4 as uuid } from 'uuid';
 import { getLetter } from '../utils/functions';
 
-// const MyInput = ()=> {
-//       const inputRef = React.createRef();
-// }
-
 const FavoriteGenerateIndicatorsFieldsDQR = ({
       formState,
       setFormState,
@@ -817,24 +813,23 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                           </tr>
                                     </thead>
                                     <tbody>
-                                          <tr key={uuid()}>
+                                          <tr>
                                                 <td
                                                       style={{
                                                             padding: '2px 5px',
                                                             verticalAlign: 'center',
                                                             textAlign: 'center',
-                                                            border: '1px solid #00000070'
+                                                            border: '1px solid blue'
                                                       }}
                                                 >
-                                                      {`${translate('Data_Element')} & ${translate('Source_Document')}`}
+                                                      {`${translate('Program_Area')}`}
                                                 </td>
-
                                                 <td
                                                       style={{
                                                             padding: '2px 5px',
-                                                            verticalAlign: 'top',
+                                                            verticalAlign: 'center',
                                                             textAlign: 'center',
-                                                            border: '1px solid #00000070'
+                                                            border: '1px solid blue'
                                                       }}
                                                 >
                                                       <div>
@@ -868,7 +863,97 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                   }}
                                                             />
                                                       </div>
+                                                </td>
+                                                <td
+                                                      style={{
+                                                            padding: '2px 5px',
+                                                            verticalAlign: 'center',
+                                                            textAlign: 'center',
+                                                            border: '1px solid blue'
+                                                      }}
+                                                >
+                                                      <div>
+                                                            <Select
+                                                                  placeholder={`${translate('Program_Area')}`}
+                                                                  style={{
+                                                                        width: '100%'
+                                                                  }}
+                                                                  options={dataStoreDSCompletness?.map(ind => ({
+                                                                        label: ind.name,
+                                                                        value: ind.name
+                                                                  }))}
+                                                                  showSearch
+                                                                  allowClear
+                                                                  optionFilterProp="label"
+                                                                  value={
+                                                                        formState?.completeness
+                                                                              ?.selectedSourceProgramAreaDS?.name
+                                                                  }
+                                                                  onChange={value => {
+                                                                        setFormState({
+                                                                              ...formState,
+                                                                              completeness: {
+                                                                                    ...formState?.completeness,
+                                                                                    selectedSourceProgramAreaDS:
+                                                                                          dataStoreDSCompletness?.find(
+                                                                                                d => d.name === value
+                                                                                          )
+                                                                              }
+                                                                        });
+                                                                  }}
+                                                            />
+                                                      </div>
+                                                </td>
+                                                <td
+                                                      style={{
+                                                            padding: '2px 5px',
+                                                            verticalAlign: 'center',
+                                                            textAlign: 'center',
+                                                            border: '1px solid #00000070'
+                                                      }}
+                                                      rowSpan={2}
+                                                >
+                                                      <div>
+                                                            <Input
+                                                                  placeholder={`${translate('Marge')} `}
+                                                                  style={{ width: '100%' }}
+                                                                  min={0}
+                                                                  type="number"
+                                                                  value={formState?.completeness?.selectedSourceMargin}
+                                                                  onChange={event => {
+                                                                        setFormState({
+                                                                              ...formState,
+                                                                              completeness: {
+                                                                                    ...formState?.completeness,
+                                                                                    selectedSourceMargin:
+                                                                                          event.target.value
+                                                                              }
+                                                                        });
+                                                                  }}
+                                                            />
+                                                      </div>
+                                                </td>
+                                          </tr>
+                                          <tr key={uuid()}>
+                                                <td
+                                                      style={{
+                                                            padding: '2px 5px',
+                                                            verticalAlign: 'center',
+                                                            textAlign: 'center',
+                                                            border: '1px solid #00000070'
+                                                      }}
+                                                >
+                                                      {`${translate('Data_Element')} & ${translate('Source_Document')}`}
+                                                </td>
 
+                                                <td
+                                                      style={{
+                                                            padding: '2px 5px',
+                                                            verticalAlign: 'top',
+                                                            textAlign: 'center',
+                                                            border: '1px solid #00000070'
+                                                      }}
+                                                >
                                                       {formState?.completeness?.dataElements?.map((de, deIndex) => (
                                                             <div key={uuid()} style={{ marginTop: '5px' }}>
                                                                   <Select
@@ -929,38 +1014,6 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                             border: '1px solid #00000070'
                                                       }}
                                                 >
-                                                      <div>
-                                                            <Select
-                                                                  placeholder={`${translate('Program_Area')}`}
-                                                                  style={{
-                                                                        width: '100%'
-                                                                  }}
-                                                                  options={dataStoreDSCompletness?.map(ind => ({
-                                                                        label: ind.name,
-                                                                        value: ind.name
-                                                                  }))}
-                                                                  showSearch
-                                                                  allowClear
-                                                                  optionFilterProp="label"
-                                                                  value={
-                                                                        formState?.completeness
-                                                                              ?.selectedSourceProgramAreaDS?.name
-                                                                  }
-                                                                  onChange={value => {
-                                                                        setFormState({
-                                                                              ...formState,
-                                                                              completeness: {
-                                                                                    ...formState?.completeness,
-                                                                                    selectedSourceProgramAreaDS:
-                                                                                          dataStoreDSCompletness?.find(
-                                                                                                d => d.name === value
-                                                                                          )
-                                                                              }
-                                                                        });
-                                                                  }}
-                                                            />
-                                                      </div>
-
                                                       {formState?.completeness?.sourceDocuments?.map((de, deIndex) => (
                                                             <div key={uuid()} style={{ marginTop: '5px' }}>
                                                                   <Select
@@ -1011,49 +1064,6 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                   />
                                                             </div>
                                                       ))}
-                                                </td>
-
-                                                <td
-                                                      style={{
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top',
-                                                            textAlign: 'center',
-                                                            border: '1px solid #00000070'
-                                                      }}
-                                                >
-                                                      <div>
-                                                            <Input
-                                                                  placeholder={`${translate('Marge')} `}
-                                                                  style={{ width: '100%' }}
-                                                                  min={0}
-                                                                  type="number"
-                                                                  value={formState?.completeness?.selectedSourceMargin}
-                                                                  onChange={event => {
-                                                                        setFormState({
-                                                                              ...formState,
-                                                                              completeness: {
-                                                                                    ...formState?.completeness,
-                                                                                    selectedSourceMargin:
-                                                                                          event.target.value
-                                                                              }
-                                                                        });
-                                                                  }}
-                                                            />
-
-                                                            {/* <MyInput
-                                                                  value={formState?.completeness?.selectedSourceMargin}
-                                                                  onChange={event => {
-                                                                        setFormState({
-                                                                              ...formState,
-                                                                              completeness: {
-                                                                                    ...formState?.completeness,
-                                                                                    selectedSourceMargin:
-                                                                                          event
-                                                                              }
-                                                                        });
-                                                                  }}
-                                                            /> */}
-                                                      </div>
                                                 </td>
                                           </tr>
                                     </tbody>

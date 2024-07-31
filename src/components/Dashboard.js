@@ -165,8 +165,8 @@ export const Dashboard = ({ me }) => {
             }
       };
 
-      const handleSelectPeriodRange = (_, periodString) => {
-            setSelectedPeriods(periodString);
+      const handleSelectPeriodRange = period => {
+            setSelectedPeriods(period);
       };
 
       const printReportAsPDF = async () => {
@@ -198,12 +198,6 @@ export const Dashboard = ({ me }) => {
 
             win.document.close();
             win.print();
-      };
-
-      const handleSelectMission = value => {
-            if (value) {
-                  setSelectedMission(dataStoreMissions.find(m => m.id === value));
-            }
       };
 
       const handleSelectLevel = value => {
@@ -262,14 +256,20 @@ export const Dashboard = ({ me }) => {
             }, []);
 
             const ouWithoutDuplicationObject = RightOUList.reduce((prev, current) => {
-                  if (!prev[current.orgUnit]) {
+                  if (
+                        !prev[current.orgUnit] &&
+                        organisationUnits?.find(ou => ou.id === current.orgUnit)?.level === selectedLevel?.level
+                  ) {
                         prev[current.orgUnit] = current;
                   }
                   return prev;
             }, {});
 
             console.log('ouWithoutDuplicationObject: ', ouWithoutDuplicationObject);
-           return Object.keys(ouWithoutDuplicationObject)
+            console.log('keys : ', Object.keys(ouWithoutDuplicationObject));
+            setConcerningOUs(
+                  Object.keys(ouWithoutDuplicationObject).map(ou => organisationUnits.find(o => o.id === ou))
+            );
       };
       const RenderFilters = () => (
             <>
@@ -358,6 +358,7 @@ export const Dashboard = ({ me }) => {
                                                                   ? false
                                                                   : true
                                                       }
+                                                      primary
                                                 >
                                                       {translate('Recherche')}
                                                 </Button>
@@ -365,7 +366,6 @@ export const Dashboard = ({ me }) => {
                                           <div>
                                                 <Button
                                                       onClick={printReportAsPDF}
-                                                      primary
                                                       icon={<ImPrinter style={{ fontSize: '20px' }} />}
                                                 >
                                                       {translate('Print_Dashboard')}
@@ -518,9 +518,9 @@ export const Dashboard = ({ me }) => {
             selectedLevel &&
             selectedOrganisationUnit && (
                   <div id="visualizations-container">
-                        {RenderVisualizationForEachStructure()}
-                        {RenderVisualizationForGlobalStructure()}
-                        {RenderNoOrganisationUnitsAtThisLevel()}
+                        {/* {RenderVisualizationForEachStructure()} */}
+                        {/* {RenderVisualizationForGlobalStructure()}
+                        {RenderNoOrganisationUnitsAtThisLevel()} */}
                   </div>
             );
 
@@ -621,7 +621,7 @@ export const Dashboard = ({ me }) => {
                   <div style={{ padding: '10px', width: '100%' }}>
                         {RenderFilters()}
                         <pre>{JSON.stringify(concerningOUs, null, 4)}</pre>
-                        {RenderVisualizations()}
+                        {/* {RenderVisualizations()} */}
                         <MyNotification notification={notification} setNotification={setNotification} />
                   </div>
             </>
