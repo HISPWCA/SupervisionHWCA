@@ -18,6 +18,8 @@ import {
 } from 'antd';
 import { IoMdAdd } from 'react-icons/io';
 import { IoListCircleOutline } from 'react-icons/io5';
+import { MdOutlineSettingsBackupRestore } from 'react-icons/md';
+
 import {
       Button,
       ButtonStrip,
@@ -99,7 +101,6 @@ import { DataDimension } from '@dhis2/analytics';
 import { IoMdOpen } from 'react-icons/io';
 import { MdStars, MdCancel } from 'react-icons/md';
 import shuffle from 'shuffle-array';
-import { TbRestore } from 'react-icons/tb';
 
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
@@ -531,10 +532,10 @@ const Supervision = ({ me }) => {
                                                               icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
                                                               onConfirm={() => handleCancelEvent(row.original)}
                                                         >
-                                                              <TbRestore
+                                                              <MdOutlineSettingsBackupRestore
                                                                     title={translate('Annuler_Planification')}
                                                                     style={{
-                                                                          fontSize: '20px',
+                                                                          fontSize: '25px',
                                                                           color: ORANGE,
                                                                           cursor: 'pointer'
                                                                     }}

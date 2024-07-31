@@ -247,7 +247,9 @@ export const Dashboard = ({ me }) => {
                               ...eventList.map(ev => ({
                                     trackedEntityInstance: currentEnrollment?.trackedEntityInstance,
                                     period: ev.eventDate,
-                                    orgUnit: currentEnrollment?.orgUnit
+                                    orgUnit: currentEnrollment?.orgUnit,
+                                    event: ev.event,
+                                    dataValues: ev.dataValues
                               }))
                         ];
                   }
@@ -266,14 +268,15 @@ export const Dashboard = ({ me }) => {
             }, {});
 
             setConcerningOUs(
-                  Object.keys(ouWithoutDuplicationObject).map(ou => {
-                        const currO = organisationUnits.find(o => o.id === ou);
+                  Object.entries(ouWithoutDuplicationObject).map(([ouKey, ouContent]) => {
+                        const currO = organisationUnits.find(o => o.id === ouKey);
                         return {
                               id: currO?.id,
                               displayName: currO?.displayName,
                               name: currO?.name,
                               level: currO?.level,
-                              path: currO?.path
+                              path: currO?.path,
+                              event: ouContent
                         };
                   })
             );
@@ -403,7 +406,7 @@ export const Dashboard = ({ me }) => {
             );
 
       const RenderVisualizationForEachStructure = () =>
-            concerningOUs.map(m => (
+            concerningOUs.map(ou => (
                   <div key={uuid()} style={{ marginBottom: '40px' }}>
                         <div
                               style={{
@@ -425,10 +428,11 @@ export const Dashboard = ({ me }) => {
                                           border: '1px solid #00000090'
                                     }}
                               >
-                                    {m.displayName}
+                                    {ou.displayName}
                               </span>
                         </div>
                         <Row gutter={[8, 8]}>
+                              {console.log('ou?.event?.dataValues: ', ou?.event?.dataValues)}
                               {dataStoreVisualizations
                                     .find(
                                           vis =>
@@ -438,8 +442,14 @@ export const Dashboard = ({ me }) => {
                                     ?.visualizations?.map(v => (
                                           <VisualizationItem
                                                 key={uuid()}
-                                                id={`${v.id}-${m?.id}`}
+                                                id={`${v.id}-${ou?.id}`}
                                                 loading={loadingInjection}
+                                                dxElements={v?.dxElements.map(dx => ({
+                                                      newName: ou?.event?.dataValues?.find(
+                                                            dv => dv.dataElement === dx.id
+                                                      )?.value,
+                                                      oldName: dx.name
+                                                }))}
                                           />
                                     ))}
                         </Row>
@@ -492,6 +502,12 @@ export const Dashboard = ({ me }) => {
                                                             key={uuid()}
                                                             id={v.id}
                                                             loading={loadingInjection}
+                                                            // dxElements={v?.dxElements.map(dx => ({
+                                                            //       newName: ou?.event?.dataValues?.find(
+                                                            //             dv => dv.dataElement === dx.id
+                                                            //       )?.value,
+                                                            //       oldName: dx.name
+                                                            // }))}
                                                       />
                                                 ))}
                                     </Row>
