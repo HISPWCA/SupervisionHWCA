@@ -26,7 +26,7 @@ const VisualizationItem = ({ id, loading, dxElements }) => (
                         <div
                               style={{
                                     width: '100%',
-                                    border: '1px solid skyblue',
+                                    border: '1px solid orange',
                                     padding: '5px',
                                     alignItems: 'center',
                                     fontSize: '13px'
@@ -42,7 +42,7 @@ const VisualizationItem = ({ id, loading, dxElements }) => (
                                           }}
                                     >
                                           <div style={{ color: '#00000090' }}>{dx.oldName}</div>
-                                          <div style={{ margin: '0px 10px' }}> {`<===>`}</div>
+                                          <div style={{ margin: '0px 10px' }}> {`==`}</div>
                                           <div style={{ fontWeight: 'bold' }}>{dx.newName} </div>
                                     </div>
                               ))}

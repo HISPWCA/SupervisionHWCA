@@ -370,7 +370,7 @@ export const Dashboard = ({ me }) => {
                                                       }
                                                       primary
                                                 >
-                                                      {translate('Recherche')}
+                                                      {translate('Apply')}
                                                 </Button>
                                           </div>
                                           <div>
@@ -448,7 +448,7 @@ export const Dashboard = ({ me }) => {
                                                       newName: ou?.event?.dataValues?.find(
                                                             dv => dv.dataElement === dx.id
                                                       )?.value,
-                                                      oldName: dx.name
+                                                      oldName: 'Indicateur 1'
                                                 }))}
                                           />
                                     ))}
@@ -632,7 +632,6 @@ export const Dashboard = ({ me }) => {
             <>
                   <div style={{ padding: '10px', width: '100%' }}>
                         {RenderFilters()}
-                        <pre>{JSON.stringify(concerningOUs, null, 4)}</pre>
                         {RenderVisualizations()}
                         <MyNotification notification={notification} setNotification={setNotification} />
                   </div>
