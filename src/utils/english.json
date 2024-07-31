@@ -295,8 +295,8 @@
     "System_Auto_Generate_Attribute_ID": "Supervision Attribute auto generate ID",
     "NbrIndicatorsToShow": "Number of indicators to show",
     "Indicators_Mapping": "Indicators Mapping",
-
-    "Indicator_Group":"Indicator type",
-    "Indicator_From_Dhis2":"Indicator From DHIS2",
-    "DHIS2_monthly_value" : "DHIS2 monthly value"
+    "Indicator_Group": "Indicator type",
+    "Indicator_From_Dhis2": "Indicator From DHIS2",
+    "DHIS2_monthly_value": "DHIS2 monthly value",
+    "Visualization_Configurations": "Visualization Configurations"
 }

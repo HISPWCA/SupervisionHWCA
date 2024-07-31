@@ -99,7 +99,7 @@ import { DataDimension } from '@dhis2/analytics';
 import { IoMdOpen } from 'react-icons/io';
 import { MdStars, MdCancel } from 'react-icons/md';
 import shuffle from 'shuffle-array';
-import {     } from 'react-icons/tb';
+import { TbRestore } from 'react-icons/tb';
 
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';

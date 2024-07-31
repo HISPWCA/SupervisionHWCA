@@ -265,8 +265,6 @@ export const Dashboard = ({ me }) => {
                   return prev;
             }, {});
 
-            console.log('ouWithoutDuplicationObject: ', ouWithoutDuplicationObject);
-            console.log('keys : ', Object.keys(ouWithoutDuplicationObject));
             setConcerningOUs(
                   Object.keys(ouWithoutDuplicationObject).map(ou => {
                         const currO = organisationUnits.find(o => o.id === ou);
@@ -388,7 +386,7 @@ export const Dashboard = ({ me }) => {
       );
 
       const RenderNoOrganisationUnitsAtThisLevel = () =>
-            selectedMission?.output?.filter(m => m.organisationUnit?.level === selectedLevel?.level)?.length === 0 && (
+            concerningOUs?.filter(m => m?.level === selectedLevel?.level)?.length === 0 && (
                   <div
                         className="my-shadow"
                         style={{
@@ -405,59 +403,52 @@ export const Dashboard = ({ me }) => {
             );
 
       const RenderVisualizationForEachStructure = () =>
-            selectedMission?.output
-                  ?.filter(m => m.organisationUnit?.level === selectedLevel?.level)
-                  ?.map(m => (
-                        <div key={uuid()} style={{ marginBottom: '40px' }}>
-                              <div
+            concerningOUs.map(m => (
+                  <div key={uuid()} style={{ marginBottom: '40px' }}>
+                        <div
+                              style={{
+                                    fontWeight: 'bold',
+                                    marginBottom: '10px',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center'
+                              }}
+                        >
+                              <span style={{ fontSize: '15px' }}>{`${translate('Analysis_For')}  - `}</span>
+                              <span
                                     style={{
-                                          fontWeight: 'bold',
-                                          marginBottom: '10px',
-                                          display: 'flex',
-                                          justifyContent: 'center',
-                                          alignItems: 'center'
+                                          marginLeft: '10px',
+                                          fontSize: '18px',
+                                          backgroundColor: 'orange',
+                                          color: '#fff',
+                                          padding: '3px 10px',
+                                          border: '1px solid #00000090'
                                     }}
                               >
-                                    <span style={{ fontSize: '15px' }}>{`${translate('Analysis_For')}  - `}</span>
-                                    <span
-                                          style={{
-                                                marginLeft: '10px',
-                                                fontSize: '18px',
-                                                backgroundColor: 'orange',
-                                                color: '#fff',
-                                                padding: '3px 10px',
-                                                border: '1px solid #00000090'
-                                          }}
-                                    >
-                                          {m.organisationUnit.displayName}
-                                    </span>
-                              </div>
-                              <Row gutter={[8, 8]}>
-                                    {dataStoreVisualizations
-                                          .find(
-                                                vis =>
-                                                      selectedProgram?.program?.id &&
-                                                      vis.program?.id === selectedProgram?.program?.id
-                                          )
-                                          ?.visualizations?.map(v => (
-                                                <VisualizationItem
-                                                      key={uuid()}
-                                                      id={`${v.id}-${m.organisationUnit?.id}`}
-                                                      loading={loadingInjection}
-                                                />
-                                          ))}
-                              </Row>
+                                    {m.displayName}
+                              </span>
                         </div>
-                  ));
+                        <Row gutter={[8, 8]}>
+                              {dataStoreVisualizations
+                                    .find(
+                                          vis =>
+                                                selectedProgram?.program?.id &&
+                                                vis.program?.id === selectedProgram?.program?.id
+                                    )
+                                    ?.visualizations?.map(v => (
+                                          <VisualizationItem
+                                                key={uuid()}
+                                                id={`${v.id}-${m?.id}`}
+                                                loading={loadingInjection}
+                                          />
+                                    ))}
+                        </Row>
+                  </div>
+            ));
       const RenderVisualizationForGlobalStructure = () => {
-            const ouList =
-                  selectedMission?.output
-                        ?.filter(m => selectedLevel?.level > 1 && m.organisationUnit?.level === selectedLevel?.level)
-                        .map(m => m.organisationUnit) || [];
-
             return (
                   selectedLevel?.level > 1 &&
-                  ouList.length > 1 && (
+                  concerningOUs.length > 1 && (
                         <div style={{ marginTop: '20px' }}>
                               <div key={uuid()} style={{ marginBottom: '40px' }}>
                                     <div
@@ -473,7 +464,7 @@ export const Dashboard = ({ me }) => {
                                                 'Global_Analysis_For'
                                           )}  - `}</span>
 
-                                          {ouList.map(ou => (
+                                          {concerningOUs.map(ou => (
                                                 <span
                                                       key={uuid()}
                                                       style={{
@@ -527,19 +518,16 @@ export const Dashboard = ({ me }) => {
             selectedLevel &&
             selectedOrganisationUnit && (
                   <div id="visualizations-container">
-                        {/* {RenderVisualizationForEachStructure()} */}
-                        {/* {RenderVisualizationForGlobalStructure()}
-                        {RenderNoOrganisationUnitsAtThisLevel()} */}
+                        {RenderVisualizationForEachStructure()}
+                        {RenderVisualizationForGlobalStructure()}
+                        {RenderNoOrganisationUnitsAtThisLevel()}
                   </div>
             );
 
       const loadAndInjectVisualizations = async () => {
             try {
+                  console.log('concerningOUs : ', concerningOUs);
                   setLoadingInjection(true);
-
-                  const concerningOUs =
-                        selectedMission.output?.filter(m => m.organisationUnit?.level === selectedLevel?.level) || [];
-
                   // generation for specifique ou
                   concerningOUs.forEach(output => {
                         dataStoreVisualizations
@@ -558,14 +546,12 @@ export const Dashboard = ({ me }) => {
                                                       width: '100%',
                                                       height: '450px'
                                                 }}
-                                                periods={[selectedPeriod.format('YYYYMM')].join(',')}
-                                                orgUnitIDs={[output.organisationUnit?.id].join(',')}
+                                                // periods={[selectedPeriod.format('YYYYMM')].join(',')}
+                                                orgUnitIDs={[output?.id].join(',')}
                                           />
                                     );
 
-                                    const rightElement = document.getElementById(
-                                          `${v.id}-${output.organisationUnit?.id}`
-                                    );
+                                    const rightElement = document.getElementById(`${v.id}-${output?.id}`);
                                     if (rightElement) {
                                           rightElement.innerHTML = responseString;
                                     }
@@ -574,9 +560,6 @@ export const Dashboard = ({ me }) => {
 
                   // generation for all ou
                   if (selectedLevel?.level > 1) {
-                        const rightOUs =
-                              concerningOUs.filter(m => m.organisationUnit?.level > 1)?.map(m => m.organisationUnit) ||
-                              [];
                         dataStoreVisualizations
                               .find(
                                     vis =>
@@ -594,7 +577,7 @@ export const Dashboard = ({ me }) => {
                                                       height: '450px'
                                                 }}
                                                 // periods={[selectedPeriod.format('YYYYMM')].join(',')}
-                                                orgUnitIDs={rightOUs.map(r => r.id).join(',')}
+                                                orgUnitIDs={concerningOUs.map(r => r.id).join(',')}
                                           />
                                     );
 
@@ -622,6 +605,10 @@ export const Dashboard = ({ me }) => {
       }, [me]);
 
       useEffect(() => {
+            concerningOUs.length > 0 && loadAndInjectVisualizations();
+      }, [concerningOUs]);
+
+      useEffect(() => {
             if (selectedPeriods.length > 0 && selectedProgram && selectedLevel) filterAndGetConcerningOrgUnits();
       }, [teiList]);
 
@@ -630,7 +617,7 @@ export const Dashboard = ({ me }) => {
                   <div style={{ padding: '10px', width: '100%' }}>
                         {RenderFilters()}
                         <pre>{JSON.stringify(concerningOUs, null, 4)}</pre>
-                        {/* {RenderVisualizations()} */}
+                        {RenderVisualizations()}
                         <MyNotification notification={notification} setNotification={setNotification} />
                   </div>
             </>
