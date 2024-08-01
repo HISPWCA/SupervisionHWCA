@@ -299,5 +299,7 @@
     "Indicator_From_Dhis2": "Indicateur du DHIS2",
     "DHIS2_monthly_value": "DHIS2 Valeur mensuelle",
     "Visualization_Configurations": "Configurations items de visualisations",
-    "Apply":"Appliquer"
+    "Apply":"Appliquer",
+
+    "Element_Name":"Nom de l'élement"
 }

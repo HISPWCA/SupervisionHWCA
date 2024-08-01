@@ -1,20 +1,36 @@
 import { QuestionCircleOutlined } from '@ant-design/icons';
-import { Col, Popconfirm, Row, Select, Table } from 'antd';
+import { Col, Input, Popconfirm, Row, Select, Table } from 'antd';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import translate from '../utils/translator';
-import { Button } from '@dhis2/ui';
+import { Button, ButtonStrip, Modal, ModalActions, ModalContent, ModalTitle, Radio } from '@dhis2/ui';
 import { useState, useEffect } from 'react';
 import { loadDataStore } from '../utils/functions';
-import { VISUALIZATIONS_ROUTE } from '../utils/api.routes';
+import { MAPS_ROUTE, VISUALIZATIONS_ROUTE } from '../utils/api.routes';
+import { DataDimension } from '@dhis2/analytics';
+import { CgCloseO } from 'react-icons/cg';
+import { FiSave } from 'react-icons/fi';
 
-const SettingVisualizations = ({}) => {
+const SettingVisualizations = ({ programs }) => {
       const [formState, setFormState] = useState({
             selectedProgram: null,
             selectedFavoris: null,
-            currentFavoris: null
+            currentFavoris: null,
+            selectedTypeVisualization: 'VISUALIZATION',
+            selectedVisualization: null,
+            dxElements: [],
+            dxName: '',
+            dxDHIS2Element: null,
+            dxTypeElement: {
+                  id: 'INDICATOR',
+                  label: 'Indicateur'
+            },
+            visibleAnalyticComponentModal: false,
+            selectedMetaDatas: []
       });
+
       const [dataStoreVisualizations, setDataStoreVisualizations] = useState([]);
       const [visualizations, setVisualizations] = useState([]);
+      const [maps, setMaps] = useState([]);
       const [loadingDataStoreVisualizations, setLoadingDataStoreVisualizations] = useState(false);
 
       const loadDataStoreVisualizations = async () => {
@@ -40,9 +56,147 @@ const SettingVisualizations = ({}) => {
             } catch (err) {}
       };
 
+      const handleSelectProgram = value => {
+            setFormState({
+                  ...formState,
+                  selectedProgram: programs?.find(p => p.id === value)
+            });
+      };
+
+      const loadMaps = async () => {
+            try {
+                  const response = await axios.get(`${MAPS_ROUTE}?paging=false&fields=id,displayName,name`);
+                  setMaps(response.data.maps?.map(m => ({ ...m, type: 'MAP' })) || []);
+            } catch (err) {}
+      };
+
+      const handleAddElement = () => {
+            if (formState.dxDHIS2Element) {
+                  const payload = {
+                        ...formState.dxDHIS2Element,
+                        type: formState.dxTypeElement?.id
+                  };
+
+                  setFormState({ ...formState, dxElements: [...formState?.dxElements, payload] });
+            }
+      };
+
+      const RenderAnalyticComponentModal = () =>
+            formState?.visibleAnalyticComponentModal ? (
+                  <Modal onClose={() => setFormState({ ...formState, visibleAnalyticComponentModal: false })} large>
+                        <ModalTitle>
+                              <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
+                                    {translate('Source_De_Donnee')}
+                              </div>
+                        </ModalTitle>
+                        <ModalContent>
+                              <div style={{ padding: '20px', border: '1px solid #ccc' }}>
+                                    <DataDimension
+                                          selectedDimensions={formState?.selectedMetaDatas?.map(it => ({
+                                                ...it,
+                                                isDeactivated: true
+                                          }))}
+                                          onSelect={value => {
+                                                setFormState({
+                                                      ...formState,
+                                                      selectedMetaDatas:
+                                                            value?.items?.length > 0 ? [value.items[0]] : []
+                                                });
+                                          }}
+                                          displayNameProp="displayName"
+                                    />
+                              </div>
+                        </ModalContent>
+                        <ModalActions>
+                              <ButtonStrip end>
+                                    <Button
+                                          destructive
+                                          onClick={() =>
+                                                setFormState({
+                                                      ...formState,
+                                                      visibleAnalyticComponentModal: false,
+                                                      dxName: formState?.selectedMetaDatas[0]?.name
+                                                })
+                                          }
+                                          icon={<CgCloseO style={{ fontSize: '18px' }} />}
+                                    >
+                                          {translate('Close')}
+                                    </Button>
+                              </ButtonStrip>
+                        </ModalActions>
+                  </Modal>
+            ) : (
+                  <></>
+            );
+
+      const handleSaveVisualizationToDataStore = async () => {
+            try {
+                  setLoadingSaveVisualizationInDatastore(true);
+
+                  if (favorisItems.length > 0) {
+                        const listFromDataStore = await loadDataStore(
+                              process.env.REACT_APP_VISUALIZATION_KEY,
+                              null,
+                              null,
+                              null
+                        );
+
+                        if (listFromDataStore?.map(d => d.id)?.includes(selectedProgramForVisualization?.id)) {
+                              throw new Error(translate('Configuration_Deja_Ajoutee'));
+                        }
+
+                        const newList = currentVisualizationConfig
+                              ? listFromDataStore.map(l => {
+                                      if (l.program?.id === currentVisualizationConfig?.program?.id) {
+                                            return {
+                                                  ...l,
+                                                  visualizations: favorisItems
+                                            };
+                                      }
+                                      return l;
+                                })
+                              : [
+                                      {
+                                            program: selectedProgramForVisualization,
+                                            visualizations: favorisItems
+                                      },
+                                      ...listFromDataStore
+                                ];
+
+                        await saveDataToDataStore(
+                              process.env.REACT_APP_VISUALIZATION_KEY,
+                              newList,
+                              setLoadingSaveVisualizationInDatastore,
+                              null,
+                              null
+                        );
+
+                        await loadDataStoreVisualizations();
+                        setNotification({
+                              show: true,
+                              message: !currentItem
+                                    ? translate('Configuration_Ajoutee')
+                                    : translate('Mise_A_Jour_Succes'),
+                              type: NOTIFICATION_SUCCESS
+                        });
+                  }
+
+                  setFavorisItems([]);
+                  setLoadingSaveVisualizationInDatastore(false);
+            } catch (err) {
+                  setLoadingSaveVisualizationInDatastore(false);
+                  setNotification({
+                        show: true,
+                        message: err.response?.data?.message || err.message,
+                        type: NOTIFICATION_CRITICAL
+                  });
+            }
+      };
+
       useEffect(() => {
             loadDataStoreVisualizations();
             loadVisualizations();
+            loadMaps();
       }, []);
 
       return (
@@ -65,17 +219,16 @@ const SettingVisualizations = ({}) => {
                                                             {translate('Programmes_Tracker')}
                                                       </div>
                                                       <Select
-                                                            options={programs.map(program => ({
+                                                            options={programs?.map(program => ({
                                                                   label: program.displayName,
                                                                   value: program.id
                                                             }))}
-                                                            loading={loadingPrograms}
                                                             showSearch
                                                             placeholder={translate('Programmes_Tracker')}
                                                             style={{ width: '100%' }}
                                                             optionFilterProp="label"
-                                                            onChange={handleSelectedProgramForVisualization}
-                                                            value={selectedProgramForVisualization?.id}
+                                                            onChange={handleSelectProgram}
+                                                            value={formState?.selectedProgram?.id}
                                                             allowClear
                                                       />
                                                 </div>
@@ -84,11 +237,15 @@ const SettingVisualizations = ({}) => {
                                                             <Radio
                                                                   label={translate('VisualisationType')}
                                                                   onChange={({ value }) =>
-                                                                        setSelectedTypeForVisualization(value)
+                                                                        setFormState({
+                                                                              ...formState,
+                                                                              selectedTypeVisualization: value
+                                                                        })
                                                                   }
                                                                   value="VISUALIZATION"
                                                                   checked={
-                                                                        selectedTypeForVisualization === 'VISUALIZATION'
+                                                                        formState?.selectedTypeVisualization ===
+                                                                        'VISUALIZATION'
                                                                   }
                                                             />
                                                       </div>
@@ -96,85 +253,212 @@ const SettingVisualizations = ({}) => {
                                                             <Radio
                                                                   label={translate('MapType')}
                                                                   onChange={({ value }) =>
-                                                                        setSelectedTypeForVisualization(value)
+                                                                        setFormState({
+                                                                              ...formState,
+                                                                              selectedTypeVisualization: value
+                                                                        })
                                                                   }
                                                                   value="MAP"
-                                                                  checked={selectedTypeForVisualization === 'MAP'}
+                                                                  checked={
+                                                                        formState?.selectedTypeVisualization === 'MAP'
+                                                                  }
                                                             />
                                                       </div>
                                                 </div>
-                                                {selectedProgramForVisualization && (
-                                                      <div style={{ marginTop: '10px' }}>
-                                                            {selectedTypeForVisualization === 'VISUALIZATION' && (
-                                                                  <div>
-                                                                        <div style={{ marginBottom: '5px' }}>
-                                                                              {translate('SelectVisualizations')}
-                                                                        </div>
-                                                                        <Select
-                                                                              options={visualizations.map(vis => ({
-                                                                                    label: vis.displayName,
-                                                                                    value: vis.id
-                                                                              }))}
-                                                                              showSearch
-                                                                              placeholder={translate(
-                                                                                    'SelectVisualizations'
-                                                                              )}
-                                                                              style={{ width: '100%' }}
-                                                                              optionFilterProp="label"
-                                                                              onChange={value =>
-                                                                                    setSelectedVisualizations(
-                                                                                          value.map(v =>
-                                                                                                visualizations.find(
-                                                                                                      m => m.id === v
-                                                                                                )
-                                                                                          )
-                                                                                    )
-                                                                              }
-                                                                              value={selectedVisualizations.map(
-                                                                                    m => m.id
-                                                                              )}
-                                                                              mode="multiple"
-                                                                              allowClear
-                                                                        />
+                                                <div style={{ marginTop: '10px' }}>
+                                                      {formState?.selectedTypeVisualization === 'VISUALIZATION' && (
+                                                            <div>
+                                                                  <div style={{ marginBottom: '5px' }}>
+                                                                        {translate('SelectVisualizations')}
                                                                   </div>
-                                                            )}
-                                                            {selectedTypeForVisualization === 'MAP' && (
-                                                                  <div>
-                                                                        <div style={{ marginBottom: '5px' }}>
-                                                                              {translate('SelectMaps')}
-                                                                        </div>
-                                                                        <Select
-                                                                              options={maps.map(map => ({
-                                                                                    label: map.displayName,
-                                                                                    value: map.id
-                                                                              }))}
-                                                                              showSearch
-                                                                              placeholder={translate('SelectMaps')}
-                                                                              style={{ width: '100%' }}
-                                                                              optionFilterProp="label"
-                                                                              onChange={value =>
-                                                                                    setSelectedMaps(
-                                                                                          value.map(v =>
-                                                                                                maps.find(
-                                                                                                      m => m.id === v
-                                                                                                )
+                                                                  <Select
+                                                                        options={visualizations?.map(vis => ({
+                                                                              label: vis.displayName,
+                                                                              value: vis.id
+                                                                        }))}
+                                                                        showSearch
+                                                                        placeholder={translate('SelectVisualizations')}
+                                                                        style={{ width: '100%' }}
+                                                                        optionFilterProp="label"
+                                                                        onChange={value =>
+                                                                              setFormState({
+                                                                                    ...formState,
+                                                                                    selectedVisualization:
+                                                                                          visualizations?.find(
+                                                                                                v => v.id === value
                                                                                           )
-                                                                                    )
-                                                                              }
-                                                                              value={selectedMaps.map(m => m.id)}
-                                                                              mode="multiple"
-                                                                              allowClear
-                                                                        />
+                                                                              })
+                                                                        }
+                                                                        value={formState?.selectedVisualization}
+                                                                        allowClear
+                                                                  />
+                                                            </div>
+                                                      )}
+
+                                                      {formState?.selectedTypeVisualization === 'MAP' && (
+                                                            <div>
+                                                                  <div style={{ marginBottom: '5px' }}>
+                                                                        {translate('SelectMaps')}
                                                                   </div>
-                                                            )}
+                                                                  <Select
+                                                                        options={maps?.map(map => ({
+                                                                              label: map.displayName,
+                                                                              value: map.id
+                                                                        }))}
+                                                                        showSearch
+                                                                        placeholder={translate('SelectMaps')}
+                                                                        style={{ width: '100%' }}
+                                                                        optionFilterProp="label"
+                                                                        onChange={value =>
+                                                                              setFormState({
+                                                                                    ...formState,
+                                                                                    selectedVisualization: maps?.find(
+                                                                                          m => m.id === value
+                                                                                    )
+                                                                              })
+                                                                        }
+                                                                        value={formState?.selectedVisualization?.map(
+                                                                              m => m.id
+                                                                        )}
+                                                                        allowClear
+                                                                  />
+                                                            </div>
+                                                      )}
+                                                </div>
+
+                                                {formState?.selectedTypeVisualization && (
+                                                      <div style={{ marginTop: '20px' }}>
+                                                            <Row gutter={[8, 8]}>
+                                                                  <Col md={8} sm={24}>
+                                                                        <Select
+                                                                              options={[
+                                                                                    {
+                                                                                          id: 'INDICATOR',
+                                                                                          label: 'Indicateur'
+                                                                                    },
+                                                                                    {
+                                                                                          id: 'RECOUPEMENT',
+                                                                                          label: 'Recoupement'
+                                                                                    }
+                                                                              ]}
+                                                                              value={formState?.dxTypeElement}
+                                                                              onChange={value =>
+                                                                                    setFormState({
+                                                                                          ...formState,
+                                                                                          dxTypeElement: value
+                                                                                    })
+                                                                              }
+                                                                              style={{ width: '100%' }}
+                                                                        />
+                                                                  </Col>
+                                                                  <Col md={12} sm={24}>
+                                                                        <div
+                                                                              style={{
+                                                                                    display: 'flex',
+                                                                                    alignItems: 'center'
+                                                                              }}
+                                                                        >
+                                                                              <Input
+                                                                                    placeholder={translate(
+                                                                                          'Element_Name'
+                                                                                    )}
+                                                                                    style={{ width: '80%' }}
+                                                                                    value={formState?.dxName}
+                                                                                    onChange={e =>
+                                                                                          setFormState({
+                                                                                                ...formState,
+                                                                                                dxName: e.target.value
+                                                                                          })
+                                                                                    }
+                                                                                    disabled={
+                                                                                          formState?.dxDHIS2Element
+                                                                                                ? false
+                                                                                                : true
+                                                                                    }
+                                                                              />
+                                                                              <div style={{ marginLeft: '5px' }}>
+                                                                                    <Button
+                                                                                          onClick={() =>
+                                                                                                setFormState({
+                                                                                                      ...formState,
+                                                                                                      visibleAnalyticComponentModal: true
+                                                                                                })
+                                                                                          }
+                                                                                          small
+                                                                                          primary
+                                                                                    >
+                                                                                          vis
+                                                                                    </Button>
+                                                                              </div>
+                                                                        </div>
+                                                                  </Col>
+                                                                  <Col md={4} sm={24}>
+                                                                        <Button
+                                                                              small
+                                                                              onClick={handleAddElement}
+                                                                              primary
+                                                                        >
+                                                                              + {translate('Ajouter')}
+                                                                        </Button>
+                                                                  </Col>
+                                                            </Row>
                                                       </div>
                                                 )}
 
-                                                {(selectedMaps.length > 0 || selectedVisualizations.length > 0) && (
+                                                {formState?.dxElements?.length > 0 && (
+                                                      <div style={{ marginTop: '20px' }}>
+                                                            <table
+                                                                  style={{ width: '100%', borderCollapse: 'collapse' }}
+                                                            >
+                                                                  <thead>
+                                                                        <tr style={{ background: '#ccc' }}>
+                                                                              <th
+                                                                                    style={{
+                                                                                          padding: '2px',
+                                                                                          border: '1px solid #ccc'
+                                                                                    }}
+                                                                              >
+                                                                                    {translate('Element_Name')}
+                                                                              </th>
+                                                                              <th
+                                                                                    style={{
+                                                                                          padding: '2px',
+                                                                                          border: '1px solid #ccc'
+                                                                                    }}
+                                                                              >
+                                                                                    {translate('Action')}
+                                                                              </th>
+                                                                        </tr>
+                                                                  </thead>
+                                                                  {formState?.dxElements?.map(element => (
+                                                                        <tr key={element.id}>
+                                                                              <td
+                                                                                    style={{
+                                                                                          padding: '2px',
+                                                                                          border: '1px solid #ccc'
+                                                                                    }}
+                                                                              >
+                                                                                    {element.name}
+                                                                              </td>
+                                                                              <td
+                                                                                    style={{
+                                                                                          padding: '2px',
+                                                                                          border: '1px solid #ccc'
+                                                                                    }}
+                                                                              >
+                                                                                    Supprimer
+                                                                              </td>
+                                                                        </tr>
+                                                                  ))}
+                                                            </table>
+                                                      </div>
+                                                )}
+
+                                                {formState?.selectedVisualization && (
                                                       <div style={{ marginTop: '10px' }}>
                                                             <Button
                                                                   primary
-                                                                  onClick={handleAddVisualizationToFavorisList}
+                                                                  onClick={handleSaveVisualizationToDataStore}
                                                             >
                                                                   +{translate('Ajouter')}
                                                             </Button>
@@ -182,230 +466,11 @@ const SettingVisualizations = ({}) => {
                                                 )}
                                           </div>
                                     </>
-{/* 
-                                    {selectedTypeForVisualization && favorisItems.length > 0 && (
-                                          <>
-                                                <div
-                                                      className="my-shadow"
-                                                      style={{
-                                                            padding: '20px',
-                                                            background: '#FFF',
-                                                            marginBottom: '2px',
-                                                            borderRadius: '8px'
-                                                      }}
-                                                >
-                                                      <Table
-                                                            bordered
-                                                            size="small"
-                                                            pagination={false}
-                                                            dataSource={favorisItems.map(f => ({ ...f, action: f.id }))}
-                                                            columns={[
-                                                                  {
-                                                                        title: translate('Favoris'),
-                                                                        dataIndex: 'displayName'
-                                                                  },
-                                                                  {
-                                                                        title: translate('Type'),
-                                                                        dataIndex: 'type'
-                                                                  },
-                                                                  {
-                                                                        title: translate('Actions'),
-                                                                        dataIndex: 'action',
-                                                                        render: value => (
-                                                                              <div>
-                                                                                    <Popconfirm
-                                                                                          title={translate(
-                                                                                                'Suppression'
-                                                                                          )}
-                                                                                          description={translate(
-                                                                                                'Confirmation_Suppression_Visualisation'
-                                                                                          )}
-                                                                                          icon={
-                                                                                                <QuestionCircleOutlined
-                                                                                                      style={{
-                                                                                                            color: 'red'
-                                                                                                      }}
-                                                                                                />
-                                                                                          }
-                                                                                          // onConfirm={() =>
-                                                                                          //       handleDeleteVisualizationConfig(
-                                                                                          //             value
-                                                                                          //       )
-                                                                                          // }
-                                                                                    >
-                                                                                          <div>
-                                                                                                <RiDeleteBinLine
-                                                                                                      style={{
-                                                                                                            color: 'red',
-                                                                                                            fontSize: '18px',
-                                                                                                            cursor: 'pointer'
-                                                                                                      }}
-                                                                                                />
-                                                                                          </div>
-                                                                                    </Popconfirm>
-                                                                              </div>
-                                                                        )
-                                                                  }
-                                                            ]}
-                                                      />
-                                                </div>
-
-                                                <div
-                                                      style={{
-                                                            marginTop: '10px',
-                                                            display: 'flex',
-                                                            alignItems: 'center'
-                                                      }}
-                                                >
-                                                      <Button
-                                                            // loading={loadingSaveSupervionsConfig}
-                                                            // disabled={
-                                                            //       loadingSaveSupervionsConfig || !selectedTEIProgram
-                                                            // }
-                                                            icon={
-                                                                  <FiSave style={{ color: '#FFF', fontSize: '18px' }} />
-                                                            }
-                                                            destructive
-                                                            onClick={() => {
-                                                                  setFavorisItems([]);
-                                                                  setSelectedMaps([]);
-                                                                  setSelectedVisualizations([]);
-                                                                  setSelectedProgramForVisualization(null);
-                                                            }}
-                                                      >
-                                                            {translate('Annuler')}
-                                                      </Button>
-                                                      <div style={{ marginLeft: '10px' }}>
-                                                            <Button
-                                                                  // loading={loadingSaveSupervionsConfig}
-                                                                  // disabled={
-                                                                  //       loadingSaveSupervionsConfig ||
-                                                                  //       !selectedTEIProgram
-                                                                  // }
-                                                                  icon={
-                                                                        <FiSave
-                                                                              style={{
-                                                                                    color: '#FFF',
-                                                                                    fontSize: '18px'
-                                                                              }}
-                                                                        />
-                                                                  }
-                                                                  primary
-                                                                  onClick={handleSaveVisualizationToDataStore}
-                                                            >
-                                                                  {isFieldEditingMode && (
-                                                                        <span>{translate('Mise_A_Jour')}</span>
-                                                                  )}
-                                                                  {!isFieldEditingMode && (
-                                                                        <span>{translate('Enregistrer')}</span>
-                                                                  )}
-                                                            </Button>
-                                                      </div>
-                                                </div>
-                                          </>
-                                    )} */}
                               </div>
                         </Col>
-                        {/* <Col md={12} sm={24}>
-                              {mappingConfigSupervisions.length > 0 && (
-                                    <div
-                                          className="my-shadow"
-                                          style={{
-                                                padding: '20px',
-                                                background: '#FFF',
-                                                marginBottom: '2px',
-                                                borderRadius: '8px'
-                                          }}
-                                    >
-                                          <div
-                                                style={{
-                                                      marginBottom: '10px',
-                                                      fontWeight: 'bold',
-                                                      fontSize: '16px'
-                                                }}
-                                          >
-                                                {translate('Visualization_Configurations')}
-                                          </div>
-                                          <Table
-                                                dataSource={dataStoreVisualizations.map(fav => ({
-                                                      ...fav,
-                                                      programName: fav?.program?.displayName,
-                                                      nbrVisualizations: fav?.visualizations?.length || 0,
-                                                      action: fav
-                                                }))}
-                                                columns={[
-                                                      {
-                                                            title: translate('Programme'),
-                                                            dataIndex: 'programName'
-                                                      },
-
-                                                      {
-                                                            title: translate('Visualizations'),
-                                                            dataIndex: 'nbrVisualizations'
-                                                      },
-                                                      {
-                                                            title: translate('Actions'),
-                                                            dataIndex: 'action',
-                                                            width: '80px',
-                                                            render: value => (
-                                                                  <div
-                                                                        style={{
-                                                                              display: 'flex',
-                                                                              alignItems: 'center'
-                                                                        }}
-                                                                  >
-                                                                        <div style={{ marginRight: '10px' }}>
-                                                                              <FiEdit
-                                                                                    style={{
-                                                                                          color: BLUE,
-                                                                                          fontSize: '18px',
-                                                                                          cursor: 'pointer'
-                                                                                    }}
-                                                                                    onClick={() =>
-                                                                                          handleEditVisualizations(
-                                                                                                value
-                                                                                          )
-                                                                                    }
-                                                                              />
-                                                                        </div>
-                                                                        <Popconfirm
-                                                                              title={translate(
-                                                                                    'Suppression_Configuration'
-                                                                              )}
-                                                                              description={translate(
-                                                                                    'Confirmation_Suppression_Configuration'
-                                                                              )}
-                                                                              icon={
-                                                                                    <QuestionCircleOutlined
-                                                                                          style={{ color: 'red' }}
-                                                                                    />
-                                                                              }
-                                                                              onConfirm={() =>
-                                                                                    handleDeleteVisatualizationProgramConfig(
-                                                                                          value
-                                                                                    )
-                                                                              }
-                                                                        >
-                                                                              <div>
-                                                                                    <RiDeleteBinLine
-                                                                                          style={{
-                                                                                                color: 'red',
-                                                                                                fontSize: '18px',
-                                                                                                cursor: 'pointer'
-                                                                                          }}
-                                                                                    />
-                                                                              </div>
-                                                                        </Popconfirm>
-                                                                  </div>
-                                                            )
-                                                      }
-                                                ]}
-                                                size="small"
-                                          />
-                                    </div>
-                              )}
-                        </Col> */}
                   </Row>
+                  {console.log(formState)}
+                  {RenderAnalyticComponentModal()}
             </>
       );
 };

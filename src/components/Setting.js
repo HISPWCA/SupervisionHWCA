@@ -252,15 +252,6 @@ const Setting = () => {
             }
       };
 
-      const loadMaps = async () => {
-            try {
-                  const response = await axios.get(`${MAPS_ROUTE}?paging=false&fields=id,displayName,name`);
-                  setMaps(response.data.maps?.map(m => ({ ...m, type: 'MAP' })) || []);
-            } catch (err) {}
-      };
-
-    
-
       const loadOrganisationUnitGroups = async () => {
             try {
                   setLoadingOrganisationUnitGroups(true);
@@ -439,7 +430,6 @@ const Setting = () => {
             }
       };
 
-   
       const loadDataStoreGlobalSettings = async () => {
             try {
                   const response = await loadDataStore(process.env.REACT_APP_GLOBAL_SETTING_KEY, null, null, null);
@@ -447,7 +437,7 @@ const Setting = () => {
             } catch (err) {
                   throw err;
             }
-      }
+      };
 
       const initIndicatorConfigStates = async () => {
             try {
@@ -2194,7 +2184,7 @@ const Setting = () => {
 
       const RenderPageVisualizationsConfig = () => (
             <>
-                  <SettingVisualizations />
+                  <SettingVisualizations programs={programs} />
             </>
       );
 
@@ -2917,7 +2907,7 @@ const Setting = () => {
 
       useEffect(() => {
             loadPrograms();
-            loadMaps();
+
             loadDataStoreGlobalSettings();
             selectedTypeSupervisionPage === PAGE_CONFIG_INDICATORS && initIndicatorConfigStates();
             selectedTypeSupervisionPage === PAGE_CONFIG_SUPERVISION && initSupConfigStates();
