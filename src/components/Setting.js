@@ -47,9 +47,22 @@ import { loadDataStore, saveDataToDataStore } from '../utils/functions';
 import { BLUE } from '../utils/couleurs';
 import MyNotification from './MyNotification';
 import translate from '../utils/translator';
+import GenerateIndicatorsFieldsList from './GenerateIndicatorsFields';
 import GenerateIndicatorsFieldsDQR from './GenerateIndicatorsFieldsDQR';
 import SettingIndicatorsMapping from './SettingIndicatorsMapping';
-import SettingVisualizations from './SettingVisualizations';
+
+const numberList = [
+      { value: 1, label: '1' },
+      { value: 2, label: '2' },
+      { value: 3, label: '3' },
+      { value: 4, label: '4' },
+      { value: 5, label: '5' },
+      { value: 6, label: '6' },
+      { value: 7, label: '7' },
+      { value: 8, label: '8' },
+      { value: 9, label: '9' },
+      { value: 10, label: '10' }
+];
 
 const Setting = () => {
       const [currentItem, setCurrentItem] = useState(null);
@@ -75,7 +88,6 @@ const Setting = () => {
       const [currentVisualizationProgram, setCurrentVisualizationProgram] = useState(null);
       const [indicatorsFieldsConfigs, setIndicatorsFieldsConfigs] = useState([]);
       const [dataStoreGlobalSettings, setDataStoreGlobalSettings] = useState(null);
-      const [currentVisualizationConfig, setCurrentVisualizationConfig] = useState(null);
 
       const [visualizations, setVisualizations] = useState([]);
       const [maps, setMaps] = useState([]);
@@ -120,7 +132,7 @@ const Setting = () => {
       const [selectedAttributeNameForAgent, setSelectedAttributeNameForAgent] = useState(null);
       const [selectedAttributeFirstNameForAgent, setSelectedAttributeFirstNameForAgent] = useState(null);
       const [selectedProgramForVisualization, setSelectedProgramForVisualization] = useState(null);
-      const [selectedTypeForVisualization, setSelectedTypeForVisualization] = useState('VISUALIZATION');
+      const [selectedTypeForVisualization, setSelectedTypeForVisualization] = useState(null);
       const [selectedMaps, setSelectedMaps] = useState([]);
       const [selectedVisualizations, setSelectedVisualizations] = useState([]);
 
@@ -250,6 +262,22 @@ const Setting = () => {
             } catch (err) {
                   setLoadingPrograms(false);
             }
+      };
+
+      const loadMaps = async () => {
+            try {
+                  const response = await axios.get(`${MAPS_ROUTE}?paging=false&fields=id,displayName,name`);
+                  setMaps(response.data.maps?.map(m => ({ ...m, type: 'MAP' })) || []);
+            } catch (err) {}
+      };
+
+      const loadVisualizations = async () => {
+            try {
+                  const response = await axios.get(
+                        `${VISUALIZATIONS_ROUTE}?pageSize=100000&fields=id,displayName,name,type`
+                  );
+                  setVisualizations(response.data.visualizations || []);
+            } catch (err) {}
       };
 
       const loadOrganisationUnitGroups = async () => {
@@ -430,6 +458,19 @@ const Setting = () => {
             }
       };
 
+      const loadDataStoreVisualizations = async () => {
+            try {
+                  setLoadingDataStoreVisualizations(true);
+                  const response = await loadDataStore(process.env.REACT_APP_VISUALIZATION_KEY, null, null, null);
+
+                  setDataStoreVisualizations(response);
+                  setLoadingDataStoreVisualizations(false);
+                  return response;
+            } catch (err) {
+                  setLoadingDataStoreVisualizations(false);
+                  throw err;
+            }
+      };
       const loadDataStoreGlobalSettings = async () => {
             try {
                   const response = await loadDataStore(process.env.REACT_APP_GLOBAL_SETTING_KEY, null, null, null);
@@ -574,7 +615,6 @@ const Setting = () => {
                         setSelectedProgramForVisualization(null);
                         setSelectedMaps([]);
                         setSelectedVisualizations([]);
-                        setFavorisItems([]);
                         setCurrentVisualizationProgram(null);
                   }
             } catch (err) {
@@ -1909,13 +1949,6 @@ const Setting = () => {
             });
       };
 
-      const handleEditVisualizations = value => {
-            console.log('Handle visualisation');
-            setCurrentVisualizationConfig(value);
-            setFavorisItems(value.visualizations);
-            setSelectedProgramForVisualization(value.program);
-      };
-
       const handleSaveVisualizationToDataStore = async () => {
             try {
                   setLoadingSaveVisualizationInDatastore(true);
@@ -1932,23 +1965,13 @@ const Setting = () => {
                               throw new Error(translate('Configuration_Deja_Ajoutee'));
                         }
 
-                        const newList = currentVisualizationConfig
-                              ? listFromDataStore.map(l => {
-                                      if (l.program?.id === currentVisualizationConfig?.program?.id) {
-                                            return {
-                                                  ...l,
-                                                  visualizations: favorisItems
-                                            };
-                                      }
-                                      return l;
-                                })
-                              : [
-                                      {
-                                            program: selectedProgramForVisualization,
-                                            visualizations: favorisItems
-                                      },
-                                      ...listFromDataStore
-                                ];
+                        const newList = [
+                              {
+                                    program: selectedProgramForVisualization,
+                                    visualizations: favorisItems
+                              },
+                              ...listFromDataStore
+                        ];
 
                         await saveDataToDataStore(
                               process.env.REACT_APP_VISUALIZATION_KEY,
@@ -1968,7 +1991,6 @@ const Setting = () => {
                         });
                   }
 
-                  setFavorisItems([]);
                   setLoadingSaveVisualizationInDatastore(false);
             } catch (err) {
                   setLoadingSaveVisualizationInDatastore(false);
@@ -2184,7 +2206,465 @@ const Setting = () => {
 
       const RenderPageVisualizationsConfig = () => (
             <>
-                  <SettingVisualizations programs={programs} />
+                  <Row gutter={[8, 10]}>
+                        <Col md={12} sm={24}>
+                              <div>
+                                    <>
+                                          <div
+                                                className="my-shadow"
+                                                style={{
+                                                      padding: '20px',
+                                                      background: '#FFF',
+                                                      marginBottom: '2px',
+                                                      borderRadius: '8px'
+                                                }}
+                                          >
+                                                <div>
+                                                      <div style={{ marginBottom: '5px' }}>
+                                                            {translate('Programmes_Tracker')}
+                                                      </div>
+                                                      <Select
+                                                            options={programs.map(program => ({
+                                                                  label: program.displayName,
+                                                                  value: program.id
+                                                            }))}
+                                                            loading={loadingPrograms}
+                                                            showSearch
+                                                            placeholder={translate('Programmes_Tracker')}
+                                                            style={{ width: '100%' }}
+                                                            optionFilterProp="label"
+                                                            onChange={handleSelectedProgramForVisualization}
+                                                            value={selectedProgramForVisualization?.id}
+                                                            allowClear
+                                                      />
+                                                </div>
+                                                <div style={{ marginTop: '20px' }}>
+                                                      <div style={{ marginTop: '5px' }}>
+                                                            <Radio
+                                                                  label={translate('VisualisationType')}
+                                                                  onChange={({ value }) =>
+                                                                        setSelectedTypeForVisualization(value)
+                                                                  }
+                                                                  value="VISUALIZATION"
+                                                                  checked={
+                                                                        selectedTypeForVisualization === 'VISUALIZATION'
+                                                                  }
+                                                            />
+                                                      </div>
+                                                      <div style={{ marginTop: '5px' }}>
+                                                            <Radio
+                                                                  label={translate('MapType')}
+                                                                  onChange={({ value }) =>
+                                                                        setSelectedTypeForVisualization(value)
+                                                                  }
+                                                                  value="MAP"
+                                                                  checked={selectedTypeForVisualization === 'MAP'}
+                                                            />
+                                                      </div>
+                                                </div>
+                                                {selectedProgramForVisualization && (
+                                                      <div style={{ marginTop: '10px' }}>
+                                                            {selectedTypeForVisualization === 'VISUALIZATION' && (
+                                                                  <div>
+                                                                        <div style={{ marginBottom: '5px' }}>
+                                                                              {translate('SelectVisualizations')}
+                                                                        </div>
+                                                                        <Select
+                                                                              options={visualizations.map(vis => ({
+                                                                                    label: vis.displayName,
+                                                                                    value: vis.id
+                                                                              }))}
+                                                                              showSearch
+                                                                              placeholder={translate(
+                                                                                    'SelectVisualizations'
+                                                                              )}
+                                                                              style={{ width: '100%' }}
+                                                                              optionFilterProp="label"
+                                                                              onChange={value =>
+                                                                                    setSelectedVisualizations(
+                                                                                          value.map(v =>
+                                                                                                visualizations.find(
+                                                                                                      m => m.id === v
+                                                                                                )
+                                                                                          )
+                                                                                    )
+                                                                              }
+                                                                              value={selectedVisualizations.map(
+                                                                                    m => m.id
+                                                                              )}
+                                                                              mode="multiple"
+                                                                              allowClear
+                                                                        />
+                                                                  </div>
+                                                            )}
+                                                            {selectedTypeForVisualization === 'MAP' && (
+                                                                  <div>
+                                                                        <div style={{ marginBottom: '5px' }}>
+                                                                              {translate('SelectMaps')}
+                                                                        </div>
+                                                                        <Select
+                                                                              options={maps.map(map => ({
+                                                                                    label: map.displayName,
+                                                                                    value: map.id
+                                                                              }))}
+                                                                              showSearch
+                                                                              placeholder={translate('SelectMaps')}
+                                                                              style={{ width: '100%' }}
+                                                                              optionFilterProp="label"
+                                                                              onChange={value =>
+                                                                                    setSelectedMaps(
+                                                                                          value.map(v =>
+                                                                                                maps.find(
+                                                                                                      m => m.id === v
+                                                                                                )
+                                                                                          )
+                                                                                    )
+                                                                              }
+                                                                              value={selectedMaps.map(m => m.id)}
+                                                                              mode="multiple"
+                                                                              allowClear
+                                                                        />
+                                                                  </div>
+                                                            )}
+                                                      </div>
+                                                )}
+
+                                                {(selectedMaps.length > 0 || selectedVisualizations.length > 0) && (
+                                                      <div style={{ marginTop: '10px' }}>
+                                                            <Button
+                                                                  primary
+                                                                  onClick={handleAddVisualizationToFavorisList}
+                                                            >
+                                                                  +{translate('Ajouter')}
+                                                            </Button>
+                                                      </div>
+                                                )}
+                                          </div>
+                                    </>
+
+                                    {selectedTypeForVisualization && favorisItems.length > 0 && (
+                                          <>
+                                                <div
+                                                      className="my-shadow"
+                                                      style={{
+                                                            padding: '20px',
+                                                            background: '#FFF',
+                                                            marginBottom: '2px',
+                                                            borderRadius: '8px'
+                                                      }}
+                                                >
+                                                      <Table
+                                                            bordered
+                                                            size="small"
+                                                            pagination={false}
+                                                            dataSource={favorisItems.map(f => ({ ...f, action: f.id }))}
+                                                            columns={[
+                                                                  {
+                                                                        title: translate('Favoris'),
+                                                                        dataIndex: 'displayName'
+                                                                  },
+                                                                  {
+                                                                        title: translate('Type'),
+                                                                        dataIndex: 'type'
+                                                                  },
+                                                                  {
+                                                                        title: translate('Actions'),
+                                                                        dataIndex: 'action',
+                                                                        render: value => (
+                                                                              <div>
+                                                                                    <Popconfirm
+                                                                                          title={translate(
+                                                                                                'Suppression'
+                                                                                          )}
+                                                                                          description={translate(
+                                                                                                'Confirmation_Suppression_Visualisation'
+                                                                                          )}
+                                                                                          icon={
+                                                                                                <QuestionCircleOutlined
+                                                                                                      style={{
+                                                                                                            color: 'red'
+                                                                                                      }}
+                                                                                                />
+                                                                                          }
+                                                                                          onConfirm={() =>
+                                                                                                handleDeleteVisualizationConfig(
+                                                                                                      value
+                                                                                                )
+                                                                                          }
+                                                                                    >
+                                                                                          <div>
+                                                                                                <RiDeleteBinLine
+                                                                                                      style={{
+                                                                                                            color: 'red',
+                                                                                                            fontSize: '18px',
+                                                                                                            cursor: 'pointer'
+                                                                                                      }}
+                                                                                                />
+                                                                                          </div>
+                                                                                    </Popconfirm>
+                                                                              </div>
+                                                                        )
+                                                                  }
+                                                            ]}
+                                                      />
+                                                </div>
+
+                                                <div
+                                                      style={{
+                                                            marginTop: '10px',
+                                                            display: 'flex',
+                                                            alignItems: 'center'
+                                                      }}
+                                                >
+                                                      <Button
+                                                            loading={loadingSaveSupervionsConfig}
+                                                            disabled={
+                                                                  loadingSaveSupervionsConfig || !selectedTEIProgram
+                                                            }
+                                                            icon={
+                                                                  <FiSave style={{ color: '#FFF', fontSize: '18px' }} />
+                                                            }
+                                                            destructive
+                                                            onClick={() => {
+                                                                  setFavorisItems([]);
+                                                                  setSelectedMaps([]);
+                                                                  setSelectedVisualizations([]);
+                                                                  setSelectedProgramForVisualization(null);
+                                                            }}
+                                                      >
+                                                            {translate('Annuler')}
+                                                      </Button>
+                                                      <div style={{ marginLeft: '10px' }}>
+                                                            <Button
+                                                                  loading={loadingSaveSupervionsConfig}
+                                                                  disabled={
+                                                                        loadingSaveSupervionsConfig ||
+                                                                        !selectedTEIProgram
+                                                                  }
+                                                                  icon={
+                                                                        <FiSave
+                                                                              style={{
+                                                                                    color: '#FFF',
+                                                                                    fontSize: '18px'
+                                                                              }}
+                                                                        />
+                                                                  }
+                                                                  primary
+                                                                  onClick={handleSaveVisualizationToDataStore}
+                                                            >
+                                                                  {isFieldEditingMode && (
+                                                                        <span>{translate('Mise_A_Jour')}</span>
+                                                                  )}
+                                                                  {!isFieldEditingMode && (
+                                                                        <span>{translate('Enregistrer')}</span>
+                                                                  )}
+                                                            </Button>
+                                                      </div>
+                                                </div>
+                                          </>
+                                    )}
+                              </div>
+                        </Col>
+                        <Col md={12} sm={24}>
+                              {mappingConfigSupervisions.length > 0 && (
+                                    <div
+                                          className="my-shadow"
+                                          style={{
+                                                padding: '20px',
+                                                background: '#FFF',
+                                                marginBottom: '2px',
+                                                borderRadius: '8px'
+                                          }}
+                                    >
+                                          <div
+                                                style={{
+                                                      marginBottom: '10px',
+                                                      fontWeight: 'bold',
+                                                      fontSize: '16px'
+                                                }}
+                                          >
+                                                {translate('Liste_Programme_Tracker')}
+                                          </div>
+                                          <Table
+                                                dataSource={favorisItems.map(fav => ({
+                                                      ...fav,
+                                                      programName: fav?.program?.displayName,
+                                                      nbrVisualizations: fav?.visualizations?.length || 0,
+                                                      action: fav
+                                                }))}
+                                                columns={[
+                                                      {
+                                                            title: translate('Programme'),
+                                                            dataIndex: 'programName'
+                                                      },
+
+                                                      {
+                                                            title: translate('Visualizations'),
+                                                            dataIndex: 'nbrVisualizations'
+                                                      },
+                                                      {
+                                                            title: translate('Actions'),
+                                                            dataIndex: 'action',
+                                                            width: '80px',
+                                                            render: value => (
+                                                                  <div
+                                                                        style={{
+                                                                              display: 'flex',
+                                                                              alignItems: 'center'
+                                                                        }}
+                                                                  >
+                                                                        <div style={{ marginRight: '10px' }}>
+                                                                              <FiEdit
+                                                                                    style={{
+                                                                                          color: BLUE,
+                                                                                          fontSize: '18px',
+                                                                                          cursor: 'pointer'
+                                                                                    }}
+                                                                                    onClick={() =>
+                                                                                          handleEditProgramSup(value)
+                                                                                    }
+                                                                              />
+                                                                        </div>
+                                                                        <Popconfirm
+                                                                              title={translate(
+                                                                                    'Suppression_Configuration'
+                                                                              )}
+                                                                              description={translate(
+                                                                                    'Confirmation_Suppression_Configuration'
+                                                                              )}
+                                                                              icon={
+                                                                                    <QuestionCircleOutlined
+                                                                                          style={{ color: 'red' }}
+                                                                                    />
+                                                                              }
+                                                                              onConfirm={() =>
+                                                                                    handleDeleteVisatualizationProgramConfig(
+                                                                                          value
+                                                                                    )
+                                                                              }
+                                                                        >
+                                                                              <div>
+                                                                                    <RiDeleteBinLine
+                                                                                          style={{
+                                                                                                color: 'red',
+                                                                                                fontSize: '18px',
+                                                                                                cursor: 'pointer'
+                                                                                          }}
+                                                                                    />
+                                                                              </div>
+                                                                        </Popconfirm>
+                                                                  </div>
+                                                            )
+                                                      }
+                                                ]}
+                                                size="small"
+                                          />
+                                    </div>
+                              )}
+
+                              {selectedPlanificationType === AGENT &&
+                                    selectedTEIProgram &&
+                                    paymentConfigList.length > 0 && (
+                                          <div
+                                                className="my-shadow"
+                                                style={{
+                                                      padding: '20px',
+                                                      marginTop: '10px',
+                                                      background: '#FFF',
+                                                      marginBottom: '2px',
+                                                      borderRadius: '8px'
+                                                }}
+                                          >
+                                                <div
+                                                      style={{
+                                                            marginBottom: '10px',
+                                                            fontWeight: 'bold',
+                                                            fontSize: '16px'
+                                                      }}
+                                                >
+                                                      {translate('Liste_Config_Paiement')}
+                                                </div>
+                                                <Table
+                                                      dataSource={paymentConfigList.map(conf => ({
+                                                            ...conf,
+                                                            programName: conf.program?.displayName,
+                                                            action: conf
+                                                      }))}
+                                                      columns={[
+                                                            { title: translate('Programme'), dataIndex: 'programName' },
+
+                                                            { title: translate('Libelle'), dataIndex: 'libelle' },
+                                                            {
+                                                                  title: translate('Montant_Constant'),
+                                                                  dataIndex: 'montantConstant'
+                                                            },
+                                                            {
+                                                                  title: translate('Frais_Mobile_Money'),
+                                                                  dataIndex: 'fraisMobileMoney'
+                                                            },
+                                                            {
+                                                                  title: translate('Actions'),
+                                                                  dataIndex: 'action',
+                                                                  width: '80px',
+                                                                  render: value => (
+                                                                        <div
+                                                                              style={{
+                                                                                    display: 'flex',
+                                                                                    alignItems: 'center'
+                                                                              }}
+                                                                        >
+                                                                              <div style={{ marginRight: '10px' }}>
+                                                                                    <FiEdit
+                                                                                          style={{
+                                                                                                color: BLUE,
+                                                                                                fontSize: '18px',
+                                                                                                cursor: 'pointer'
+                                                                                          }}
+                                                                                          onClick={() =>
+                                                                                                handleEditPaymentConfig(
+                                                                                                      value
+                                                                                                )
+                                                                                          }
+                                                                                    />
+                                                                              </div>
+                                                                              <Popconfirm
+                                                                                    title={translate(
+                                                                                          'Suppression_Configuration'
+                                                                                    )}
+                                                                                    description={translate(
+                                                                                          'Confirmation_Suppression_Configuration'
+                                                                                    )}
+                                                                                    icon={
+                                                                                          <QuestionCircleOutlined
+                                                                                                style={{ color: 'red' }}
+                                                                                          />
+                                                                                    }
+                                                                                    onConfirm={() =>
+                                                                                          handleDeletePaymentConfig(
+                                                                                                value
+                                                                                          )
+                                                                                    }
+                                                                              >
+                                                                                    <div>
+                                                                                          <RiDeleteBinLine
+                                                                                                style={{
+                                                                                                      color: 'red',
+                                                                                                      fontSize: '18px',
+                                                                                                      cursor: 'pointer'
+                                                                                                }}
+                                                                                          />
+                                                                                    </div>
+                                                                              </Popconfirm>
+                                                                        </div>
+                                                                  )
+                                                            }
+                                                      ]}
+                                                      size="small"
+                                                />
+                                          </div>
+                                    )}
+                        </Col>
+                  </Row>
             </>
       );
 
@@ -2907,7 +3387,9 @@ const Setting = () => {
 
       useEffect(() => {
             loadPrograms();
-
+            loadMaps();
+            loadVisualizations();
+            loadDataStoreVisualizations();
             loadDataStoreGlobalSettings();
             selectedTypeSupervisionPage === PAGE_CONFIG_INDICATORS && initIndicatorConfigStates();
             selectedTypeSupervisionPage === PAGE_CONFIG_SUPERVISION && initSupConfigStates();

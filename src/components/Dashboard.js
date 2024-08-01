@@ -223,7 +223,7 @@ export const Dashboard = ({ me }) => {
       };
 
       const filterAndGetConcerningOrgUnits = () => {
-            const RightOUList = teiList.reduce((prev, current) => {
+            const rightOUList = teiList.reduce((prev, current) => {
                   if (selectedProgram.generationType === TYPE_GENERATION_AS_EVENT) {
                         const eventList = [];
                         const currentEnrollment = current.enrollments?.filter(
@@ -257,26 +257,40 @@ export const Dashboard = ({ me }) => {
                   return prev;
             }, []);
 
-            const ouWithoutDuplicationObject = RightOUList.reduce((prev, current) => {
-                  if (
-                        !prev[current.orgUnit] &&
-                        organisationUnits?.find(ou => ou.id === current.orgUnit)?.level === selectedLevel?.level
-                  ) {
-                        prev[current.orgUnit] = current;
-                  }
-                  return prev;
-            }, {});
+            // const ouWithoutDuplicationObject = RightOUList.reduce((prev, current) => {
+            //       if (
+            //             !prev[current.orgUnit] &&
+            //             organisationUnits?.find(ou => ou.id === current.orgUnit)?.level === selectedLevel?.level
+            //       ) {
+            //             prev[current.orgUnit] = current;
+            //       }
+            //       return prev;
+            // }, {});
+
+            // setConcerningOUs(
+            //       Object.entries(ouWithoutDuplicationObject).map(([ouKey, ouContent]) => {
+            //             const currO = organisationUnits.find(o => o.id === ouKey);
+            //             return {
+            //                   id: currO?.id,
+            //                   displayName: currO?.displayName,
+            //                   name: currO?.name,
+            //                   level: currO?.level,
+            //                   path: currO?.path,
+            //                   event: ouContent
+            //             };
+            //       })
+            // );
 
             setConcerningOUs(
-                  Object.entries(ouWithoutDuplicationObject).map(([ouKey, ouContent]) => {
-                        const currO = organisationUnits.find(o => o.id === ouKey);
+                  rightOUList.map(event => {
+                        const currO = organisationUnits.find(o => o.id === event.orgUnit);
                         return {
                               id: currO?.id,
                               displayName: currO?.displayName,
                               name: currO?.name,
                               level: currO?.level,
                               path: currO?.path,
-                              event: ouContent
+                              event: event
                         };
                   })
             );
@@ -533,6 +547,10 @@ export const Dashboard = ({ me }) => {
                         {RenderNoOrganisationUnitsAtThisLevel()}
                   </div>
             );
+
+            const getIndicatorNameFromFavoris = (indNames) => { 
+                  console.log('names: ', indNames);
+            }
 
       const loadAndInjectVisualizations = async () => {
             try {
