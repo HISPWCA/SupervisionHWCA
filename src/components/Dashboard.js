@@ -444,11 +444,11 @@ export const Dashboard = ({ me }) => {
                                                 key={uuid()}
                                                 id={`${v.id}-${ou?.id}`}
                                                 loading={loadingInjection}
-                                                dxElements={v?.dxElements.map(dx => ({
+                                                dxElements={v?.dxElements?.map(dx => ({
                                                       newName: ou?.event?.dataValues?.find(
                                                             dv => dv.dataElement === dx.id
                                                       )?.value,
-                                                      oldName: 'Indicateur 1'
+                                                      oldName: dx.name
                                                 }))}
                                           />
                                     ))}
@@ -502,12 +502,6 @@ export const Dashboard = ({ me }) => {
                                                             key={uuid()}
                                                             id={v.id}
                                                             loading={loadingInjection}
-                                                            // dxElements={v?.dxElements.map(dx => ({
-                                                            //       newName: ou?.event?.dataValues?.find(
-                                                            //             dv => dv.dataElement === dx.id
-                                                            //       )?.value,
-                                                            //       oldName: dx.name
-                                                            // }))}
                                                       />
                                                 ))}
                                     </Row>

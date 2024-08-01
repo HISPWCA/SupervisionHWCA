@@ -9,9 +9,9 @@ const VisualizationItem = ({ id, loading, dxElements }) => (
                         backgroundColor: '#fff',
                         padding: '10px',
                         borderRadius: '8px',
-                        minHeight: '500px',
-                        maxHeight: '500px',
-                        overflowY: 'scroll'
+                        minHeight: dxElements ? '500px' : '450px',
+                        maxHeight: dxElements ? '500px' : '450px',
+                        overflowY: dxElements ? 'scroll' : 'hidden'
                   }}
             >
                   {loading ? (
