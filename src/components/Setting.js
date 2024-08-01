@@ -47,22 +47,8 @@ import { loadDataStore, saveDataToDataStore } from '../utils/functions';
 import { BLUE } from '../utils/couleurs';
 import MyNotification from './MyNotification';
 import translate from '../utils/translator';
-import GenerateIndicatorsFieldsList from './GenerateIndicatorsFields';
 import GenerateIndicatorsFieldsDQR from './GenerateIndicatorsFieldsDQR';
 import SettingIndicatorsMapping from './SettingIndicatorsMapping';
-
-const numberList = [
-      { value: 1, label: '1' },
-      { value: 2, label: '2' },
-      { value: 3, label: '3' },
-      { value: 4, label: '4' },
-      { value: 5, label: '5' },
-      { value: 6, label: '6' },
-      { value: 7, label: '7' },
-      { value: 8, label: '8' },
-      { value: 9, label: '9' },
-      { value: 10, label: '10' }
-];
 
 const Setting = () => {
       const [currentItem, setCurrentItem] = useState(null);
@@ -88,6 +74,7 @@ const Setting = () => {
       const [currentVisualizationProgram, setCurrentVisualizationProgram] = useState(null);
       const [indicatorsFieldsConfigs, setIndicatorsFieldsConfigs] = useState([]);
       const [dataStoreGlobalSettings, setDataStoreGlobalSettings] = useState(null);
+      const [currentVisualizationConfig, setCurrentVisualizationConfig] = useState(null);
 
       const [visualizations, setVisualizations] = useState([]);
       const [maps, setMaps] = useState([]);
@@ -132,7 +119,7 @@ const Setting = () => {
       const [selectedAttributeNameForAgent, setSelectedAttributeNameForAgent] = useState(null);
       const [selectedAttributeFirstNameForAgent, setSelectedAttributeFirstNameForAgent] = useState(null);
       const [selectedProgramForVisualization, setSelectedProgramForVisualization] = useState(null);
-      const [selectedTypeForVisualization, setSelectedTypeForVisualization] = useState(null);
+      const [selectedTypeForVisualization, setSelectedTypeForVisualization] = useState('VISUALIZATION');
       const [selectedMaps, setSelectedMaps] = useState([]);
       const [selectedVisualizations, setSelectedVisualizations] = useState([]);
 
@@ -615,6 +602,7 @@ const Setting = () => {
                         setSelectedProgramForVisualization(null);
                         setSelectedMaps([]);
                         setSelectedVisualizations([]);
+                        setFavorisItems([]);
                         setCurrentVisualizationProgram(null);
                   }
             } catch (err) {
@@ -1949,6 +1937,13 @@ const Setting = () => {
             });
       };
 
+      const handleEditVisualizations = value => {
+            console.log('Handle visualisation');
+            setCurrentVisualizationConfig(value);
+            setFavorisItems(value.visualizations);
+            setSelectedProgramForVisualization(value.program);
+      };
+
       const handleSaveVisualizationToDataStore = async () => {
             try {
                   setLoadingSaveVisualizationInDatastore(true);
@@ -1965,13 +1960,23 @@ const Setting = () => {
                               throw new Error(translate('Configuration_Deja_Ajoutee'));
                         }
 
-                        const newList = [
-                              {
-                                    program: selectedProgramForVisualization,
-                                    visualizations: favorisItems
-                              },
-                              ...listFromDataStore
-                        ];
+                        const newList = currentVisualizationConfig
+                              ? listFromDataStore.map(l => {
+                                      if (l.program?.id === currentVisualizationConfig?.program?.id) {
+                                            return {
+                                                  ...l,
+                                                  visualizations: favorisItems
+                                            };
+                                      }
+                                      return l;
+                                })
+                              : [
+                                      {
+                                            program: selectedProgramForVisualization,
+                                            visualizations: favorisItems
+                                      },
+                                      ...listFromDataStore
+                                ];
 
                         await saveDataToDataStore(
                               process.env.REACT_APP_VISUALIZATION_KEY,
@@ -1991,6 +1996,7 @@ const Setting = () => {
                         });
                   }
 
+                  setFavorisItems([]);
                   setLoadingSaveVisualizationInDatastore(false);
             } catch (err) {
                   setLoadingSaveVisualizationInDatastore(false);
@@ -2417,10 +2423,10 @@ const Setting = () => {
                                                       }}
                                                 >
                                                       <Button
-                                                            loading={loadingSaveSupervionsConfig}
-                                                            disabled={
-                                                                  loadingSaveSupervionsConfig || !selectedTEIProgram
-                                                            }
+                                                            // loading={loadingSaveSupervionsConfig}
+                                                            // disabled={
+                                                            //       loadingSaveSupervionsConfig || !selectedTEIProgram
+                                                            // }
                                                             icon={
                                                                   <FiSave style={{ color: '#FFF', fontSize: '18px' }} />
                                                             }
@@ -2436,11 +2442,11 @@ const Setting = () => {
                                                       </Button>
                                                       <div style={{ marginLeft: '10px' }}>
                                                             <Button
-                                                                  loading={loadingSaveSupervionsConfig}
-                                                                  disabled={
-                                                                        loadingSaveSupervionsConfig ||
-                                                                        !selectedTEIProgram
-                                                                  }
+                                                                  // loading={loadingSaveSupervionsConfig}
+                                                                  // disabled={
+                                                                  //       loadingSaveSupervionsConfig ||
+                                                                  //       !selectedTEIProgram
+                                                                  // }
                                                                   icon={
                                                                         <FiSave
                                                                               style={{
@@ -2483,10 +2489,10 @@ const Setting = () => {
                                                       fontSize: '16px'
                                                 }}
                                           >
-                                                {translate('Liste_Programme_Tracker')}
+                                                {translate('Visualization_Configurations')}
                                           </div>
                                           <Table
-                                                dataSource={favorisItems.map(fav => ({
+                                                dataSource={dataStoreVisualizations.map(fav => ({
                                                       ...fav,
                                                       programName: fav?.program?.displayName,
                                                       nbrVisualizations: fav?.visualizations?.length || 0,
@@ -2521,7 +2527,9 @@ const Setting = () => {
                                                                                           cursor: 'pointer'
                                                                                     }}
                                                                                     onClick={() =>
-                                                                                          handleEditProgramSup(value)
+                                                                                          handleEditVisualizations(
+                                                                                                value
+                                                                                          )
                                                                                     }
                                                                               />
                                                                         </div>

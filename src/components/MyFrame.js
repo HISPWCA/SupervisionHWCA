@@ -1,7 +1,6 @@
 import { MAP } from '../utils/constants';
 
-const MyFrame = ({ base_url, id, orgUnitIDs, periods, style = {}, type = MAP }) => {
-      console.log('orgUnitIDs: ', orgUnitIDs);
+const MyFrame = ({ base_url, id, orgUnitIDs, periods, style = {}, type = MAP , getIndicatorName}) => {
       const htmlStringForChart = `
 
         <!DOCTYPE html>
@@ -491,7 +490,7 @@ const MyFrame = ({ base_url, id, orgUnitIDs, periods, style = {}, type = MAP }) 
               throw new Error("Impossible de récupérer ce favorit");
             }
 
-
+            getIndicatorName(favoriteData)
             currentPlugin.load(favoriteData);
 
           } catch (err) {

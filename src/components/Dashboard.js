@@ -444,9 +444,24 @@ export const Dashboard = ({ me }) => {
                               >
                                     {ou.displayName}
                               </span>
+
+                              <span style={{ margin: '0px 20px' }}>{`   -   `}</span>
+
+                              {ou.event?.period && (
+                                    <span
+                                          style={{
+                                                fontSize: '18px',
+                                                backgroundColor: 'orange',
+                                                color: '#fff',
+                                                padding: '3px 10px',
+                                                border: '1px solid #00000090'
+                                          }}
+                                    >
+                                          {dayjs(ou.event?.period).format('YYYY-MM-DD')}
+                                    </span>
+                              )}
                         </div>
                         <Row gutter={[8, 8]}>
-                              {console.log('ou?.event?.dataValues: ', ou?.event?.dataValues)}
                               {dataStoreVisualizations
                                     .find(
                                           vis =>
@@ -481,7 +496,8 @@ export const Dashboard = ({ me }) => {
                                                 marginBottom: '10px',
                                                 display: 'flex',
                                                 justifyContent: 'center',
-                                                alignItems: 'center'
+                                                alignItems: 'center',
+                                                flexWrap: 'wrap'
                                           }}
                                     >
                                           <span style={{ fontSize: '15px' }}>{`${translate(
@@ -548,9 +564,9 @@ export const Dashboard = ({ me }) => {
                   </div>
             );
 
-            const getIndicatorNameFromFavoris = (indNames) => { 
-                  console.log('names: ', indNames);
-            }
+      const getIndicatorNameFromFavoris = indNames => {
+            console.log('names: ', indNames);
+      };
 
       const loadAndInjectVisualizations = async () => {
             try {
@@ -604,6 +620,7 @@ export const Dashboard = ({ me }) => {
                                                       width: '100%',
                                                       height: '450px'
                                                 }}
+                                                getIndicatorName={getIndicatorNameFromFavoris}
                                                 // periods={[selectedPeriod.format('YYYYMM')].join(',')}
                                                 orgUnitIDs={concerningOUs.map(r => r.id).join(',')}
                                           />
