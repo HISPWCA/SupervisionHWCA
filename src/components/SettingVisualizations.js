@@ -1,12 +1,50 @@
 import { QuestionCircleOutlined } from '@ant-design/icons';
-import { Col, Popconfirm, Table } from 'antd';
+import { Col, Popconfirm, Row, Select, Table } from 'antd';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import translate from '../utils/translator';
 import { Button } from '@dhis2/ui';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { loadDataStore } from '../utils/functions';
+import { VISUALIZATIONS_ROUTE } from '../utils/api.routes';
 
-const SettingVisualizations = () => {
-      const [formState, setFormState] = useState({});
+const SettingVisualizations = ({}) => {
+      const [formState, setFormState] = useState({
+            selectedProgram: null,
+            selectedFavoris: null,
+            currentFavoris: null
+      });
+      const [dataStoreVisualizations, setDataStoreVisualizations] = useState([]);
+      const [visualizations, setVisualizations] = useState([]);
+      const [loadingDataStoreVisualizations, setLoadingDataStoreVisualizations] = useState(false);
+
+      const loadDataStoreVisualizations = async () => {
+            try {
+                  setLoadingDataStoreVisualizations(true);
+                  const response = await loadDataStore(process.env.REACT_APP_VISUALIZATION_KEY, null, null, null);
+
+                  setDataStoreVisualizations(response);
+                  setLoadingDataStoreVisualizations(false);
+                  return response;
+            } catch (err) {
+                  setLoadingDataStoreVisualizations(false);
+                  throw err;
+            }
+      };
+
+      const loadVisualizations = async () => {
+            try {
+                  const response = await axios.get(
+                        `${VISUALIZATIONS_ROUTE}?pageSize=100000&fields=id,displayName,name,type`
+                  );
+                  setVisualizations(response.data.visualizations || []);
+            } catch (err) {}
+      };
+
+      useEffect(() => {
+            loadDataStoreVisualizations();
+            loadVisualizations();
+      }, []);
+
       return (
             <>
                   <Row gutter={[8, 10]}>
@@ -144,7 +182,7 @@ const SettingVisualizations = () => {
                                                 )}
                                           </div>
                                     </>
-
+{/* 
                                     {selectedTypeForVisualization && favorisItems.length > 0 && (
                                           <>
                                                 <div
@@ -265,10 +303,10 @@ const SettingVisualizations = () => {
                                                       </div>
                                                 </div>
                                           </>
-                                    )}
+                                    )} */}
                               </div>
                         </Col>
-                        <Col md={12} sm={24}>
+                        {/* <Col md={12} sm={24}>
                               {mappingConfigSupervisions.length > 0 && (
                                     <div
                                           className="my-shadow"
@@ -366,7 +404,7 @@ const SettingVisualizations = () => {
                                           />
                                     </div>
                               )}
-                        </Col>
+                        </Col> */}
                   </Row>
             </>
       );

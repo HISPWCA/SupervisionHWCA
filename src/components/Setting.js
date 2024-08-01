@@ -259,14 +259,7 @@ const Setting = () => {
             } catch (err) {}
       };
 
-      const loadVisualizations = async () => {
-            try {
-                  const response = await axios.get(
-                        `${VISUALIZATIONS_ROUTE}?pageSize=100000&fields=id,displayName,name,type`
-                  );
-                  setVisualizations(response.data.visualizations || []);
-            } catch (err) {}
-      };
+    
 
       const loadOrganisationUnitGroups = async () => {
             try {
@@ -446,19 +439,7 @@ const Setting = () => {
             }
       };
 
-      const loadDataStoreVisualizations = async () => {
-            try {
-                  setLoadingDataStoreVisualizations(true);
-                  const response = await loadDataStore(process.env.REACT_APP_VISUALIZATION_KEY, null, null, null);
-
-                  setDataStoreVisualizations(response);
-                  setLoadingDataStoreVisualizations(false);
-                  return response;
-            } catch (err) {
-                  setLoadingDataStoreVisualizations(false);
-                  throw err;
-            }
-      };
+   
       const loadDataStoreGlobalSettings = async () => {
             try {
                   const response = await loadDataStore(process.env.REACT_APP_GLOBAL_SETTING_KEY, null, null, null);
@@ -466,7 +447,7 @@ const Setting = () => {
             } catch (err) {
                   throw err;
             }
-      };
+      }
 
       const initIndicatorConfigStates = async () => {
             try {
@@ -2937,8 +2918,6 @@ const Setting = () => {
       useEffect(() => {
             loadPrograms();
             loadMaps();
-            loadVisualizations();
-            loadDataStoreVisualizations();
             loadDataStoreGlobalSettings();
             selectedTypeSupervisionPage === PAGE_CONFIG_INDICATORS && initIndicatorConfigStates();
             selectedTypeSupervisionPage === PAGE_CONFIG_SUPERVISION && initSupConfigStates();
