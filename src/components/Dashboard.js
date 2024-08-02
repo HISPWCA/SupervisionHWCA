@@ -525,10 +525,46 @@ export const Dashboard = ({ me }) => {
                   </div>
             );
 
-      const getRightIndicators = (index, indicatorsList) => {
+      const getRightIndicatorName = (index, indicatorsList, output) => {
             if (index && indicatorsList?.length > 0) {
-                  return indicatorsList?.find(ind => +ind?.position === +index);
+                  const currentIndicator = indicatorsList?.find(ind => +ind?.position === +index);
+                  const indicatorName =
+                        currentIndicator &&
+                        output.event?.dataValues?.find(dv => dv.dataElement === currentIndicator?.value?.id)?.value;
+                  return indicatorName;
             }
+      };
+
+      const handleReplaceIndicatorName = (elementHTML, indicatorsList, output) => {
+            let countTimer = 0;
+            let interval = setInterval(() => {
+                  countTimer = countTimer + 1;
+                  if (countTimer >= 60 * 2) {
+                        return clearInterval(interval);
+                  }
+
+                  const foundElement = elementHTML.querySelector('iframe');
+                  if (foundElement) {
+                        const listItems = foundElement.contentWindow?.document?.body?.querySelectorAll(
+                              '.highcharts-legend-item.highcharts-column-series'
+                        );
+
+                        if (listItems) {
+                              for (let item of listItems) {
+                                    const tspan = item.querySelector('tspan');
+                                    if (tspan) {
+                                          const text = tspan.innerHTML;
+                                          const texts = text?.split('-');
+                                          const textsIndex1 = texts[0]?.split(' ')?.[1];
+                                          const indName = getRightIndicatorName(+textsIndex1, indicatorsList, output);
+                                          if (indName) {
+                                                tspan.innerHTML = indName + ' - ' + texts?.[1];
+                                          }
+                                    }
+                              }
+                        }
+                  }
+            }, 1000);
       };
 
       const loadAndInjectVisualizations = async () => {
@@ -557,21 +593,6 @@ export const Dashboard = ({ me }) => {
                                                       width: '100%',
                                                       height: '450px'
                                                 }}
-                                                replaceLabel={true}
-                                                getRightIndicatorName={index => {
-                                                      const currentIndicator = getRightIndicators(
-                                                            index,
-                                                            indicatorsList
-                                                      );
-                                                      console.log('Current indicator :  ', currentIndicator);
-                                                      const indicatorName =
-                                                            currentIndicator &&
-                                                            output.event?.dataValues?.find(
-                                                                  dv => dv.dataElement === currentIndicator?.value?.id
-                                                            )?.value;
-                                                      console.log('indicator name :', indicatorName);
-                                                      return indicatorName;
-                                                }}
                                                 periods={[dayjs(output.event?.eventDate).format('YYYYMMDD')].join(',')}
                                                 orgUnitIDs={[output?.id].join(',')}
                                           />
@@ -583,6 +604,7 @@ export const Dashboard = ({ me }) => {
 
                                     if (rightElement) {
                                           rightElement.innerHTML = responseString;
+                                          handleReplaceIndicatorName(rightElement, indicatorsList, output);
                                     }
                               });
                   });

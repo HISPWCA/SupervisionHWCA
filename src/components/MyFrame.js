@@ -1,15 +1,6 @@
 import { MAP } from '../utils/constants';
 
-const MyFrame = ({
-      base_url,
-      id,
-      orgUnitIDs,
-      periods,
-      style = {},
-      type = MAP,
-      replaceLabel = false,
-      getRightIndicatorName
-}) => {
+const MyFrame = ({ base_url, id, orgUnitIDs, periods, style = {}, type = MAP }) => {
       const htmlStringForChart = `
 
         <!DOCTYPE html>
@@ -518,36 +509,7 @@ const MyFrame = ({
 
       <body>
         <div id="${id}">Chart</div>
-        <script>
-                  if(${replaceLabel}){ 
-                  let countTimer = 0
-                  let interval = setInterval(() => {
-                      countTimer = countTimer + 1 
-                      if(countTimer >= (60)) {
-                        return clearInterval(interval)
-                      }
-
-                    const foundElement = document.getElementById('${id}');
-                    if(foundElement){
-                      const listItems = foundElement.querySelectorAll('.highcharts-legend-item.highcharts-column-series');
-                      for(let item of listItems ){
-                        const tspan = item.querySelector('tspan');
-                        if(tspan){
-                          const text = tspan.innerHTML
-                          const texts = text?.split('-')
-                          console.log("texts: ", texts)
-                          const textsIndex1 = texts[0]?.split(' ')?.[1]
-                          console.log("texts index 1 : " , textsIndex1)
-                          const getRightIndicatorNameFunc = ${getRightIndicatorName}
-                          console.log("function : " , getRightIndicatorNameFunc(3))
-                          
-                           
-                        }
-                      }
-                    }
-                  }, 1000);
-                  }
-        </script>
+        
       </body>
 
 </html>
