@@ -572,6 +572,9 @@ export const Dashboard = ({ me }) => {
             try {
                   console.log('concerningOUs : ', concerningOUs);
                   setLoadingInjection(true);
+                  const rightStageConfig = selectedProgram?.programStageConfigurations?.find(stage => stage?.programStage?.id)
+
+
                   // generation for specifique ou
                   concerningOUs.forEach(output => {
                         dataStoreVisualizations
@@ -590,7 +593,11 @@ export const Dashboard = ({ me }) => {
                                                       width: '100%',
                                                       height: '450px'
                                                 }}
-                                                // periods={[selectedPeriod.format('YYYYMM')].join(',')}
+                                                replaceLabel={true}
+                                                indicators={selectedProgram?.programStageConfigurations?.find(
+                                                      stage => stage?.programStage?.id === output?.event?.programStage
+                                                )?.indicators}
+                                                periods={[dayjs(output.event?.period).format('YYYYMMDD')].join(',')}
                                                 orgUnitIDs={[output?.id].join(',')}
                                           />
                                     );
@@ -620,9 +627,9 @@ export const Dashboard = ({ me }) => {
                                                       width: '100%',
                                                       height: '450px'
                                                 }}
-                                                getIndicatorName={getIndicatorNameFromFavoris}
-                                                // periods={[selectedPeriod.format('YYYYMM')].join(',')}
+                                                // periods={[output.format('YYYYMM')].join(',')}
                                                 orgUnitIDs={concerningOUs.map(r => r.id).join(',')}
+                                               
                                           />
                                     );
 

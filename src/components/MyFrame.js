@@ -1,6 +1,15 @@
 import { MAP } from '../utils/constants';
 
-const MyFrame = ({ base_url, id, orgUnitIDs, periods, style = {}, type = MAP , getIndicatorName}) => {
+const MyFrame = ({
+      base_url,
+      id,
+      orgUnitIDs,
+      periods,
+      style = {},
+      type = MAP,
+      replaceLabel = false,
+      indicators = []
+}) => {
       const htmlStringForChart = `
 
         <!DOCTYPE html>
@@ -490,14 +499,12 @@ const MyFrame = ({ base_url, id, orgUnitIDs, periods, style = {}, type = MAP , g
               throw new Error("Impossible de récupérer ce favorit");
             }
 
-            getIndicatorName(favoriteData)
             currentPlugin.load(favoriteData);
 
           } catch (err) {
             console.log(err);
           }
         };
-
                 
                   /* A ne pas Toucher */
                   Ext.onReady(function (event) {
@@ -513,6 +520,15 @@ const MyFrame = ({ base_url, id, orgUnitIDs, periods, style = {}, type = MAP , g
 
 <body>
         <div id="${id}">Chart</div>
+        <script>
+                 if(${replaceLabel} && ${indicators}){ {
+                    setInterval(() => {
+                    const foundElement = document.getElementById('${id}');
+                    console.log("foundElement: ", foundElement)
+                    console.log("Indicator list : ", ${indicators})
+                  }, 1000);
+                 }
+        </script>
 </body>
 
 </html>
