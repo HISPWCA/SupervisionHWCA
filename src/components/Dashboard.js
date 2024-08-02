@@ -242,44 +242,11 @@ export const Dashboard = ({ me }) => {
                               }
                         }
 
-                        return [
-                              ...prev,
-                              ...eventList.map(ev => ({
-                                    trackedEntityInstance: currentEnrollment?.trackedEntityInstance,
-                                    period: ev.eventDate,
-                                    orgUnit: currentEnrollment?.orgUnit,
-                                    event: ev.event,
-                                    dataValues: ev.dataValues
-                              }))
-                        ];
+                        return [...prev, ...eventList];
                   }
 
                   return prev;
             }, []);
-
-            // const ouWithoutDuplicationObject = RightOUList.reduce((prev, current) => {
-            //       if (
-            //             !prev[current.orgUnit] &&
-            //             organisationUnits?.find(ou => ou.id === current.orgUnit)?.level === selectedLevel?.level
-            //       ) {
-            //             prev[current.orgUnit] = current;
-            //       }
-            //       return prev;
-            // }, {});
-
-            // setConcerningOUs(
-            //       Object.entries(ouWithoutDuplicationObject).map(([ouKey, ouContent]) => {
-            //             const currO = organisationUnits.find(o => o.id === ouKey);
-            //             return {
-            //                   id: currO?.id,
-            //                   displayName: currO?.displayName,
-            //                   name: currO?.name,
-            //                   level: currO?.level,
-            //                   path: currO?.path,
-            //                   event: ouContent
-            //             };
-            //       })
-            // );
 
             setConcerningOUs(
                   rightOUList.map(event => {
@@ -445,9 +412,9 @@ export const Dashboard = ({ me }) => {
                                     {ou.displayName}
                               </span>
 
-                              <span style={{ margin: '0px 20px' }}>{`   -   `}</span>
+                              <span style={{ margin: '0px 10px' }}>{` - `}</span>
 
-                              {ou.event?.period && (
+                              {ou.event?.eventDate && (
                                     <span
                                           style={{
                                                 fontSize: '18px',
@@ -457,7 +424,7 @@ export const Dashboard = ({ me }) => {
                                                 border: '1px solid #00000090'
                                           }}
                                     >
-                                          {dayjs(ou.event?.period).format('YYYY-MM-DD')}
+                                          {dayjs(ou.event?.eventDate).format('YYYY-MM-DD')}
                                     </span>
                               )}
                         </div>
@@ -471,14 +438,8 @@ export const Dashboard = ({ me }) => {
                                     ?.visualizations?.map(v => (
                                           <VisualizationItem
                                                 key={uuid()}
-                                                id={`${v.id}-${ou?.id}`}
+                                                id={`${v.id}-${ou?.id}-${ou?.event?.event}`}
                                                 loading={loadingInjection}
-                                                dxElements={v?.dxElements?.map(dx => ({
-                                                      newName: ou?.event?.dataValues?.find(
-                                                            dv => dv.dataElement === dx.id
-                                                      )?.value,
-                                                      oldName: dx.name
-                                                }))}
                                           />
                                     ))}
                         </Row>
@@ -564,19 +525,22 @@ export const Dashboard = ({ me }) => {
                   </div>
             );
 
-      const getIndicatorNameFromFavoris = indNames => {
-            console.log('names: ', indNames);
+      const getRightIndicators = (index, indicatorsList) => {
+            if (index && indicatorsList?.length > 0) {
+                  return indicatorsList?.find(ind => +ind?.position === +index);
+            }
       };
 
       const loadAndInjectVisualizations = async () => {
             try {
-                  console.log('concerningOUs : ', concerningOUs);
                   setLoadingInjection(true);
-                  const rightStageConfig = selectedProgram?.programStageConfigurations?.find(stage => stage?.programStage?.id)
-
 
                   // generation for specifique ou
                   concerningOUs.forEach(output => {
+                        const indicatorsList = selectedProgram?.programStageConfigurations?.find(
+                              stage => stage?.programStage?.id === output?.event?.programStage
+                        )?.indicators;
+
                         dataStoreVisualizations
                               .find(
                                     vis =>
@@ -594,15 +558,29 @@ export const Dashboard = ({ me }) => {
                                                       height: '450px'
                                                 }}
                                                 replaceLabel={true}
-                                                indicators={selectedProgram?.programStageConfigurations?.find(
-                                                      stage => stage?.programStage?.id === output?.event?.programStage
-                                                )?.indicators}
-                                                periods={[dayjs(output.event?.period).format('YYYYMMDD')].join(',')}
+                                                getRightIndicatorName={index => {
+                                                      const currentIndicator = getRightIndicators(
+                                                            index,
+                                                            indicatorsList
+                                                      );
+                                                      console.log('Current indicator :  ', currentIndicator);
+                                                      const indicatorName =
+                                                            currentIndicator &&
+                                                            output.event?.dataValues?.find(
+                                                                  dv => dv.dataElement === currentIndicator?.value?.id
+                                                            )?.value;
+                                                      console.log('indicator name :', indicatorName);
+                                                      return indicatorName;
+                                                }}
+                                                periods={[dayjs(output.event?.eventDate).format('YYYYMMDD')].join(',')}
                                                 orgUnitIDs={[output?.id].join(',')}
                                           />
                                     );
 
-                                    const rightElement = document.getElementById(`${v.id}-${output?.id}`);
+                                    const rightElement = document.getElementById(
+                                          `${v.id}-${output?.id}-${output?.event?.event}`
+                                    );
+
                                     if (rightElement) {
                                           rightElement.innerHTML = responseString;
                                     }
@@ -627,9 +605,10 @@ export const Dashboard = ({ me }) => {
                                                       width: '100%',
                                                       height: '450px'
                                                 }}
-                                                // periods={[output.format('YYYYMM')].join(',')}
-                                                orgUnitIDs={concerningOUs.map(r => r.id).join(',')}
-                                               
+                                                periods={concerningOUs
+                                                      ?.map(r => dayjs(r.event?.eventDate)?.format('YYYYMMDD'))
+                                                      ?.join(',')}
+                                                orgUnitIDs={concerningOUs?.map(r => r.id)?.join(',')}
                                           />
                                     );
 

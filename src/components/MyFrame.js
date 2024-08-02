@@ -8,7 +8,7 @@ const MyFrame = ({
       style = {},
       type = MAP,
       replaceLabel = false,
-      indicators = []
+      getRightIndicatorName
 }) => {
       const htmlStringForChart = `
 
@@ -508,9 +508,7 @@ const MyFrame = ({
                 
                   /* A ne pas Toucher */
                   Ext.onReady(function (event) {
-
                        generate_views(null, null, null)
-                            
                   })
 
                   
@@ -518,18 +516,39 @@ const MyFrame = ({
 
 </head>
 
-<body>
+      <body>
         <div id="${id}">Chart</div>
         <script>
-                 if(${replaceLabel} && ${indicators}){ {
-                    setInterval(() => {
+                  if(${replaceLabel}){ 
+                  let countTimer = 0
+                  let interval = setInterval(() => {
+                      countTimer = countTimer + 1 
+                      if(countTimer >= (60)) {
+                        return clearInterval(interval)
+                      }
+
                     const foundElement = document.getElementById('${id}');
-                    console.log("foundElement: ", foundElement)
-                    console.log("Indicator list : ", ${indicators})
+                    if(foundElement){
+                      const listItems = foundElement.querySelectorAll('.highcharts-legend-item.highcharts-column-series');
+                      for(let item of listItems ){
+                        const tspan = item.querySelector('tspan');
+                        if(tspan){
+                          const text = tspan.innerHTML
+                          const texts = text?.split('-')
+                          console.log("texts: ", texts)
+                          const textsIndex1 = texts[0]?.split(' ')?.[1]
+                          console.log("texts index 1 : " , textsIndex1)
+                          const getRightIndicatorNameFunc = ${getRightIndicatorName}
+                          console.log("function : " , getRightIndicatorNameFunc(3))
+                          
+                           
+                        }
+                      }
+                    }
                   }, 1000);
-                 }
+                  }
         </script>
-</body>
+      </body>
 
 </html>
        
