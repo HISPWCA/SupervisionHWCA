@@ -547,9 +547,10 @@ export const Dashboard = ({ me }) => {
 
                   const foundElement = elementHTML.querySelector('iframe');
                   if (foundElement) {
+                        
                         const listItems = foundElement.contentWindow?.document?.body?.querySelectorAll(
                               '.highcharts-legend-item.highcharts-column-series'
-                        );
+                        )
 
                         if (listItems) {
                               for (let item of listItems) {
