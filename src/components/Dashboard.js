@@ -341,7 +341,7 @@ export const Dashboard = ({ me }) => {
                                                 <Button
                                                       onClick={handleSearch}
                                                       icon={<FaSearch style={{ fontSize: '20px' }} />}
-                                                      loading={loadingTeiList}
+                                                      loading={loadingTeiList || loadingInjection}
                                                       disabled={
                                                             selectedLevel?.level &&
                                                             selectedOrganisationUnit &&
@@ -440,7 +440,7 @@ export const Dashboard = ({ me }) => {
                                           <VisualizationItem
                                                 key={uuid()}
                                                 id={`${v.id}-${ou?.id}-${ou?.event?.event}`}
-                                                loading={loadingInjection}
+                                                // loading={loadingInjection}
                                           />
                                     ))}
                         </Row>
@@ -495,7 +495,7 @@ export const Dashboard = ({ me }) => {
                                                       <VisualizationItem
                                                             key={uuid()}
                                                             id={v.id}
-                                                            loading={loadingInjection}
+                                                            // loading={loadingInjection}
                                                       />
                                                 ))}
                                     </Row>
@@ -542,7 +542,7 @@ export const Dashboard = ({ me }) => {
             let countTimer = 0;
             let interval = setInterval(() => {
                   countTimer = countTimer + 1;
-                  if (countTimer >= 60 * 2) {
+                  if (countTimer >= 60 * 5) {
                         return clearInterval(interval);
                   }
 
@@ -570,78 +570,89 @@ export const Dashboard = ({ me }) => {
             }, 1000);
       };
 
+      const pause = milliseconds => {
+            var dt = new Date();
+            while (new Date() - dt <= milliseconds) {
+                  /* Do nothing */
+            }
+      };
       const loadAndInjectVisualizations = async () => {
             try {
                   setLoadingInjection(true);
 
                   // generation for specifique ou
-                  concerningOUs.forEach(output => {
+                  for (let output of concerningOUs) {
+                        console.log('Premiere ou : ');
                         const indicatorsList = selectedProgram?.programStageConfigurations?.find(
                               stage => stage?.programStage?.id === output?.event?.programStage
                         )?.indicators;
 
-                        dataStoreVisualizations
-                              .find(
+                        const visualizations =
+                              dataStoreVisualizations.find(
                                     vis =>
                                           selectedProgram?.program?.id &&
                                           vis.program?.id === selectedProgram?.program?.id
-                              )
-                              ?.visualizations?.forEach(v => {
-                                    const responseString = ReactDOMServer.renderToString(
-                                          <MyFrame
-                                                type={v.type}
-                                                base_url={SERVER_URL}
-                                                id={v.id}
-                                                style={{
-                                                      width: '100%',
-                                                      height: '450px'
-                                                }}
-                                                periods={[dayjs(output.event?.eventDate).format('YYYYMMDD')].join(',')}
-                                                orgUnitIDs={[output?.id].join(',')}
-                                          />
-                                    );
+                              )?.visualizations || [];
 
-                                    const rightElement = document.getElementById(
-                                          `${v.id}-${output?.id}-${output?.event?.event}`
-                                    );
+                        for (let v of visualizations) {
+                              const responseString = ReactDOMServer.renderToString(
+                                    <MyFrame
+                                          type={v.type}
+                                          base_url={SERVER_URL}
+                                          id={v.id}
+                                          style={{
+                                                width: '100%',
+                                                height: '450px'
+                                          }}
+                                          periods={[dayjs(output.event?.eventDate).format('YYYYMMDD')].join(',')}
+                                          orgUnitIDs={[output?.id].join(',')}
+                                    />
+                              );
 
-                                    if (rightElement) {
-                                          rightElement.innerHTML = responseString;
-                                          handleReplaceIndicatorName(rightElement, indicatorsList, output);
-                                    }
-                              });
-                  });
+                              const rightElement = document.getElementById(
+                                    `${v.id}-${output?.id}-${output?.event?.event}`
+                              );
+
+                              if (rightElement) {
+                                    rightElement.innerHTML = responseString;
+                                    handleReplaceIndicatorName(rightElement, indicatorsList, output);
+                              }
+
+                              pause(3000);
+                        }
+                  }
 
                   // generation for all ou
                   if (selectedLevel?.level > 1) {
-                        dataStoreVisualizations
-                              .find(
+                        const visualizations =
+                              dataStoreVisualizations.find(
                                     vis =>
                                           selectedProgram?.program?.id &&
                                           vis.program?.id === selectedProgram?.program?.id
-                              )
-                              ?.visualizations?.forEach(v => {
-                                    const responseString = ReactDOMServer.renderToString(
-                                          <MyFrame
-                                                type={v.type}
-                                                base_url={SERVER_URL}
-                                                id={v.id}
-                                                style={{
-                                                      width: '100%',
-                                                      height: '450px'
-                                                }}
-                                                periods={concerningOUs
-                                                      ?.map(r => dayjs(r.event?.eventDate)?.format('YYYYMMDD'))
-                                                      ?.join(',')}
-                                                orgUnitIDs={concerningOUs?.map(r => r.id)?.join(',')}
-                                          />
-                                    );
+                              )?.visualizations || [];
 
-                                    const rightElement = document.getElementById(`${v.id}`);
-                                    if (rightElement) {
-                                          rightElement.innerHTML = responseString;
-                                    }
-                              });
+                        for (let v of visualizations) {
+                              const responseString = ReactDOMServer.renderToString(
+                                    <MyFrame
+                                          type={v.type}
+                                          base_url={SERVER_URL}
+                                          id={v.id}
+                                          style={{
+                                                width: '100%',
+                                                height: '450px'
+                                          }}
+                                          periods={concerningOUs
+                                                ?.map(r => dayjs(r.event?.eventDate)?.format('YYYYMMDD'))
+                                                ?.join(',')}
+                                          orgUnitIDs={concerningOUs?.map(r => r.id)?.join(',')}
+                                    />
+                              );
+
+                              const rightElement = document.getElementById(`${v.id}`);
+                              if (rightElement) {
+                                    rightElement.innerHTML = responseString;
+                              }
+                        }
                   }
 
                   setLoadingInjection(false);
@@ -649,45 +660,6 @@ export const Dashboard = ({ me }) => {
                   console.log('Error: ', err);
                   setLoadingInjection(false);
             }
-      };
-
-      const listenPageScrolling = () => {
-            window.addEventListener('scroll', () => {
-                  concerningOUs.forEach(output => {
-                        const indicatorsList = selectedProgram?.programStageConfigurations?.find(
-                              stage => stage?.programStage?.id === output?.event?.programStage
-                        )?.indicators;
-
-                        dataStoreVisualizations
-                              .find(
-                                    vis =>
-                                          selectedProgram?.program?.id &&
-                                          vis.program?.id === selectedProgram?.program?.id
-                              )
-                              ?.visualizations?.forEach(v => {
-                                    const rightElement = document.getElementById(
-                                          `${v.id}-${output?.id}-${output?.event?.event}`
-                                    );
-
-                                    if (rightElement) {
-                                        
-                                          const rect = rightElement.getBoundingClientRect();
-
-                                          console.log("Rect : " , rect)
-
-                                          const isInViewport =
-                                                rect.top >= 0 &&
-                                                rect.left >= 0 &&
-                                                rect.bottom <=
-                                                      (window.innerHeight || document.documentElement.clientHeight) &&
-                                                rect.right <=
-                                                      (window.innerWidth || document.documentElement.clientWidth);
-
-                                          console.log(isInViewport);
-                                    }
-                              });
-                  });
-            });
       };
 
       useEffect(() => {
@@ -701,12 +673,8 @@ export const Dashboard = ({ me }) => {
 
       useEffect(() => {
             if (concerningOUs.length > 0) {
-                  listenPageScrolling();
                   loadAndInjectVisualizations();
             }
-            return () => {
-                  window.removeEventListener('scroll', listenPageScrolling);
-            };
       }, [concerningOUs]);
 
       useEffect(() => {
@@ -715,7 +683,7 @@ export const Dashboard = ({ me }) => {
 
       return (
             <>
-                  <div id="item-container" style={{ padding: '10px', width: '100%' }}>
+                  <div style={{ padding: '10px', width: '100%' }}>
                         {RenderFilters()}
                         {RenderVisualizations()}
                         <MyNotification notification={notification} setNotification={setNotification} />
