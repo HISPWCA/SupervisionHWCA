@@ -18,6 +18,7 @@ import {
       DESCENDANTS,
       TYPE_GENERATION_AS_EVENT
 } from '../utils/constants';
+
 import { loadDataStore } from '../utils/functions';
 import MyNotification from './MyNotification';
 import { Button } from '@dhis2/ui';
@@ -547,10 +548,9 @@ export const Dashboard = ({ me }) => {
 
                   const foundElement = elementHTML.querySelector('iframe');
                   if (foundElement) {
-                        
                         const listItems = foundElement.contentWindow?.document?.body?.querySelectorAll(
                               '.highcharts-legend-item.highcharts-column-series'
-                        )
+                        );
 
                         if (listItems) {
                               for (let item of listItems) {
@@ -567,8 +567,8 @@ export const Dashboard = ({ me }) => {
                               }
                         }
                   }
-            }, 1000)
-      }
+            }, 1000);
+      };
 
       const loadAndInjectVisualizations = async () => {
             try {
@@ -649,7 +649,46 @@ export const Dashboard = ({ me }) => {
                   console.log('Error: ', err);
                   setLoadingInjection(false);
             }
-      }
+      };
+
+      const listenPageScrolling = () => {
+            window.addEventListener('scroll', () => {
+                  concerningOUs.forEach(output => {
+                        const indicatorsList = selectedProgram?.programStageConfigurations?.find(
+                              stage => stage?.programStage?.id === output?.event?.programStage
+                        )?.indicators;
+
+                        dataStoreVisualizations
+                              .find(
+                                    vis =>
+                                          selectedProgram?.program?.id &&
+                                          vis.program?.id === selectedProgram?.program?.id
+                              )
+                              ?.visualizations?.forEach(v => {
+                                    const rightElement = document.getElementById(
+                                          `${v.id}-${output?.id}-${output?.event?.event}`
+                                    );
+
+                                    if (rightElement) {
+                                        
+                                          const rect = rightElement.getBoundingClientRect();
+
+                                          console.log("Rect : " , rect)
+
+                                          const isInViewport =
+                                                rect.top >= 0 &&
+                                                rect.left >= 0 &&
+                                                rect.bottom <=
+                                                      (window.innerHeight || document.documentElement.clientHeight) &&
+                                                rect.right <=
+                                                      (window.innerWidth || document.documentElement.clientWidth);
+
+                                          console.log(isInViewport);
+                                    }
+                              });
+                  });
+            });
+      };
 
       useEffect(() => {
             if (me) {
@@ -661,7 +700,13 @@ export const Dashboard = ({ me }) => {
       }, [me]);
 
       useEffect(() => {
-            concerningOUs.length > 0 && loadAndInjectVisualizations();
+            if (concerningOUs.length > 0) {
+                  listenPageScrolling();
+                  loadAndInjectVisualizations();
+            }
+            return () => {
+                  window.removeEventListener('scroll', listenPageScrolling);
+            };
       }, [concerningOUs]);
 
       useEffect(() => {
@@ -670,7 +715,7 @@ export const Dashboard = ({ me }) => {
 
       return (
             <>
-                  <div style={{ padding: '10px', width: '100%' }}>
+                  <div id="item-container" style={{ padding: '10px', width: '100%' }}>
                         {RenderFilters()}
                         {RenderVisualizations()}
                         <MyNotification notification={notification} setNotification={setNotification} />
