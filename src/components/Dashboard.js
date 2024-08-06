@@ -477,7 +477,9 @@ export const Dashboard = ({ me }) => {
                                                             border: '1px solid #00000090'
                                                       }}
                                                 >
-                                                      {ou.displayName}
+                                                      {`${ou.displayName} ( ${dayjs(ou.event?.eventDate).format(
+                                                            'YYYY-MM-DD'
+                                                      )} )`}
                                                 </span>
                                           ))}
                                     </div>
@@ -564,8 +566,8 @@ export const Dashboard = ({ me }) => {
                               }
                         }
                   }
-            }, 1000);
-      };
+            }, 1000)
+      }
 
       const loadAndInjectVisualizations = async () => {
             try {
@@ -646,7 +648,7 @@ export const Dashboard = ({ me }) => {
                   console.log('Error: ', err);
                   setLoadingInjection(false);
             }
-      };
+      }
 
       useEffect(() => {
             if (me) {
