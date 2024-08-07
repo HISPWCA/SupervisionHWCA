@@ -300,6 +300,7 @@
     "DHIS2_monthly_value": "DHIS2 monthly value",
     "Visualization_Configurations": "Visualization Configurations",
     "Apply": "Apply",
-
-    "Element_Name":"Element name "
+    "Element_Name": "Element name ",
+    "Prev": "Prev",
+    "Next": "Next"
 }

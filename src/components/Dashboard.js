@@ -33,6 +33,8 @@ import MyFrame from './MyFrame';
 import { ImPrinter } from 'react-icons/im';
 import OrganisationUnitsTree from './OrganisationUnitsTree';
 import { FaSearch } from 'react-icons/fa';
+import { GrFormPreviousLink } from 'react-icons/gr';
+import { GrFormNextLink } from 'react-icons/gr';
 
 const quarterOfYear = require('dayjs/plugin/quarterOfYear');
 const weekOfYear = require('dayjs/plugin/weekOfYear');
@@ -52,6 +54,8 @@ export const Dashboard = ({ me }) => {
       const [organisationUnitLevels, setOrganisationUnitLevels] = useState([]);
       const [teiList, setTeiList] = useState([]);
       const [concerningOUs, setConcerningOUs] = useState([]);
+      const [currentPosition, setCurrentPosition] = useState(0);
+      const [numberOfGeneration, setNumberOfGeneration] = useState(1);
 
       const [dataStoreSupervisionsConfigs, setDataStoreSupervisionsConfigs] = useState([]);
       const [dataStoreMissions, setDataStoreMissions] = useState([]);
@@ -66,7 +70,6 @@ export const Dashboard = ({ me }) => {
       const [selectedMission, setSelectedMission] = useState(null);
       const [selectedOrganisationUnit, setSelectedOrganisationUnit] = useState(null);
       const [selectedLevel, setSelectedLevel] = useState(null);
-      const [selectedPeriod, setSelectedPeriod] = useState(dayjs(new Date()));
       const [selectedPeriods, setSelectedPeriods] = useState([dayjs().startOf('month'), dayjs()]);
       const [selectedProgram, setSelectedProgram] = useState(null);
 
@@ -263,6 +266,15 @@ export const Dashboard = ({ me }) => {
                   })
             );
       };
+
+      const handleGoPrevious = () => {
+            setCurrentPosition(currentPosition - +numberOfGeneration);
+      };
+
+      const handleGotoNext = () => {
+            setCurrentPosition(currentPosition + +numberOfGeneration);
+      };
+
       const RenderFilters = () => (
             <>
                   <div
@@ -295,7 +307,7 @@ export const Dashboard = ({ me }) => {
                               </Col>
 
                               {selectedProgram && (
-                                    <Col sm={24} md={5}>
+                                    <Col sm={24} md={4}>
                                           <div style={{ marginBottom: '2px' }}>{translate('Unite_Organisation')}</div>
                                           <OrganisationUnitsTree
                                                 meOrgUnitId={me?.organisationUnits[0]?.id}
@@ -323,7 +335,7 @@ export const Dashboard = ({ me }) => {
                                     />
                               </Col>
 
-                              <Col sm={24} md={5}>
+                              <Col sm={24} md={4}>
                                     <div style={{ marginBottom: '2px' }}>{translate('Periode')}</div>
                                     <DatePicker.RangePicker
                                           picker="date"
@@ -335,33 +347,72 @@ export const Dashboard = ({ me }) => {
                                     />
                               </Col>
 
-                              <Col sm={24} md={7}>
-                                    <div style={{ marginTop: '20px', display: 'flex' }}>
-                                          <div style={{ marginRight: '20px' }}>
-                                                <Button
-                                                      onClick={handleSearch}
-                                                      icon={<FaSearch style={{ fontSize: '20px' }} />}
-                                                      loading={loadingTeiList || loadingInjection}
-                                                      disabled={
-                                                            selectedLevel?.level &&
-                                                            selectedOrganisationUnit &&
-                                                            selectedPeriods.length > 0 &&
-                                                            selectedProgram
-                                                                  ? false
-                                                                  : true
-                                                      }
-                                                      primary
-                                                >
-                                                      {translate('Apply')}
-                                                </Button>
+                              <Col sm={24} md={9}>
+                                    <div
+                                          style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'space-between',
+                                                marginTop: '20px'
+                                          }}
+                                    >
+                                          <div style={{ display: 'flex' }}>
+                                                <div style={{ marginRight: '20px' }}>
+                                                      <Button
+                                                            onClick={handleSearch}
+                                                            icon={<FaSearch style={{ fontSize: '20px' }} />}
+                                                            loading={loadingTeiList || loadingInjection}
+                                                            disabled={
+                                                                  selectedLevel?.level &&
+                                                                  selectedOrganisationUnit &&
+                                                                  selectedPeriods.length > 0 &&
+                                                                  selectedProgram
+                                                                        ? false
+                                                                        : true
+                                                            }
+                                                            primary
+                                                      >
+                                                            {translate('Apply')}
+                                                      </Button>
+                                                </div>
+                                                <div>
+                                                      <Button
+                                                            onClick={printReportAsPDF}
+                                                            icon={<ImPrinter style={{ fontSize: '20px' }} />}
+                                                      >
+                                                            {translate('Print_Dashboard')}
+                                                      </Button>
+                                                </div>
                                           </div>
-                                          <div>
-                                                <Button
-                                                      onClick={printReportAsPDF}
-                                                      icon={<ImPrinter style={{ fontSize: '20px' }} />}
-                                                >
-                                                      {translate('Print_Dashboard')}
-                                                </Button>
+                                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                <div>
+                                                      <Button
+                                                            icon={
+                                                                  <GrFormPreviousLink
+                                                                        style={{ fontSize: '20px', color: '#fff' }}
+                                                                  />
+                                                            }
+                                                            // small
+                                                            primary
+                                                            onClick={handleGoPrevious}
+                                                      >
+                                                            {translate('Prev')}
+                                                      </Button>
+                                                </div>
+                                                <div style={{ marginLeft: '5px' }}>
+                                                      <Button
+                                                            icon={
+                                                                  <GrFormNextLink
+                                                                        style={{ fontSize: '20px', color: '#fff' }}
+                                                                  />
+                                                            }
+                                                            // small
+                                                            primary
+                                                            onClick={handleGotoNext}
+                                                      >
+                                                            {translate('Next')}
+                                                      </Button>
+                                                </div>
                                           </div>
                                     </div>
                               </Col>
@@ -388,7 +439,7 @@ export const Dashboard = ({ me }) => {
             );
 
       const RenderVisualizationForEachStructure = () =>
-            concerningOUs.map(ou => (
+            concerningOUs.slice(currentPosition, currentPosition + +numberOfGeneration).map(ou => (
                   <div key={uuid()} style={{ marginBottom: '40px' }}>
                         <div
                               style={{
@@ -582,6 +633,7 @@ export const Dashboard = ({ me }) => {
 
                   // generation for specifique ou
                   for (let output of concerningOUs) {
+                        let elementList = [];
                         console.log('Premiere ou : ');
                         const indicatorsList = selectedProgram?.programStageConfigurations?.find(
                               stage => stage?.programStage?.id === output?.event?.programStage
@@ -615,10 +667,13 @@ export const Dashboard = ({ me }) => {
 
                               if (rightElement) {
                                     rightElement.innerHTML = responseString;
-                                    handleReplaceIndicatorName(rightElement, indicatorsList, output);
+                                    elementList.push({ rightElement, output });
+                                    //      pause(2000);
                               }
+                        }
 
-                              pause(3000);
+                        for (let el of elementList) {
+                              handleReplaceIndicatorName(el.rightElement, indicatorsList, el.output);
                         }
                   }
 
