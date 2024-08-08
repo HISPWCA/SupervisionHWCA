@@ -646,7 +646,6 @@ export const Dashboard = ({ me }) => {
                         .slice(currentPosition, currentPosition + +numberOfGeneration)
                         .forEach(output => {
                               let elementList = [];
-                              console.log('Premiere ou : ');
                               const indicatorsList = selectedProgram?.programStageConfigurations?.find(
                                     stage => stage?.programStage?.id === output?.event?.programStage
                               )?.indicators;
@@ -681,12 +680,7 @@ export const Dashboard = ({ me }) => {
                                           handleReplaceIndicatorName(rightElement, indicatorsList, output);
                                     }
                               })
-
-
-
-
                         })
-
 
 
                   // generation for all ou
