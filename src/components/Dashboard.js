@@ -33,8 +33,7 @@ import MyFrame from './MyFrame';
 import { ImPrinter } from 'react-icons/im';
 import OrganisationUnitsTree from './OrganisationUnitsTree';
 import { FaSearch } from 'react-icons/fa';
-import { GrFormPreviousLink } from 'react-icons/gr';
-import { GrFormNextLink } from 'react-icons/gr';
+import { GrLinkNext, GrLinkPrevious } from 'react-icons/gr';
 
 const quarterOfYear = require('dayjs/plugin/quarterOfYear');
 const weekOfYear = require('dayjs/plugin/weekOfYear');
@@ -364,9 +363,9 @@ export const Dashboard = ({ me }) => {
                                                             loading={loadingTeiList || loadingInjection}
                                                             disabled={
                                                                   selectedLevel?.level &&
-                                                                  selectedOrganisationUnit &&
-                                                                  selectedPeriods.length > 0 &&
-                                                                  selectedProgram
+                                                                        selectedOrganisationUnit &&
+                                                                        selectedPeriods.length > 0 &&
+                                                                        selectedProgram
                                                                         ? false
                                                                         : true
                                                             }
@@ -384,15 +383,19 @@ export const Dashboard = ({ me }) => {
                                                       </Button>
                                                 </div>
                                           </div>
-                                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                                          <div style={{ display: 'flex', alignItems: 'end' }}>
+                                                <div style={{ marginRight: '10px', fontWeight: 'bold' }}>
+                                                      {`Page:    ${currentPosition + 1}/${concerningOUs?.length}`}
+                                                </div>
                                                 <div>
                                                       <Button
+                                                            small
                                                             icon={
-                                                                  <GrFormPreviousLink
+                                                                  <GrLinkPrevious
                                                                         style={{ fontSize: '20px', color: '#fff' }}
                                                                   />
                                                             }
-                                                            // small
+                                                            disabled={currentPosition === 0 || currentPosition < 0 ? true : false}
                                                             primary
                                                             onClick={handleGoPrevious}
                                                       >
@@ -401,12 +404,18 @@ export const Dashboard = ({ me }) => {
                                                 </div>
                                                 <div style={{ marginLeft: '5px' }}>
                                                       <Button
+                                                            small
                                                             icon={
-                                                                  <GrFormNextLink
+                                                                  <GrLinkNext
                                                                         style={{ fontSize: '20px', color: '#fff' }}
                                                                   />
                                                             }
-                                                            // small
+                                                            disabled={
+                                                                  +currentPosition + +numberOfGeneration >=
+                                                                        concerningOUs?.length
+                                                                        ? true
+                                                                        : false
+                                                            }
                                                             primary
                                                             onClick={handleGotoNext}
                                                       >
@@ -434,7 +443,7 @@ export const Dashboard = ({ me }) => {
                               fontWeight: 'bold'
                         }}
                   >
-                        {translate('No_Planification_Done_On_An_OU')} !
+                        {translate('No_Planification_Done_On_An_OU')}
                   </div>
             );
 
@@ -491,7 +500,6 @@ export const Dashboard = ({ me }) => {
                                           <VisualizationItem
                                                 key={uuid()}
                                                 id={`${v.id}-${ou?.id}-${ou?.event?.event}`}
-                                                // loading={loadingInjection}
                                           />
                                     ))}
                         </Row>
@@ -525,8 +533,9 @@ export const Dashboard = ({ me }) => {
                                                             fontSize: '18px',
                                                             backgroundColor: 'orange',
                                                             color: '#fff',
-                                                            padding: '3px 10px',
-                                                            border: '1px solid #00000090'
+                                                            padding: '2px 10px',
+                                                            border: '1px solid #ccc',
+                                                            marginTop: '5px'
                                                       }}
                                                 >
                                                       {`${ou.displayName} ( ${dayjs(ou.event?.eventDate).format(
@@ -546,7 +555,6 @@ export const Dashboard = ({ me }) => {
                                                       <VisualizationItem
                                                             key={uuid()}
                                                             id={v.id}
-                                                            // loading={loadingInjection}
                                                       />
                                                 ))}
                                     </Row>
@@ -565,7 +573,7 @@ export const Dashboard = ({ me }) => {
                   const trackedEntityInstances = response.data.trackedEntityInstances;
                   setTeiList(trackedEntityInstances);
                   setLoadingTeiList(false);
-            } catch (err) {}
+            } catch (err) { }
       };
 
       const RenderVisualizations = () =>
@@ -593,7 +601,7 @@ export const Dashboard = ({ me }) => {
             let countTimer = 0;
             let interval = setInterval(() => {
                   countTimer = countTimer + 1;
-                  if (countTimer >= 60 * 5) {
+                  if (countTimer >= 60 * 2) {
                         return clearInterval(interval);
                   }
 
@@ -632,50 +640,55 @@ export const Dashboard = ({ me }) => {
                   setLoadingInjection(true);
 
                   // generation for specifique ou
-                  for (let output of concerningOUs) {
-                        let elementList = [];
-                        console.log('Premiere ou : ');
-                        const indicatorsList = selectedProgram?.programStageConfigurations?.find(
-                              stage => stage?.programStage?.id === output?.event?.programStage
-                        )?.indicators;
+                  concerningOUs
+                        .slice(currentPosition, currentPosition + +numberOfGeneration)
+                        .forEach(output => {
+                              let elementList = [];
+                              console.log('Premiere ou : ');
+                              const indicatorsList = selectedProgram?.programStageConfigurations?.find(
+                                    stage => stage?.programStage?.id === output?.event?.programStage
+                              )?.indicators;
 
-                        const visualizations =
-                              dataStoreVisualizations.find(
-                                    vis =>
-                                          selectedProgram?.program?.id &&
-                                          vis.program?.id === selectedProgram?.program?.id
-                              )?.visualizations || [];
+                              const visualizations =
+                                    dataStoreVisualizations.find(
+                                          vis =>
+                                                selectedProgram?.program?.id &&
+                                                vis.program?.id === selectedProgram?.program?.id
+                                    )?.visualizations || [];
 
-                        for (let v of visualizations) {
-                              const responseString = ReactDOMServer.renderToString(
-                                    <MyFrame
-                                          type={v.type}
-                                          base_url={SERVER_URL}
-                                          id={v.id}
-                                          style={{
-                                                width: '100%',
-                                                height: '450px'
-                                          }}
-                                          periods={[dayjs(output.event?.eventDate).format('YYYYMMDD')].join(',')}
-                                          orgUnitIDs={[output?.id].join(',')}
-                                    />
-                              );
+                              for (let v of visualizations) {
+                                    const responseString = ReactDOMServer.renderToString(
+                                          <MyFrame
+                                                type={v.type}
+                                                base_url={SERVER_URL}
+                                                id={v.id}
+                                                style={{
+                                                      width: '100%',
+                                                      height: '450px'
+                                                }}
+                                                periods={[dayjs(output.event?.eventDate).format('YYYYMMDD')].join(',')}
+                                                orgUnitIDs={[output?.id].join(',')}
+                                          />
+                                    );
 
-                              const rightElement = document.getElementById(
-                                    `${v.id}-${output?.id}-${output?.event?.event}`
-                              );
+                                    const rightElement = document.getElementById(
+                                          `${v.id}-${output?.id}-${output?.event?.event}`
+                                    );
 
-                              if (rightElement) {
-                                    rightElement.innerHTML = responseString;
-                                    elementList.push({ rightElement, output });
-                                    //      pause(2000);
+                                    if (rightElement) {
+                                          rightElement.innerHTML = responseString;
+                                          elementList.push({ rightElement, output });
+                                          //      pause(2000);
+                                    }
                               }
-                        }
 
-                        for (let el of elementList) {
-                              handleReplaceIndicatorName(el.rightElement, indicatorsList, el.output);
-                        }
-                  }
+                              for (let el of elementList) {
+                                    handleReplaceIndicatorName(el.rightElement, indicatorsList, el.output);
+                              }
+
+                        })
+
+
 
                   // generation for all ou
                   if (selectedLevel?.level > 1) {
@@ -696,14 +709,17 @@ export const Dashboard = ({ me }) => {
                                                 width: '100%',
                                                 height: '450px'
                                           }}
-                                          periods={concerningOUs
-                                                ?.map(r => dayjs(r.event?.eventDate)?.format('YYYYMMDD'))
-                                                ?.join(',')}
-                                          orgUnitIDs={concerningOUs?.map(r => r.id)?.join(',')}
+                                          periods={concerningOUs?.map(r => dayjs(r.event?.eventDate)?.format('YYYYMMDD'))?.join(',')}
+                                          orgUnitIDs={concerningOUs.reduce((p, c) => {
+                                                if (!p.includes(c?.id)) {
+                                                      p.push(c?.id)
+                                                }
+                                                return p
+                                          }, [])?.join(',')}
                                     />
-                              );
+                              )
 
-                              const rightElement = document.getElementById(`${v.id}`);
+                              const rightElement = document.getElementById(`${v.id}`)
                               if (rightElement) {
                                     rightElement.innerHTML = responseString;
                               }
@@ -730,10 +746,12 @@ export const Dashboard = ({ me }) => {
             if (concerningOUs.length > 0) {
                   loadAndInjectVisualizations();
             }
-      }, [concerningOUs]);
+      }, [concerningOUs, currentPosition]);
 
       useEffect(() => {
-            if (selectedPeriods.length > 0 && selectedProgram && selectedLevel) filterAndGetConcerningOrgUnits();
+            if (selectedPeriods.length > 0 && selectedProgram && selectedLevel) {
+                  filterAndGetConcerningOrgUnits();
+            }
       }, [teiList]);
 
       return (
