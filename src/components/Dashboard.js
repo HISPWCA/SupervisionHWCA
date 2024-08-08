@@ -33,7 +33,9 @@ import MyFrame from './MyFrame';
 import { ImPrinter } from 'react-icons/im';
 import OrganisationUnitsTree from './OrganisationUnitsTree';
 import { FaSearch } from 'react-icons/fa';
-import { GrLinkNext, GrLinkPrevious } from 'react-icons/gr';
+
+import { IoIosArrowRoundForward } from 'react-icons/io'
+import { IoIosArrowRoundBack } from 'react-icons/io'
 
 const quarterOfYear = require('dayjs/plugin/quarterOfYear');
 const weekOfYear = require('dayjs/plugin/weekOfYear');
@@ -384,14 +386,14 @@ export const Dashboard = ({ me }) => {
                                                 </div>
                                           </div>
                                           <div style={{ display: 'flex', alignItems: 'end' }}>
-                                                <div style={{ marginRight: '10px', fontWeight: 'bold' }}>
+                                                {concerningOUs?.length > 0 && <div style={{ marginRight: '20px', fontWeight: 'bold' }}>
                                                       {`Page:    ${currentPosition + 1}/${concerningOUs?.length}`}
-                                                </div>
+                                                </div>}
                                                 <div>
                                                       <Button
                                                             small
                                                             icon={
-                                                                  <GrLinkPrevious
+                                                                  <IoIosArrowRoundBack
                                                                         style={{ fontSize: '20px', color: '#fff' }}
                                                                   />
                                                             }
@@ -406,7 +408,7 @@ export const Dashboard = ({ me }) => {
                                                       <Button
                                                             small
                                                             icon={
-                                                                  <GrLinkNext
+                                                                  <IoIosArrowRoundForward
                                                                         style={{ fontSize: '20px', color: '#fff' }}
                                                                   />
                                                             }
@@ -649,14 +651,11 @@ export const Dashboard = ({ me }) => {
                                     stage => stage?.programStage?.id === output?.event?.programStage
                               )?.indicators;
 
-                              const visualizations =
-                                    dataStoreVisualizations.find(
-                                          vis =>
-                                                selectedProgram?.program?.id &&
-                                                vis.program?.id === selectedProgram?.program?.id
-                                    )?.visualizations || [];
-
-                              for (let v of visualizations) {
+                              dataStoreVisualizations.find(
+                                    vis =>
+                                          selectedProgram?.program?.id &&
+                                          vis.program?.id === selectedProgram?.program?.id
+                              )?.visualizations?.forEach(v => {
                                     const responseString = ReactDOMServer.renderToString(
                                           <MyFrame
                                                 type={v.type}
@@ -679,12 +678,12 @@ export const Dashboard = ({ me }) => {
                                           rightElement.innerHTML = responseString;
                                           elementList.push({ rightElement, output });
                                           //      pause(2000);
+                                          handleReplaceIndicatorName(rightElement, indicatorsList, output);
                                     }
-                              }
+                              })
 
-                              for (let el of elementList) {
-                                    handleReplaceIndicatorName(el.rightElement, indicatorsList, el.output);
-                              }
+
+
 
                         })
 
@@ -692,14 +691,14 @@ export const Dashboard = ({ me }) => {
 
                   // generation for all ou
                   if (selectedLevel?.level > 1) {
-                        const visualizations =
-                              dataStoreVisualizations.find(
-                                    vis =>
-                                          selectedProgram?.program?.id &&
-                                          vis.program?.id === selectedProgram?.program?.id
-                              )?.visualizations || [];
 
-                        for (let v of visualizations) {
+                        dataStoreVisualizations.find(
+                              vis =>
+                                    selectedProgram?.program?.id &&
+                                    vis.program?.id === selectedProgram?.program?.id
+                        )?.visualizations?.forEach(v => {
+
+
                               const responseString = ReactDOMServer.renderToString(
                                     <MyFrame
                                           type={v.type}
@@ -723,7 +722,9 @@ export const Dashboard = ({ me }) => {
                               if (rightElement) {
                                     rightElement.innerHTML = responseString;
                               }
-                        }
+
+                        })
+
                   }
 
                   setLoadingInjection(false);
