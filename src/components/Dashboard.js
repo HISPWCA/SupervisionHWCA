@@ -224,6 +224,7 @@ export const Dashboard = ({ me }) => {
       const handleSearch = () => {
             if (selectedPeriods.length > 0 && selectedOrganisationUnit && selectedProgram && selectedLevel) {
                   loadTEIS(selectedProgram.program?.id, selectedOrganisationUnit.id);
+                  setCurrentPosition(1)
             }
       };
 
