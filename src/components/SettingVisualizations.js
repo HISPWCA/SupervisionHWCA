@@ -79,7 +79,7 @@ const SettingVisualizations = ({ programs }) => {
 
                   setFormState({ ...formState, dxElements: [...formState?.dxElements, payload] });
             }
-      };
+      }
 
       const RenderAnalyticComponentModal = () =>
             formState?.visibleAnalyticComponentModal ? (

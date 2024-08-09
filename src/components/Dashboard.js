@@ -58,6 +58,7 @@ export const Dashboard = ({ me }) => {
       const [currentPosition, setCurrentPosition] = useState(0);
       const [numberOfGeneration, setNumberOfGeneration] = useState(1);
 
+
       const [dataStoreSupervisionsConfigs, setDataStoreSupervisionsConfigs] = useState([]);
       const [dataStoreMissions, setDataStoreMissions] = useState([]);
       const [dataStoreVisualizations, setDataStoreVisualizations] = useState([]);
@@ -78,22 +79,10 @@ export const Dashboard = ({ me }) => {
       const [loadingDataStoreVisualizations, setLoadingDataStoreVisualizations] = useState(false);
       const [loadingDataStoreSupervisionsConfigs, setLoadingDataStoreSupervisionsConfigs] = useState(false);
       const [loadingInjection, setLoadingInjection] = useState(false);
-
-      const [loadingDataStoreMissions, setLoadingDataStoreMissions] = useState(false);
       const [loadingTeiList, setLoadingTeiList] = useState(false);
       const [loadingOrganisationUnitLevels, setLoadingOrganisationUnitLevels] = useState(false);
+      const [loadingPrint, setLoadingPrint] = useState(false)
 
-      const loadDataStoreMissions = async () => {
-            try {
-                  setLoadingDataStoreMissions(true);
-                  const response = await loadDataStore(process.env.REACT_APP_MISSIONS_KEY, null, null, null);
-                  setDataStoreMissions(response || []);
-                  setLoadingDataStoreMissions(false);
-                  return response;
-            } catch (err) {
-                  setLoadingDataStoreMissions(false);
-            }
-      };
 
       const loadOrganisationUnitLevels = async () => {
             try {
@@ -112,21 +101,8 @@ export const Dashboard = ({ me }) => {
                   setLoadingOrganisationUnits(true);
                   const response = await axios.get(ORGANISATION_UNITS_ROUTE);
                   const orgUnits = response.data.organisationUnits;
-                  // const progs = await loadDataStoreSupervisionsConfigs();
 
                   setOrganisationUnits(orgUnits);
-                  // if (progs.length > 0) {
-                  //       const currentProgram = progs[0];
-                  //       const currentOrgUnit = orgUnits.find(ou => ou.id === me?.organisationUnits?.[0]?.id);
-                  //       const currentPeriod = dayjs();
-
-                  //       if (currentProgram) {
-                  //             setSelectedProgram(currentProgram);
-                  //             setSelectedOrganisationUnit(currentOrgUnit);
-                  //             setSelectedPeriod(currentPeriod);
-                  //       }
-                  // }
-
                   setLoadingOrganisationUnits(false);
             } catch (err) {
                   setLoadingOrganisationUnits(false);
@@ -175,34 +151,41 @@ export const Dashboard = ({ me }) => {
       };
 
       const printReportAsPDF = async () => {
-            let reportDocument = document.querySelector('[id="visualizations-container"]');
+            try {
+                  setLoadingPrint(true)
+                  let reportDocument = document.querySelector('[id="visualizations-container"]');
 
-            reportDocument.querySelectorAll('canvas').forEach(cv => {
-                  const current_canvas_parent = cv.parentElement;
-                  const current_canvas_url = cv.toDataURL();
-                  current_canvas_parent.innerHTML = "<img src='" + current_canvas_url + "' />";
-            });
+                  reportDocument.querySelectorAll('canvas').forEach(cv => {
+                        const current_canvas_parent = cv.parentElement;
+                        const current_canvas_url = cv.toDataURL();
+                        current_canvas_parent.innerHTML = "<img src='" + current_canvas_url + "' />";
+                  });
 
-            const iframeList = reportDocument.querySelectorAll('iframe');
-            for (let ifr of iframeList) {
-                  const canvas = await window.html2canvas(ifr.contentWindow.document.body);
-                  if (canvas) {
-                        const current_iframe_parent = ifr.parentElement;
-                        const current_iframe_url = canvas.toDataURL();
-                        current_iframe_parent.innerHTML = "<img src='" + current_iframe_url + "' />";
-                        ifr.replaceWith("<img src='" + current_iframe_url + "' />");
+                  const iframeList = reportDocument.querySelectorAll('iframe');
+                  for (let ifr of iframeList) {
+                        const canvas = await window.html2canvas(ifr.contentWindow.document.body);
+                        if (canvas) {
+                              const current_iframe_parent = ifr.parentElement;
+                              const current_iframe_url = canvas.toDataURL();
+                              current_iframe_parent.innerHTML = "<img src='" + current_iframe_url + "' />";
+                              ifr.replaceWith("<img src='" + current_iframe_url + "' />");
+                        }
                   }
+
+                  const win = window.open('', '', 'height=1000,width=1000');
+
+                  win.document.write(`<!DOCTYPE html><head></head>`);
+                  win.document.write(`<body lang="en">`);
+                  win.document.write(reportDocument.innerHTML);
+                  win.document.write(`</body></html>`);
+
+                  win.document.close();
+                  win.print();
+                  setLoadingPrint(false)
+            } catch (err) {
+                  setLoadingPrint(false)
             }
 
-            const win = window.open('', '', 'height=1000,width=1000');
-
-            win.document.write(`<!DOCTYPE html><head></head>`);
-            win.document.write(`<body lang="en">`);
-            win.document.write(reportDocument.innerHTML);
-            win.document.write(`</body></html>`);
-
-            win.document.close();
-            win.print();
       };
 
       const handleSelectLevel = value => {
@@ -224,7 +207,7 @@ export const Dashboard = ({ me }) => {
       const handleSearch = () => {
             if (selectedPeriods.length > 0 && selectedOrganisationUnit && selectedProgram && selectedLevel) {
                   loadTEIS(selectedProgram.program?.id, selectedOrganisationUnit.id);
-                  setCurrentPosition(1)
+                  setCurrentPosition(0)
             }
       };
 
@@ -265,7 +248,7 @@ export const Dashboard = ({ me }) => {
                               path: currO?.path,
                               event: event
                         };
-                  })
+                  }).filter(o => o.level === selectedLevel?.level)
             );
       };
 
@@ -379,6 +362,7 @@ export const Dashboard = ({ me }) => {
                                                 </div>
                                                 <div>
                                                       <Button
+                                                            loading={loadingPrint}
                                                             onClick={printReportAsPDF}
                                                             icon={<ImPrinter style={{ fontSize: '20px' }} />}
                                                       >
@@ -387,7 +371,10 @@ export const Dashboard = ({ me }) => {
                                                 </div>
                                           </div>
                                           <div style={{ display: 'flex', alignItems: 'end' }}>
-                                                {concerningOUs?.length > 0 && <div style={{ marginRight: '20px', fontWeight: 'bold' }}>
+                                                {concerningOUs?.length > 0 && <div style={{
+                                                      marginRight: '20px', fontWeight: 'bold',
+                                                      padding: '1px', background: 'green', color: '#fff', fontSize: '18px'
+                                                }}>
                                                       {`Page:    ${currentPosition + 1}/${concerningOUs?.length}`}
                                                 </div>}
                                                 <div>
@@ -470,7 +457,8 @@ export const Dashboard = ({ me }) => {
                                           backgroundColor: 'orange',
                                           color: '#fff',
                                           padding: '3px 10px',
-                                          border: '1px solid #00000090'
+                                          border: 'none',
+                                          borderRadius: '10px'
                                     }}
                               >
                                     {ou.displayName}
@@ -485,7 +473,8 @@ export const Dashboard = ({ me }) => {
                                                 backgroundColor: 'orange',
                                                 color: '#fff',
                                                 padding: '3px 10px',
-                                                border: '1px solid #00000090'
+                                                border: 'none',
+                                                borderRadius: '10px'
                                           }}
                                     >
                                           {dayjs(ou.event?.eventDate).format('YYYY-MM-DD')}
@@ -537,7 +526,8 @@ export const Dashboard = ({ me }) => {
                                                             backgroundColor: 'orange',
                                                             color: '#fff',
                                                             padding: '2px 10px',
-                                                            border: '1px solid #ccc',
+                                                            border: 'none',
+                                                            borderRadius: '10px',
                                                             marginTop: '5px'
                                                       }}
                                                 >
@@ -604,7 +594,9 @@ export const Dashboard = ({ me }) => {
             let countTimer = 0;
             let interval = setInterval(() => {
                   countTimer = countTimer + 1;
-                  if (countTimer >= 60 * 2) {
+                  console.log("count: ", countTimer)
+                  if (countTimer >= 10) {
+                        console.log("Interval timer destroyed")
                         return clearInterval(interval);
                   }
 
@@ -629,7 +621,7 @@ export const Dashboard = ({ me }) => {
                               }
                         }
                   }
-            }, 1000);
+            }, 3000);
       };
 
       const pause = milliseconds => {
@@ -638,6 +630,7 @@ export const Dashboard = ({ me }) => {
                   /* Do nothing */
             }
       };
+
       const loadAndInjectVisualizations = async () => {
             try {
                   setLoadingInjection(true);
@@ -677,7 +670,6 @@ export const Dashboard = ({ me }) => {
                                     if (rightElement) {
                                           rightElement.innerHTML = responseString;
                                           elementList.push({ rightElement, output });
-                                          //      pause(2000);
                                           handleReplaceIndicatorName(rightElement, indicatorsList, output);
                                     }
                               })
@@ -692,8 +684,6 @@ export const Dashboard = ({ me }) => {
                                     selectedProgram?.program?.id &&
                                     vis.program?.id === selectedProgram?.program?.id
                         )?.visualizations?.forEach(v => {
-
-
                               const responseString = ReactDOMServer.renderToString(
                                     <MyFrame
                                           type={v.type}
@@ -716,6 +706,12 @@ export const Dashboard = ({ me }) => {
                               const rightElement = document.getElementById(`${v.id}`)
                               if (rightElement) {
                                     rightElement.innerHTML = responseString;
+                                    for (let output of concerningOUs) {
+                                          const indicatorsList = selectedProgram?.programStageConfigurations?.find(
+                                                stage => stage?.programStage?.id === output?.event?.programStage
+                                          )?.indicators;
+                                          handleReplaceIndicatorName(rightElement, indicatorsList, output)
+                                    }
                               }
 
                         })
