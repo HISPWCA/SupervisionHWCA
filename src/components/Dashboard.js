@@ -57,7 +57,6 @@ export const Dashboard = ({ me }) => {
       const [concerningOUs, setConcerningOUs] = useState([]);
       const [currentPosition, setCurrentPosition] = useState(0);
       const [numberOfGeneration, setNumberOfGeneration] = useState(1);
-      const [currentIntervalTime, setCurrentIntervalTime] = useState(null)
 
 
       const [dataStoreSupervisionsConfigs, setDataStoreSupervisionsConfigs] = useState([]);
@@ -184,7 +183,7 @@ export const Dashboard = ({ me }) => {
                   win.print();
                   setLoadingPrint(false)
             } catch (err) {
-                  console.log("error  print :  ", err )
+                  console.log("error  print :  ", err)
                   setLoadingPrint(false)
             }
 
@@ -585,13 +584,8 @@ export const Dashboard = ({ me }) => {
 
       const handleReplaceIndicatorName = (elementHTML, config, output) => {
             let countTimer = 0;
-            let interval = setInterval(() => {
+            setInterval(() => {
                   countTimer = countTimer + 1;
-
-                  // if (countTimer >= 10) {
-                  //       console.log("Interval timer destroyed")
-                  //       return clearInterval(interval);
-                  // }
 
                   const foundElement = elementHTML.querySelector('iframe');
                   if (foundElement) {
@@ -674,7 +668,6 @@ export const Dashboard = ({ me }) => {
                                           selectedProgram?.program?.id &&
                                           vis.program?.id === selectedProgram?.program?.id
                               )?.visualizations?.forEach(v => {
-                                    console.log("each event : ", output)
                                     const responseString = ReactDOMServer.renderToString(
                                           <MyFrame
                                                 type={v.type}
@@ -767,7 +760,6 @@ export const Dashboard = ({ me }) => {
                   loadOrganisationUnits();
             }
 
-            return () => currentIntervalTime && clearInterval(currentIntervalTime);
       }, [me]);
 
       useEffect(() => {
