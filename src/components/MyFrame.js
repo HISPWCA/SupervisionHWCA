@@ -1,7 +1,20 @@
 import { MAP } from '../utils/constants';
 
-const MyFrame = ({ base_url, id, orgUnitIDs, periods, style = {}, type = MAP }) => {
-      const htmlStringForChart = `
+const MyFrame = (
+  {
+    base_url,
+    id,
+    orgUnitIDs,
+    periods,
+    style = {},
+    type = MAP,
+    targetLineValue,
+    targetLineTitle,
+    baseLineValue,
+    baseLineTitle
+  }
+) => {
+  const htmlStringForChart = `
 
         <!DOCTYPE html>
 <html lang="en">
@@ -125,6 +138,10 @@ const MyFrame = ({ base_url, id, orgUnitIDs, periods, style = {}, type = MAP }) 
                                  el: '${id}',
                                 ou: '${orgUnitIDs}'.split(','),
                                 pe: '${periods}' ?  '${periods}'.split(',') : [],
+                                targetLineValue: '${targetLineValue}' ?  +${targetLineValue} : null,
+                                targetLineTitle: '${targetLineTitle}' ?  '${targetLineTitle}' : null,
+                                baseLineValue:'${baseLineValue}' ?  +${baseLineValue} : null,
+                                baseLineTitle: '${baseLineTitle}' ?  '${baseLineTitle}' : null,
                                })
 
                             /* ***********  FIN du Block de Travail  ******************** */
@@ -399,6 +416,12 @@ const MyFrame = ({ base_url, id, orgUnitIDs, periods, style = {}, type = MAP }) 
           server_url = SERVEUR_URL,
           username = null,
           password = null,
+          measureCriteria = null,
+		      targetLineValue = null,
+          targetLineTitle = null,
+          baseLineValue = null,
+          baseLineTitle = null,
+
         }) => {
           try {
             chartPlugin.url = server_url;
@@ -490,6 +513,22 @@ const MyFrame = ({ base_url, id, orgUnitIDs, periods, style = {}, type = MAP }) 
               throw new Error("Impossible de récupérer ce favorit");
             }
 
+            if(targetLineTitle){
+              favoriteData.targetLineTitle = targetLineTitle;
+            }
+
+            if(targetLineValue){
+              favoriteData.targetLineValue = targetLineValue;
+            }
+
+            if(baseLineTitle){
+              favoriteData.baseLineTitle = baseLineTitle;
+            }
+
+            if(baseLineValue){
+              favoriteData.baseLineValue = baseLineValue;
+            }
+
             currentPlugin.load(favoriteData);
 
           } catch (err) {
@@ -516,7 +555,7 @@ const MyFrame = ({ base_url, id, orgUnitIDs, periods, style = {}, type = MAP }) 
        
         `;
 
-      const htmlStringForMAP = `
+  const htmlStringForMAP = `
 
         <!DOCTYPE html>
 <html lang="en">
@@ -1046,16 +1085,16 @@ const MyFrame = ({ base_url, id, orgUnitIDs, periods, style = {}, type = MAP }) 
        
         `;
 
-      return (
-            <div>
-                  <iframe
-                        id={`${id}-iframe`}
-                        frameborder="0"
-                        srcDoc={type === MAP ? htmlStringForMAP : htmlStringForChart}
-                        style={{ height: '100%', width: '100%', ...style }}
-                  ></iframe>
-            </div>
-      );
+  return (
+    <div>
+      <iframe
+        id={`${id}-iframe`}
+        frameborder="0"
+        srcDoc={type === MAP ? htmlStringForMAP : htmlStringForChart}
+        style={{ height: '100%', width: '100%', ...style }}
+      >{console.log("régeneration")}</iframe>
+    </div>
+  );
 };
 
 export default MyFrame;

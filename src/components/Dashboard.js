@@ -57,6 +57,7 @@ export const Dashboard = ({ me }) => {
       const [concerningOUs, setConcerningOUs] = useState([]);
       const [currentPosition, setCurrentPosition] = useState(0);
       const [numberOfGeneration, setNumberOfGeneration] = useState(1);
+      const [currentIntervalTime, setCurrentIntervalTime] = useState(null)
 
 
       const [dataStoreSupervisionsConfigs, setDataStoreSupervisionsConfigs] = useState([]);
@@ -183,6 +184,7 @@ export const Dashboard = ({ me }) => {
                   win.print();
                   setLoadingPrint(false)
             } catch (err) {
+                  console.log("error  print :  ", err )
                   setLoadingPrint(false)
             }
 
@@ -496,11 +498,12 @@ export const Dashboard = ({ me }) => {
                                     ))}
                         </Row>
                   </div>
-            ));
+            ))
+
       const RenderVisualizationForGlobalStructure = () => {
             return (
                   selectedLevel?.level > 1 &&
-                  concerningOUs.length > 1 && (
+                  concerningOUs.length > 1 && concerningOUs.length === (+currentPosition + 1) && (
                         <div style={{ marginTop: '20px' }}>
                               <div key={uuid()} style={{ marginBottom: '40px' }}>
                                     <div
@@ -567,7 +570,7 @@ export const Dashboard = ({ me }) => {
                   setTeiList(trackedEntityInstances);
                   setLoadingTeiList(false);
             } catch (err) { }
-      };
+      }
 
       const RenderVisualizations = () =>
             selectedProgram &&
@@ -578,27 +581,17 @@ export const Dashboard = ({ me }) => {
                         {RenderVisualizationForGlobalStructure()}
                         {RenderNoOrganisationUnitsAtThisLevel()}
                   </div>
-            );
+            )
 
-      const getRightIndicatorName = (index, indicatorsList, output) => {
-            if (index && indicatorsList?.length > 0) {
-                  const currentIndicator = indicatorsList?.find(ind => +ind?.position === +index);
-                  const indicatorName =
-                        currentIndicator &&
-                        output.event?.dataValues?.find(dv => dv.dataElement === currentIndicator?.value?.id)?.value;
-                  return indicatorName;
-            }
-      };
-
-      const handleReplaceIndicatorName = (elementHTML, indicatorsList, output) => {
+      const handleReplaceIndicatorName = (elementHTML, config, output) => {
             let countTimer = 0;
             let interval = setInterval(() => {
                   countTimer = countTimer + 1;
-                  console.log("count: ", countTimer)
-                  if (countTimer >= 10) {
-                        console.log("Interval timer destroyed")
-                        return clearInterval(interval);
-                  }
+
+                  // if (countTimer >= 10) {
+                  //       console.log("Interval timer destroyed")
+                  //       return clearInterval(interval);
+                  // }
 
                   const foundElement = elementHTML.querySelector('iframe');
                   if (foundElement) {
@@ -610,18 +603,50 @@ export const Dashboard = ({ me }) => {
                               for (let item of listItems) {
                                     const tspan = item.querySelector('tspan');
                                     if (tspan) {
+
                                           const text = tspan.innerHTML;
                                           const texts = text?.split('-');
-                                          const textsIndex1 = texts[0]?.split(' ')?.[1];
-                                          const indName = getRightIndicatorName(+textsIndex1, indicatorsList, output);
-                                          if (indName) {
-                                                tspan.innerHTML = indName + ' - ' + texts?.[1];
+                                          const textsIndex1 = texts?.[0];
+
+                                          // Remplacement des noms pour l'indicateur
+                                          if (textsIndex1?.toLowerCase()?.includes('indicat') && textsIndex1?.split(' ')?.[1] && config?.indicators?.length > 0) {
+                                                const index = +textsIndex1?.split(' ')?.[1]
+                                                const currentIndicator = config?.indicators?.find(ind => +ind?.position === +index);
+                                                const indicatorName = currentIndicator &&
+                                                      output.event?.dataValues?.find(dv => dv.dataElement === currentIndicator?.value?.id)?.value;
+
+                                                if (indicatorName) {
+                                                      return tspan.innerHTML = indicatorName + ' - ' + texts?.[1];
+                                                }
                                           }
+
+                                          // Remplacement des noms pour le cross check
+                                          if ((textsIndex1?.toLowerCase()?.includes('cross checks') || textsIndex1?.toLowerCase()?.includes('recoupements')) && textsIndex1?.[1] && config?.recoupements?.length > 0) {
+                                                console.log("cross check ")
+                                                let index = textsIndex1?.toLowerCase()?.split('cross checks ')?.[1] || textsIndex1?.toLowerCase()?.split('recoupements ')?.[1]
+                                                const currentRecoupement = config?.recoupements?.find(ind => +ind?.position === +index);
+
+                                                console.log("currentRecoupement : ", currentRecoupement)
+
+                                                const primaryCrosscheckName = currentRecoupement &&
+                                                      output.event?.dataValues?.find(dv => dv.dataElement === currentRecoupement?.primaryValue?.id)?.value;
+
+                                                const secondaryCrosscheckName = currentRecoupement &&
+                                                      output.event?.dataValues?.find(dv => dv.dataElement === currentRecoupement?.secondaryValue?.id)?.value;
+
+                                                console.log("Cross check primary : ", primaryCrosscheckName)
+                                                console.log("Cross check secondaire : ", secondaryCrosscheckName)
+
+                                                if (primaryCrosscheckName && secondaryCrosscheckName) {
+                                                      return tspan.innerHTML = `( ${primaryCrosscheckName}:${secondaryCrosscheckName} ) - ${texts?.[1]}`;
+                                                }
+                                          }
+
                                     }
                               }
                         }
                   }
-            }, 3000);
+            }, 5000);
       };
 
       const pause = milliseconds => {
@@ -640,15 +665,16 @@ export const Dashboard = ({ me }) => {
                         .slice(currentPosition, currentPosition + +numberOfGeneration)
                         .forEach(output => {
                               let elementList = [];
-                              const indicatorsList = selectedProgram?.programStageConfigurations?.find(
+                              const config = selectedProgram?.programStageConfigurations?.find(
                                     stage => stage?.programStage?.id === output?.event?.programStage
-                              )?.indicators;
+                              )
 
                               dataStoreVisualizations.find(
                                     vis =>
                                           selectedProgram?.program?.id &&
                                           vis.program?.id === selectedProgram?.program?.id
                               )?.visualizations?.forEach(v => {
+                                    console.log("each event : ", output)
                                     const responseString = ReactDOMServer.renderToString(
                                           <MyFrame
                                                 type={v.type}
@@ -660,6 +686,10 @@ export const Dashboard = ({ me }) => {
                                                 }}
                                                 periods={[dayjs(output.event?.eventDate).format('YYYYMMDD')].join(',')}
                                                 orgUnitIDs={[output?.id].join(',')}
+                                                baseLineTitle={v.baseLineTitle}
+                                                baseLineValue={v.baseLineValue}
+                                                targetLineTitle={v.targetLineTitle}
+                                                targetLineValue={v.targetLineValue}
                                           />
                                     );
 
@@ -670,7 +700,7 @@ export const Dashboard = ({ me }) => {
                                     if (rightElement) {
                                           rightElement.innerHTML = responseString;
                                           elementList.push({ rightElement, output });
-                                          handleReplaceIndicatorName(rightElement, indicatorsList, output);
+                                          handleReplaceIndicatorName(rightElement, config, output);
                                     }
                               })
                         })
@@ -700,6 +730,10 @@ export const Dashboard = ({ me }) => {
                                                 }
                                                 return p
                                           }, [])?.join(',')}
+                                          baseLineTitle={v.baseLineTitle}
+                                          baseLineValue={v.baseLineValue}
+                                          targetLineTitle={v.targetLineTitle}
+                                          targetLineValue={v.targetLineValue}
                                     />
                               )
 
@@ -707,10 +741,10 @@ export const Dashboard = ({ me }) => {
                               if (rightElement) {
                                     rightElement.innerHTML = responseString;
                                     for (let output of concerningOUs) {
-                                          const indicatorsList = selectedProgram?.programStageConfigurations?.find(
+                                          const config = selectedProgram?.programStageConfigurations?.find(
                                                 stage => stage?.programStage?.id === output?.event?.programStage
-                                          )?.indicators;
-                                          handleReplaceIndicatorName(rightElement, indicatorsList, output)
+                                          );
+                                          handleReplaceIndicatorName(rightElement, config, output)
                                     }
                               }
 
@@ -732,6 +766,8 @@ export const Dashboard = ({ me }) => {
                   loadOrganisationUnitLevels();
                   loadOrganisationUnits();
             }
+
+            return () => currentIntervalTime && clearInterval(currentIntervalTime);
       }, [me]);
 
       useEffect(() => {
