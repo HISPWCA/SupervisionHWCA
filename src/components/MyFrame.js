@@ -1092,7 +1092,7 @@ const MyFrame = (
         frameborder="0"
         srcDoc={type === MAP ? htmlStringForMAP : htmlStringForChart}
         style={{ height: '100%', width: '100%', ...style }}
-      >{console.log("régeneration")}</iframe>
+      ></iframe>
     </div>
   );
 };

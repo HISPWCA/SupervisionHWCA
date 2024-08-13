@@ -610,7 +610,7 @@ export const Dashboard = ({ me }) => {
                                                       output.event?.dataValues?.find(dv => dv.dataElement === currentIndicator?.value?.id)?.value;
 
                                                 if (indicatorName) {
-                                                      return tspan.innerHTML = indicatorName + ' - ' + texts?.[1];
+                                                      tspan.innerHTML = indicatorName + ' - ' + texts?.[1];
                                                 }
                                           }
 
@@ -632,7 +632,35 @@ export const Dashboard = ({ me }) => {
                                                 console.log("Cross check secondaire : ", secondaryCrosscheckName)
 
                                                 if (primaryCrosscheckName && secondaryCrosscheckName) {
-                                                      return tspan.innerHTML = `( ${primaryCrosscheckName}:${secondaryCrosscheckName} ) - ${texts?.[1]}`;
+                                                      let fullName = `( ${primaryCrosscheckName}:${secondaryCrosscheckName} ) - ${texts?.[1]}`;
+                                                      let tspanParent = tspan.parentElement
+
+                                                      console.log("tspanParent: ", tspanParent)
+
+                                                      if (tspanParent) {
+                                                            const tspan1 = document.createElement('tspan')
+                                                            const tspan2 = document.createElement('tspan')
+                                                            const tspan3 = document.createElement('tspan')
+
+                                                            tspan1.setAttribute('x', 0)
+                                                            tspan1.setAttribute('y', 0)
+
+                                                            tspan2.setAttribute('x', 0)
+                                                            tspan2.setAttribute('y', 1)
+
+                                                            tspan3.setAttribute('x', 0)
+                                                            tspan3.setAttribute('y', 2)
+
+                                                            tspan1.innerHTML = primaryCrosscheckName
+                                                            tspan2.innerHTML = secondaryCrosscheckName + " - "
+                                                            tspan3.innerHTML = texts?.[1]
+
+                                                            tspanParent.appendChild(tspan1)
+                                                            tspanParent.appendChild(tspan2)
+                                                            tspanParent.appendChild(tspan3)
+
+                                                            tspanParent.style.fontSize = '12px'
+                                                      }
                                                 }
                                           }
 
