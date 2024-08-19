@@ -152,7 +152,7 @@ export const Dashboard = ({ me }) => {
 
       const printReportAsPDF = async () => {
             try {
-                  setLoadingPrint(true)
+                  // setLoadingPrint(true)
                   let reportDocument = document.querySelector('[id="visualizations-container"]');
 
                   reportDocument.querySelectorAll('canvas').forEach(cv => {
@@ -181,10 +181,10 @@ export const Dashboard = ({ me }) => {
 
                   win.document.close();
                   win.print();
-                  setLoadingPrint(false)
+                  // setLoadingPrint(false)
             } catch (err) {
                   console.log("error  print :  ", err)
-                  setLoadingPrint(false)
+                  // setLoadingPrint(false)
             }
 
       };
@@ -616,11 +616,9 @@ export const Dashboard = ({ me }) => {
 
                                           // Remplacement des noms pour le cross check
                                           if ((textsIndex1?.toLowerCase()?.includes('cross checks') || textsIndex1?.toLowerCase()?.includes('recoupements')) && textsIndex1?.[1] && config?.recoupements?.length > 0) {
-                                                console.log("cross check ")
                                                 let index = textsIndex1?.toLowerCase()?.split('cross checks ')?.[1] || textsIndex1?.toLowerCase()?.split('recoupements ')?.[1]
                                                 const currentRecoupement = config?.recoupements?.find(ind => +ind?.position === +index);
 
-                                                console.log("currentRecoupement : ", currentRecoupement)
 
                                                 const primaryCrosscheckName = currentRecoupement &&
                                                       output.event?.dataValues?.find(dv => dv.dataElement === currentRecoupement?.primaryValue?.id)?.value;
@@ -628,39 +626,40 @@ export const Dashboard = ({ me }) => {
                                                 const secondaryCrosscheckName = currentRecoupement &&
                                                       output.event?.dataValues?.find(dv => dv.dataElement === currentRecoupement?.secondaryValue?.id)?.value;
 
-                                                console.log("Cross check primary : ", primaryCrosscheckName)
-                                                console.log("Cross check secondaire : ", secondaryCrosscheckName)
 
                                                 if (primaryCrosscheckName && secondaryCrosscheckName) {
-                                                      let fullName = `( ${primaryCrosscheckName}:${secondaryCrosscheckName} ) - ${texts?.[1]}`;
-                                                      let tspanParent = tspan.parentElement
+                                                      // tspan.innerHTML = `<p style="background : red;">( ${primaryCrosscheckName}:${secondaryCrosscheckName} ) - ${texts?.[1]}</p>`;
+                                                      // tspan.innerHTML = `( ${primaryCrosscheckName}:${secondaryCrosscheckName} ) - ${texts?.[1]}`;
+                                                      // tspan.style.fontSize = '10px'
 
-                                                      console.log("tspanParent: ", tspanParent)
+                                                      // let tspanParent = tspan.parentElement
 
-                                                      if (tspanParent) {
-                                                            const tspan1 = document.createElement('tspan')
-                                                            const tspan2 = document.createElement('tspan')
-                                                            const tspan3 = document.createElement('tspan')
+                                                      // console.log("tspanParent: ", tspanParent)
 
-                                                            tspan1.setAttribute('x', 0)
-                                                            tspan1.setAttribute('y', 0)
+                                                      // if (tspanParent) {
+                                                      //       const tspan1 = document.createElement('tspan')
+                                                      //       const tspan2 = document.createElement('tspan')
+                                                      //       const tspan3 = document.createElement('tspan')
 
-                                                            tspan2.setAttribute('x', 0)
-                                                            tspan2.setAttribute('y', 1)
+                                                      //       tspan1.setAttribute('x', 0)
+                                                      //       tspan1.setAttribute('y', 0)
 
-                                                            tspan3.setAttribute('x', 0)
-                                                            tspan3.setAttribute('y', 2)
+                                                      //       tspan2.setAttribute('x', 0)
+                                                      //       tspan2.setAttribute('y', 1)
 
-                                                            tspan1.innerHTML = primaryCrosscheckName
-                                                            tspan2.innerHTML = secondaryCrosscheckName + " - "
-                                                            tspan3.innerHTML = texts?.[1]
+                                                      //       tspan3.setAttribute('x', 0)
+                                                      //       tspan3.setAttribute('y', 2)
 
-                                                            tspanParent.appendChild(tspan1)
-                                                            tspanParent.appendChild(tspan2)
-                                                            tspanParent.appendChild(tspan3)
+                                                      //       tspan1.innerHTML = primaryCrosscheckName
+                                                      //       tspan2.innerHTML = secondaryCrosscheckName + " - "
+                                                      //       tspan3.innerHTML = texts?.[1]
 
-                                                            tspanParent.style.fontSize = '12px'
-                                                      }
+                                                      //       tspanParent.appendChild(tspan1)
+                                                      //       tspanParent.appendChild(tspan2)
+                                                      //       tspanParent.appendChild(tspan3)
+
+                                                      //       tspanParent.style.fontSize = '12px'
+                                                      // }
                                                 }
                                           }
 
