@@ -592,7 +592,8 @@ export const Dashboard = ({ me }) => {
                         const listItems = foundElement.contentWindow?.document?.body?.querySelectorAll(
                               '.highcharts-legend-item.highcharts-column-series'
                         );
-
+                        const foundElementLegend = foundElement.contentWindow?.document?.body?.querySelector('#my-legend')
+                        if (foundElementLegend) { foundElementLegend.innerHTML = "" }
                         if (listItems) {
                               for (let item of listItems) {
                                     const tspan = item.querySelector('tspan');
@@ -628,38 +629,31 @@ export const Dashboard = ({ me }) => {
 
 
                                                 if (primaryCrosscheckName && secondaryCrosscheckName) {
+
                                                       // tspan.innerHTML = `<p style="background : red;">( ${primaryCrosscheckName}:${secondaryCrosscheckName} ) - ${texts?.[1]}</p>`;
                                                       // tspan.innerHTML = `( ${primaryCrosscheckName}:${secondaryCrosscheckName} ) - ${texts?.[1]}`;
                                                       // tspan.style.fontSize = '10px'
 
-                                                      // let tspanParent = tspan.parentElement
+                                                      if (foundElementLegend) {
 
-                                                      // console.log("tspanParent: ", tspanParent)
+                                                            const legendHighChartParent = foundElement.contentWindow?.document?.body?.querySelector('.highcharts-legend')
+                                                            if (legendHighChartParent) {
+                                                                  // legendHighChartParent.style.display = 'none'
+                                                            }
 
-                                                      // if (tspanParent) {
-                                                      //       const tspan1 = document.createElement('tspan')
-                                                      //       const tspan2 = document.createElement('tspan')
-                                                      //       const tspan3 = document.createElement('tspan')
+                                                            if (legendHighChartParent) {
+                                                                  const elementRect = item.querySelector('rect')
+                                                                  const rectColor = elementRect.getAttribute('fill')
 
-                                                      //       tspan1.setAttribute('x', 0)
-                                                      //       tspan1.setAttribute('y', 0)
+                                                                  let legendContent = document.createElement('div')
+                                                                  legendContent.innerHTML = `<div style="font-size: 12px; display: flex; align-items: center;">
+                                                            <span style="background : ${rectColor || '#ccc'}; border-radius: 50px; height: 10px; width: 10px;margin-right: 5px;"></span>
+                                                             <span> ${primaryCrosscheckName} / ${secondaryCrosscheckName}  - ${texts?.[1]}</span>
+                                                            </div>`;
+                                                                  foundElementLegend.appendChild(legendContent)
+                                                            }
 
-                                                      //       tspan2.setAttribute('x', 0)
-                                                      //       tspan2.setAttribute('y', 1)
-
-                                                      //       tspan3.setAttribute('x', 0)
-                                                      //       tspan3.setAttribute('y', 2)
-
-                                                      //       tspan1.innerHTML = primaryCrosscheckName
-                                                      //       tspan2.innerHTML = secondaryCrosscheckName + " - "
-                                                      //       tspan3.innerHTML = texts?.[1]
-
-                                                      //       tspanParent.appendChild(tspan1)
-                                                      //       tspanParent.appendChild(tspan2)
-                                                      //       tspanParent.appendChild(tspan3)
-
-                                                      //       tspanParent.style.fontSize = '12px'
-                                                      // }
+                                                      }
                                                 }
                                           }
 

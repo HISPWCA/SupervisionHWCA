@@ -548,11 +548,10 @@ const MyFrame = (
 
       <body>
         <div id="${id}">Chart</div>
-        
+        <div id="my-legend"></div>
       </body>
 
-</html>
-       
+</html>       
         `;
 
   const htmlStringForMAP = `
