@@ -264,22 +264,22 @@ const Supervision = ({ me }) => {
                         ?.map(dv => dv.dataElement)
                         .includes(correctProgramStageFromDataStore.statusSupervisionField?.id)
                         ? rowEvent.dataValues.map(dvEl => {
-                                if (correctProgramStageFromDataStore.statusSupervisionField?.id === dvEl) {
-                                      return {
-                                            ...dvEl,
-                                            value: CANCELED.value
-                                      };
-                                } else {
-                                      return dvEl;
-                                }
-                          })
+                              if (correctProgramStageFromDataStore.statusSupervisionField?.id === dvEl) {
+                                    return {
+                                          ...dvEl,
+                                          value: CANCELED.value
+                                    };
+                              } else {
+                                    return dvEl;
+                              }
+                        })
                         : [
-                                ...rowEvent.dataValues,
-                                {
-                                      dataElement: correctProgramStageFromDataStore.statusSupervisionField?.id,
-                                      value: CANCELED.value
-                                }
-                          ];
+                              ...rowEvent.dataValues,
+                              {
+                                    dataElement: correctProgramStageFromDataStore.statusSupervisionField?.id,
+                                    value: CANCELED.value
+                              }
+                        ];
 
                   const payload = {
                         events: [
@@ -318,417 +318,417 @@ const Supervision = ({ me }) => {
       const columns = () => {
             return selectedSupervisionsConfigProgram?.planificationType === ORGANISATION_UNIT
                   ? [
-                          {
-                                accessorKey: 'libelle', //access nested data with dot notation
-                                header: `${translate('Unite_Organisation')}`
-                          },
+                        {
+                              accessorKey: 'libelle', //access nested data with dot notation
+                              header: `${translate('Unite_Organisation')}`
+                        },
 
-                          {
-                                accessorKey: 'teamLead', //access nested data with dot notation
-                                header: `${translate('Team_Lead')}`,
-                                Cell: ({ cell, row }) => (
-                                      <>
-                                            {cell.getValue()?.trim()?.length > 0 && (
-                                                  <span
-                                                        style={{
-                                                              background: '#FFF4B0',
-                                                              fontSize: '12px',
-                                                              padding: '6px',
-                                                              marginRight: '5px',
-                                                              fontWeight: 'bold',
-                                                              borderRadius: '6px',
-                                                              marginTop: '2px',
-                                                              border: '1px solid #ccc'
-                                                        }}
-                                                  >
-                                                        {' '}
-                                                        {cell.getValue()}
-                                                  </span>
-                                            )}
-                                      </>
-                                )
-                          },
-                          {
-                                accessorKey: 'superviseurs',
-                                header: `${translate('Superviseurs')}`,
-                                Cell: ({ cell, row }) =>
-                                      cell.getValue()?.trim()?.length > 0 &&
-                                      cell.getValue()?.trim()?.split(',')?.length > 0 ? (
-                                            <div
-                                                  style={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        flexWrap: 'wrap'
-                                                  }}
-                                            >
-                                                  {cell.getValue()?.split(',')?.length >= 3 ? (
-                                                        <Popover
-                                                              content={
-                                                                    <div style={{ maxWidth: '400px' }}>
-                                                                          <div
-                                                                                style={{
-                                                                                      display: 'flex',
-                                                                                      alignItems: 'center',
-                                                                                      flexWrap: 'wrap'
-                                                                                }}
-                                                                          >
-                                                                                {cell
-                                                                                      .getValue()
-                                                                                      ?.split(',')
-                                                                                      ?.map((sup, index) => (
-                                                                                            <div
-                                                                                                  key={index}
-                                                                                                  style={{
-                                                                                                        background:
-                                                                                                              '#0A939640',
-                                                                                                        fontSize: '12px',
-                                                                                                        padding: '4px',
-                                                                                                        border: '1px solid #ccc',
-                                                                                                        marginRight:
-                                                                                                              '5px',
-                                                                                                        borderRadius:
-                                                                                                              '6px',
-                                                                                                        marginTop: '5px'
-                                                                                                  }}
-                                                                                            >
-                                                                                                  {' '}
-                                                                                                  {sup}
-                                                                                            </div>
-                                                                                      ))}
-                                                                          </div>
-                                                                    </div>
-                                                              }
-                                                              title={translate('Superviseurs')}
-                                                              trigger="hover"
-                                                        >
-                                                              <div
-                                                                    style={{
-                                                                          display: 'flex',
-                                                                          alignItems: 'center',
-                                                                          flexWrap: 'wrap'
-                                                                    }}
-                                                              >
-                                                                    {cell
-                                                                          .getValue()
-                                                                          ?.split(',')
-                                                                          ?.map(
-                                                                                (sup, index) =>
-                                                                                      index < 3 && (
-                                                                                            <div
-                                                                                                  key={index}
-                                                                                                  style={{
-                                                                                                        background:
-                                                                                                              '#0A939640',
-                                                                                                        fontSize: '12px',
-                                                                                                        border: '1px solid #ccc',
-                                                                                                        padding: '4px',
-                                                                                                        cursor: 'pointer',
-                                                                                                        marginRight:
-                                                                                                              '5px',
-                                                                                                        borderRadius:
-                                                                                                              '6px',
-                                                                                                        marginTop: '5px'
-                                                                                                  }}
-                                                                                            >
-                                                                                                  {' '}
-                                                                                                  {sup}
-                                                                                            </div>
-                                                                                      )
-                                                                          )}
-                                                                    <div
-                                                                          style={{
-                                                                                cursor: 'pointer',
-                                                                                marginLeft: '5px'
-                                                                          }}
-                                                                    >
-                                                                          ...
-                                                                    </div>
-                                                              </div>
-                                                        </Popover>
-                                                  ) : (
-                                                        cell
-                                                              .getValue()
-                                                              ?.split(',')
-                                                              ?.map((sup, index) => (
-                                                                    <div
-                                                                          key={index}
-                                                                          style={{
-                                                                                background: '#0A939640',
-                                                                                border: '1px solid #ccc',
-                                                                                fontSize: '12px',
-                                                                                padding: '4px',
-                                                                                marginRight: '5px',
-                                                                                borderRadius: '6px',
-                                                                                marginTop: '5px'
-                                                                          }}
-                                                                    >
-                                                                          {' '}
-                                                                          {sup}
-                                                                    </div>
-                                                              ))
-                                                  )}
-                                            </div>
-                                      ) : (
-                                            <></>
-                                      )
-                          },
-                          {
-                                accessorKey: 'period',
-                                header: `${translate('Periode')}`
-                          },
+                        {
+                              accessorKey: 'teamLead', //access nested data with dot notation
+                              header: `${translate('Team_Lead')}`,
+                              Cell: ({ cell, row }) => (
+                                    <>
+                                          {cell.getValue()?.trim()?.length > 0 && (
+                                                <span
+                                                      style={{
+                                                            background: '#FFF4B0',
+                                                            fontSize: '12px',
+                                                            padding: '6px',
+                                                            marginRight: '5px',
+                                                            fontWeight: 'bold',
+                                                            borderRadius: '6px',
+                                                            marginTop: '2px',
+                                                            border: '1px solid #ccc'
+                                                      }}
+                                                >
+                                                      {' '}
+                                                      {cell.getValue()}
+                                                </span>
+                                          )}
+                                    </>
+                              )
+                        },
+                        {
+                              accessorKey: 'superviseurs',
+                              header: `${translate('Superviseurs')}`,
+                              Cell: ({ cell, row }) =>
+                                    cell.getValue()?.trim()?.length > 0 &&
+                                          cell.getValue()?.trim()?.split(',')?.length > 0 ? (
+                                          <div
+                                                style={{
+                                                      display: 'flex',
+                                                      alignItems: 'center',
+                                                      flexWrap: 'wrap'
+                                                }}
+                                          >
+                                                {cell.getValue()?.split(',')?.length >= 3 ? (
+                                                      <Popover
+                                                            content={
+                                                                  <div style={{ maxWidth: '400px' }}>
+                                                                        <div
+                                                                              style={{
+                                                                                    display: 'flex',
+                                                                                    alignItems: 'center',
+                                                                                    flexWrap: 'wrap'
+                                                                              }}
+                                                                        >
+                                                                              {cell
+                                                                                    .getValue()
+                                                                                    ?.split(',')
+                                                                                    ?.map((sup, index) => (
+                                                                                          <div
+                                                                                                key={index}
+                                                                                                style={{
+                                                                                                      background:
+                                                                                                            '#0A939640',
+                                                                                                      fontSize: '12px',
+                                                                                                      padding: '4px',
+                                                                                                      border: '1px solid #ccc',
+                                                                                                      marginRight:
+                                                                                                            '5px',
+                                                                                                      borderRadius:
+                                                                                                            '6px',
+                                                                                                      marginTop: '5px'
+                                                                                                }}
+                                                                                          >
+                                                                                                {' '}
+                                                                                                {sup}
+                                                                                          </div>
+                                                                                    ))}
+                                                                        </div>
+                                                                  </div>
+                                                            }
+                                                            title={translate('Superviseurs')}
+                                                            trigger="hover"
+                                                      >
+                                                            <div
+                                                                  style={{
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        flexWrap: 'wrap'
+                                                                  }}
+                                                            >
+                                                                  {cell
+                                                                        .getValue()
+                                                                        ?.split(',')
+                                                                        ?.map(
+                                                                              (sup, index) =>
+                                                                                    index < 3 && (
+                                                                                          <div
+                                                                                                key={index}
+                                                                                                style={{
+                                                                                                      background:
+                                                                                                            '#0A939640',
+                                                                                                      fontSize: '12px',
+                                                                                                      border: '1px solid #ccc',
+                                                                                                      padding: '4px',
+                                                                                                      cursor: 'pointer',
+                                                                                                      marginRight:
+                                                                                                            '5px',
+                                                                                                      borderRadius:
+                                                                                                            '6px',
+                                                                                                      marginTop: '5px'
+                                                                                                }}
+                                                                                          >
+                                                                                                {' '}
+                                                                                                {sup}
+                                                                                          </div>
+                                                                                    )
+                                                                        )}
+                                                                  <div
+                                                                        style={{
+                                                                              cursor: 'pointer',
+                                                                              marginLeft: '5px'
+                                                                        }}
+                                                                  >
+                                                                        ...
+                                                                  </div>
+                                                            </div>
+                                                      </Popover>
+                                                ) : (
+                                                      cell
+                                                            .getValue()
+                                                            ?.split(',')
+                                                            ?.map((sup, index) => (
+                                                                  <div
+                                                                        key={index}
+                                                                        style={{
+                                                                              background: '#0A939640',
+                                                                              border: '1px solid #ccc',
+                                                                              fontSize: '12px',
+                                                                              padding: '4px',
+                                                                              marginRight: '5px',
+                                                                              borderRadius: '6px',
+                                                                              marginTop: '5px'
+                                                                        }}
+                                                                  >
+                                                                        {' '}
+                                                                        {sup}
+                                                                  </div>
+                                                            ))
+                                                )}
+                                          </div>
+                                    ) : (
+                                          <></>
+                                    )
+                        },
+                        {
+                              accessorKey: 'period',
+                              header: `${translate('Periode')}`
+                        },
 
-                          {
-                                accessorKey: 'statusSupervision', //normal accessorKey
-                                header: `${translate('Status_Supervision')}`,
-                                size: 150,
-                                Cell: ({ cell, row }) => {
-                                      return (
-                                            <>
-                                                  <span
-                                                        title={getStatusNameAndColor(cell.getValue())?.name}
-                                                        style={{
-                                                              fontSize: '12px',
-                                                              padding: '6px',
-                                                              marginRight: '5px',
-                                                              fontWeight: 'bold',
-                                                              borderRadius: '6px',
-                                                              marginTop: '2px',
-                                                              border: '1px solid #000',
-                                                              background: getStatusNameAndColor(cell.getValue())?.color
-                                                                    ?.background,
-                                                              color: getStatusNameAndColor(cell.getValue())?.color?.text
-                                                        }}
-                                                  >
-                                                        {getStatusNameAndColor(cell.getValue())?.name}
-                                                  </span>
-                                            </>
-                                      );
-                                }
-                          },
-                          {
-                                header: `${translate('Actions')}`,
-                                size: 50,
-                                Cell: ({ cell, row }) => {
-                                      return (
-                                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                  <a
-                                                        target="_blank"
-                                                        href={`${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${row.original.trackedEntityInstance}&program=${row.original.program}&ou=${row.original.orgUnit}`}
-                                                        style={{ cursor: 'pointer' }}
-                                                  >
-                                                        <IoMdOpen
-                                                              title={translate('Ouvrir_Dans_Le_Tracker')}
-                                                              style={{
-                                                                    fontSize: '20px',
-                                                                    color: BLUE,
-                                                                    cursor: 'pointer'
-                                                              }}
-                                                        />
-                                                  </a>
-                                                  <div style={{ marginLeft: '10px' }}>
-                                                        <Popconfirm
-                                                              title={translate('Annuler_Planification')}
-                                                              description={translate('Confirmation_Annulation_Event')}
-                                                              icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
-                                                              onConfirm={() => handleCancelEvent(row.original)}
-                                                        >
-                                                              <MdOutlineSettingsBackupRestore
-                                                                    title={translate('Annuler_Planification')}
-                                                                    style={{
-                                                                          fontSize: '25px',
-                                                                          color: ORANGE,
-                                                                          cursor: 'pointer'
-                                                                    }}
-                                                              />
-                                                        </Popconfirm>
-                                                  </div>
-                                            </div>
-                                      );
-                                }
-                          }
-                    ]
+                        {
+                              accessorKey: 'statusSupervision', //normal accessorKey
+                              header: `${translate('Status_Supervision')}`,
+                              size: 150,
+                              Cell: ({ cell, row }) => {
+                                    return (
+                                          <>
+                                                <span
+                                                      title={getStatusNameAndColor(cell.getValue())?.name}
+                                                      style={{
+                                                            fontSize: '12px',
+                                                            padding: '6px',
+                                                            marginRight: '5px',
+                                                            fontWeight: 'bold',
+                                                            borderRadius: '6px',
+                                                            marginTop: '2px',
+                                                            border: '1px solid #000',
+                                                            background: getStatusNameAndColor(cell.getValue())?.color
+                                                                  ?.background,
+                                                            color: getStatusNameAndColor(cell.getValue())?.color?.text
+                                                      }}
+                                                >
+                                                      {getStatusNameAndColor(cell.getValue())?.name}
+                                                </span>
+                                          </>
+                                    );
+                              }
+                        },
+                        {
+                              header: `${translate('Actions')}`,
+                              size: 50,
+                              Cell: ({ cell, row }) => {
+                                    return (
+                                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                <a
+                                                      target="_blank"
+                                                      href={`${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${row.original.trackedEntityInstance}&program=${row.original.program}&ou=${row.original.orgUnit}`}
+                                                      style={{ cursor: 'pointer' }}
+                                                >
+                                                      <IoMdOpen
+                                                            title={translate('Ouvrir_Dans_Le_Tracker')}
+                                                            style={{
+                                                                  fontSize: '20px',
+                                                                  color: BLUE,
+                                                                  cursor: 'pointer'
+                                                            }}
+                                                      />
+                                                </a>
+                                                <div style={{ marginLeft: '10px' }}>
+                                                      <Popconfirm
+                                                            title={translate('Annuler_Planification')}
+                                                            description={translate('Confirmation_Annulation_Event')}
+                                                            icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+                                                            onConfirm={() => handleCancelEvent(row.original)}
+                                                      >
+                                                            <MdOutlineSettingsBackupRestore
+                                                                  title={translate('Annuler_Planification')}
+                                                                  style={{
+                                                                        fontSize: '25px',
+                                                                        color: ORANGE,
+                                                                        cursor: 'pointer'
+                                                                  }}
+                                                            />
+                                                      </Popconfirm>
+                                                </div>
+                                          </div>
+                                    );
+                              }
+                        }
+                  ]
                   : [
-                          {
-                                accessorKey: 'agent', //access nested data with dot notation
-                                header: `${translate('Agent')}`
-                          },
-                          {
-                                accessorKey: 'libelle', //access nested data with dot notation
-                                header: `${translate('Unite_Organisation')}`
-                          },
-                          {
-                                accessorKey: 'teamLead', //access nested data with dot notation
-                                header: `${translate('Team_Lead')}`,
-                                Cell: ({ cell, row }) => (
-                                      <>
-                                            {cell.getValue()?.trim()?.length > 0 && (
-                                                  <span
-                                                        style={{
-                                                              background: '#0A939640',
-                                                              fontSize: '12px',
-                                                              padding: '5px',
-                                                              marginRight: '5px',
-                                                              fontWeight: 'bold',
-                                                              borderRadius: '6px',
-                                                              marginTop: '2px'
-                                                        }}
-                                                  >
-                                                        {' '}
-                                                        {cell.getValue()}
-                                                  </span>
-                                            )}
-                                      </>
-                                )
-                          },
-                          {
-                                accessorKey: 'superviseurs',
-                                header: `${translate('Superviseurs')}`,
-                                Cell: ({ cell, row }) =>
-                                      cell.getValue()?.trim()?.length > 0 &&
-                                      cell.getValue()?.trim()?.split(',')?.length > 0 ? (
-                                            <div
-                                                  style={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        flexWrap: 'wrap'
-                                                  }}
-                                            >
-                                                  {cell.getValue()?.split(',')?.length >= 3 ? (
-                                                        <Popover
-                                                              content={
-                                                                    <div>
-                                                                          {cell
-                                                                                .getValue()
-                                                                                ?.split(',')
-                                                                                ?.map((sup, index) => (
-                                                                                      <span
-                                                                                            key={index}
-                                                                                            style={{
-                                                                                                  background:
-                                                                                                        '#0A939640',
-                                                                                                  fontSize: '12px',
-                                                                                                  padding: '4px',
-                                                                                                  marginRight: '5px',
-                                                                                                  borderRadius: '6px',
-                                                                                                  marginTop: '2px'
-                                                                                            }}
-                                                                                      >
-                                                                                            {' '}
-                                                                                            {sup}
-                                                                                      </span>
-                                                                                ))}
-                                                                    </div>
-                                                              }
-                                                              title={translate('Superviseurs')}
-                                                              trigger="hover"
-                                                        >
-                                                              {cell
-                                                                    .getValue()
-                                                                    ?.split(',')
-                                                                    ?.map(
-                                                                          (sup, index) =>
-                                                                                index < 3 && (
-                                                                                      <span
-                                                                                            key={index}
-                                                                                            style={{
-                                                                                                  background:
-                                                                                                        '#0A939640',
-                                                                                                  fontSize: '12px',
-                                                                                                  padding: '4px',
-                                                                                                  marginRight: '5px',
-                                                                                                  borderRadius: '6px',
-                                                                                                  marginTop: '2px'
-                                                                                            }}
-                                                                                      >
-                                                                                            {' '}
-                                                                                            {sup}
-                                                                                      </span>
-                                                                                )
-                                                                    )}
-                                                        </Popover>
-                                                  ) : (
-                                                        cell
-                                                              .getValue()
-                                                              ?.split(',')
-                                                              ?.map((sup, index) => (
-                                                                    <span
-                                                                          key={index}
-                                                                          style={{
-                                                                                background: '#0A939640',
-                                                                                fontSize: '12px',
-                                                                                padding: '4px',
-                                                                                marginRight: '5px',
-                                                                                borderRadius: '6px',
-                                                                                marginTop: '2px'
-                                                                          }}
-                                                                    >
-                                                                          {' '}
-                                                                          {sup}
-                                                                    </span>
-                                                              ))
-                                                  )}
-                                            </div>
-                                      ) : (
-                                            <></>
-                                      )
-                          },
-                          {
-                                accessorKey: 'period',
-                                header: `${translate('Periode')}`
-                          },
-                          {
-                                accessorKey: 'statusSupervision', //normal accessorKey
-                                header: `${translate('Status_Supervision')}`,
-                                Cell: ({ cell, row }) => {
-                                      return (
-                                            <>
-                                                  <span
-                                                        title={getStatusNameAndColor(cell.getValue())?.name}
-                                                        style={{
-                                                              fontSize: '12px',
-                                                              padding: '6px',
-                                                              marginRight: '5px',
-                                                              fontWeight: 'bold',
-                                                              borderRadius: '6px',
-                                                              marginTop: '2px',
-                                                              border: '1px solid #000',
-                                                              background: getStatusNameAndColor(cell.getValue())?.color
-                                                                    ?.background,
-                                                              color: getStatusNameAndColor(cell.getValue())?.color?.text
-                                                        }}
-                                                  >
-                                                        {getStatusNameAndColor(cell.getValue())?.name}
-                                                  </span>
-                                            </>
-                                      );
-                                }
-                          },
+                        {
+                              accessorKey: 'agent', //access nested data with dot notation
+                              header: `${translate('Agent')}`
+                        },
+                        {
+                              accessorKey: 'libelle', //access nested data with dot notation
+                              header: `${translate('Unite_Organisation')}`
+                        },
+                        {
+                              accessorKey: 'teamLead', //access nested data with dot notation
+                              header: `${translate('Team_Lead')}`,
+                              Cell: ({ cell, row }) => (
+                                    <>
+                                          {cell.getValue()?.trim()?.length > 0 && (
+                                                <span
+                                                      style={{
+                                                            background: '#0A939640',
+                                                            fontSize: '12px',
+                                                            padding: '5px',
+                                                            marginRight: '5px',
+                                                            fontWeight: 'bold',
+                                                            borderRadius: '6px',
+                                                            marginTop: '2px'
+                                                      }}
+                                                >
+                                                      {' '}
+                                                      {cell.getValue()}
+                                                </span>
+                                          )}
+                                    </>
+                              )
+                        },
+                        {
+                              accessorKey: 'superviseurs',
+                              header: `${translate('Superviseurs')}`,
+                              Cell: ({ cell, row }) =>
+                                    cell.getValue()?.trim()?.length > 0 &&
+                                          cell.getValue()?.trim()?.split(',')?.length > 0 ? (
+                                          <div
+                                                style={{
+                                                      display: 'flex',
+                                                      alignItems: 'center',
+                                                      flexWrap: 'wrap'
+                                                }}
+                                          >
+                                                {cell.getValue()?.split(',')?.length >= 3 ? (
+                                                      <Popover
+                                                            content={
+                                                                  <div>
+                                                                        {cell
+                                                                              .getValue()
+                                                                              ?.split(',')
+                                                                              ?.map((sup, index) => (
+                                                                                    <span
+                                                                                          key={index}
+                                                                                          style={{
+                                                                                                background:
+                                                                                                      '#0A939640',
+                                                                                                fontSize: '12px',
+                                                                                                padding: '4px',
+                                                                                                marginRight: '5px',
+                                                                                                borderRadius: '6px',
+                                                                                                marginTop: '2px'
+                                                                                          }}
+                                                                                    >
+                                                                                          {' '}
+                                                                                          {sup}
+                                                                                    </span>
+                                                                              ))}
+                                                                  </div>
+                                                            }
+                                                            title={translate('Superviseurs')}
+                                                            trigger="hover"
+                                                      >
+                                                            {cell
+                                                                  .getValue()
+                                                                  ?.split(',')
+                                                                  ?.map(
+                                                                        (sup, index) =>
+                                                                              index < 3 && (
+                                                                                    <span
+                                                                                          key={index}
+                                                                                          style={{
+                                                                                                background:
+                                                                                                      '#0A939640',
+                                                                                                fontSize: '12px',
+                                                                                                padding: '4px',
+                                                                                                marginRight: '5px',
+                                                                                                borderRadius: '6px',
+                                                                                                marginTop: '2px'
+                                                                                          }}
+                                                                                    >
+                                                                                          {' '}
+                                                                                          {sup}
+                                                                                    </span>
+                                                                              )
+                                                                  )}
+                                                      </Popover>
+                                                ) : (
+                                                      cell
+                                                            .getValue()
+                                                            ?.split(',')
+                                                            ?.map((sup, index) => (
+                                                                  <span
+                                                                        key={index}
+                                                                        style={{
+                                                                              background: '#0A939640',
+                                                                              fontSize: '12px',
+                                                                              padding: '4px',
+                                                                              marginRight: '5px',
+                                                                              borderRadius: '6px',
+                                                                              marginTop: '2px'
+                                                                        }}
+                                                                  >
+                                                                        {' '}
+                                                                        {sup}
+                                                                  </span>
+                                                            ))
+                                                )}
+                                          </div>
+                                    ) : (
+                                          <></>
+                                    )
+                        },
+                        {
+                              accessorKey: 'period',
+                              header: `${translate('Periode')}`
+                        },
+                        {
+                              accessorKey: 'statusSupervision', //normal accessorKey
+                              header: `${translate('Status_Supervision')}`,
+                              Cell: ({ cell, row }) => {
+                                    return (
+                                          <>
+                                                <span
+                                                      title={getStatusNameAndColor(cell.getValue())?.name}
+                                                      style={{
+                                                            fontSize: '12px',
+                                                            padding: '6px',
+                                                            marginRight: '5px',
+                                                            fontWeight: 'bold',
+                                                            borderRadius: '6px',
+                                                            marginTop: '2px',
+                                                            border: '1px solid #000',
+                                                            background: getStatusNameAndColor(cell.getValue())?.color
+                                                                  ?.background,
+                                                            color: getStatusNameAndColor(cell.getValue())?.color?.text
+                                                      }}
+                                                >
+                                                      {getStatusNameAndColor(cell.getValue())?.name}
+                                                </span>
+                                          </>
+                                    );
+                              }
+                        },
 
-                          {
-                                header: `${translate('Actions')}`,
-                                size: 100,
-                                Cell: ({ cell, row }) => {
-                                      return (
-                                            <div style={{ textAlign: 'center' }}>
-                                                  <a
-                                                        target="_blank"
-                                                        href={`${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${row.original.trackedEntityInstance}&program=${row.original.program}&ou=${row.original.orgUnit}`}
-                                                        style={{ cursor: 'pointer' }}
-                                                  >
-                                                        <IoMdOpen
-                                                              title={translate('Ouvrir_Dans_Le_Tracker')}
-                                                              style={{
-                                                                    fontSize: '18px',
-                                                                    color: BLUE,
-                                                                    cursor: 'pointer'
-                                                              }}
-                                                        />
-                                                  </a>
-                                            </div>
-                                      );
-                                }
-                          }
-                    ];
+                        {
+                              header: `${translate('Actions')}`,
+                              size: 100,
+                              Cell: ({ cell, row }) => {
+                                    return (
+                                          <div style={{ textAlign: 'center' }}>
+                                                <a
+                                                      target="_blank"
+                                                      href={`${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${row.original.trackedEntityInstance}&program=${row.original.program}&ou=${row.original.orgUnit}`}
+                                                      style={{ cursor: 'pointer' }}
+                                                >
+                                                      <IoMdOpen
+                                                            title={translate('Ouvrir_Dans_Le_Tracker')}
+                                                            style={{
+                                                                  fontSize: '18px',
+                                                                  color: BLUE,
+                                                                  cursor: 'pointer'
+                                                            }}
+                                                      />
+                                                </a>
+                                          </div>
+                                    );
+                              }
+                        }
+                  ];
       };
 
       const loadOrganisationUnits = async () => {
@@ -929,14 +929,14 @@ const Supervision = ({ me }) => {
                   const response = await loadDataStore(process.env.REACT_APP_MISSIONS_KEY, null, null, null);
                   setDataStoreMissions(response);
                   return response;
-            } catch (err) {}
+            } catch (err) { }
       };
 
       const loadDataStoreIndicatorsMapping = async () => {
             try {
                   const response = await loadDataStore(process.env.REACT_APP_INDICATORS_MAPPING_KEY, null, null, null);
                   setDataStoreIndicatorsMapping(response);
-            } catch (err) {}
+            } catch (err) { }
       };
 
       const loadDataStoreIndicators = async () => {
@@ -1061,7 +1061,7 @@ const Supervision = ({ me }) => {
                               if (
                                     selectedPeriodSupervisionConfig &&
                                     dayjs(current.created).format('YYYYMM') ===
-                                          dayjs(selectedPeriodSupervisionConfig).format('YYYYMM') &&
+                                    dayjs(selectedPeriodSupervisionConfig).format('YYYYMM') &&
                                     current.enrollments?.filter(
                                           en => en.program === selectedSupervisionsConfigProgram?.program?.id
                                     )
@@ -1115,20 +1115,18 @@ const Supervision = ({ me }) => {
                                           ...prev,
                                           {
                                                 trackedEntityInstance,
-                                                agent: `${
-                                                      current.attributes?.find(
-                                                            att =>
-                                                                  att.attribute ===
-                                                                  selectedSupervisionsConfigProgram?.attributeName?.id
-                                                      )?.value || ''
-                                                } ${
-                                                      current.attributes?.find(
+                                                agent: `${current.attributes?.find(
+                                                      att =>
+                                                            att.attribute ===
+                                                            selectedSupervisionsConfigProgram?.attributeName?.id
+                                                )?.value || ''
+                                                      } ${current.attributes?.find(
                                                             att =>
                                                                   att.attribute ===
                                                                   selectedSupervisionsConfigProgram?.attributeFirstName
                                                                         ?.id
                                                       )?.value || ''
-                                                }`,
+                                                      }`,
                                                 montant: calculateMontant(
                                                       trackedEntityInstance,
                                                       eventDate,
@@ -1203,21 +1201,19 @@ const Supervision = ({ me }) => {
                                                 .filter(en => en?.events[0]?.eventDate)
                                                 .map(en => ({
                                                       trackedEntityInstance: en.trackedEntityInstance,
-                                                      agent: `${
-                                                            current.attributes?.find(
-                                                                  att =>
-                                                                        att.attribute ===
-                                                                        selectedSupervisionsConfigProgram?.attributeName
-                                                                              ?.id
-                                                            )?.value || ''
-                                                      } ${
-                                                            current.attributes?.find(
+                                                      agent: `${current.attributes?.find(
+                                                            att =>
+                                                                  att.attribute ===
+                                                                  selectedSupervisionsConfigProgram?.attributeName
+                                                                        ?.id
+                                                      )?.value || ''
+                                                            } ${current.attributes?.find(
                                                                   att =>
                                                                         att.attribute ===
                                                                         selectedSupervisionsConfigProgram
                                                                               ?.attributeFirstName?.id
                                                             )?.value || ''
-                                                      }`,
+                                                            }`,
                                                       period: en?.events[0]?.eventDate,
                                                       teamLead: getTeamLead(
                                                             dataStoreSupervisions,
@@ -1294,21 +1290,19 @@ const Supervision = ({ me }) => {
                                                 .filter(ev => ev.eventDate)
                                                 .map(ev => ({
                                                       trackedEntityInstance: currentEnrollment?.trackedEntityInstance,
-                                                      agent: `${
-                                                            current.attributes?.find(
-                                                                  att =>
-                                                                        att.attribute ===
-                                                                        selectedSupervisionsConfigProgram?.attributeName
-                                                                              ?.id
-                                                            )?.value || ''
-                                                      } ${
-                                                            current.attributes?.find(
+                                                      agent: `${current.attributes?.find(
+                                                            att =>
+                                                                  att.attribute ===
+                                                                  selectedSupervisionsConfigProgram?.attributeName
+                                                                        ?.id
+                                                      )?.value || ''
+                                                            } ${current.attributes?.find(
                                                                   att =>
                                                                         att.attribute ===
                                                                         selectedSupervisionsConfigProgram
                                                                               ?.attributeFirstName?.id
                                                             )?.value || ''
-                                                      }`,
+                                                            }`,
                                                       period: ev.eventDate,
                                                       teamLead: getTeamLead(dataStoreSupervisions, ev.event),
                                                       montant: calculateMontant(
@@ -1574,7 +1568,7 @@ const Supervision = ({ me }) => {
                   if (!enrollment_id)
                         throw new Error(
                               createdEnrollment?.response?.importSummaries[0]?.description ||
-                                    translate('Erreur_Creation_Enrollment')
+                              translate('Erreur_Creation_Enrollment')
                         );
 
                   // const availableProgramStages = [];
@@ -1803,15 +1797,15 @@ const Supervision = ({ me }) => {
                               eventPayload.dataValues =
                                     selectedProgram?.configurationType === DQR
                                           ? mappingConfigs
-                                                  .filter(ev => ev.programStage?.id === payload.programStage?.id)
-                                                  .map(ev => ({
-                                                        dataElement: ev.dataElement?.id,
-                                                        value: ev.indicator?.displayName
-                                                  }))
+                                                .filter(ev => ev.programStage?.id === payload.programStage?.id)
+                                                .map(ev => ({
+                                                      dataElement: ev.dataElement?.id,
+                                                      value: ev.indicator?.displayName
+                                                }))
                                           : mappingConfigs.map(ev => ({
-                                                  dataElement: ev.dataElement?.id,
-                                                  value: ev.indicator?.displayName
-                                            }));
+                                                dataElement: ev.dataElement?.id,
+                                                value: ev.indicator?.displayName
+                                          }));
                         } else {
                               eventPayload.status = 'SCHEDULE';
                               eventPayload.dueDate = payload.period
@@ -1856,7 +1850,7 @@ const Supervision = ({ me }) => {
                                                             if (
                                                                   i ===
                                                                   payload.programStageConfig?.supervisorField?.length -
-                                                                        1
+                                                                  1
                                                             ) {
                                                                   newDataValues.push({
                                                                         dataElement: currentDE.id,
@@ -2133,7 +2127,7 @@ const Supervision = ({ me }) => {
                                                                         i ===
                                                                         payload.programStageConfig?.supervisorField
                                                                               ?.length -
-                                                                              1
+                                                                        1
                                                                   ) {
                                                                         newDataValues.push({
                                                                               dataElement: currentDE.id,
@@ -2278,42 +2272,42 @@ const Supervision = ({ me }) => {
                                           },
                                           tei_event: sup.tei?.enrollments
                                                 ? sup.tei.enrollments.reduce((prev, curr) => {
-                                                        if (
-                                                              curr.orgUnit === sup.tei.orgUnit &&
-                                                              curr.program === sup.program?.id
-                                                        ) {
-                                                              const corresponding_event = curr.events?.find(
-                                                                    ev =>
-                                                                          dayjs(ev.eventDate).format('YYYY-MM-DD') ===
-                                                                                dayjs(sup.period).format(
-                                                                                      'YYYY-MM-DD'
-                                                                                ) ||
-                                                                          dayjs(ev.dueDate).format('YYYY-MM-DD') ===
-                                                                                dayjs(sup.period).format('YYYY-MM-DD')
-                                                              );
+                                                      if (
+                                                            curr.orgUnit === sup.tei.orgUnit &&
+                                                            curr.program === sup.program?.id
+                                                      ) {
+                                                            const corresponding_event = curr.events?.find(
+                                                                  ev =>
+                                                                        dayjs(ev.eventDate).format('YYYY-MM-DD') ===
+                                                                        dayjs(sup.period).format(
+                                                                              'YYYY-MM-DD'
+                                                                        ) ||
+                                                                        dayjs(ev.dueDate).format('YYYY-MM-DD') ===
+                                                                        dayjs(sup.period).format('YYYY-MM-DD')
+                                                            );
 
-                                                              if (corresponding_event) {
-                                                                    prev = {
-                                                                          ...prev,
-                                                                          event: corresponding_event.event,
-                                                                          orgUnit: corresponding_event.orgUnit,
-                                                                          enrollment: corresponding_event.enrollment,
-                                                                          program: corresponding_event.program,
-                                                                          programStage:
-                                                                                corresponding_event.programStage,
-                                                                          trackedEntityInstance:
-                                                                                corresponding_event.trackedEntityInstance,
-                                                                          orgUnitName: corresponding_event.orgUnitName,
-                                                                          created: corresponding_event.created,
-                                                                          dueDate: corresponding_event.dueDate,
-                                                                          eventDate: corresponding_event.eventDate,
-                                                                          storedBy: corresponding_event.storedBy,
-                                                                          status: corresponding_event.status
-                                                                    };
-                                                              }
-                                                        }
-                                                        return prev;
-                                                  }, {})
+                                                            if (corresponding_event) {
+                                                                  prev = {
+                                                                        ...prev,
+                                                                        event: corresponding_event.event,
+                                                                        orgUnit: corresponding_event.orgUnit,
+                                                                        enrollment: corresponding_event.enrollment,
+                                                                        program: corresponding_event.program,
+                                                                        programStage:
+                                                                              corresponding_event.programStage,
+                                                                        trackedEntityInstance:
+                                                                              corresponding_event.trackedEntityInstance,
+                                                                        orgUnitName: corresponding_event.orgUnitName,
+                                                                        created: corresponding_event.created,
+                                                                        dueDate: corresponding_event.dueDate,
+                                                                        eventDate: corresponding_event.eventDate,
+                                                                        storedBy: corresponding_event.storedBy,
+                                                                        status: corresponding_event.status
+                                                                  };
+                                                            }
+                                                      }
+                                                      return prev;
+                                                }, {})
                                                 : sup.tei_event
                                     })) || []
                         }));
@@ -2507,17 +2501,17 @@ const Supervision = ({ me }) => {
                               eventPayload.dataValues =
                                     selectedProgram?.configurationType === 'DQR'
                                           ? mappingConfigs
-                                                  .filter(ev => ev.programStage?.id === stage)
-                                                  .map(ev => ({
-                                                        dataElement: ev.dataElement?.id,
-                                                        value: ev.indicator?.displayName
-                                                  }))
+                                                .filter(ev => ev.programStage?.id === stage)
+                                                .map(ev => ({
+                                                      dataElement: ev.dataElement?.id,
+                                                      value: ev.indicator?.displayName
+                                                }))
                                           : mappingConfigs
-                                                  //   .filter(ev => ev.programStage?.id === stage)
-                                                  .map(ev => ({
-                                                        dataElement: ev.dataElement?.id,
-                                                        value: ev.indicator?.displayName
-                                                  }));
+                                                //   .filter(ev => ev.programStage?.id === stage)
+                                                .map(ev => ({
+                                                      dataElement: ev.dataElement?.id,
+                                                      value: ev.indicator?.displayName
+                                                }));
                         } else {
                               eventPayload.status = 'SCHEDULE';
                               eventPayload.dueDate = payload.period
@@ -2565,7 +2559,7 @@ const Supervision = ({ me }) => {
                                                             if (
                                                                   i ===
                                                                   payload.programStageConfig?.supervisorField?.length -
-                                                                        1
+                                                                  1
                                                             ) {
                                                                   newDataValues.push({
                                                                         dataElement: currentDE.id,
@@ -2757,11 +2751,11 @@ const Supervision = ({ me }) => {
                   const response = await axios.get(
                         `${ANALYTICS_ROUTE}/dataValueSet.json?dimension=ou:${orgUnit}&dimension=dx:${dx}&dimension=pe:${period}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=true&includeNumDen=true&skipRounding=false&completedOnly=false`
                   );
-                  return response.data?.dataValues[0]?.value || 100;
+                  return response.data?.dataValues[0]?.value;
             } catch (error) {
                   console.log('Error getting analytic value : ', error);
             }
-      };
+      };    
 
       const handleSupervisionPlanificationSaveBtn = async () => {
             try {
@@ -2857,10 +2851,10 @@ const Supervision = ({ me }) => {
                         prev = prev.concat(curr.supervisions || []);
                         prev = prev.filter(p =>
                               p.period &&
-                              trackedEntityInstance === p.trackedEntityInstance &&
-                              dayjs(period).format('YYYY-MM-DD') === dayjs(p.period).format('YYYY-MM-DD') &&
-                              p.organisationUnit?.id === organisationUnitId &&
-                              p.program?.id === programId
+                                    trackedEntityInstance === p.trackedEntityInstance &&
+                                    dayjs(period).format('YYYY-MM-DD') === dayjs(p.period).format('YYYY-MM-DD') &&
+                                    p.organisationUnit?.id === organisationUnitId &&
+                                    p.program?.id === programId
                                     ? true
                                     : false
                         );
@@ -2877,7 +2871,7 @@ const Supervision = ({ me }) => {
 
             montant = parseFloat(
                   correctPaymentObject.montantConstant -
-                        (correctPaymentObject.montantConstant * correctPaymentObject.fraisMobileMoney) / 100
+                  (correctPaymentObject.montantConstant * correctPaymentObject.fraisMobileMoney) / 100
             ).toFixed(2);
 
             return `${montant} FCFA`;
@@ -2932,10 +2926,10 @@ const Supervision = ({ me }) => {
                                                       loadingAllSupervisionsFromTracker
                                                             ? true
                                                             : selectedSupervisionsConfigProgram &&
-                                                              selectedPeriodSupervisionConfig &&
-                                                              selectedOrgUnitSupervisionFromTracker
-                                                            ? false
-                                                            : true
+                                                                  selectedPeriodSupervisionConfig &&
+                                                                  selectedOrgUnitSupervisionFromTracker
+                                                                  ? false
+                                                                  : true
                                                 }
                                           >
                                                 Rechercher
@@ -3056,7 +3050,7 @@ const Supervision = ({ me }) => {
                                                                   primary
                                                                   disabled={loadingSupervisionPlanification}
                                                                   loading={loadingSupervisionPlanification}
-                                                                  // onClick={handleSupervisionPlanificationSaveBtn}
+                                                            // onClick={handleSupervisionPlanificationSaveBtn}
                                                             >
                                                                   {translate('Planifier_Supervision')}
                                                             </Button>
@@ -3176,9 +3170,8 @@ const Supervision = ({ me }) => {
                                                 .map((sup, index) => (
                                                       <div
                                                             key={index}
-                                                            className={`supervision-item ${
-                                                                  selectedProgram?.id === sup.id ? 'active' : ''
-                                                            }`}
+                                                            className={`supervision-item ${selectedProgram?.id === sup.id ? 'active' : ''
+                                                                  }`}
                                                             onClick={() => handleClickSupervisionItem(sup)}
                                                       >
                                                             {sup.program?.displayName}
@@ -3194,9 +3187,8 @@ const Supervision = ({ me }) => {
                                                 .map((sup, index) => (
                                                       <div
                                                             key={index}
-                                                            className={`supervision-item ${
-                                                                  selectedProgram?.id === sup.id ? 'active' : ''
-                                                            }`}
+                                                            className={`supervision-item ${selectedProgram?.id === sup.id ? 'active' : ''
+                                                                  }`}
                                                             onClick={() => handleClickSupervisionItem(sup)}
                                                       >
                                                             {sup.program?.displayName}
@@ -3386,9 +3378,9 @@ const Supervision = ({ me }) => {
                                                                   ].map(user =>
                                                                         user.id && user.id.length > 0
                                                                               ? {
-                                                                                      label: user.displayName,
-                                                                                      value: user.displayName
-                                                                                }
+                                                                                    label: user.displayName,
+                                                                                    value: user.displayName
+                                                                              }
                                                                               : { label: user, value: user }
                                                                   )}
                                                             />
@@ -4565,7 +4557,7 @@ const Supervision = ({ me }) => {
                               return field;
                         })
                   );
-            } catch (err) {}
+            } catch (err) { }
       };
 
       const handleCloseOrgUnitForm = (org, index) => {
@@ -4900,95 +4892,95 @@ const Supervision = ({ me }) => {
                                                       )}
                                                       {selectedProgram?.fieldConfig?.supervisor?.dataElements?.length >
                                                             0 && (
-                                                            <Col sm={24} md={24}>
-                                                                  <div>
-                                                                        <div style={{ marginBottom: '5px' }}>
-                                                                              {translate('Superviseurs')}
-                                                                        </div>
-                                                                        <Select
-                                                                              placeholder={translate('Superviseurs')}
-                                                                              style={{ width: '100%' }}
-                                                                              loading={loadingUsers}
-                                                                              disabled={loadingUsers}
-                                                                              value={inputFields[
-                                                                                    index
-                                                                              ]?.supervisors?.map(sup => sup.id)}
-                                                                              onChange={values =>
-                                                                                    handleInputSupervisors(
-                                                                                          values,
+                                                                  <Col sm={24} md={24}>
+                                                                        <div>
+                                                                              <div style={{ marginBottom: '5px' }}>
+                                                                                    {translate('Superviseurs')}
+                                                                              </div>
+                                                                              <Select
+                                                                                    placeholder={translate('Superviseurs')}
+                                                                                    style={{ width: '100%' }}
+                                                                                    loading={loadingUsers}
+                                                                                    disabled={loadingUsers}
+                                                                                    value={inputFields[
                                                                                           index
-                                                                                    )
-                                                                              }
-                                                                              mode="multiple"
-                                                                              optionFilterProp="label"
-                                                                              showSearch
-                                                                              allowClear
-                                                                              options={users.map(user => ({
-                                                                                    label: user.displayName,
-                                                                                    value: user.id
-                                                                              }))}
-                                                                        />
-                                                                  </div>
-                                                            </Col>
-                                                      )}
+                                                                                    ]?.supervisors?.map(sup => sup.id)}
+                                                                                    onChange={values =>
+                                                                                          handleInputSupervisors(
+                                                                                                values,
+                                                                                                index
+                                                                                          )
+                                                                                    }
+                                                                                    mode="multiple"
+                                                                                    optionFilterProp="label"
+                                                                                    showSearch
+                                                                                    allowClear
+                                                                                    options={users.map(user => ({
+                                                                                          label: user.displayName,
+                                                                                          value: user.id
+                                                                                    }))}
+                                                                              />
+                                                                        </div>
+                                                                  </Col>
+                                                            )}
                                                       {selectedProgram?.fieldConfig?.supervisor?.dataElements?.length >
                                                             0 && (
-                                                            <Col md={24}>
-                                                                  <div>
-                                                                        <div style={{ marginBottom: '5px' }}>
-                                                                              {translate('Autre_Superviseurs')}
-                                                                        </div>
-                                                                        <Row gutter={[10, 10]}>
-                                                                              <Col md={18} sm={24}>
-                                                                                    <Input
-                                                                                          placeholder={translate(
-                                                                                                'Autre_Superviseurs'
-                                                                                          )}
-                                                                                          value={
-                                                                                                inputFields[index]
-                                                                                                      ?.inputOtherSupervisor
-                                                                                          }
-                                                                                          onChange={event =>
-                                                                                                handleInputOtherSupervisor(
-                                                                                                      event,
-                                                                                                      index
-                                                                                                )
-                                                                                          }
-                                                                                    />
-                                                                              </Col>
-                                                                              <Col
-                                                                                    flex="auto"
-                                                                                    style={{ textAlign: 'right' }}
-                                                                              >
-                                                                                    <Button
-                                                                                          primary
-                                                                                          onClick={() =>
-                                                                                                handleInputAddOtherSupervisors(
-                                                                                                      index
-                                                                                                )
-                                                                                          }
-                                                                                          disabled={
-                                                                                                inputFields[
-                                                                                                      index
-                                                                                                ]?.inputOtherSupervisor?.trim() &&
-                                                                                                !inputFields[
-                                                                                                      index
-                                                                                                ]?.otherSupervisorList?.includes(
+                                                                  <Col md={24}>
+                                                                        <div>
+                                                                              <div style={{ marginBottom: '5px' }}>
+                                                                                    {translate('Autre_Superviseurs')}
+                                                                              </div>
+                                                                              <Row gutter={[10, 10]}>
+                                                                                    <Col md={18} sm={24}>
+                                                                                          <Input
+                                                                                                placeholder={translate(
+                                                                                                      'Autre_Superviseurs'
+                                                                                                )}
+                                                                                                value={
+                                                                                                      inputFields[index]
+                                                                                                            ?.inputOtherSupervisor
+                                                                                                }
+                                                                                                onChange={event =>
+                                                                                                      handleInputOtherSupervisor(
+                                                                                                            event,
+                                                                                                            index
+                                                                                                      )
+                                                                                                }
+                                                                                          />
+                                                                                    </Col>
+                                                                                    <Col
+                                                                                          flex="auto"
+                                                                                          style={{ textAlign: 'right' }}
+                                                                                    >
+                                                                                          <Button
+                                                                                                primary
+                                                                                                onClick={() =>
+                                                                                                      handleInputAddOtherSupervisors(
+                                                                                                            index
+                                                                                                      )
+                                                                                                }
+                                                                                                disabled={
                                                                                                       inputFields[
                                                                                                             index
-                                                                                                      ]?.inputOtherSupervisor?.trim()
-                                                                                                )
-                                                                                                      ? false
-                                                                                                      : true
-                                                                                          }
-                                                                                    >
-                                                                                          + {translate('Ajouter')}{' '}
-                                                                                    </Button>
-                                                                              </Col>
-                                                                        </Row>
-                                                                  </div>
-                                                            </Col>
-                                                      )}
+                                                                                                      ]?.inputOtherSupervisor?.trim() &&
+                                                                                                            !inputFields[
+                                                                                                                  index
+                                                                                                            ]?.otherSupervisorList?.includes(
+                                                                                                                  inputFields[
+                                                                                                                        index
+                                                                                                                  ]?.inputOtherSupervisor?.trim()
+                                                                                                            )
+                                                                                                            ? false
+                                                                                                            : true
+                                                                                                }
+                                                                                          >
+                                                                                                + {translate('Ajouter')}{' '}
+                                                                                          </Button>
+                                                                                    </Col>
+                                                                              </Row>
+                                                                        </div>
+                                                                  </Col>
+                                                            )}
 
                                                       {inputFields[index]?.otherSupervisors?.length > 0 && (
                                                             <Col md={24}>
@@ -5124,12 +5116,11 @@ const Supervision = ({ me }) => {
 
                   const route = `${ANALYTICS_ROUTE}.json?dimension=dx:${selectedIndicators
                         .map(ind => ind.indicator?.id)
-                        .join(';')},ou:${selectedOrganisationUnitSingle?.id};OU_GROUP-${
-                        selectedOrganisationUnitGroup?.id
-                  }&filter=pe:${formatPeriod(
-                        selectedPeriod,
-                        selectedPeriodType
-                  )}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=false&includeNumDen=false&skipRounding=false&completedOnly=false&outputIdScheme=UID`;
+                        .join(';')},ou:${selectedOrganisationUnitSingle?.id};OU_GROUP-${selectedOrganisationUnitGroup?.id
+                        }&filter=pe:${formatPeriod(
+                              selectedPeriod,
+                              selectedPeriodType
+                        )}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=false&includeNumDen=false&skipRounding=false&completedOnly=false&outputIdScheme=UID`;
                   const response = await axios.get(route);
 
                   const analyticResult = response.data.rows || [];
@@ -5197,9 +5188,8 @@ const Supervision = ({ me }) => {
                   if (selectedOrganisationUnitGroups.length === 0)
                         throw new Error(translate('OrgUnitGroup_Obligatoire'));
 
-                  const route = `${ORGANISATION_UNITS_ROUTE}&filter=path:like:${
-                        selectedOrganisationUnitSingle.id
-                  }&filter=organisationUnitGroups.id:in:[${selectedOrganisationUnitGroups.map(ou => ou.id).join(',')}]`;
+                  const route = `${ORGANISATION_UNITS_ROUTE}&filter=path:like:${selectedOrganisationUnitSingle.id
+                        }&filter=organisationUnitGroups.id:in:[${selectedOrganisationUnitGroups.map(ou => ou.id).join(',')}]`;
                   const response = await axios.get(route);
                   const orgUnits = response.data.organisationUnits;
 
@@ -5352,11 +5342,11 @@ const Supervision = ({ me }) => {
                                                 loading={loadingAnalyticIndicatorResults}
                                                 disabled={
                                                       selectedOrganisationUnitSingle &&
-                                                      selectedOrganisationUnitGroup &&
-                                                      selectedIndicators.length > 0 &&
-                                                      selectedOrganisationUnitGroupSet &&
-                                                      selectedPeriod &&
-                                                      parseInt(inputMeilleur || 0) + parseInt(inputMauvais || 0) > 0
+                                                            selectedOrganisationUnitGroup &&
+                                                            selectedIndicators.length > 0 &&
+                                                            selectedOrganisationUnitGroupSet &&
+                                                            selectedPeriod &&
+                                                            parseInt(inputMeilleur || 0) + parseInt(inputMauvais || 0) > 0
                                                             ? false
                                                             : true
                                                 }
@@ -5461,8 +5451,8 @@ const Supervision = ({ me }) => {
                                                       loading={loadingAnalyticIndicatorResults}
                                                       disabled={
                                                             selectedOrganisationUnitSingle &&
-                                                            selectedOrganisationUnitGroups.length > 0 &&
-                                                            parseInt(inputNbrOrgUnit) > 0
+                                                                  selectedOrganisationUnitGroups.length > 0 &&
+                                                                  parseInt(inputNbrOrgUnit) > 0
                                                                   ? false
                                                                   : true
                                                       }
@@ -6306,15 +6296,15 @@ const Supervision = ({ me }) => {
                                     </table>
                                     {analyticIndicatorResults.length <
                                           parseInt(inputMeilleur) + parseInt(inputMauvais) && (
-                                          <div style={{ marginTop: '20px' }}>
-                                                <MyNoticeBox
-                                                      message={translate('Best_Input_Is_Too_Gratter')}
-                                                      title={translate('Recherche')}
-                                                      type={NOTICE_BOX_ERROR}
-                                                      show={true}
-                                                />
-                                          </div>
-                                    )}
+                                                <div style={{ marginTop: '20px' }}>
+                                                      <MyNoticeBox
+                                                            message={translate('Best_Input_Is_Too_Gratter')}
+                                                            title={translate('Recherche')}
+                                                            type={NOTICE_BOX_ERROR}
+                                                            show={true}
+                                                      />
+                                                </div>
+                                          )}
                               </div>
                         </div>
                   </Card>
@@ -6488,11 +6478,10 @@ const Supervision = ({ me }) => {
                   if (teis.length > 0) {
                         const routeAnalytic = `${API_BASE_ROUTE}/analytics/dataValueSet.json?dimension=dx:${selectedIndicators
                               .map(ind => ind.indicator?.id)
-                              .join(';')}&dimension=ou:${selectedOrganisationUnitSingle?.id};LEVEL-${postLevel?.id}${
-                              ouGroupString?.trim()?.length > 0 ? ';' + ouGroupString : ''
-                        }&dimension=pe:${dayjs(selectedPeriod).format(
-                              'YYYYMM'
-                        )}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=true&includeNumDen=true&skipRounding=false&completedOnly=false`;
+                              .join(';')}&dimension=ou:${selectedOrganisationUnitSingle?.id};LEVEL-${postLevel?.id}${ouGroupString?.trim()?.length > 0 ? ';' + ouGroupString : ''
+                              }&dimension=pe:${dayjs(selectedPeriod).format(
+                                    'YYYYMM'
+                              )}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=true&includeNumDen=true&skipRounding=false&completedOnly=false`;
                         const analyticResponse = await axios.get(routeAnalytic);
                         const dataValues = analyticResponse.data.dataValues || [];
 
@@ -6503,15 +6492,13 @@ const Supervision = ({ me }) => {
                               if (currentEnrollment) {
                                     const payload = {
                                           ...current,
-                                          agentName: `${
-                                                current.attributes?.find(
-                                                      att => att.attribute === selectedProgram?.attributeName?.id
-                                                )?.value || ''
-                                          } ${
-                                                current.attributes?.find(
+                                          agentName: `${current.attributes?.find(
+                                                att => att.attribute === selectedProgram?.attributeName?.id
+                                          )?.value || ''
+                                                } ${current.attributes?.find(
                                                       att => att.attribute === selectedProgram?.attributeFirstName?.id
                                                 )?.value || ''
-                                          }`
+                                                }`
                                     };
                                     const indicatorPayload = {};
 
@@ -6522,7 +6509,7 @@ const Supervision = ({ me }) => {
                                                             ind.indicator?.id === dv.dataElement &&
                                                             dv.orgUnit === currentEnrollment.orgUnit &&
                                                             dayjs(selectedPeriod).format('YYYYMM') ===
-                                                                  dayjs(dv.period).format('YYYYMM')
+                                                            dayjs(dv.period).format('YYYYMM')
                                                 ) || [];
                                           const dValue = dValues.reduce((pv, cr) => cr.value + cr.value, 0) || 0;
 
@@ -6680,8 +6667,8 @@ const Supervision = ({ me }) => {
                                                                         loading={loadingTeiList}
                                                                         disabled={
                                                                               selectedPeriod &&
-                                                                              selectedIndicators.length > 0 &&
-                                                                              selectedOrganisationUnitSingle
+                                                                                    selectedIndicators.length > 0 &&
+                                                                                    selectedOrganisationUnitSingle
                                                                                     ? false
                                                                                     : true
                                                                         }
@@ -6889,14 +6876,13 @@ const Supervision = ({ me }) => {
                                                       <div
                                                             style={{
                                                                   marginLeft: '10px',
-                                                                  display: `${
-                                                                        selectedSupervisionType ===
-                                                                        TYPE_SUPERVISION_AGENT
+                                                                  display: `${selectedSupervisionType ===
+                                                                              TYPE_SUPERVISION_AGENT
                                                                               ? selectedAgents.length > 0
                                                                                     ? 'block'
                                                                                     : 'none'
                                                                               : 'block'
-                                                                  }`
+                                                                        }`
                                                             }}
                                                       >
                                                             <Button
