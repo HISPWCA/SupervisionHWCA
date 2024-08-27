@@ -19,6 +19,27 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
             return newArray;
       };
 
+      const handleSelectedGlobalProgramArea = value => {
+            console.log('Value: ', value);
+            const globalProgramArea = dataStoreIndicators.find(d => d.name === value);
+            if (globalProgramArea) {
+                  setFormState({
+                        ...formState,
+                        selectedGlobalProgramArea: globalProgramArea,
+                        // indicators: formState?.indicators?.map((i, iIndex) => {
+                        //       if (iIndex === indIndex) {
+                        //             return {
+                        //                   ...i,
+                        //                   selectedSourceIndicator: null,
+                        //                   selectedSourceProgramArea: dataStoreIndicators.find(d => d.name === value)
+                        //             };
+                        //       }
+                        //       return i;
+                        // })
+                  });
+            }
+      };
+
       return (
             <>
                   <Card className="my-shadow my-scrollable" bodyStyle={{ padding: '10px' }} size="small">
@@ -34,17 +55,39 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                           alignItems: 'center'
                                     }}
                               >
-                                    <span style={{ fontWeight: 'bold' }}>{translate('How_Many_Indicators')}</span>
-                                    <span style={{ marginLeft: '10px' }}>
-                                          <Select
-                                                style={{ width: '100px' }}
-                                                options={getNumberIndicatorsToShow()}
-                                                value={formState?.nbrIndicatorsToShow}
-                                                onChange={value => {
-                                                      setFormState({ ...formState, nbrIndicatorsToShow: value });
-                                                }}
-                                          />
-                                    </span>
+                                    {/* <div style={{ display: 'flex', alignItems: 'center', marginRight: '30px' }}>
+                                          <span>Global_Program_Area</span>
+                                          <span style={{ marginLeft: '10px' }}>
+                                                <Select
+                                                      placeholder={`${translate('Program_Area')} `}
+                                                      style={{
+                                                            width: '100%'
+                                                      }}
+                                                      options={dataStoreIndicators?.map(ind => ({
+                                                            label: ind.name,
+                                                            value: ind.name
+                                                      }))}
+                                                      showSearch
+                                                      allowClear
+                                                      optionFilterProp="label"
+                                                      value={formState?.selectedGlobalProgramArea?.name}
+                                                      onChange={handleSelectedGlobalProgramArea}
+                                                />
+                                          </span>
+                                    </div> */}
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                          <span style={{ fontWeight: 'bold' }}>{translate('How_Many_Indicators')}</span>
+                                          <span style={{ marginLeft: '10px' }}>
+                                                <Select
+                                                      style={{ width: '100px' }}
+                                                      options={getNumberIndicatorsToShow()}
+                                                      value={formState?.nbrIndicatorsToShow}
+                                                      onChange={value => {
+                                                            setFormState({ ...formState, nbrIndicatorsToShow: value });
+                                                      }}
+                                                />
+                                          </span>
+                                    </div>
                               </div>
                               <table style={{ borderCollapse: 'collapse', width: '100%' }}>
                                     <thead>
@@ -128,6 +171,11 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                           value: ind.name
                                                                                     })
                                                                               )}
+                                                                              disabled={
+                                                                                    formState?.selectedGlobalProgramArea &&
+                                                                                    indicator?.selectedSourceProgramArea
+                                                                                          ?.name
+                                                                              }
                                                                               showSearch
                                                                               allowClear
                                                                               optionFilterProp="label"

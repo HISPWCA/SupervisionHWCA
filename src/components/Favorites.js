@@ -37,7 +37,6 @@ const Favorites = ({ me }) => {
             useState(false);
 
       const [selectedBackgroundInformationFavorit, setSelectedBackgroundInformationFavorit] = useState(null);
-      const [selectedProgram, setSelectedProgram] = useState(null);
       const [selectedMetaDatas, setSelectedMetaDatas] = useState([]);
       const [inputFavorisNameForBackgroundInforation, setInputFavoritNameForBackgroundInforation] = useState('');
       const [loadingSaveFavoritBackgroundInformations, setLoadingSaveFavoritBackgroundInformations] = useState(false);
@@ -82,6 +81,7 @@ const Favorites = ({ me }) => {
             selectedBackgroundInformationTypeConfiguration: DIRECTE,
             selectedBackgroundInformationFavorit: null,
             inputFavorisNameForBackgroundInforation: '',
+            selectedGlobalProgramArea: null,
             nbrIndicatorsToShow: 0,
             indicators: [],
             recoupements: [],
