@@ -20,22 +20,35 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
       };
 
       const handleSelectedGlobalProgramArea = value => {
-            console.log('Value: ', value);
-            const globalProgramArea = dataStoreIndicators.find(d => d.name === value);
-            if (globalProgramArea) {
+            const globalIndicatorProgramArea = dataStoreIndicators.find(d => d.name === value);
+            if (globalIndicatorProgramArea) {
                   setFormState({
                         ...formState,
-                        selectedGlobalProgramArea: globalProgramArea,
-                        // indicators: formState?.indicators?.map((i, iIndex) => {
-                        //       if (iIndex === indIndex) {
-                        //             return {
-                        //                   ...i,
-                        //                   selectedSourceIndicator: null,
-                        //                   selectedSourceProgramArea: dataStoreIndicators.find(d => d.name === value)
-                        //             };
-                        //       }
-                        //       return i;
-                        // })
+                        selectedGlobalProgramArea: globalIndicatorProgramArea,
+
+                        indicators: formState?.indicators?.map(i => ({
+                              ...i,
+                              selectedSourceIndicator: null,
+                              selectedSourceProgramArea: globalIndicatorProgramArea
+                        })),
+
+                        recoupements: formState?.recoupements?.map(i => ({
+                              ...i,
+                              selectedSourcePrimary: null,
+                              selectedSourceSecondary: null,
+                              selectedSourceProgramArea: dataStoreCrosschecks.find(d => d.name === value)
+                        })),
+
+                        consistencyOvertimes: formState?.consistencyOvertimes?.map(i => ({
+                              ...i,
+                              selectedSourceProgramArea: globalIndicatorProgramArea
+                        })),
+
+                        completeness: {
+                              ...formState?.completeness,
+                              selectedSourceProgramAreaDE: dataStoreDECompletness?.find(d => d.name === value),
+                              selectedSourceProgramAreaDS: dataStoreDSCompletness?.find(d => d.name === value)
+                        }
                   });
             }
       };
@@ -52,16 +65,17 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                           justifyContent: 'center',
                                           width: '100%',
                                           display: 'flex',
-                                          alignItems: 'center'
+                                          alignItems: 'center',
+                                          marginBottom: '10px'
                                     }}
                               >
-                                    {/* <div style={{ display: 'flex', alignItems: 'center', marginRight: '30px' }}>
-                                          <span>Global_Program_Area</span>
+                                    <div style={{ display: 'flex', alignItems: 'center', marginRight: '30px' }}>
+                                          <span>{translate('Global_Program_Area')}</span>
                                           <span style={{ marginLeft: '10px' }}>
                                                 <Select
                                                       placeholder={`${translate('Program_Area')} `}
                                                       style={{
-                                                            width: '100%'
+                                                            minWidth: '200px'
                                                       }}
                                                       options={dataStoreIndicators?.map(ind => ({
                                                             label: ind.name,
@@ -74,7 +88,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                       onChange={handleSelectedGlobalProgramArea}
                                                 />
                                           </span>
-                                    </div> */}
+                                    </div>
                                     <div style={{ display: 'flex', alignItems: 'center' }}>
                                           <span style={{ fontWeight: 'bold' }}>{translate('How_Many_Indicators')}</span>
                                           <span style={{ marginLeft: '10px' }}>
@@ -410,6 +424,10 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                               label: ind.name,
                                                                               value: ind.name
                                                                         }))}
+                                                                        disabled={
+                                                                              formState?.selectedGlobalProgramArea &&
+                                                                              rec?.selectedSourceProgramArea?.name
+                                                                        }
                                                                         showSearch
                                                                         allowClear
                                                                         optionFilterProp="label"
@@ -679,6 +697,10 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                               label: ind.name,
                                                                               value: ind.name
                                                                         }))}
+                                                                        disabled={
+                                                                              formState?.selectedGlobalProgramArea &&
+                                                                              cons?.selectedSourceProgramArea?.name
+                                                                        }
                                                                         showSearch
                                                                         allowClear
                                                                         optionFilterProp="label"
@@ -890,6 +912,11 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                         label: ind.name,
                                                                         value: ind.name
                                                                   }))}
+                                                                  disabled={
+                                                                        formState?.selectedGlobalProgramArea &&
+                                                                        formState?.completeness
+                                                                              ?.selectedSourceProgramAreaDE?.name
+                                                                  }
                                                                   showSearch
                                                                   allowClear
                                                                   optionFilterProp="label"
@@ -933,6 +960,11 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                   showSearch
                                                                   allowClear
                                                                   optionFilterProp="label"
+                                                                  disabled={
+                                                                        formState?.selectedGlobalProgramArea &&
+                                                                        formState?.completeness
+                                                                              ?.selectedSourceProgramAreaDS?.name
+                                                                  }
                                                                   value={
                                                                         formState?.completeness
                                                                               ?.selectedSourceProgramAreaDS?.name
