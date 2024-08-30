@@ -303,5 +303,6 @@
     "Element_Name": "Nom de l'élement",
     "Prev": "Préc",
     "Next": "Suiv",
-    "Global_Program_Area": "Domaine de programme global"
+    "Global_Program_Area": "Domaine de programme global",
+    "Use_Indicator_Name_From_Dhis2": "Utiliser nom du DHIS2"
 }

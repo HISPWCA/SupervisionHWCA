@@ -303,5 +303,7 @@
     "Element_Name": "Element name ",
     "Prev": "Prev",
     "Next": "Next",
-    "Global_Program_Area":"Global program area"
+    "Global_Program_Area":"Global program area",
+    "Use_Indicator_Name_From_Dhis2": "use name from DHIS2"
+
 }
