@@ -253,7 +253,6 @@ const SettingIndicatorsMapping = () => {
                                                                         >
                                                                               <Row
                                                                                     gutter={[5, 5]}
-                                                                                    className="items-center"
                                                                               >
                                                                                     <Col md={3}>
                                                                                           <div>{indicator.name}</div>
