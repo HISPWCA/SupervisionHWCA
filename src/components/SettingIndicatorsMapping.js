@@ -10,7 +10,7 @@ import { FiSave } from 'react-icons/fi';
 import MyNotification from './MyNotification';
 import { NOTIFICATION_CRITICAL, NOTIFICATION_SUCCESS } from '../utils/constants';
 
-const SettingIndicatorsMapping = ({ programs }) => {
+const SettingIndicatorsMapping = () => {
       const [notification, setNotification] = useState({
             show: false,
             message: null,
