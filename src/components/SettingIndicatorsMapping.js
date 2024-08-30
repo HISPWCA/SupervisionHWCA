@@ -251,7 +251,10 @@ const SettingIndicatorsMapping = () => {
                                                                                     paddingBottom: '5px'
                                                                               }}
                                                                         >
-                                                                              <Row gutter={[5, 5]}>
+                                                                              <Row
+                                                                                    gutter={[5, 5]}
+                                                                                    className="items-center"
+                                                                              >
                                                                                     <Col md={3}>
                                                                                           <div>{indicator.name}</div>
                                                                                     </Col>
