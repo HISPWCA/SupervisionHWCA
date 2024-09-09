@@ -3,7 +3,7 @@ import translate from '../utils/translator';
 import { v4 as uuid } from 'uuid';
 import { TagsInput } from 'react-tag-input-component';
 
-const GenerateIndicatorsFieldsDQR = ({ formState, setFormState, indicatorRef, recoupementRef }) => {
+const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
       return (
             <>
                   <div style={{ marginTop: '10px' }}>
@@ -561,6 +561,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState, indicatorRef, re
                                                                   />
                                                             </div>
                                                       </div>
+
                                                       <div style={{ marginTop: '5px' }}>
                                                             <div
                                                                   style={{
@@ -621,6 +622,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState, indicatorRef, re
                                                                   />
                                                             </div>
                                                       </div>
+
                                                       <div style={{ marginTop: '5px' }}>
                                                             <div
                                                                   style={{
@@ -671,6 +673,56 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState, indicatorRef, re
                                                                                                                                     value
                                                                                                                         )
                                                                                                                               ?.dataElement
+                                                                                                            };
+                                                                                                      }
+                                                                                                      return i;
+                                                                                                }
+                                                                                          ) || []
+                                                                              });
+                                                                        }}
+                                                                  />
+                                                            </div>
+                                                      </div>
+
+                                                      <div style={{ marginTop: '5px' }}>
+                                                            <div
+                                                                  style={{
+                                                                        marginBottom: '5px'
+                                                                  }}
+                                                            >
+                                                                  <div>
+                                                                        {`${translate('Cross_Check_Keys_Word')}  ${
+                                                                              indexRec + 1
+                                                                        }`}
+                                                                  </div>
+
+                                                                  <div
+                                                                        style={{
+                                                                              color: '#00000090',
+                                                                              margin: '5px 0px'
+                                                                        }}
+                                                                  >
+                                                                        {`${translate('Cross_Check_Keys_Word_Help')}`}
+                                                                  </div>
+                                                            </div>
+                                                            <div>
+                                                                  <TagsInput
+                                                                        style={{ width: '100%' }}
+                                                                        value={rec?.keyWords || []}
+                                                                        onChange={word => {
+                                                                              setFormState({
+                                                                                    ...formState,
+                                                                                    recoupements:
+                                                                                          formState?.recoupements?.map(
+                                                                                                i => {
+                                                                                                      if (
+                                                                                                            i.id ===
+                                                                                                            rec.id
+                                                                                                      ) {
+                                                                                                            return {
+                                                                                                                  ...i,
+                                                                                                                  keyWords:
+                                                                                                                        word || []
                                                                                                             };
                                                                                                       }
                                                                                                       return i;

@@ -34,8 +34,8 @@ import { ImPrinter } from 'react-icons/im';
 import OrganisationUnitsTree from './OrganisationUnitsTree';
 import { FaSearch } from 'react-icons/fa';
 
-import { IoIosArrowRoundForward } from 'react-icons/io'
-import { IoIosArrowRoundBack } from 'react-icons/io'
+import { IoIosArrowRoundForward } from 'react-icons/io';
+import { IoIosArrowRoundBack } from 'react-icons/io';
 
 const quarterOfYear = require('dayjs/plugin/quarterOfYear');
 const weekOfYear = require('dayjs/plugin/weekOfYear');
@@ -57,7 +57,6 @@ export const Dashboard = ({ me }) => {
       const [concerningOUs, setConcerningOUs] = useState([]);
       const [currentPosition, setCurrentPosition] = useState(0);
       const [numberOfGeneration, setNumberOfGeneration] = useState(1);
-
 
       const [dataStoreSupervisionsConfigs, setDataStoreSupervisionsConfigs] = useState([]);
       const [dataStoreMissions, setDataStoreMissions] = useState([]);
@@ -81,8 +80,7 @@ export const Dashboard = ({ me }) => {
       const [loadingInjection, setLoadingInjection] = useState(false);
       const [loadingTeiList, setLoadingTeiList] = useState(false);
       const [loadingOrganisationUnitLevels, setLoadingOrganisationUnitLevels] = useState(false);
-      const [loadingPrint, setLoadingPrint] = useState(false)
-
+      const [loadingPrint, setLoadingPrint] = useState(false);
 
       const loadOrganisationUnitLevels = async () => {
             try {
@@ -183,10 +181,9 @@ export const Dashboard = ({ me }) => {
                   win.print();
                   // setLoadingPrint(false)
             } catch (err) {
-                  console.log("error  print :  ", err)
+                  console.log('error  print :  ', err);
                   // setLoadingPrint(false)
             }
-
       };
 
       const handleSelectLevel = value => {
@@ -208,7 +205,7 @@ export const Dashboard = ({ me }) => {
       const handleSearch = () => {
             if (selectedPeriods.length > 0 && selectedOrganisationUnit && selectedProgram && selectedLevel) {
                   loadTEIS(selectedProgram.program?.id, selectedOrganisationUnit.id);
-                  setCurrentPosition(0)
+                  setCurrentPosition(0);
             }
       };
 
@@ -225,8 +222,8 @@ export const Dashboard = ({ me }) => {
                                     if (
                                           (dayjs(event.eventDate).isAfter(dayjs(selectedPeriods[0])) &&
                                                 dayjs(event.eventDate).isBefore(dayjs(selectedPeriods[1]))) ||
-                                          (dayjs(event.eventDate).isSame(dayjs(selectedPeriods[0])) &&
-                                                dayjs(event.eventDate).isSame(dayjs(selectedPeriods[1])))
+                                          dayjs(event.eventDate).isSame(dayjs(selectedPeriods[0])) ||
+                                          dayjs(event.eventDate).isSame(dayjs(selectedPeriods[1]))
                                     )
                                           eventList.push(event);
                               }
@@ -239,17 +236,19 @@ export const Dashboard = ({ me }) => {
             }, []);
 
             setConcerningOUs(
-                  rightOUList.map(event => {
-                        const currO = organisationUnits.find(o => o.id === event.orgUnit);
-                        return {
-                              id: currO?.id,
-                              displayName: currO?.displayName,
-                              name: currO?.name,
-                              level: currO?.level,
-                              path: currO?.path,
-                              event: event
-                        };
-                  }).filter(o => o.level === selectedLevel?.level)
+                  rightOUList
+                        .map(event => {
+                              const currO = organisationUnits.find(o => o.id === event.orgUnit);
+                              return {
+                                    id: currO?.id,
+                                    displayName: currO?.displayName,
+                                    name: currO?.name,
+                                    level: currO?.level,
+                                    path: currO?.path,
+                                    event: event
+                              };
+                        })
+                        .filter(o => o.level === selectedLevel?.level)
             );
       };
 
@@ -350,9 +349,9 @@ export const Dashboard = ({ me }) => {
                                                             loading={loadingTeiList || loadingInjection}
                                                             disabled={
                                                                   selectedLevel?.level &&
-                                                                        selectedOrganisationUnit &&
-                                                                        selectedPeriods.length > 0 &&
-                                                                        selectedProgram
+                                                                  selectedOrganisationUnit &&
+                                                                  selectedPeriods.length > 0 &&
+                                                                  selectedProgram
                                                                         ? false
                                                                         : true
                                                             }
@@ -372,12 +371,20 @@ export const Dashboard = ({ me }) => {
                                                 </div>
                                           </div>
                                           <div style={{ display: 'flex', alignItems: 'end' }}>
-                                                {concerningOUs?.length > 0 && <div style={{
-                                                      marginRight: '20px', fontWeight: 'bold',
-                                                      padding: '1px', background: 'green', color: '#fff', fontSize: '18px'
-                                                }}>
-                                                      {`Page:    ${currentPosition + 1}/${concerningOUs?.length}`}
-                                                </div>}
+                                                {concerningOUs?.length > 0 && (
+                                                      <div
+                                                            style={{
+                                                                  marginRight: '20px',
+                                                                  fontWeight: 'bold',
+                                                                  padding: '1px',
+                                                                  background: 'green',
+                                                                  color: '#fff',
+                                                                  fontSize: '18px'
+                                                            }}
+                                                      >
+                                                            {`Page:    ${currentPosition + 1}/${concerningOUs?.length}`}
+                                                      </div>
+                                                )}
                                                 <div>
                                                       <Button
                                                             small
@@ -386,7 +393,11 @@ export const Dashboard = ({ me }) => {
                                                                         style={{ fontSize: '20px', color: '#fff' }}
                                                                   />
                                                             }
-                                                            disabled={currentPosition === 0 || currentPosition < 0 ? true : false}
+                                                            disabled={
+                                                                  currentPosition === 0 || currentPosition < 0
+                                                                        ? true
+                                                                        : false
+                                                            }
                                                             primary
                                                             onClick={handleGoPrevious}
                                                       >
@@ -403,7 +414,7 @@ export const Dashboard = ({ me }) => {
                                                             }
                                                             disabled={
                                                                   +currentPosition + +numberOfGeneration >=
-                                                                        concerningOUs?.length
+                                                                  concerningOUs?.length
                                                                         ? true
                                                                         : false
                                                             }
@@ -497,12 +508,13 @@ export const Dashboard = ({ me }) => {
                                     ))}
                         </Row>
                   </div>
-            ))
+            ));
 
       const RenderVisualizationForGlobalStructure = () => {
             return (
                   selectedLevel?.level > 1 &&
-                  concerningOUs.length > 1 && concerningOUs.length === (+currentPosition + 1) && (
+                  concerningOUs.length > 1 &&
+                  concerningOUs.length === +currentPosition + 1 && (
                         <div style={{ marginTop: '20px' }}>
                               <div key={uuid()} style={{ marginBottom: '40px' }}>
                                     <div
@@ -547,10 +559,7 @@ export const Dashboard = ({ me }) => {
                                                             vis.program?.id === selectedProgram?.program?.id
                                                 )
                                                 ?.visualizations?.map(v => (
-                                                      <VisualizationItem
-                                                            key={uuid()}
-                                                            id={v.id}
-                                                      />
+                                                      <VisualizationItem key={uuid()} id={v.id} />
                                                 ))}
                                     </Row>
                               </div>
@@ -568,8 +577,8 @@ export const Dashboard = ({ me }) => {
                   const trackedEntityInstances = response.data.trackedEntityInstances;
                   setTeiList(trackedEntityInstances);
                   setLoadingTeiList(false);
-            } catch (err) { }
-      }
+            } catch (err) {}
+      };
 
       const RenderVisualizations = () =>
             selectedProgram &&
@@ -580,7 +589,120 @@ export const Dashboard = ({ me }) => {
                         {RenderVisualizationForGlobalStructure()}
                         {RenderNoOrganisationUnitsAtThisLevel()}
                   </div>
-            )
+            );
+
+      const handleReplaceIndicatorName_OLD = (elementHTML, config, output) => {
+            let countTimer = 0;
+            setInterval(() => {
+                  countTimer = countTimer + 1;
+
+                  const foundElement = elementHTML.querySelector('iframe');
+                  if (foundElement) {
+                        const listItems = foundElement.contentWindow?.document?.body?.querySelectorAll(
+                              '.highcharts-legend-item.highcharts-column-series'
+                        );
+                        const foundElementLegend =
+                              foundElement.contentWindow?.document?.body?.querySelector('#my-legend');
+                        if (foundElementLegend) {
+                              foundElementLegend.innerHTML = '';
+                        }
+                        if (listItems) {
+                              for (let item of listItems) {
+                                    const tspan = item.querySelector('tspan');
+                                    if (tspan) {
+                                          const text = tspan.innerHTML;
+                                          const texts = text?.split('-');
+                                          const textsIndex1 = texts?.[0];
+
+                                          // Remplacement des noms pour l'indicateur
+                                          if (
+                                                textsIndex1?.toLowerCase()?.includes('indicat') &&
+                                                textsIndex1?.split(' ')?.[1] &&
+                                                config?.indicators?.length > 0
+                                          ) {
+                                                const index = +textsIndex1?.split(' ')?.[1];
+                                                const currentIndicator = config?.indicators?.find(
+                                                      ind => +ind?.position === +index
+                                                );
+                                                const indicatorName =
+                                                      currentIndicator &&
+                                                      output.event?.dataValues?.find(
+                                                            dv => dv.dataElement === currentIndicator?.value?.id
+                                                      )?.value;
+
+                                                if (indicatorName) {
+                                                      tspan.innerHTML = indicatorName + ' - ' + texts?.[1];
+                                                }
+                                          }
+
+                                          // Remplacement des noms pour le cross check
+                                          if (
+                                                (textsIndex1?.toLowerCase()?.includes('cross checks') ||
+                                                      textsIndex1?.toLowerCase()?.includes('recoupements')) &&
+                                                textsIndex1?.[1] &&
+                                                config?.recoupements?.length > 0
+                                          ) {
+                                                let index =
+                                                      textsIndex1?.toLowerCase()?.split('cross checks ')?.[1] ||
+                                                      textsIndex1?.toLowerCase()?.split('recoupements ')?.[1];
+                                                const currentRecoupement = config?.recoupements?.find(
+                                                      ind => +ind?.position === +index
+                                                );
+
+                                                const primaryCrosscheckName =
+                                                      currentRecoupement &&
+                                                      output.event?.dataValues?.find(
+                                                            dv =>
+                                                                  dv.dataElement ===
+                                                                  currentRecoupement?.primaryValue?.id
+                                                      )?.value;
+
+                                                const secondaryCrosscheckName =
+                                                      currentRecoupement &&
+                                                      output.event?.dataValues?.find(
+                                                            dv =>
+                                                                  dv.dataElement ===
+                                                                  currentRecoupement?.secondaryValue?.id
+                                                      )?.value;
+
+                                                if (primaryCrosscheckName && secondaryCrosscheckName) {
+                                                      // tspan.innerHTML = `<p style="background : red;">( ${primaryCrosscheckName}:${secondaryCrosscheckName} ) - ${texts?.[1]}</p>`;
+                                                      // tspan.innerHTML = `( ${primaryCrosscheckName}:${secondaryCrosscheckName} ) - ${texts?.[1]}`;
+                                                      // tspan.style.fontSize = '10px'
+
+                                                      if (foundElementLegend) {
+                                                            const legendHighChartParent =
+                                                                  foundElement.contentWindow?.document?.body?.querySelector(
+                                                                        '.highcharts-legend'
+                                                                  );
+                                                            if (legendHighChartParent) {
+                                                                  // legendHighChartParent.style.display = 'none'
+                                                            }
+
+                                                            if (legendHighChartParent) {
+                                                                  const elementRect = item.querySelector('rect');
+                                                                  const rectColor = elementRect.getAttribute('fill');
+
+                                                                  let legendContent = document.createElement('div');
+                                                                  legendContent.innerHTML = `<div style="font-size: 12px; display: flex; align-items: center;">
+                                                            <span style="background : ${
+                                                                  rectColor || '#ccc'
+                                                            }; border-radius: 50px; height: 10px; width: 10px;margin-right: 5px;"></span>
+                                                             <span> ${primaryCrosscheckName} / ${secondaryCrosscheckName}  - ${
+                                                                        texts?.[1]
+                                                                  }</span>
+                                                            </div>`;
+                                                                  foundElementLegend.appendChild(legendContent);
+                                                            }
+                                                      }
+                                                }
+                                          }
+                                    }
+                              }
+                        }
+                  }
+            }, 5000);
+      };
 
       const handleReplaceIndicatorName = (elementHTML, config, output) => {
             let countTimer = 0;
@@ -592,71 +714,108 @@ export const Dashboard = ({ me }) => {
                         const listItems = foundElement.contentWindow?.document?.body?.querySelectorAll(
                               '.highcharts-legend-item.highcharts-column-series'
                         );
-                        const foundElementLegend = foundElement.contentWindow?.document?.body?.querySelector('#my-legend')
-                        if (foundElementLegend) { foundElementLegend.innerHTML = "" }
+                        const foundElementLegend =
+                              foundElement.contentWindow?.document?.body?.querySelector('#my-legend');
+                        if (foundElementLegend) {
+                              foundElementLegend.innerHTML = '';
+                        }
                         if (listItems) {
                               for (let item of listItems) {
                                     const tspan = item.querySelector('tspan');
                                     if (tspan) {
-
                                           const text = tspan.innerHTML;
                                           const texts = text?.split('-');
                                           const textsIndex1 = texts?.[0];
 
                                           // Remplacement des noms pour l'indicateur
-                                          if (textsIndex1?.toLowerCase()?.includes('indicat') && textsIndex1?.split(' ')?.[1] && config?.indicators?.length > 0) {
-                                                const index = +textsIndex1?.split(' ')?.[1]
-                                                const currentIndicator = config?.indicators?.find(ind => +ind?.position === +index);
-                                                const indicatorName = currentIndicator &&
-                                                      output.event?.dataValues?.find(dv => dv.dataElement === currentIndicator?.value?.id)?.value;
+                                          if (config?.indicators?.length > 0) {
+                                                for (let ind of config.indicators) {
+                                                      if (ind.keyWords?.length > 0) {
+                                                            for (let word of ind.keyWords) {
+                                                                  if (text?.trim()?.includes(word.trim())) {
+                                                                        let currentIndicator = ind;
+                                                                        const indicatorName =
+                                                                              currentIndicator &&
+                                                                              output.event?.dataValues?.find(
+                                                                                    dv =>
+                                                                                          dv.dataElement ===
+                                                                                          currentIndicator?.value?.id
+                                                                              )?.value;
 
-                                                if (indicatorName) {
-                                                      tspan.innerHTML = indicatorName + ' - ' + texts?.[1];
+                                                                        if (indicatorName) {
+                                                                              tspan.innerHTML = text.replaceAll(
+                                                                                    word,
+                                                                                    indicatorName
+                                                                              );
+                                                                        }
+                                                                  }
+                                                            }
+                                                      }
                                                 }
                                           }
 
                                           // Remplacement des noms pour le cross check
-                                          if ((textsIndex1?.toLowerCase()?.includes('cross checks') || textsIndex1?.toLowerCase()?.includes('recoupements')) && textsIndex1?.[1] && config?.recoupements?.length > 0) {
-                                                let index = textsIndex1?.toLowerCase()?.split('cross checks ')?.[1] || textsIndex1?.toLowerCase()?.split('recoupements ')?.[1]
-                                                const currentRecoupement = config?.recoupements?.find(ind => +ind?.position === +index);
+                                          if (
+                                                (textsIndex1?.toLowerCase()?.includes('cross checks') ||
+                                                      textsIndex1?.toLowerCase()?.includes('recoupements')) &&
+                                                textsIndex1?.[1] &&
+                                                config?.recoupements?.length > 0
+                                          ) {
+                                                let index =
+                                                      textsIndex1?.toLowerCase()?.split('cross checks ')?.[1] ||
+                                                      textsIndex1?.toLowerCase()?.split('recoupements ')?.[1];
+                                                const currentRecoupement = config?.recoupements?.find(
+                                                      ind => +ind?.position === +index
+                                                );
 
+                                                const primaryCrosscheckName =
+                                                      currentRecoupement &&
+                                                      output.event?.dataValues?.find(
+                                                            dv =>
+                                                                  dv.dataElement ===
+                                                                  currentRecoupement?.primaryValue?.id
+                                                      )?.value;
 
-                                                const primaryCrosscheckName = currentRecoupement &&
-                                                      output.event?.dataValues?.find(dv => dv.dataElement === currentRecoupement?.primaryValue?.id)?.value;
-
-                                                const secondaryCrosscheckName = currentRecoupement &&
-                                                      output.event?.dataValues?.find(dv => dv.dataElement === currentRecoupement?.secondaryValue?.id)?.value;
-
+                                                const secondaryCrosscheckName =
+                                                      currentRecoupement &&
+                                                      output.event?.dataValues?.find(
+                                                            dv =>
+                                                                  dv.dataElement ===
+                                                                  currentRecoupement?.secondaryValue?.id
+                                                      )?.value;
 
                                                 if (primaryCrosscheckName && secondaryCrosscheckName) {
-
                                                       // tspan.innerHTML = `<p style="background : red;">( ${primaryCrosscheckName}:${secondaryCrosscheckName} ) - ${texts?.[1]}</p>`;
                                                       // tspan.innerHTML = `( ${primaryCrosscheckName}:${secondaryCrosscheckName} ) - ${texts?.[1]}`;
                                                       // tspan.style.fontSize = '10px'
 
                                                       if (foundElementLegend) {
-
-                                                            const legendHighChartParent = foundElement.contentWindow?.document?.body?.querySelector('.highcharts-legend')
+                                                            const legendHighChartParent =
+                                                                  foundElement.contentWindow?.document?.body?.querySelector(
+                                                                        '.highcharts-legend'
+                                                                  );
                                                             if (legendHighChartParent) {
                                                                   // legendHighChartParent.style.display = 'none'
                                                             }
 
                                                             if (legendHighChartParent) {
-                                                                  const elementRect = item.querySelector('rect')
-                                                                  const rectColor = elementRect.getAttribute('fill')
+                                                                  const elementRect = item.querySelector('rect');
+                                                                  const rectColor = elementRect.getAttribute('fill');
 
-                                                                  let legendContent = document.createElement('div')
+                                                                  let legendContent = document.createElement('div');
                                                                   legendContent.innerHTML = `<div style="font-size: 12px; display: flex; align-items: center;">
-                                                            <span style="background : ${rectColor || '#ccc'}; border-radius: 50px; height: 10px; width: 10px;margin-right: 5px;"></span>
-                                                             <span> ${primaryCrosscheckName} / ${secondaryCrosscheckName}  - ${texts?.[1]}</span>
+                                                            <span style="background : ${
+                                                                  rectColor || '#ccc'
+                                                            }; border-radius: 50px; height: 10px; width: 10px;margin-right: 5px;"></span>
+                                                             <span> ${primaryCrosscheckName} / ${secondaryCrosscheckName}  - ${
+                                                                        texts?.[1]
+                                                                  }</span>
                                                             </div>`;
-                                                                  foundElementLegend.appendChild(legendContent)
+                                                                  foundElementLegend.appendChild(legendContent);
                                                             }
-
                                                       }
                                                 }
                                           }
-
                                     }
                               }
                         }
@@ -664,31 +823,24 @@ export const Dashboard = ({ me }) => {
             }, 5000);
       };
 
-      const pause = milliseconds => {
-            var dt = new Date();
-            while (new Date() - dt <= milliseconds) {
-                  /* Do nothing */
-            }
-      };
-
       const loadAndInjectVisualizations = async () => {
             try {
                   setLoadingInjection(true);
 
                   // generation for specifique ou
-                  concerningOUs
-                        .slice(currentPosition, currentPosition + +numberOfGeneration)
-                        .forEach(output => {
-                              let elementList = [];
-                              const config = selectedProgram?.programStageConfigurations?.find(
-                                    stage => stage?.programStage?.id === output?.event?.programStage
-                              )
+                  concerningOUs.slice(currentPosition, currentPosition + +numberOfGeneration).forEach(output => {
+                        let elementList = [];
+                        const config = selectedProgram?.programStageConfigurations?.find(
+                              stage => stage?.programStage?.id === output?.event?.programStage
+                        );
 
-                              dataStoreVisualizations.find(
+                        dataStoreVisualizations
+                              .find(
                                     vis =>
                                           selectedProgram?.program?.id &&
                                           vis.program?.id === selectedProgram?.program?.id
-                              )?.visualizations?.forEach(v => {
+                              )
+                              ?.visualizations?.forEach(v => {
                                     const responseString = ReactDOMServer.renderToString(
                                           <MyFrame
                                                 type={v.type}
@@ -716,54 +868,56 @@ export const Dashboard = ({ me }) => {
                                           elementList.push({ rightElement, output });
                                           handleReplaceIndicatorName(rightElement, config, output);
                                     }
-                              })
-                        })
-
+                              });
+                  });
 
                   // generation for all ou
                   if (selectedLevel?.level > 1) {
-
-                        dataStoreVisualizations.find(
-                              vis =>
-                                    selectedProgram?.program?.id &&
-                                    vis.program?.id === selectedProgram?.program?.id
-                        )?.visualizations?.forEach(v => {
-                              const responseString = ReactDOMServer.renderToString(
-                                    <MyFrame
-                                          type={v.type}
-                                          base_url={SERVER_URL}
-                                          id={v.id}
-                                          style={{
-                                                width: '100%',
-                                                height: '450px'
-                                          }}
-                                          periods={concerningOUs?.map(r => dayjs(r.event?.eventDate)?.format('YYYYMMDD'))?.join(',')}
-                                          orgUnitIDs={concerningOUs.reduce((p, c) => {
-                                                if (!p.includes(c?.id)) {
-                                                      p.push(c?.id)
-                                                }
-                                                return p
-                                          }, [])?.join(',')}
-                                          baseLineTitle={v.baseLineTitle}
-                                          baseLineValue={v.baseLineValue}
-                                          targetLineTitle={v.targetLineTitle}
-                                          targetLineValue={v.targetLineValue}
-                                    />
+                        dataStoreVisualizations
+                              .find(
+                                    vis =>
+                                          selectedProgram?.program?.id &&
+                                          vis.program?.id === selectedProgram?.program?.id
                               )
+                              ?.visualizations?.forEach(v => {
+                                    const responseString = ReactDOMServer.renderToString(
+                                          <MyFrame
+                                                type={v.type}
+                                                base_url={SERVER_URL}
+                                                id={v.id}
+                                                style={{
+                                                      width: '100%',
+                                                      height: '450px'
+                                                }}
+                                                periods={concerningOUs
+                                                      ?.map(r => dayjs(r.event?.eventDate)?.format('YYYYMMDD'))
+                                                      ?.join(',')}
+                                                orgUnitIDs={concerningOUs
+                                                      .reduce((p, c) => {
+                                                            if (!p.includes(c?.id)) {
+                                                                  p.push(c?.id);
+                                                            }
+                                                            return p;
+                                                      }, [])
+                                                      ?.join(',')}
+                                                baseLineTitle={v.baseLineTitle}
+                                                baseLineValue={v.baseLineValue}
+                                                targetLineTitle={v.targetLineTitle}
+                                                targetLineValue={v.targetLineValue}
+                                          />
+                                    );
 
-                              const rightElement = document.getElementById(`${v.id}`)
-                              if (rightElement) {
-                                    rightElement.innerHTML = responseString;
-                                    for (let output of concerningOUs) {
-                                          const config = selectedProgram?.programStageConfigurations?.find(
-                                                stage => stage?.programStage?.id === output?.event?.programStage
-                                          );
-                                          handleReplaceIndicatorName(rightElement, config, output)
+                                    const rightElement = document.getElementById(`${v.id}`);
+                                    if (rightElement) {
+                                          rightElement.innerHTML = responseString;
+                                          for (let output of concerningOUs) {
+                                                const config = selectedProgram?.programStageConfigurations?.find(
+                                                      stage => stage?.programStage?.id === output?.event?.programStage
+                                                );
+                                                handleReplaceIndicatorName(rightElement, config, output);
+                                          }
                                     }
-                              }
-
-                        })
-
+                              });
                   }
 
                   setLoadingInjection(false);
@@ -780,7 +934,6 @@ export const Dashboard = ({ me }) => {
                   loadOrganisationUnitLevels();
                   loadOrganisationUnits();
             }
-
       }, [me]);
 
       useEffect(() => {

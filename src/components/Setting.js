@@ -780,12 +780,6 @@ const Setting = () => {
                         },
                         programStageConfigurations: newProgramStageConfigurations.map(p => ({
                               ...p,
-                              indicators: p.indicators?.map(i => {
-                                    return {
-                                          ...i,
-                                          keyWords: indicatorRef.current[i.position]?.value
-                                    };
-                              }),
                               programStage: p.programStage && {
                                     id: p.programStage.id,
                                     displayName: p.programStage.displayName,
@@ -2028,8 +2022,6 @@ const Setting = () => {
                                                       <GenerateIndicatorsFieldsDQR
                                                             formState={formState}
                                                             setFormState={setFormState}
-                                                            indicatorRef={indicatorRef}
-                                                            recoupementRef={recoupementRef}
                                                       />
                                                 </>
                                           )}
