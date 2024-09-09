@@ -262,14 +262,15 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                                                                       ) {
                                                                                                             return {
                                                                                                                   ...i,
-                                                                                                                  DHIS2MonthlyValue2: formState?.selectedProgramStageForConfiguration?.programStageDataElements?.find(
-                                                                                                                        p =>
-                                                                                                                              p
-                                                                                                                                    .dataElement
-                                                                                                                                    .id ===
-                                                                                                                              value
-                                                                                                                  )
-                                                                                                                        ?.dataElement
+                                                                                                                  DHIS2MonthlyValue2:
+                                                                                                                        formState?.selectedProgramStageForConfiguration?.programStageDataElements?.find(
+                                                                                                                              p =>
+                                                                                                                                    p
+                                                                                                                                          .dataElement
+                                                                                                                                          .id ===
+                                                                                                                                    value
+                                                                                                                        )
+                                                                                                                              ?.dataElement
                                                                                                             };
                                                                                                       }
                                                                                                       return i;
@@ -320,14 +321,66 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                                                                       ) {
                                                                                                             return {
                                                                                                                   ...i,
-                                                                                                                  DHIS2MonthlyValue3: formState?.selectedProgramStageForConfiguration?.programStageDataElements?.find(
-                                                                                                                        p =>
-                                                                                                                              p
-                                                                                                                                    .dataElement
-                                                                                                                                    .id ===
-                                                                                                                              value
-                                                                                                                  )
-                                                                                                                        ?.dataElement
+                                                                                                                  DHIS2MonthlyValue3:
+                                                                                                                        formState?.selectedProgramStageForConfiguration?.programStageDataElements?.find(
+                                                                                                                              p =>
+                                                                                                                                    p
+                                                                                                                                          .dataElement
+                                                                                                                                          .id ===
+                                                                                                                                    value
+                                                                                                                        )
+                                                                                                                              ?.dataElement
+                                                                                                            };
+                                                                                                      }
+                                                                                                      return i;
+                                                                                                }
+                                                                                          ) || []
+                                                                              });
+                                                                        }}
+                                                                  />
+                                                            </div>
+                                                      </div>
+
+                                                      <hr />
+                                                      <div style={{ marginTop: '5px' }}>
+                                                            <div
+                                                                  style={{
+                                                                        marginBottom: '5px'
+                                                                  }}
+                                                            >
+                                                                  <div>
+                                                                        {`${translate('Indicator_Keys_Word')}  ${
+                                                                              indexInd + 1
+                                                                        }`}
+                                                                  </div>
+
+                                                                  <div
+                                                                        style={{
+                                                                              color: '#00000090',
+                                                                              margin: '5px 0px'
+                                                                        }}
+                                                                  >
+                                                                        {`${translate('Indicator_keys_Word_Help')}`}
+                                                                  </div>
+                                                            </div>
+                                                            <div>
+                                                                  <Input
+                                                                        value={ind?.keyWords}
+                                                                        onChange={event => {
+                                                                              setFormState({
+                                                                                    ...formState,
+                                                                                    indicators:
+                                                                                          formState?.indicators?.map(
+                                                                                                i => {
+                                                                                                      if (
+                                                                                                            i.id ===
+                                                                                                            ind.id
+                                                                                                      ) {
+                                                                                                            return {
+                                                                                                                  ...i,
+                                                                                                                  keyWords: event
+                                                                                                                        .target
+                                                                                                                        .value
                                                                                                             };
                                                                                                       }
                                                                                                       return i;

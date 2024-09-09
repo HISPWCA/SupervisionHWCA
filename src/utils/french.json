@@ -304,5 +304,9 @@
     "Prev": "Préc",
     "Next": "Suiv",
     "Global_Program_Area": "Domaine de programme global",
-    "Use_Indicator_Name_From_Dhis2": "Utiliser nom du DHIS2"
+    "Use_Indicator_Name_From_Dhis2": "Utiliser nom du DHIS2",
+    "Indicator_Keys_Word": "Mots clés des indicateurs",
+    "Indicator_keys_Word_Help": "Ajouter tous les mots clés des indicateurs séparés par une virgule",
+    "Cross_Check_Keys_Word": "Mots clés des recoupements",
+    "Cross_Check_Keys_Word_Help": "Ajouter tous les mots clés des recoupement séparés par une virgule"
 }

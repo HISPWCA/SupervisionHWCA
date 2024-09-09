@@ -90,11 +90,7 @@ const Setting = () => {
       const [programStageConfigurations, setProgramStageConfigurations] = useState([]);
       const [currentProgramstageConfiguration, setCurrentProgramstageConfiguration] = useState(null);
 
-      const [selectedOrganisationUnitGroup, setSelectedOrganisationUnitGroup] = useState(null);
-      const [selectedProgramStageForConfiguration, setSelectedProgramStageForConfiguration] = useState(null);
-      const [selectedSupervisorDataElements, setSelectedSupervisorDataElements] = useState([]);
       const [selectedStatusSupervisionDataElement, setSelectedStatusSupervisionDataElement] = useState(null);
-      const [selectedConfigurationType, setSelectedConfigurationType] = useState('ERDQ');
       const [selectedIndicator, setSelectedIndicator] = useState(null);
       const [selectedIndicatorGroup, setSelectedIndicatorGroup] = useState(null);
       const [selectedIndicatorType, setSelectedIndicatorType] = useState(PROGRAM_INDICATOR);
@@ -107,17 +103,8 @@ const Setting = () => {
 
       const [selectedAnalyseIndicator, setSelectedAnalyseIndicator] = useState(null);
       const [selectedAnalyseDataElement, setSelectedAnalyseDataElement] = useState(null);
-      const [selectedProgramStage, setSelectedProgramStage] = useState(null);
-      const [selectedSupervisionProgramStage, setSelectedStatusSupervisionProgramStage] = useState(null);
-      const [selectedStatutPaymentProgramStage, setSelectedStatutPaymentProgramStage] = useState(null);
-      const [selectedStatutSupervisionDataElement, setSelectedStatutSupervisionDataElement] = useState(null);
-      const [selectedStatutPaymentDataElement, setSelectedStatutPaymentDataElement] = useState(null);
-      const [selectedDataElements, setSelectedDataElements] = useState([]);
       const [selectedAttributesToDisplay, setSelectedAttributesToDisplay] = useState([]);
-      const [selectedPlanificationIndicatorRDQeCase, setSelectedPlanificationIndicatorRDQeCase] = useState(false);
       const [selectedPlanificationType, setSelectedPlanificationType] = useState(ORGANISATION_UNIT);
-      const [selectedAttributeNameForAgent, setSelectedAttributeNameForAgent] = useState(null);
-      const [selectedAttributeFirstNameForAgent, setSelectedAttributeFirstNameForAgent] = useState(null);
       const [selectedProgramForVisualization, setSelectedProgramForVisualization] = useState(null);
       const [selectedTypeForVisualization, setSelectedTypeForVisualization] = useState('VISUALIZATION');
       const [selectedMaps, setSelectedMaps] = useState([]);
@@ -185,7 +172,8 @@ const Setting = () => {
                               DHIS2MonthlyValue1: null,
                               DHIS2MonthlyValue2: null,
                               DHIS2MonthlyValue3: null,
-                              programArea: null
+                              programArea: null,
+                              keyWords: ''
                         });
                   }
 
@@ -255,7 +243,7 @@ const Setting = () => {
             try {
                   const response = await axios.get(`${MAPS_ROUTE}?paging=false&fields=id,displayName,name`);
                   setMaps(response.data.maps?.map(m => ({ ...m, type: 'MAP' })) || []);
-            } catch (err) { }
+            } catch (err) {}
       };
 
       const loadVisualizations = async () => {
@@ -264,7 +252,7 @@ const Setting = () => {
                         `${VISUALIZATIONS_ROUTE}?pageSize=100000&fields=id,displayName,name,type`
                   );
                   setVisualizations(response.data.visualizations || []);
-            } catch (err) { }
+            } catch (err) {}
       };
 
       const loadOrganisationUnitGroups = async () => {
@@ -730,51 +718,51 @@ const Setting = () => {
                   const newProgramStageConfigurations = existingConfig
                         ? formState?.isFieldEditingMode && currentProgramstageConfiguration
                               ? programStageConfigurations.map(p => {
-                                    if (p.programStage?.id === currentProgramstageConfiguration?.programStage?.id) {
-                                          return {
-                                                programStage: formState?.selectedProgramStageForConfiguration,
-                                                organisationUnitGroup: formState?.selectedOrganisationUnitGroup,
-                                                supervisorField: formState?.selectedSupervisorDataElements,
-                                                statusSupervisionField:
-                                                      formState?.selectedStatusSupervisionDataElement,
-                                                selectedNbrIndicatorsToShow: formState.selectedNbrIndicatorsToShow,
-                                                indicators: formState.indicators,
-                                                recoupements: formState.recoupements,
-                                                completeness: formState.completeness,
-                                                consistencyOvertimes: formState.consistencyOvertimes
-                                          };
-                                    }
+                                      if (p.programStage?.id === currentProgramstageConfiguration?.programStage?.id) {
+                                            return {
+                                                  programStage: formState?.selectedProgramStageForConfiguration,
+                                                  organisationUnitGroup: formState?.selectedOrganisationUnitGroup,
+                                                  supervisorField: formState?.selectedSupervisorDataElements,
+                                                  statusSupervisionField:
+                                                        formState?.selectedStatusSupervisionDataElement,
+                                                  selectedNbrIndicatorsToShow: formState.selectedNbrIndicatorsToShow,
+                                                  indicators: formState.indicators,
+                                                  recoupements: formState.recoupements,
+                                                  completeness: formState.completeness,
+                                                  consistencyOvertimes: formState.consistencyOvertimes
+                                            };
+                                      }
 
-                                    return p;
-                              })
+                                      return p;
+                                })
                               : [
-                                    ...existingConfig.programStageConfigurations,
-                                    {
-                                          programStage: formState?.selectedProgramStageForConfiguration,
-                                          organisationUnitGroup: formState?.selectedOrganisationUnitGroup,
-                                          supervisorField: formState?.selectedSupervisorDataElements,
-                                          statusSupervisionField: formState?.selectedStatusSupervisionDataElement,
-                                          selectedNbrIndicatorsToShow: formState.selectedNbrIndicatorsToShow,
-                                          indicators: formState.indicators,
-                                          recoupements: formState.recoupements,
-                                          completeness: formState.completeness,
-                                          consistencyOvertimes: formState.consistencyOvertimes
-                                    }
-                              ]
+                                      ...existingConfig.programStageConfigurations,
+                                      {
+                                            programStage: formState?.selectedProgramStageForConfiguration,
+                                            organisationUnitGroup: formState?.selectedOrganisationUnitGroup,
+                                            supervisorField: formState?.selectedSupervisorDataElements,
+                                            statusSupervisionField: formState?.selectedStatusSupervisionDataElement,
+                                            selectedNbrIndicatorsToShow: formState.selectedNbrIndicatorsToShow,
+                                            indicators: formState.indicators,
+                                            recoupements: formState.recoupements,
+                                            completeness: formState.completeness,
+                                            consistencyOvertimes: formState.consistencyOvertimes
+                                      }
+                                ]
                         : [
-                              {
-                                    id: uuid(),
-                                    programStage: formState?.selectedProgramStageForConfiguration,
-                                    organisationUnitGroup: formState?.selectedOrganisationUnitGroup,
-                                    supervisorField: formState?.selectedSupervisorDataElements,
-                                    selectedNbrIndicatorsToShow: formState.selectedNbrIndicatorsToShow,
-                                    statusSupervisionField: formState?.selectedStatusSupervisionDataElement,
-                                    indicators: formState.indicators,
-                                    recoupements: formState.recoupements,
-                                    completeness: formState.completeness,
-                                    consistencyOvertimes: formState.consistencyOvertimes
-                              }
-                        ];
+                                {
+                                      id: uuid(),
+                                      programStage: formState?.selectedProgramStageForConfiguration,
+                                      organisationUnitGroup: formState?.selectedOrganisationUnitGroup,
+                                      supervisorField: formState?.selectedSupervisorDataElements,
+                                      selectedNbrIndicatorsToShow: formState.selectedNbrIndicatorsToShow,
+                                      statusSupervisionField: formState?.selectedStatusSupervisionDataElement,
+                                      indicators: formState.indicators,
+                                      recoupements: formState.recoupements,
+                                      completeness: formState.completeness,
+                                      consistencyOvertimes: formState.consistencyOvertimes
+                                }
+                          ];
 
                   const payload = {
                         generationType: formState.selectedSupervisionGenerationType,
@@ -1761,154 +1749,154 @@ const Setting = () => {
                                     columns={
                                           formState?.selectedConfigurationType === ERDQ
                                                 ? [
-                                                      {
-                                                            title: translate('Program_Stage'),
-                                                            dataIndex: 'programStageName'
-                                                      },
-                                                      {
-                                                            title: translate('Groupe_Unite_Organisation'),
-                                                            dataIndex: 'organisationUnitGroupName'
-                                                      },
+                                                        {
+                                                              title: translate('Program_Stage'),
+                                                              dataIndex: 'programStageName'
+                                                        },
+                                                        {
+                                                              title: translate('Groupe_Unite_Organisation'),
+                                                              dataIndex: 'organisationUnitGroupName'
+                                                        },
 
-                                                      {
-                                                            title: translate('Actions'),
-                                                            dataIndex: 'action',
-                                                            width: '80px',
-                                                            render: value => (
-                                                                  <div
-                                                                        style={{
-                                                                              display: 'flex',
-                                                                              alignItems: 'center'
-                                                                        }}
-                                                                  >
-                                                                        <div style={{ marginRight: '10px' }}>
-                                                                              <FiEdit
-                                                                                    style={{
-                                                                                          color: BLUE,
-                                                                                          fontSize: '18px',
-                                                                                          cursor: 'pointer'
-                                                                                    }}
-                                                                                    onClick={() =>
-                                                                                          handleEditProgramStageConfigurations(
-                                                                                                value
-                                                                                          )
-                                                                                    }
-                                                                              />
-                                                                        </div>
-                                                                        <Popconfirm
-                                                                              title={translate(
-                                                                                    'Suppression_Configuration'
-                                                                              )}
-                                                                              description={translate(
-                                                                                    'Confirmation_Suppression_Configuration'
-                                                                              )}
-                                                                              icon={
-                                                                                    <QuestionCircleOutlined
-                                                                                          style={{ color: 'red' }}
-                                                                                    />
-                                                                              }
-                                                                              onConfirm={() => {
-                                                                                    handleDeleteProgramStageConfiguration(
-                                                                                          value
-                                                                                    );
-                                                                              }}
-                                                                        >
-                                                                              <div>
-                                                                                    <RiDeleteBinLine
-                                                                                          style={{
-                                                                                                color: 'red',
-                                                                                                fontSize: '18px',
-                                                                                                cursor: 'pointer'
-                                                                                          }}
-                                                                                    />
-                                                                              </div>
-                                                                        </Popconfirm>
-                                                                  </div>
-                                                            )
-                                                      }
-                                                ]
+                                                        {
+                                                              title: translate('Actions'),
+                                                              dataIndex: 'action',
+                                                              width: '80px',
+                                                              render: value => (
+                                                                    <div
+                                                                          style={{
+                                                                                display: 'flex',
+                                                                                alignItems: 'center'
+                                                                          }}
+                                                                    >
+                                                                          <div style={{ marginRight: '10px' }}>
+                                                                                <FiEdit
+                                                                                      style={{
+                                                                                            color: BLUE,
+                                                                                            fontSize: '18px',
+                                                                                            cursor: 'pointer'
+                                                                                      }}
+                                                                                      onClick={() =>
+                                                                                            handleEditProgramStageConfigurations(
+                                                                                                  value
+                                                                                            )
+                                                                                      }
+                                                                                />
+                                                                          </div>
+                                                                          <Popconfirm
+                                                                                title={translate(
+                                                                                      'Suppression_Configuration'
+                                                                                )}
+                                                                                description={translate(
+                                                                                      'Confirmation_Suppression_Configuration'
+                                                                                )}
+                                                                                icon={
+                                                                                      <QuestionCircleOutlined
+                                                                                            style={{ color: 'red' }}
+                                                                                      />
+                                                                                }
+                                                                                onConfirm={() => {
+                                                                                      handleDeleteProgramStageConfiguration(
+                                                                                            value
+                                                                                      );
+                                                                                }}
+                                                                          >
+                                                                                <div>
+                                                                                      <RiDeleteBinLine
+                                                                                            style={{
+                                                                                                  color: 'red',
+                                                                                                  fontSize: '18px',
+                                                                                                  cursor: 'pointer'
+                                                                                            }}
+                                                                                      />
+                                                                                </div>
+                                                                          </Popconfirm>
+                                                                    </div>
+                                                              )
+                                                        }
+                                                  ]
                                                 : [
-                                                      {
-                                                            title: translate('Program_Stage'),
-                                                            dataIndex: 'programStageName'
-                                                      },
+                                                        {
+                                                              title: translate('Program_Stage'),
+                                                              dataIndex: 'programStageName'
+                                                        },
 
-                                                      {
-                                                            title: translate('Actions'),
-                                                            dataIndex: 'action',
-                                                            width: '80px',
-                                                            render: value => (
-                                                                  <div
-                                                                        style={{
-                                                                              display: 'flex',
-                                                                              alignItems: 'center'
-                                                                        }}
-                                                                  >
-                                                                        <div style={{ marginRight: '10px' }}>
-                                                                              <FiEdit
-                                                                                    style={{
-                                                                                          color: BLUE,
-                                                                                          fontSize: '18px',
-                                                                                          cursor: 'pointer'
-                                                                                    }}
-                                                                                    onClick={() =>
-                                                                                          handleEditProgramStageConfigurations(
-                                                                                                value
-                                                                                          )
-                                                                                    }
-                                                                              />
-                                                                        </div>
-                                                                        <Popconfirm
-                                                                              title={translate(
-                                                                                    'Suppression_Configuration'
-                                                                              )}
-                                                                              description={translate(
-                                                                                    'Confirmation_Suppression_Configuration'
-                                                                              )}
-                                                                              icon={
-                                                                                    <QuestionCircleOutlined
-                                                                                          style={{ color: 'red' }}
-                                                                                    />
-                                                                              }
-                                                                              onConfirm={() => {
-                                                                                    //   setSelectedProgramStageForConfiguration(
-                                                                                    //         null
-                                                                                    //   );
-                                                                                    //   setSelectedOrganisationUnitGroup(
-                                                                                    //         null
-                                                                                    //   );
-                                                                                    //   setSelectedSupervisorDataElements(
-                                                                                    //         []
-                                                                                    //   );
-                                                                                    //   setSelectedStatusSupervisionDataElement(
-                                                                                    //         null
-                                                                                    //   );
-                                                                                    //   setProgramStageConfigurations(
-                                                                                    //         programStageConfigurations.filter(
-                                                                                    //               p =>
-                                                                                    //                     p.programStage
-                                                                                    //                           ?.id !==
-                                                                                    //                     value
-                                                                                    //                           .programStage
-                                                                                    //                           ?.id
-                                                                                    //         )
-                                                                                    //   );
-                                                                              }}
-                                                                        >
-                                                                              <div>
-                                                                                    <RiDeleteBinLine
-                                                                                          style={{
-                                                                                                color: 'red',
-                                                                                                fontSize: '18px',
-                                                                                                cursor: 'pointer'
-                                                                                          }}
-                                                                                    />
-                                                                              </div>
-                                                                        </Popconfirm>
-                                                                  </div>
-                                                            )
-                                                      }
-                                                ]
+                                                        {
+                                                              title: translate('Actions'),
+                                                              dataIndex: 'action',
+                                                              width: '80px',
+                                                              render: value => (
+                                                                    <div
+                                                                          style={{
+                                                                                display: 'flex',
+                                                                                alignItems: 'center'
+                                                                          }}
+                                                                    >
+                                                                          <div style={{ marginRight: '10px' }}>
+                                                                                <FiEdit
+                                                                                      style={{
+                                                                                            color: BLUE,
+                                                                                            fontSize: '18px',
+                                                                                            cursor: 'pointer'
+                                                                                      }}
+                                                                                      onClick={() =>
+                                                                                            handleEditProgramStageConfigurations(
+                                                                                                  value
+                                                                                            )
+                                                                                      }
+                                                                                />
+                                                                          </div>
+                                                                          <Popconfirm
+                                                                                title={translate(
+                                                                                      'Suppression_Configuration'
+                                                                                )}
+                                                                                description={translate(
+                                                                                      'Confirmation_Suppression_Configuration'
+                                                                                )}
+                                                                                icon={
+                                                                                      <QuestionCircleOutlined
+                                                                                            style={{ color: 'red' }}
+                                                                                      />
+                                                                                }
+                                                                                onConfirm={() => {
+                                                                                      //   setSelectedProgramStageForConfiguration(
+                                                                                      //         null
+                                                                                      //   );
+                                                                                      //   setSelectedOrganisationUnitGroup(
+                                                                                      //         null
+                                                                                      //   );
+                                                                                      //   setSelectedSupervisorDataElements(
+                                                                                      //         []
+                                                                                      //   );
+                                                                                      //   setSelectedStatusSupervisionDataElement(
+                                                                                      //         null
+                                                                                      //   );
+                                                                                      //   setProgramStageConfigurations(
+                                                                                      //         programStageConfigurations.filter(
+                                                                                      //               p =>
+                                                                                      //                     p.programStage
+                                                                                      //                           ?.id !==
+                                                                                      //                     value
+                                                                                      //                           .programStage
+                                                                                      //                           ?.id
+                                                                                      //         )
+                                                                                      //   );
+                                                                                }}
+                                                                          >
+                                                                                <div>
+                                                                                      <RiDeleteBinLine
+                                                                                            style={{
+                                                                                                  color: 'red',
+                                                                                                  fontSize: '18px',
+                                                                                                  cursor: 'pointer'
+                                                                                            }}
+                                                                                      />
+                                                                                </div>
+                                                                          </Popconfirm>
+                                                                    </div>
+                                                              )
+                                                        }
+                                                  ]
                                     }
                                     size="small"
                                     pagination={false}
@@ -1962,21 +1950,21 @@ const Setting = () => {
 
                         const newList = currentVisualizationConfig
                               ? listFromDataStore.map(l => {
-                                    if (l.program?.id === currentVisualizationConfig?.program?.id) {
-                                          return {
-                                                ...l,
-                                                visualizations: favorisItems
-                                          };
-                                    }
-                                    return l;
-                              })
+                                      if (l.program?.id === currentVisualizationConfig?.program?.id) {
+                                            return {
+                                                  ...l,
+                                                  visualizations: favorisItems
+                                            };
+                                      }
+                                      return l;
+                                })
                               : [
-                                    {
-                                          program: selectedProgramForVisualization,
-                                          visualizations: favorisItems
-                                    },
-                                    ...listFromDataStore
-                              ];
+                                      {
+                                            program: selectedProgramForVisualization,
+                                            visualizations: favorisItems
+                                      },
+                                      ...listFromDataStore
+                                ];
 
                         await saveDataToDataStore(
                               process.env.REACT_APP_VISUALIZATION_KEY,
@@ -2205,7 +2193,7 @@ const Setting = () => {
                   }
             }
 
-            setFavorisItems([...favorisItems, ...newFavList,]);
+            setFavorisItems([...favorisItems, ...newFavList]);
             setSelectedVisualizations([]);
             setSelectedMaps([]);
       };
@@ -3208,7 +3196,7 @@ const Setting = () => {
                                                 padding: '20px',
                                                 background: '#FFF',
                                                 marginBottom: '2px',
-                                                borderRadius: '8px', 
+                                                borderRadius: '8px'
                                           }}
                                     >
                                           <div
@@ -3312,31 +3300,35 @@ const Setting = () => {
                         <Col md={4} sm={24}>
                               <div style={{ marginBottom: '2px', position: 'sticky', top: 30 }}>
                                     <div
-                                          className={`setting-menu-item ${selectedTypeSupervisionPage === PAGE_INDICATORS_MAPPING ? 'active' : ''
-                                                }`}
+                                          className={`setting-menu-item ${
+                                                selectedTypeSupervisionPage === PAGE_INDICATORS_MAPPING ? 'active' : ''
+                                          }`}
                                           onClick={() => handleClickConfigMenu(PAGE_INDICATORS_MAPPING)}
                                     >
                                           {translate('Indicators_Mapping')}
                                     </div>
                                     <div
-                                          className={`setting-menu-item ${selectedTypeSupervisionPage === PAGE_CONFIG_SUPERVISION ? 'active' : ''
-                                                }`}
+                                          className={`setting-menu-item ${
+                                                selectedTypeSupervisionPage === PAGE_CONFIG_SUPERVISION ? 'active' : ''
+                                          }`}
                                           onClick={() => handleClickConfigMenu(PAGE_CONFIG_SUPERVISION)}
                                     >
                                           {translate('Parametre_Supervision')}
                                     </div>
                                     <div
-                                          className={`setting-menu-item ${selectedTypeSupervisionPage === PAGE_CONFIG_VISUALIZATION
+                                          className={`setting-menu-item ${
+                                                selectedTypeSupervisionPage === PAGE_CONFIG_VISUALIZATION
                                                       ? 'active'
                                                       : ''
-                                                }`}
+                                          }`}
                                           onClick={() => handleClickConfigMenu(PAGE_CONFIG_VISUALIZATION)}
                                     >
                                           {translate('Visualizations')}
                                     </div>
                                     <div
-                                          className={`setting-menu-item ${selectedTypeSupervisionPage === PAGE_CONFIG_ANALYSE ? 'active' : ''
-                                                }`}
+                                          className={`setting-menu-item ${
+                                                selectedTypeSupervisionPage === PAGE_CONFIG_ANALYSE ? 'active' : ''
+                                          }`}
                                           onClick={() => handleClickConfigMenu(PAGE_CONFIG_ANALYSE)}
                                     >
                                           {translate('Analyses')}
