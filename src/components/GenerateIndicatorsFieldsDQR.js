@@ -1,8 +1,9 @@
-import { Select } from 'antd';
+import { Input, Select } from 'antd';
 import translate from '../utils/translator';
 import { v4 as uuid } from 'uuid';
+import { TagsInput } from 'react-tag-input-component';
 
-const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
+const GenerateIndicatorsFieldsDQR = ({ formState, setFormState, indicatorRef, recoupementRef }) => {
       return (
             <>
                   <div style={{ marginTop: '10px' }}>
@@ -341,7 +342,6 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                             </div>
                                                       </div>
 
-                                                      <hr />
                                                       <div style={{ marginTop: '5px' }}>
                                                             <div
                                                                   style={{
@@ -364,9 +364,10 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                                   </div>
                                                             </div>
                                                             <div>
-                                                                  <Input
-                                                                        value={ind?.keyWords}
-                                                                        onChange={event => {
+                                                                  <TagsInput
+                                                                        style={{ width: '100%' }}
+                                                                        value={ind?.keyWords || []}
+                                                                        onChange={word => {
                                                                               setFormState({
                                                                                     ...formState,
                                                                                     indicators:
@@ -378,9 +379,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                                                                       ) {
                                                                                                             return {
                                                                                                                   ...i,
-                                                                                                                  keyWords: event
-                                                                                                                        .target
-                                                                                                                        .value
+                                                                                                                  keyWords: word
                                                                                                             };
                                                                                                       }
                                                                                                       return i;

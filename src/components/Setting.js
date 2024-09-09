@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, createRef } from 'react';
 import { Button, Radio, Tab, TabBar } from '@dhis2/ui';
 import {
       AGGREGATE_INDICATOR,
@@ -173,7 +173,7 @@ const Setting = () => {
                               DHIS2MonthlyValue2: null,
                               DHIS2MonthlyValue3: null,
                               programArea: null,
-                              keyWords: ''
+                              keyWords: []
                         });
                   }
 
@@ -184,7 +184,8 @@ const Setting = () => {
                               primaryValue: null,
                               secondaryValue: null,
                               margin: null,
-                              programArea: null
+                              programArea: null,
+                              keyWords: []
                         });
                   }
 
@@ -197,18 +198,22 @@ const Setting = () => {
                               programArea: null
                         });
                   }
+
                   for (let i = 1; i <= +dqrConfig.nbrDataElementCompleteness; i++) {
                         newDataElementCompleteness.push({
                               id: uuid(),
                               position: i,
-                              value: null
+                              value: null,
+                              keyWords: []
                         });
                   }
+
                   for (let i = 1; i <= +dqrConfig.nbrSourceDocumentCompleteness; i++) {
                         newSourceDocumentCompleteness.push({
                               id: uuid(),
                               position: i,
-                              value: null
+                              value: null,
+                              keyWords: []
                         });
                   }
 
@@ -775,6 +780,12 @@ const Setting = () => {
                         },
                         programStageConfigurations: newProgramStageConfigurations.map(p => ({
                               ...p,
+                              indicators: p.indicators?.map(i => {
+                                    return {
+                                          ...i,
+                                          keyWords: indicatorRef.current[i.position]?.value
+                                    };
+                              }),
                               programStage: p.programStage && {
                                     id: p.programStage.id,
                                     displayName: p.programStage.displayName,
@@ -1926,7 +1937,6 @@ const Setting = () => {
       };
 
       const handleEditVisualizations = value => {
-            console.log('Handle visualisation');
             setCurrentVisualizationConfig(value);
             setFavorisItems(value.visualizations);
             setSelectedProgramForVisualization(value.program);
@@ -2018,6 +2028,8 @@ const Setting = () => {
                                                       <GenerateIndicatorsFieldsDQR
                                                             formState={formState}
                                                             setFormState={setFormState}
+                                                            indicatorRef={indicatorRef}
+                                                            recoupementRef={recoupementRef}
                                                       />
                                                 </>
                                           )}
