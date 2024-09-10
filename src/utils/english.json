@@ -300,13 +300,15 @@
     "DHIS2_monthly_value": "DHIS2 monthly value",
     "Visualization_Configurations": "Visualization Configurations",
     "Apply": "Apply",
-    "Element_Name": "Element name ",
+    "Element_Name": "Element name",
     "Prev": "Prev",
     "Next": "Next",
-    "Global_Program_Area":"Global program area",
+    "Global_Program_Area": "Global program area",
     "Use_Indicator_Name_From_Dhis2": "use name from DHIS2",
-    "Indicator_Keys_Word":"Indicator keys word",
-    "Indicator_keys_Word_Help":"Add all indicator keys word by pressing enter keyboard",
-    "Cross_Check_Keys_Word":"Cross check keys word",
-    "Cross_Check_Keys_Word_Help":"Add all cross check keys word by pressing enter keyboard"
+    "Indicator_Keys_Word": "Indicator keys word",
+    "Indicator_keys_Word_Help": "Add all indicator keys word by pressing enter keyboard , this informations is used to replace some text on dashboard and android Side",
+    "Cross_Check_Keys_Word": "Cross check keys word",
+    "Cross_Check_Keys_Word_Help": "Add all cross check keys word by pressing enter keyboard, this informations is used to replace some text on dashboard and android Side",
+    "Keys_Word": "Keys word",
+    "Keys_Word_Help": "Add all keys word by pressing enter keyboard, this informations is used to replace some text on dashboard and android Side "
 }

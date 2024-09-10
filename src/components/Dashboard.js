@@ -724,8 +724,8 @@ export const Dashboard = ({ me }) => {
                                     const tspan = item.querySelector('tspan');
                                     if (tspan) {
                                           const text = tspan.innerHTML;
-                                          const texts = text?.split('-');
-                                          const textsIndex1 = texts?.[0];
+                                          // const texts = text?.split('-');
+                                          // const textsIndex1 = texts?.[0];
 
                                           // Remplacement des noms pour l'indicateur
                                           if (config?.indicators?.length > 0) {
@@ -755,63 +755,74 @@ export const Dashboard = ({ me }) => {
                                           }
 
                                           // Remplacement des noms pour le cross check
-                                          if (
-                                                (textsIndex1?.toLowerCase()?.includes('cross checks') ||
-                                                      textsIndex1?.toLowerCase()?.includes('recoupements')) &&
-                                                textsIndex1?.[1] &&
-                                                config?.recoupements?.length > 0
-                                          ) {
-                                                let index =
-                                                      textsIndex1?.toLowerCase()?.split('cross checks ')?.[1] ||
-                                                      textsIndex1?.toLowerCase()?.split('recoupements ')?.[1];
-                                                const currentRecoupement = config?.recoupements?.find(
-                                                      ind => +ind?.position === +index
-                                                );
 
-                                                const primaryCrosscheckName =
-                                                      currentRecoupement &&
-                                                      output.event?.dataValues?.find(
-                                                            dv =>
-                                                                  dv.dataElement ===
-                                                                  currentRecoupement?.primaryValue?.id
-                                                      )?.value;
+                                          if (config?.recoupements?.length > 0) {
+                                                for (let rec of config?.recoupements) {
+                                                      if (rec.keyWords?.length > 0) {
+                                                            for (let word of rec.keyWords) {
+                                                                  if (text?.trim()?.includes(word.trim())) {
+                                                                        let currentRecoupement = rec;
 
-                                                const secondaryCrosscheckName =
-                                                      currentRecoupement &&
-                                                      output.event?.dataValues?.find(
-                                                            dv =>
-                                                                  dv.dataElement ===
-                                                                  currentRecoupement?.secondaryValue?.id
-                                                      )?.value;
+                                                                        const primaryCrosscheckName =
+                                                                              currentRecoupement &&
+                                                                              output.event?.dataValues?.find(
+                                                                                    dv =>
+                                                                                          dv.dataElement ===
+                                                                                          currentRecoupement
+                                                                                                ?.primaryValue?.id
+                                                                              )?.value;
 
-                                                if (primaryCrosscheckName && secondaryCrosscheckName) {
-                                                      // tspan.innerHTML = `<p style="background : red;">( ${primaryCrosscheckName}:${secondaryCrosscheckName} ) - ${texts?.[1]}</p>`;
-                                                      // tspan.innerHTML = `( ${primaryCrosscheckName}:${secondaryCrosscheckName} ) - ${texts?.[1]}`;
-                                                      // tspan.style.fontSize = '10px'
+                                                                        const secondaryCrosscheckName =
+                                                                              currentRecoupement &&
+                                                                              output.event?.dataValues?.find(
+                                                                                    dv =>
+                                                                                          dv.dataElement ===
+                                                                                          currentRecoupement
+                                                                                                ?.secondaryValue?.id
+                                                                              )?.value;
 
-                                                      if (foundElementLegend) {
-                                                            const legendHighChartParent =
-                                                                  foundElement.contentWindow?.document?.body?.querySelector(
-                                                                        '.highcharts-legend'
-                                                                  );
-                                                            if (legendHighChartParent) {
-                                                                  // legendHighChartParent.style.display = 'none'
-                                                            }
+                                                                        if (
+                                                                              primaryCrosscheckName &&
+                                                                              secondaryCrosscheckName
+                                                                        ) {
+                                                                              if (foundElementLegend) {
+                                                                                    const legendHighChartParent =
+                                                                                          foundElement.contentWindow?.document?.body?.querySelector(
+                                                                                                '.highcharts-legend'
+                                                                                          );
 
-                                                            if (legendHighChartParent) {
-                                                                  const elementRect = item.querySelector('rect');
-                                                                  const rectColor = elementRect.getAttribute('fill');
+                                                                                    if (legendHighChartParent) {
+                                                                                          const elementRect =
+                                                                                                item.querySelector(
+                                                                                                      'rect'
+                                                                                                );
+                                                                                          const rectColor =
+                                                                                                elementRect.getAttribute(
+                                                                                                      'fill'
+                                                                                                );
 
-                                                                  let legendContent = document.createElement('div');
-                                                                  legendContent.innerHTML = `<div style="font-size: 12px; display: flex; align-items: center;">
+                                                                                          let legendContent =
+                                                                                                document.createElement(
+                                                                                                      'div'
+                                                                                                );
+                                                                                          legendContent.innerHTML = `<div style="font-size: 12px; display: flex; align-items: center;">
                                                             <span style="background : ${
                                                                   rectColor || '#ccc'
                                                             }; border-radius: 50px; height: 10px; width: 10px;margin-right: 5px;"></span>
-                                                             <span> ${primaryCrosscheckName} / ${secondaryCrosscheckName}  - ${
-                                                                        texts?.[1]
-                                                                  }</span>
+                                                             <span> ${text.replaceAll(
+                                                                   word,
+                                                                   primaryCrosscheckName +
+                                                                         ' / ' +
+                                                                         secondaryCrosscheckName
+                                                             )}</span>
                                                             </div>`;
-                                                                  foundElementLegend.appendChild(legendContent);
+                                                                                          foundElementLegend.appendChild(
+                                                                                                legendContent
+                                                                                          );
+                                                                                    }
+                                                                              }
+                                                                        }
+                                                                  }
                                                             }
                                                       }
                                                 }

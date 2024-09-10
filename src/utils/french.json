@@ -306,7 +306,9 @@
     "Global_Program_Area": "Domaine de programme global",
     "Use_Indicator_Name_From_Dhis2": "Utiliser nom du DHIS2",
     "Indicator_Keys_Word": "Mots clés des indicateurs",
-    "Indicator_keys_Word_Help": "Ajouter tous les mots clés des indicateurs en appuyant sur la touche entrée",
+    "Indicator_keys_Word_Help": "Ajouter tous les mots clés des indicateurs en appuyant sur la touche entrée, ses informations seront utilisées au niveau du tableau de bord et du côté android pour le changement des noms des éléments",
     "Cross_Check_Keys_Word": "Mots clés des recoupements",
-    "Cross_Check_Keys_Word_Help": "Ajouter tous les mots clés des recoupements en appuyant sur la touche entrée"
+    "Cross_Check_Keys_Word_Help": "Ajouter tous les mots clés des recoupements en appuyant sur la touche entrée,ses informations seront utilisées au niveau du tableau de bord et du côté android pour le changement des noms des éléments",
+    "Keys_Word": "Mots clés",
+    "Keys_Word_Help": "Ajouter tous les mots clés en appuyant sur la touche entrée , ses informations seront utilisées au niveau du tableau de bord et du côté android pour le changement des noms des éléments"
 }
