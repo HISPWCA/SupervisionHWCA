@@ -310,5 +310,8 @@
     "Cross_Check_Keys_Word": "Mots clés des recoupements",
     "Cross_Check_Keys_Word_Help": "Ajouter tous les mots clés des recoupements en appuyant sur la touche entrée,ses informations seront utilisées au niveau du tableau de bord et du côté android pour le changement des noms des éléments",
     "Keys_Word": "Mots clés",
-    "Keys_Word_Help": "Ajouter tous les mots clés en appuyant sur la touche entrée , ses informations seront utilisées au niveau du tableau de bord et du côté android pour le changement des noms des éléments"
+    "Keys_Word_Help": "Ajouter tous les mots clés en appuyant sur la touche entrée , ses informations seront utilisées au niveau du tableau de bord et du côté android pour le changement des noms des éléments",
+    "Keys_Word_Month1": "Mots clés Mois 1",
+    "Keys_Word_Month2": "Mots clés Mois 2",
+    "Keys_Word_Month4": "Mots clés Mois 3"
 }

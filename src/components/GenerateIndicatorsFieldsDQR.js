@@ -1184,42 +1184,48 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                                         }}
                                                                   />
                                                             </div>
-                                                      </div>
-                                                ))}
-
-                                                <div style={{ marginTop: '5px' }}>
-                                                      <div
-                                                            style={{
-                                                                  marginBottom: '5px'
-                                                            }}
-                                                      >
-                                                            <div>{`${translate('Keys_Word')}`}</div>
-
-                                                            <div
-                                                                  style={{
-                                                                        color: '#00000090',
-                                                                        margin: '5px 0px'
-                                                                  }}
-                                                            >
-                                                                  {`${translate('Keys_Word_Help')}`}
+                                                            <div style={{ marginTop: '5px' }}>
+                                                                  <div
+                                                                        style={{
+                                                                              marginBottom: '5px'
+                                                                        }}
+                                                                  >
+                                                                        <div>{`${translate('Keys_Word')} ${
+                                                                              indexItem + 1
+                                                                        }`}</div>
+                                                                  </div>
+                                                                  <div>
+                                                                        <TagsInput
+                                                                              style={{ width: '100%' }}
+                                                                              value={item?.keyWords}
+                                                                              onChange={word => {
+                                                                                    setFormState({
+                                                                                          ...formState,
+                                                                                          completeness: {
+                                                                                                ...formState?.completeness,
+                                                                                                dataElements:
+                                                                                                      formState?.completeness?.dataElements?.map(
+                                                                                                            i => {
+                                                                                                                  if (
+                                                                                                                        i.id ===
+                                                                                                                        item.id
+                                                                                                                  ) {
+                                                                                                                        return {
+                                                                                                                              ...i,
+                                                                                                                              keyWords: word
+                                                                                                                        };
+                                                                                                                  }
+                                                                                                                  return i;
+                                                                                                            }
+                                                                                                      )
+                                                                                          }
+                                                                                    });
+                                                                              }}
+                                                                        />
+                                                                  </div>
                                                             </div>
                                                       </div>
-                                                      <div>
-                                                            <TagsInput
-                                                                  style={{ width: '100%' }}
-                                                                  value={formState?.completeness?.keyWordsDE || []}
-                                                                  onChange={word => {
-                                                                        setFormState({
-                                                                              ...formState,
-                                                                              completeness: {
-                                                                                    ...formState?.completeness,
-                                                                                    keyWordsDE: word || []
-                                                                              }
-                                                                        });
-                                                                  }}
-                                                            />
-                                                      </div>
-                                                </div>
+                                                ))}
                                           </td>
                                           <td
                                                 style={{
@@ -1332,42 +1338,49 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                                         }}
                                                                   />
                                                             </div>
-                                                      </div>
-                                                ))}
 
-                                                <div style={{ marginTop: '5px' }}>
-                                                      <div
-                                                            style={{
-                                                                  marginBottom: '5px'
-                                                            }}
-                                                      >
-                                                            <div>{`${translate('Keys_Word')}`}</div>
-
-                                                            <div
-                                                                  style={{
-                                                                        color: '#00000090',
-                                                                        margin: '5px 0px'
-                                                                  }}
-                                                            >
-                                                                  {`${translate('Keys_Word_Help')}`}
+                                                            <div style={{ marginTop: '5px' }}>
+                                                                  <div
+                                                                        style={{
+                                                                              marginBottom: '5px'
+                                                                        }}
+                                                                  >
+                                                                        <div>{`${translate('Keys_Word')} ${
+                                                                              indexItem + 1
+                                                                        }`}</div>
+                                                                  </div>
+                                                                  <div>
+                                                                        <TagsInput
+                                                                              style={{ width: '100%' }}
+                                                                              value={item?.keyWords}
+                                                                              onChange={word => {
+                                                                                    setFormState({
+                                                                                          ...formState,
+                                                                                          completeness: {
+                                                                                                ...formState?.completeness,
+                                                                                                sourceDocuments:
+                                                                                                      formState?.completeness?.sourceDocuments?.map(
+                                                                                                            i => {
+                                                                                                                  if (
+                                                                                                                        i.id ===
+                                                                                                                        item.id
+                                                                                                                  ) {
+                                                                                                                        return {
+                                                                                                                              ...i,
+                                                                                                                              keyWords: word
+                                                                                                                        };
+                                                                                                                  }
+                                                                                                                  return i;
+                                                                                                            }
+                                                                                                      )
+                                                                                          }
+                                                                                    });
+                                                                              }}
+                                                                        />
+                                                                  </div>
                                                             </div>
                                                       </div>
-                                                      <div>
-                                                            <TagsInput
-                                                                  style={{ width: '100%' }}
-                                                                  value={formState?.completeness?.keyWordsDOC || []}
-                                                                  onChange={word => {
-                                                                        setFormState({
-                                                                              ...formState,
-                                                                              completeness: {
-                                                                                    ...formState?.completeness,
-                                                                                    keyWordsDOC: word || []
-                                                                              }
-                                                                        });
-                                                                  }}
-                                                            />
-                                                      </div>
-                                                </div>
+                                                ))}
                                           </td>
                                           <td
                                                 style={{

@@ -1761,11 +1761,16 @@ const Supervision = ({ me }) => {
 
       const updatePeriodsConfigs = async periodPayload => {
             try {
-                  let configList = await loadDataStore(process.env.REACT_APP_PERIODS_CONFIG_KEY, null, null, null);
-                  if (configList && periodPayload) {
-                        configList = [periodPayload, ...configList];
+                  let configPayload = (await loadDataStore(
+                        process.env.REACT_APP_PERIODS_CONFIG_KEY,
+                        null,
+                        null,
+                        null
+                  )) || { periods: [], month1KeyWords: [], month2KeyWords: [], month3KeyWords: [] };
+                  if (configPayload && periodPayload) {
+                        configPayload = { ...configPayload, periods: [...configPayload.periods, periodPayload] };
                   }
-                  await saveDataToDataStore(process.env.REACT_APP_PERIODS_CONFIG_KEY, configList, null, null, null);
+                  await saveDataToDataStore(process.env.REACT_APP_PERIODS_CONFIG_KEY, configPayload, null, null, null);
             } catch (err) {}
       };
 

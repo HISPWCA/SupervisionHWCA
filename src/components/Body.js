@@ -56,7 +56,12 @@ export const Body = () => {
                   await loadDataStore(process.env.REACT_APP_DE_COMPLETNESS_KEY, null, null, []);
                   await loadDataStore(process.env.REACT_APP_INDICATORS_MAPPING_KEY, null, null, []);
                   await loadDataStore(process.env.REACT_APP_DS_COMPLETNESS_KEY, null, null, []);
-                  await loadDataStore(process.env.REACT_APP_PERIODS_CONFIG_KEY, null, null, []);
+                  await loadDataStore(process.env.REACT_APP_PERIODS_CONFIG_KEY, null, null, {
+                        periods: [],
+                        month1KeyWords: [],
+                        month2KeyWords: [],
+                        month3KeyWords: []
+                  });
                   await loadDataStore(process.env.REACT_APP_GLOBAL_SETTING_KEY, null, null, {
                         DQR: {
                               nbrIndicator: 5,

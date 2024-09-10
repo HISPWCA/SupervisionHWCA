@@ -305,10 +305,13 @@
     "Next": "Next",
     "Global_Program_Area": "Global program area",
     "Use_Indicator_Name_From_Dhis2": "use name from DHIS2",
-    "Indicator_Keys_Word": "Indicator keys word",
-    "Indicator_keys_Word_Help": "Add all indicator keys word by pressing enter keyboard , this informations is used to replace some text on dashboard and android Side",
-    "Cross_Check_Keys_Word": "Cross check keys word",
-    "Cross_Check_Keys_Word_Help": "Add all cross check keys word by pressing enter keyboard, this informations is used to replace some text on dashboard and android Side",
-    "Keys_Word": "Keys word",
-    "Keys_Word_Help": "Add all keys word by pressing enter keyboard, this informations is used to replace some text on dashboard and android Side "
+    "Indicator_Keys_Word": "Indicator Key words",
+    "Indicator_keys_Word_Help": "Add all indicator Key words by pressing enter keyboard , this informations is used to replace some text on dashboard and android Side",
+    "Cross_Check_Keys_Word": "Cross check Key words",
+    "Cross_Check_Keys_Word_Help": "Add all cross check Key words by pressing enter keyboard, this informations is used to replace some text on dashboard and android Side",
+    "Keys_Word": "Key words",
+    "Keys_Word_Help": "Add all Key words by pressing enter keyboard, this informations is used to replace some text on dashboard and android Side ",
+    "Keys_Word_Month1":"Key Words Month 1",
+    "Keys_Word_Month2":"Key Words Month 2",
+    "Keys_Word_Month4":"Key Words Month 3"
 }
