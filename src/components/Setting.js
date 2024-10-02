@@ -1293,7 +1293,7 @@ const Setting = () => {
                         isFieldEditingMode: true
                   });
 
-                  setPeriodFormState(periodFormState);
+                  setPeriodFormState(dataStorePeriodConfigs);
                   await loadProgramStages(prog?.program?.id);
 
                   setProgramStageConfigurations(prog.programStageConfigurations || []);
@@ -1786,7 +1786,7 @@ const Setting = () => {
                                                                                     width: '50%'
                                                                               }}
                                                                         >
-                                                                              {translate('Keys_Word_Month2')}
+                                                                              {translate('Keys_Word_Month3')}
                                                                         </td>
                                                                         <td
                                                                               style={{
