@@ -1,12 +1,13 @@
 import { Input, Select } from 'antd';
 import translate from '../utils/translator';
 import { v4 as uuid } from 'uuid';
+import { useState } from 'react';
 
 const GenerateIndicatorsConfigFieldsList = ({
       indicatorsFieldsConfigs,
-      selectedProgramStageForConfiguration,
       setIndicatorsFieldsConfigs,
-      selectedConfigurationType
+      setFormStateForRDQA,
+      formStateForRDQA
 }) => {
       return (
             <table style={{ borderCollapse: 'collapse', width: '100%' }}>
@@ -35,7 +36,7 @@ const GenerateIndicatorsConfigFieldsList = ({
                         </tr>
                   </thead>
                   <tbody>
-                        {indicatorsFieldsConfigs.map((ind, indexInd) => (
+                        {indicatorsFieldsConfigs?.map((ind, indexInd) => (
                               <tr key={uuid()}>
                                     <td
                                           style={{
@@ -57,7 +58,7 @@ const GenerateIndicatorsConfigFieldsList = ({
                                                       style={{
                                                             width: '307px'
                                                       }}
-                                                      options={selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                      options={formStateForRDQA?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
                                                             progStageDE => ({
                                                                   label: progStageDE.dataElement?.displayName,
                                                                   value: progStageDE.dataElement?.id
@@ -73,7 +74,7 @@ const GenerateIndicatorsConfigFieldsList = ({
                                                                         if (ind.id === i.id) {
                                                                               return {
                                                                                     ...i,
-                                                                                    value: selectedProgramStageForConfiguration?.programStageDataElements?.find(
+                                                                                    value: formStateForRDQA?.selectedProgramStageForConfiguration?.programStageDataElements?.find(
                                                                                           p =>
                                                                                                 p.dataElement.id ===
                                                                                                 value
@@ -87,54 +88,7 @@ const GenerateIndicatorsConfigFieldsList = ({
                                                 />
                                           </div>
 
-                                          {selectedConfigurationType === 'DQR' && (
-                                                <div style={{ marginTop: '15px' }}>
-                                                      <div>{`${translate('Marge')} ${indexInd + 1}`}</div>
-                                                      <div
-                                                            style={{
-                                                                  marginTop: '5px'
-                                                            }}
-                                                      >
-                                                            <Select
-                                                                  placeholder={`${translate('Marge')} ${indexInd + 1}`}
-                                                                  style={{
-                                                                        width: '307px'
-                                                                  }}
-                                                                  options={selectedProgramStageForConfiguration?.programStageDataElements?.map(
-                                                                        progStageDE => ({
-                                                                              label: progStageDE.dataElement
-                                                                                    ?.displayName,
-                                                                              value: progStageDE.dataElement?.id
-                                                                        })
-                                                                  )}
-                                                                  showSearch
-                                                                  allowClear
-                                                                  optionFilterProp="label"
-                                                                  value={ind?.indicatorMargin?.id}
-                                                                  onSelect={value => {
-                                                                        setIndicatorsFieldsConfigs(
-                                                                              indicatorsFieldsConfigs.map(i => {
-                                                                                    if (i.id === ind.id) {
-                                                                                          return {
-                                                                                                ...i,
-                                                                                                indicatorMargin:
-                                                                                                      selectedProgramStageForConfiguration?.programStageDataElements?.find(
-                                                                                                            p =>
-                                                                                                                  p
-                                                                                                                        .dataElement
-                                                                                                                        .id ===
-                                                                                                                  value
-                                                                                                      )?.dataElement
-                                                                                          };
-                                                                                    }
-                                                                                    return i;
-                                                                              })
-                                                                        );
-                                                                  }}
-                                                            />
-                                                      </div>
-                                                </div>
-                                          )}
+                                         
                                     </td>
                                     <td
                                           style={{
@@ -164,7 +118,7 @@ const GenerateIndicatorsConfigFieldsList = ({
                                                                   style={{
                                                                         width: '307px'
                                                                   }}
-                                                                  options={selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                  options={formStateForRDQA?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
                                                                         progStageDE => ({
                                                                               label: progStageDE.dataElement
                                                                                     ?.displayName,
@@ -194,7 +148,7 @@ const GenerateIndicatorsConfigFieldsList = ({
                                                                                                                         ) {
                                                                                                                               return {
                                                                                                                                     ...recoupement,
-                                                                                                                                    value: selectedProgramStageForConfiguration?.programStageDataElements?.find(
+                                                                                                                                    value: formStateForRDQA?.selectedProgramStageForConfiguration?.programStageDataElements?.find(
                                                                                                                                           p =>
                                                                                                                                                 p
                                                                                                                                                       .dataElement
@@ -219,54 +173,6 @@ const GenerateIndicatorsConfigFieldsList = ({
                                                 </div>
                                           ))}
 
-                                          {selectedConfigurationType === 'DQR' && (
-                                                <div style={{ marginTop: '15px' }}>
-                                                      <div>{`${translate('Marge')} ${indexInd + 1}`}</div>
-                                                      <div
-                                                            style={{
-                                                                  marginTop: '5px'
-                                                            }}
-                                                      >
-                                                            <Select
-                                                                  placeholder={`${translate('Marge')} ${indexInd + 1}`}
-                                                                  style={{
-                                                                        width: '307px'
-                                                                  }}
-                                                                  options={selectedProgramStageForConfiguration?.programStageDataElements?.map(
-                                                                        progStageDE => ({
-                                                                              label: progStageDE.dataElement
-                                                                                    ?.displayName,
-                                                                              value: progStageDE.dataElement?.id
-                                                                        })
-                                                                  )}
-                                                                  showSearch
-                                                                  allowClear
-                                                                  optionFilterProp="label"
-                                                                  value={ind?.recoupementMargin?.id}
-                                                                  onSelect={value => {
-                                                                        setIndicatorsFieldsConfigs(
-                                                                              indicatorsFieldsConfigs.map(i => {
-                                                                                    if (i.id === ind.id) {
-                                                                                          return {
-                                                                                                ...i,
-                                                                                                recoupementMargin:
-                                                                                                      selectedProgramStageForConfiguration?.programStageDataElements?.find(
-                                                                                                            p =>
-                                                                                                                  p
-                                                                                                                        .dataElement
-                                                                                                                        .id ===
-                                                                                                                  value
-                                                                                                      )?.dataElement
-                                                                                          };
-                                                                                    }
-                                                                                    return i;
-                                                                              })
-                                                                        );
-                                                                  }}
-                                                            />
-                                                      </div>
-                                                </div>
-                                          )}
                                     </td>
                               </tr>
                         ))}

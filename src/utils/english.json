@@ -255,8 +255,8 @@
     "SelectVisualizations": "Select Visualizataions",
     "SelectMaps": "Select Maps",
     "Favoris": "Favorite",
-    "Configuration_RDQe_Case": "Configuration for eRDQ Case ",
-    "Configuration_DQe_Case": "Configuration for DQR Case ",
+    "Configuration_RDQA_Case": "Configuration for RDQA Case ",
+    "Configuration_DQR_Case": "Configuration for DQR Case ",
     "Program_Stage_Configuration_Fields_For_Recoupement_And_Indicator": "Fields Indicators and Cross check configuration ",
     "Recoupements": "Cross Check",
     "NumberOfIndicators": "Number of indicators",
@@ -311,7 +311,7 @@
     "Cross_Check_Keys_Word_Help": "Add all cross check Key words by pressing enter keyboard, this informations is used to replace some text on dashboard and android Side",
     "Keys_Word": "Key words",
     "Keys_Word_Help": "Add all Key words by pressing enter keyboard, this informations is used to replace some text on dashboard and android Side ",
-    "Keys_Word_Month1":"Key Words Month 1",
-    "Keys_Word_Month2":"Key Words Month 2",
-    "Keys_Word_Month3":"Key Words Month 3"
+    "Keys_Word_Month1": "Key Words Month 1",
+    "Keys_Word_Month2": "Key Words Month 2",
+    "Keys_Word_Month3": "Key Words Month 3"
 }
