@@ -3,7 +3,7 @@ import translate from '../utils/translator';
 import { v4 as uuid } from 'uuid';
 import { useState } from 'react';
 
-const GenerateIndicatorsConfigFieldsList = ({
+const GenerateIndicatorsFieldsRDQA = ({
       indicatorsFieldsConfigsForRDQA,
       setIndicatorsFieldsConfigsForRDQA,
       formStateForRDQA
@@ -180,4 +180,4 @@ const GenerateIndicatorsConfigFieldsList = ({
       );
 };
 
-export default GenerateIndicatorsConfigFieldsList;
+export default GenerateIndicatorsFieldsRDQA;

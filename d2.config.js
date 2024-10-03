@@ -1,8 +1,8 @@
 const config = {
       type: 'app',
-      name: 'Supervision-v2',
-      title: 'Supervision-v2',
-      description: 'Supervision-v2 App  ',
+      name: 'Supervision-v3',
+      title: 'Supervision-v3',
+      description: 'Supervision-v3 App',
       entryPoints: {
             app: './src/App.js'
       }
