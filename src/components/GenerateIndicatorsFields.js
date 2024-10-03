@@ -4,9 +4,8 @@ import { v4 as uuid } from 'uuid';
 import { useState } from 'react';
 
 const GenerateIndicatorsConfigFieldsList = ({
-      indicatorsFieldsConfigs,
-      setIndicatorsFieldsConfigs,
-      setFormStateForRDQA,
+      indicatorsFieldsConfigsForRDQA,
+      setIndicatorsFieldsConfigsForRDQA,
       formStateForRDQA
 }) => {
       return (
@@ -36,7 +35,7 @@ const GenerateIndicatorsConfigFieldsList = ({
                         </tr>
                   </thead>
                   <tbody>
-                        {indicatorsFieldsConfigs?.map((ind, indexInd) => (
+                        {indicatorsFieldsConfigsForRDQA?.map((ind, indexInd) => (
                               <tr key={uuid()}>
                                     <td
                                           style={{
@@ -69,8 +68,8 @@ const GenerateIndicatorsConfigFieldsList = ({
                                                       optionFilterProp="label"
                                                       value={ind?.value?.id}
                                                       onSelect={value => {
-                                                            setIndicatorsFieldsConfigs(
-                                                                  indicatorsFieldsConfigs.map((i, indexi) => {
+                                                            setIndicatorsFieldsConfigsForRDQA(
+                                                                  indicatorsFieldsConfigsForRDQA.map((i, indexi) => {
                                                                         if (ind.id === i.id) {
                                                                               return {
                                                                                     ...i,
@@ -133,8 +132,8 @@ const GenerateIndicatorsConfigFieldsList = ({
                                                                               ?.value?.id
                                                                   }
                                                                   onSelect={value => {
-                                                                        setIndicatorsFieldsConfigs(
-                                                                              indicatorsFieldsConfigs.map(
+                                                                        setIndicatorsFieldsConfigsForRDQA(
+                                                                              indicatorsFieldsConfigsForRDQA.map(
                                                                                     (i, indexj) => {
                                                                                           if (i.id === ind.id) {
                                                                                                 return {

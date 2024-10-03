@@ -19,7 +19,6 @@ import {
       AGENT,
       PAGE_CONFIG_VISUALIZATION,
       DQR,
-      ERDQ,
       PAGE_INDICATORS_MAPPING,
       RDQA
 } from '../utils/constants';
@@ -256,11 +255,10 @@ const Setting = () => {
 
 
       const initFieldsForRDQA = () => {
+
             if (!currentProgramstageConfigurationForRDQA && !formStateForRDQA?.isFieldEditingMode) {
                   const newList = [];
                   const rdqaConfig = dataStoreGlobalSettings["ERDQ"];
-
-                  console.log("rdqaConfig: ", rdqaConfig )
 
                   if (rdqaConfig?.nbrIndicator && rdqaConfig?.nbrRecoupement) {
 
@@ -781,7 +779,7 @@ const Setting = () => {
                   if (!formState?.selectedProgramStageForConfiguration)
                         throw new Error(translate('Please_Select_Program_Stage'));
 
-                  if (!formState?.selectedOrganisationUnitGroup && formState?.selectedConfigurationType === ERDQ)
+                  if (!formState?.selectedOrganisationUnitGroup && formState?.selectedConfigurationType === RDQA)
                         throw new Error(translate('Please_Select_Organisation_Unit_Group'));
 
                   if (formState?.selectedSupervisorDataElements?.length === 0)
@@ -1354,8 +1352,8 @@ const Setting = () => {
                                                                   selectedConfigurationType: value
                                                             })
                                                       }
-                                                      value={ERDQ}
-                                                      checked={formState?.selectedConfigurationType === ERDQ}
+                                                      value={RDQA}
+                                                      checked={formState?.selectedConfigurationType === RDQA}
                                                 />
                                           </div>
                                           <div style={{ marginTop: '5px' }}>
@@ -2100,9 +2098,8 @@ const Setting = () => {
                                                       selectedProgramStageForConfiguration={
                                                             formStateForRDQA?.selectedProgramStageForConfiguration
                                                       }
-                                                      indicatorsFieldsConfigs={indicatorsFieldsConfigs}
-                                                      setIndicatorsFieldsConfigs={setIndicatorsFieldsConfigs}
-                                                      setFormStateForRDQA={setFormStateForRDQA}
+                                                      indicatorsFieldsConfigsForRDQA={indicatorsFieldsConfigsForRDQA}
+                                                      setIndicatorsFieldsConfigsForRDQA={setIndicatorsFieldsConfigsForRDQA}
                                                       formStateForRDQA={formStateForRDQA}
                                                 />
                                           </>
@@ -2337,12 +2334,15 @@ const Setting = () => {
                                                             </>
                                                       ) : (
                                                             <>
-                                                                  {
-                                                                        JSON.stringify(indicatorsFieldsConfigsForRDQA, null, 4)
-                                                                  }
+
                                                                   {RenderProgramStageConfigurationForRDQA()}
                                                                   {RenderIndicatorAndRecoupementConfigFieldsForRDQA()}
                                                                   {/* {RenderSaveConfigurationButtonForRDQA()} */}
+                                                                  <pre>
+                                                                        {
+                                                                              JSON.stringify(indicatorsFieldsConfigsForRDQA, null, 4)
+                                                                        }
+                                                                  </pre>
                                                             </>
                                                       )
                                                 }
@@ -3666,10 +3666,6 @@ const Setting = () => {
 
       useEffect(() => {
             if (dataStoreGlobalSettings) {
-
-                  console.log("dataStoreGlobalSettings: ", dataStoreGlobalSettings)
-
-                  console.log("formState?.selectedConfigurationType: ", formState?.selectedConfigurationType)
 
                   formState?.selectedConfigurationType === DQR && initFields();
                   formState?.selectedConfigurationType === RDQA && initFieldsForRDQA();
