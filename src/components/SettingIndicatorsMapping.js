@@ -173,7 +173,6 @@ const SettingIndicatorsMapping = () => {
 
       return (
             <>
-                  {console.log(formState)}
                   <Card className="my-shadow" size="small" style={{ minWidth: '100%' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                               <div style={{ fontWeight: 'bold' }}>{translate('Indicators_Mapping')}</div>

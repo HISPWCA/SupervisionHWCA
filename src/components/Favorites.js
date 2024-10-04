@@ -65,6 +65,13 @@ const Favorites = ({ me }) => {
             type: null
       });
 
+      const [localFormState, setLocalFormState] = useState({
+            visibleAnalyticComponentModal: false,
+            currentIndicator: null,
+            currentRecoupement: null,
+            selectedMetaDatas: []
+      });
+
       const [selectedTypeSource, setSelectedTypeSource] = useState('DHIS2');
 
       const [dataStoreCrosschecks, setDataStoreCrosschecks] = useState([]);
@@ -1062,9 +1069,10 @@ const Favorites = ({ me }) => {
             </div>
       );
 
+
       const RenderContent = () => (
             <div>
-                  {RenderTitle()}
+                  <RenderTitle />
                   <div style={{ marginTop: '10px', padding: '10px' }}>
                         <Row gutter={[12, 12]}>
                               <Col sm={24} md={6}>
@@ -1090,7 +1098,6 @@ const Favorites = ({ me }) => {
                                           formState?.selectedProgram?.configurationType === RDQA && (
                                                 <FavoriteGenerateIndicatorsFieldsRDQA
                                                       formState={formState}
-                                                      setFormState={setFormState}
                                                       indicatorFieldsForRDQA={indicatorFieldsForRDQA}
                                                       setIndicatorFieldsForRDQA={setIndicatorFieldsForRDQA}
                                                 />
@@ -1100,6 +1107,81 @@ const Favorites = ({ me }) => {
                   </div>
             </div>
       );
+
+      // const RenderAnalyticComponentModalForRDQA = () =>
+      //       localFormState?.visibleAnalyticComponentModal ? (
+      //             <Modal
+      //                   onClose={() =>
+      //                         setLocalFormState({
+      //                               ...localFormState,
+      //                               visibleAnalyticComponentModal: false,
+      //                               currentIndicator: null,
+      //                               currentRecoupement: null,
+      //                               selectedMetaDatas: []
+      //                         })
+      //                   }
+      //                   large
+      //             >
+      //                   <ModalTitle>
+      //                         <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
+      //                               {translate('Source_De_Donnee')}
+      //                         </div>
+      //                   </ModalTitle>
+      //                   <ModalContent>
+      //                         {!localFormState?.currentIndicator && <div>Error no data </div>}
+      //                         {localFormState?.currentIndicator && (
+      //                               <div style={{ padding: '20px', border: '1px solid #ccc' }}>
+      //                                     <DataDimension
+      //                                           selectedDimensions={localFormState?.selectedMetaDatas?.map(it => ({
+      //                                                 ...it
+      //                                           }))}
+      //                                           onSelect={value => {
+      //                                                 setLocalFormState({
+      //                                                       ...localFormState,
+      //                                                       selectedMetaDatas:
+      //                                                             value?.items?.length > 0 ? [value.items[0]] : []
+      //                                                 });
+      //                                           }}
+      //                                           displayNameProp="displayName"
+      //                                     />
+      //                               </div>
+      //                         )}
+      //                   </ModalContent>
+      //                   <ModalActions>
+      //                         <ButtonStrip end>
+      //                               <Button
+      //                                     primary
+      //                                     onClick={() => {
+      //                                           //   formState?.indicators?.map(ind => {
+      //                                           //         if (
+      //                                           //               ind.group === formState?.currentIndicator?.group &&
+      //                                           //               ind.indicator === formState?.currentIndicator?.indicator
+      //                                           //         ) {
+      //                                           //               return {
+      //                                           //                     ...ind,
+      //                                           //                     dhis2: formState?.selectedMetaDatas[0]
+      //                                           //               };
+      //                                           //         }
+      //                                           //         return ind;
+      //                                           //   }) || [];
+      //                                           setLocalFormState({
+      //                                                 ...formState,
+      //                                                 visibleAnalyticComponentModal: false,
+      //                                                 selectedMetaDatas: [],
+      //                                                 currentIndicator: null
+      //                                           });
+      //                                     }}
+      //                                     icon={<FiSave style={{ fontSize: '18px' }} />}
+      //                               >
+      //                                     {translate('Enregistrer')}
+      //                               </Button>
+      //                         </ButtonStrip>
+      //                   </ModalActions>
+      //             </Modal>
+      //       ) : (
+      //             <></>
+      //       );
+
       const RenderAnalyticComponentModal = () =>
             visibleAnalyticComponentModal ? (
                   <Modal onClose={() => handleCancelAnalyticComponentModal()} large>
@@ -1288,6 +1370,7 @@ const Favorites = ({ me }) => {
                   {RenderAddFavoritBackgroundInformationModal()}
                   {RenderAnalyticComponentModal()}
                   {RenderAnalyticComponentModalForRecoupement()}
+                  {/* {RenderAnalyticComponentModalForRDQA()} */}
                   <MyNotification notification={notification} setNotification={setNotification} />
             </>
       );

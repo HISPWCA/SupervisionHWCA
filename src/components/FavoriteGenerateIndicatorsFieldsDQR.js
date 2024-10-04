@@ -152,7 +152,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                           {formState?.indicators
                                                 ?.slice(0, formState?.nbrIndicatorsToShow)
                                                 ?.map((indicator, indIndex) => (
-                                                      <tr key={uuid()}>
+                                                      <tr key={indIndex}>
                                                             <td
                                                                   style={{
                                                                         padding: '2px 5px',
@@ -395,7 +395,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                     </thead>
                                     <tbody>
                                           {formState?.recoupements?.map((rec, recIndex) => (
-                                                <tr key={uuid()}>
+                                                <tr key={recIndex}>
                                                       <td
                                                             style={{
                                                                   padding: '2px 5px',
@@ -668,7 +668,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                     </thead>
                                     <tbody>
                                           {formState?.consistencyOvertimes?.map((cons, consIndex) => (
-                                                <tr key={uuid()}>
+                                                <tr key={consIndex}>
                                                       <td
                                                             style={{
                                                                   padding: '2px 5px',
@@ -1014,7 +1014,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                       </div>
                                                 </td>
                                           </tr>
-                                          <tr key={uuid()}>
+                                          <tr>
                                                 <td
                                                       style={{
                                                             padding: '2px 5px',
@@ -1035,7 +1035,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                       }}
                                                 >
                                                       {formState?.completeness?.dataElements?.map((de, deIndex) => (
-                                                            <div key={uuid()} style={{ marginTop: '5px' }}>
+                                                            <div key={deIndex} style={{ marginTop: '5px' }}>
                                                                   <Select
                                                                         placeholder={`${translate('Data_Element')} ${
                                                                               deIndex + 1
@@ -1095,7 +1095,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                       }}
                                                 >
                                                       {formState?.completeness?.sourceDocuments?.map((de, deIndex) => (
-                                                            <div key={uuid()} style={{ marginTop: '5px' }}>
+                                                            <div key={deIndex} style={{ marginTop: '5px' }}>
                                                                   <Select
                                                                         placeholder={`${translate('Data_Element')} ${
                                                                               deIndex + 1
