@@ -11,11 +11,13 @@ import MyNotification from './MyNotification';
 import {
       ALL,
       DIRECTE,
+      DQR,
       ELEMENT_GROUP,
       FAVORIS,
       NOTIFICATION_CRITICAL,
       NOTIFICATION_SUCCESS,
-      ORGANISATION_UNIT
+      ORGANISATION_UNIT,
+      RDQA
 } from '../utils/constants';
 
 import { loadDataStore, saveDataToDataStore } from '../utils/functions';
@@ -27,6 +29,7 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import dayjs from 'dayjs';
 import FavoriteGenerateIndicatorsFieldsDQR from './FavoriteGenerateIndicatorsFieldsDQR';
+import FavoriteGenerateIndicatorsFieldsRDQA from './FavoriteGenerateIndicatorsFieldsRDQA';
 
 const Favorites = ({ me }) => {
       const [programStages, setProgramStages] = useState([]);
@@ -74,6 +77,8 @@ const Favorites = ({ me }) => {
       const [selectedCrosscheckChild, setSelectedCrosscheckChild] = useState(null);
       const [visibleAnalyticComponentModalForCrossCheck, setVisibleAnalyticComponentModalForCrossCheck] =
             useState(false);
+
+      const [indicatorFieldsForRDQA, setIndicatorFieldsForRDQA] = useState([]);
 
       const [formState, setFormState] = useState({
             selectedProgram: null,
@@ -188,6 +193,34 @@ const Favorites = ({ me }) => {
                                     existingFormState?.completeness?.selectedSourceProgramAreaDS || null
                         }
                   });
+            }
+      };
+
+      const initFieldsForRDQA = () => {
+            if (formState?.selectedProgram?.configurationType === RDQA) {
+                  const rightProgramStage = formState?.selectedProgram?.programStageConfigurations?.find(
+                        p => p.programStage?.id === formState?.selectedProgramStage?.id
+                  );
+
+                  console.log('found right program stage : ', rightProgramStage);
+
+                  let newIndicatorList = [];
+                  for (let ind of rightProgramStage?.indicatorsFieldsConfigs) {
+                        let newRecoupementList = [];
+                        for (let rec of ind.recoupements) {
+                              newRecoupementList.push({
+                                    ...rec,
+                                    source: null
+                              });
+                        }
+                        newIndicatorList.push({
+                              ...ind,
+                              source: null,
+                              recoupements: newRecoupementList
+                        });
+                  }
+
+                  setIndicatorFieldsForRDQA(newIndicatorList);
             }
       };
 
@@ -1041,17 +1074,27 @@ const Favorites = ({ me }) => {
                                     </div>
                               </Col>
                               <Col sm={24} md={18}>
-                                    {formState?.selectedProgramStage && (
-                                          <FavoriteGenerateIndicatorsFieldsDQR
-                                                formState={formState}
-                                                setFormState={setFormState}
-                                                dataStoreIndicators={dataStoreIndicators}
-                                                dataStoreCrosschecks={dataStoreCrosschecks}
-                                                dataStoreDECompletness={dataStoreDECompletness}
-                                                dataStoreDSCompletness={dataStoreDSCompletness}
-                                          />
-                                    )}
-                                    {/* {selectedProgram && RenderDataElementConfigList()} */}
+                                    {formState?.selectedProgramStage &&
+                                          formState?.selectedProgram?.configurationType === DQR && (
+                                                <FavoriteGenerateIndicatorsFieldsDQR
+                                                      formState={formState}
+                                                      setFormState={setFormState}
+                                                      dataStoreIndicators={dataStoreIndicators}
+                                                      dataStoreCrosschecks={dataStoreCrosschecks}
+                                                      dataStoreDECompletness={dataStoreDECompletness}
+                                                      dataStoreDSCompletness={dataStoreDSCompletness}
+                                                />
+                                          )}
+
+                                    {formState?.selectedProgramStage &&
+                                          formState?.selectedProgram?.configurationType === RDQA && (
+                                                <FavoriteGenerateIndicatorsFieldsRDQA
+                                                      formState={formState}
+                                                      setFormState={setFormState}
+                                                      indicatorFieldsForRDQA={indicatorFieldsForRDQA}
+                                                      setIndicatorFieldsForRDQA={setIndicatorFieldsForRDQA}
+                                                />
+                                          )}
                               </Col>
                         </Row>
                   </div>
@@ -1235,6 +1278,7 @@ const Favorites = ({ me }) => {
       useEffect(() => {
             if (formState?.selectedProgramStage) {
                   initFields();
+                  initFieldsForRDQA();
             }
       }, [formState?.selectedProgramStage]);
 
