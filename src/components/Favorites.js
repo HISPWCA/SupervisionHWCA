@@ -235,6 +235,7 @@ const Favorites = ({ me }) => {
             setFormState({
                   ...formState,
                   selectedProgram: sup,
+                  selectedBackgroundInformationFavorit: null,
                   selectedProgramStage:
                         sup.programStageConfigurations?.length === 0
                               ? programStages.find(
@@ -281,13 +282,34 @@ const Favorites = ({ me }) => {
             }
       };
 
-      const handleChangeSelectionTypeConfigurationForBackgroundInformation = ({ value }) => {
+      const cleanAllStates = () => {
             setFormState({
-                  ...formState,
-                  selectedBackgroundInformationTypeConfiguration: value,
+                  selectedProgram: null,
                   selectedProgramStage: null,
-                  selectedBackgroundInformationFavorit: null
+                  selectedBackgroundInformationTypeConfiguration: DIRECTE,
+                  selectedBackgroundInformationFavorit: null,
+                  inputFavorisNameForBackgroundInforation: '',
+                  selectedGlobalProgramArea: null,
+                  nbrIndicatorsToShow: 0,
+                  indicators: [],
+                  recoupements: [],
+                  consistencyOvertimes: [],
+                  completeness: {
+                        dataElements: [],
+                        sourceDocuments: []
+                  }
             });
+            setIndicatorFieldsForRDQA([]);
+      };
+
+      const handleChangeSelectionTypeConfigurationForBackgroundInformation = ({ value }) => {
+            // setFormState({
+            //       ...formState,
+            //       selectedBackgroundInformationTypeConfiguration: value,
+            //       selectedProgramStage: null,
+            //       selectedBackgroundInformationFavorit: null
+            // });
+            cleanAllStates();
       };
 
       const handleSelectBackgroundInformationFavorit = value => {
@@ -618,6 +640,49 @@ const Favorites = ({ me }) => {
             return newList;
       };
 
+      const getEachDataElementsForRDQA = () => {
+            let newList = [];
+
+            const programStage = {
+                  id: formState?.selectedProgramStage?.id,
+                  displayName: formState?.selectedProgramStage?.displayName
+            };
+            const program = {
+                  id: formState?.selectedProgram?.program?.id,
+                  displayName: formState?.selectedProgram?.program?.displayName
+            };
+
+            for (let indicator of indicatorFieldsForRDQA) {
+                  const indicatorPaylaod = {
+                        dataElement: indicator?.value,
+                        indicator: indicator?.source && {
+                              id: indicator?.source?.name,
+                              displayName: indicator?.source?.name
+                        },
+                        programStage,
+                        program
+                  };
+
+                  if (indicatorPaylaod.dataElement && indicatorPaylaod.indicator) newList.push(indicatorPaylaod);
+
+                  for (let recoupement of indicator?.recoupements) {
+                        const recoupementPayload = {
+                              dataElement: recoupement?.value,
+                              indicator: recoupement?.source && {
+                                    id: recoupement?.source?.name,
+                                    displayName: recoupement?.source?.name
+                              },
+                              programStage,
+                              program
+                        };
+                        if (recoupementPayload.dataElement && recoupementPayload.indicator)
+                              newList.push(recoupementPayload);
+                  }
+            }
+
+            return newList;
+      };
+
       const handleAddFavoritBackgroundInformationSave = async () => {
             try {
                   setLoadingSaveFavoritBackgroundInformations(true);
@@ -638,7 +703,10 @@ const Favorites = ({ me }) => {
 
                   let payload = {
                         name: formState?.inputFavorisNameForBackgroundInforation,
-                        configs: getEachDataElements(),
+                        configs:
+                              formState?.selectedProgram?.configurationType === RDQA
+                                    ? getEachDataElementsForRDQA()
+                                    : getEachDataElements(),
                         program: formState?.selectedProgram?.program,
                         formState,
                         createdAt: dayjs(),
@@ -1069,7 +1137,6 @@ const Favorites = ({ me }) => {
             </div>
       );
 
-
       const RenderContent = () => (
             <div>
                   <RenderTitle />
@@ -1107,80 +1174,6 @@ const Favorites = ({ me }) => {
                   </div>
             </div>
       );
-
-      // const RenderAnalyticComponentModalForRDQA = () =>
-      //       localFormState?.visibleAnalyticComponentModal ? (
-      //             <Modal
-      //                   onClose={() =>
-      //                         setLocalFormState({
-      //                               ...localFormState,
-      //                               visibleAnalyticComponentModal: false,
-      //                               currentIndicator: null,
-      //                               currentRecoupement: null,
-      //                               selectedMetaDatas: []
-      //                         })
-      //                   }
-      //                   large
-      //             >
-      //                   <ModalTitle>
-      //                         <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
-      //                               {translate('Source_De_Donnee')}
-      //                         </div>
-      //                   </ModalTitle>
-      //                   <ModalContent>
-      //                         {!localFormState?.currentIndicator && <div>Error no data </div>}
-      //                         {localFormState?.currentIndicator && (
-      //                               <div style={{ padding: '20px', border: '1px solid #ccc' }}>
-      //                                     <DataDimension
-      //                                           selectedDimensions={localFormState?.selectedMetaDatas?.map(it => ({
-      //                                                 ...it
-      //                                           }))}
-      //                                           onSelect={value => {
-      //                                                 setLocalFormState({
-      //                                                       ...localFormState,
-      //                                                       selectedMetaDatas:
-      //                                                             value?.items?.length > 0 ? [value.items[0]] : []
-      //                                                 });
-      //                                           }}
-      //                                           displayNameProp="displayName"
-      //                                     />
-      //                               </div>
-      //                         )}
-      //                   </ModalContent>
-      //                   <ModalActions>
-      //                         <ButtonStrip end>
-      //                               <Button
-      //                                     primary
-      //                                     onClick={() => {
-      //                                           //   formState?.indicators?.map(ind => {
-      //                                           //         if (
-      //                                           //               ind.group === formState?.currentIndicator?.group &&
-      //                                           //               ind.indicator === formState?.currentIndicator?.indicator
-      //                                           //         ) {
-      //                                           //               return {
-      //                                           //                     ...ind,
-      //                                           //                     dhis2: formState?.selectedMetaDatas[0]
-      //                                           //               };
-      //                                           //         }
-      //                                           //         return ind;
-      //                                           //   }) || [];
-      //                                           setLocalFormState({
-      //                                                 ...formState,
-      //                                                 visibleAnalyticComponentModal: false,
-      //                                                 selectedMetaDatas: [],
-      //                                                 currentIndicator: null
-      //                                           });
-      //                                     }}
-      //                                     icon={<FiSave style={{ fontSize: '18px' }} />}
-      //                               >
-      //                                     {translate('Enregistrer')}
-      //                               </Button>
-      //                         </ButtonStrip>
-      //                   </ModalActions>
-      //             </Modal>
-      //       ) : (
-      //             <></>
-      //       );
 
       const RenderAnalyticComponentModal = () =>
             visibleAnalyticComponentModal ? (
@@ -1370,7 +1363,6 @@ const Favorites = ({ me }) => {
                   {RenderAddFavoritBackgroundInformationModal()}
                   {RenderAnalyticComponentModal()}
                   {RenderAnalyticComponentModalForRecoupement()}
-                  {/* {RenderAnalyticComponentModalForRDQA()} */}
                   <MyNotification notification={notification} setNotification={setNotification} />
             </>
       );

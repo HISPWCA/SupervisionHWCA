@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { Card, Col, Input, Row } from 'antd';
 import translate from '../utils/translator';
-import { v4 as uuid } from 'uuid';
 import { Button, ButtonStrip, Modal, ModalActions, ModalContent, ModalTitle } from '@dhis2/ui';
 import { DataDimension } from '@dhis2/analytics';
 import { FiSave } from 'react-icons/fi';
 import { TbSelect } from 'react-icons/tb';
 
 const FavoriteGenerateIndicatorsFieldsRDQA = ({ formState, indicatorFieldsForRDQA, setIndicatorFieldsForRDQA }) => {
+      
       const [localFormState, setLocalFormState] = useState({
             visibleAnalyticComponentModal: false,
             currentIndicator: null,
@@ -49,7 +49,7 @@ const FavoriteGenerateIndicatorsFieldsRDQA = ({ formState, indicatorFieldsForRDQ
                                                                   value?.items?.length > 0 ? [value.items[0]] : []
                                                       });
                                                 }}
-                                                displayNameProp="displayName"
+                                                displayNameProp="name"
                                           />
                                     </div>
                               )}
@@ -59,11 +59,13 @@ const FavoriteGenerateIndicatorsFieldsRDQA = ({ formState, indicatorFieldsForRDQ
                                     <Button
                                           primary
                                           onClick={() => {
-                                                setIndicatorFieldsForRDQA({
+                                                setIndicatorFieldsForRDQA([
                                                       ...indicatorFieldsForRDQA.map(ind => {
                                                             if (
                                                                   localFormState.currentIndicator &&
-                                                                  localFormState.currentRecoupement
+                                                                  localFormState.currentRecoupement &&
+                                                                  ind?.position ===
+                                                                        localFormState.currentIndicator?.position
                                                             ) {
                                                                   return {
                                                                         ...ind,
@@ -86,7 +88,9 @@ const FavoriteGenerateIndicatorsFieldsRDQA = ({ formState, indicatorFieldsForRDQ
 
                                                             if (
                                                                   localFormState.currentIndicator &&
-                                                                  !localFormState.currentRecoupement
+                                                                  !localFormState.currentRecoupement &&
+                                                                  ind?.position ===
+                                                                        localFormState.currentIndicator?.position
                                                             ) {
                                                                   return {
                                                                         ...ind,
@@ -95,7 +99,7 @@ const FavoriteGenerateIndicatorsFieldsRDQA = ({ formState, indicatorFieldsForRDQ
                                                             }
                                                             return ind;
                                                       })
-                                                });
+                                                ]);
                                                 setLocalFormState({
                                                       ...formState,
                                                       visibleAnalyticComponentModal: false,
@@ -178,10 +182,9 @@ const FavoriteGenerateIndicatorsFieldsRDQA = ({ formState, indicatorFieldsForRDQ
                                                                                                             return {
                                                                                                                   ...i,
                                                                                                                   source: {
-                                                                                                                        displayName:
-                                                                                                                              event
-                                                                                                                                    .target
-                                                                                                                                    .value
+                                                                                                                        name: event
+                                                                                                                              .target
+                                                                                                                              .value
                                                                                                                   }
                                                                                                             };
                                                                                                       }
@@ -190,7 +193,7 @@ const FavoriteGenerateIndicatorsFieldsRDQA = ({ formState, indicatorFieldsForRDQ
                                                                                           )
                                                                                     ])
                                                                               }
-                                                                              value={ind?.source?.displayName}
+                                                                              value={ind?.source?.name}
                                                                               placeholder={`${translate(
                                                                                     'Indicateurs'
                                                                               )} ${index + 1}`}
@@ -243,12 +246,8 @@ const FavoriteGenerateIndicatorsFieldsRDQA = ({ formState, indicatorFieldsForRDQ
                                                                         <Row gutter={[5, 5]}>
                                                                               <Col md={22}>
                                                                                     <Input
-                                                                                          disabled={
-                                                                                                !ind.source?.displayName
-                                                                                          }
-                                                                                          value={
-                                                                                                rec?.source?.displayName
-                                                                                          }
+                                                                                          disabled={!ind.source?.name}
+                                                                                          value={rec?.source?.name}
                                                                                           onChange={event => {
                                                                                                 setIndicatorFieldsForRDQA(
                                                                                                       [
@@ -277,10 +276,9 @@ const FavoriteGenerateIndicatorsFieldsRDQA = ({ formState, indicatorFieldsForRDQ
                                                                                                                                                                   return {
                                                                                                                                                                         ...r,
                                                                                                                                                                         source: {
-                                                                                                                                                                              displayName:
-                                                                                                                                                                                    event
-                                                                                                                                                                                          .target
-                                                                                                                                                                                          .value
+                                                                                                                                                                              name: event
+                                                                                                                                                                                    .target
+                                                                                                                                                                                    .value
                                                                                                                                                                         }
                                                                                                                                                                   };
                                                                                                                                                             }
@@ -307,7 +305,7 @@ const FavoriteGenerateIndicatorsFieldsRDQA = ({ formState, indicatorFieldsForRDQ
                                                                                           disabled={
                                                                                                 !indicatorFieldsForRDQA?.[
                                                                                                       index
-                                                                                                ]?.source?.displayName
+                                                                                                ]?.source?.name
                                                                                           }
                                                                                           primary
                                                                                           small
@@ -342,8 +340,6 @@ const FavoriteGenerateIndicatorsFieldsRDQA = ({ formState, indicatorFieldsForRDQ
                   </Card>
 
                   {RenderAnalyticComponentModal()}
-
-                  <pre>{JSON.stringify(indicatorFieldsForRDQA, null, 4)}</pre>
             </>
       );
 };
