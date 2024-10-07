@@ -209,8 +209,6 @@ const Favorites = ({ me }) => {
                         p => p.programStage?.id === formState?.selectedProgramStage?.id
                   );
 
-                  console.log('found right program stage : ', rightProgramStage);
-
                   let newIndicatorList = [];
                   for (let ind of rightProgramStage?.indicatorsFieldsConfigs) {
                         let newRecoupementList = [];
@@ -303,24 +301,35 @@ const Favorites = ({ me }) => {
       };
 
       const handleChangeSelectionTypeConfigurationForBackgroundInformation = ({ value }) => {
-            // setFormState({
-            //       ...formState,
-            //       selectedBackgroundInformationTypeConfiguration: value,
-            //       selectedProgramStage: null,
-            //       selectedBackgroundInformationFavorit: null
-            // });
-            cleanAllStates();
+            setFormState({
+                  ...formState,
+                  selectedBackgroundInformationTypeConfiguration: value,
+                  selectedBackgroundInformationFavorit: null,
+                  inputFavorisNameForBackgroundInforation: '',
+                  selectedGlobalProgramArea: null,
+                  nbrIndicatorsToShow: 0,
+                  indicators: [],
+                  recoupements: [],
+                  consistencyOvertimes: [],
+                  completeness: {
+                        dataElements: [],
+                        sourceDocuments: []
+                  }
+            });
+            setIndicatorFieldsForRDQA([]);
       };
 
       const handleSelectBackgroundInformationFavorit = value => {
             const currentFav = favoritBackgroundInformationList.find(b => b.id === value);
             if (currentFav) {
+                  
                   setFormState({
                         ...formState,
                         selectedProgramStage: currentFav.formState?.selectedProgramStage,
                         selectedBackgroundInformationFavorit: currentFav,
                         inputFavorisNameForBackgroundInforation: currentFav.name
-                  });
+                  })
+                  setIndicatorFieldsForRDQA(currentFav?.indicatorFieldsForRDQA || []);
             }
       };
 
@@ -708,7 +717,7 @@ const Favorites = ({ me }) => {
                                     ? getEachDataElementsForRDQA()
                                     : getEachDataElements(),
                         program: formState?.selectedProgram?.program,
-                        formState,
+                        formState: formState?.selectedProgram?.configurationType === RDQA ? formState : indicatorFieldsForRDQA,
                         createdAt: dayjs(),
                         updatedAt: dayjs()
                   };

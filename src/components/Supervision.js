@@ -1545,11 +1545,10 @@ const Supervision = ({ me }) => {
                   );
                   if (!currentProgram.data) throw new Error(translate('Programme_Non_Trouver'));
 
-                  // const generatedCode = await generatedAutoCode(
-                  //       currentProgram.data.programTrackedEntityAttributes[0]?.trackedEntityAttribute?.id
-                  // );
+                  const autoGenerateUIDForSupervision =
+                        selectedProgram?.selectedSupervisionAutoGenerateID?.id || 'WzghGqeASL5';
 
-                  const generatedCode = await generatedAutoCode('WzghGqeASL5');
+                  const generatedCode = await generatedAutoCode(autoGenerateUIDForSupervision);
 
                   const tei = {
                         trackedEntityType: currentProgram.data.trackedEntityType.id,
@@ -2454,9 +2453,6 @@ const Supervision = ({ me }) => {
                                     }
 
                                     if (is_ok) {
-                                          /*
-                                           * Nous allons vérifier s'il y a un program stage selectionné. S'il en a , alors on vérifier si c'ette organisation unit appartient au group
-                                           */
                                           const payload = {
                                                 ...item,
                                                 orgUnit: item.organisationUnit?.id,
@@ -2468,11 +2464,7 @@ const Supervision = ({ me }) => {
                                           };
 
                                           let createdTEIObject = null;
-
-                                          if (selectedSupervisionType === TYPE_SUPERVISION_AGENT) {
-                                          } else {
-                                                createdTEIObject = await generateEventsAsNewSupervision(payload);
-                                          }
+                                          createdTEIObject = await generateEventsAsNewSupervision(payload);
 
                                           if (createdTEIObject) {
                                                 supervisionsList.push({
@@ -2821,32 +2813,12 @@ const Supervision = ({ me }) => {
 
                   const newDataStoreSupervisions = await loadDataStoreSupervisions();
 
-                  // if (
-                  //       selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
-                  //       selectedProgram.generationType === TYPE_GENERATION_AS_TEI
-                  // )
-                  //       await saveSupervisionAsTEIStrategy(inputFields, newDataStoreSupervisions);
-
-                  // if (
-                  //       selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
-                  //       selectedProgram.generationType === TYPE_GENERATION_AS_ENROLMENT
-                  // ) {
-                  //       await saveSupervisionAsEnrollmentStrategy(inputFields, newDataStoreSupervisions);
-                  // }
-
                   if (
                         selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
                         selectedProgram.generationType === TYPE_GENERATION_AS_EVENT
                   ) {
                         await saveSupervisionAsEventStrategy(inputFields, newDataStoreSupervisions);
                   }
-
-                  // if (
-                  //       selectedSupervisionType === TYPE_SUPERVISION_AGENT &&
-                  //       selectedProgram.generationType === TYPE_GENERATION_AS_EVENT
-                  // ) {
-                  //       await saveSupervisionAsEventStrategy(inputFields, newDataStoreSupervisions);
-                  // }
 
                   loadDataStoreSupervisionConfigs(organisationUnits);
                   loadDataStorePerformanceFavoritsConfigs();
@@ -3106,7 +3078,6 @@ const Supervision = ({ me }) => {
                                                                   primary
                                                                   disabled={loadingSupervisionPlanification}
                                                                   loading={loadingSupervisionPlanification}
-                                                                  // onClick={handleSupervisionPlanificationSaveBtn}
                                                             >
                                                                   {translate('Planifier_Supervision')}
                                                             </Button>
