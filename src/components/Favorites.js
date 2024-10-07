@@ -203,7 +203,7 @@ const Favorites = ({ me }) => {
             }
       };
 
-      const initFieldsForRDQA = () => {
+      const initFieldsForRDQA = (initValuesList = []) => {
             if (formState?.selectedProgram?.configurationType === RDQA) {
                   const rightProgramStage = formState?.selectedProgram?.programStageConfigurations?.find(
                         p => p.programStage?.id === formState?.selectedProgramStage?.id
@@ -215,12 +215,16 @@ const Favorites = ({ me }) => {
                         for (let rec of ind.recoupements) {
                               newRecoupementList.push({
                                     ...rec,
-                                    source: null
+                                    source:
+                                          initValuesList
+                                                ?.find(iInd => iInd?.position === ind?.position)
+                                                ?.recoupements?.find(iRec => iRec.position === rec?.position)?.source ||
+                                          null
                               });
                         }
                         newIndicatorList.push({
                               ...ind,
-                              source: null,
+                              source: initValuesList?.find(iInd => iInd?.position === ind?.position)?.source || null,
                               recoupements: newRecoupementList
                         });
                   }
@@ -305,6 +309,7 @@ const Favorites = ({ me }) => {
                   ...formState,
                   selectedBackgroundInformationTypeConfiguration: value,
                   selectedBackgroundInformationFavorit: null,
+                  selectedProgramStage: null,
                   inputFavorisNameForBackgroundInforation: '',
                   selectedGlobalProgramArea: null,
                   nbrIndicatorsToShow: 0,
@@ -328,7 +333,8 @@ const Favorites = ({ me }) => {
                         selectedBackgroundInformationFavorit: currentFav,
                         inputFavorisNameForBackgroundInforation: currentFav.name
                   });
-                  setIndicatorFieldsForRDQA(currentFav?.indicatorFieldsForRDQA || []);
+
+                  setIndicatorFieldsForRDQA(currentFav?.formState?.indicatorFieldsForRDQA || []);
             }
       };
 
@@ -718,7 +724,7 @@ const Favorites = ({ me }) => {
                         program: formState?.selectedProgram?.program,
                         formState:
                               formState?.selectedProgram?.configurationType === RDQA
-                                    ? indicatorFieldsForRDQA
+                                    ? { ...formState, indicatorFieldsForRDQA }
                                     : formState,
                         createdAt: dayjs(),
                         updatedAt: dayjs()
@@ -1364,7 +1370,7 @@ const Favorites = ({ me }) => {
       useEffect(() => {
             if (formState?.selectedProgramStage) {
                   initFields();
-                  initFieldsForRDQA();
+                  !formState?.selectedBackgroundInformationFavorit && initFieldsForRDQA();
             }
       }, [formState?.selectedProgramStage]);
 

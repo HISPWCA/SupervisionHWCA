@@ -1,7 +1,6 @@
 import { Input, Select } from 'antd';
 import translate from '../utils/translator';
 import { v4 as uuid } from 'uuid';
-import { useState } from 'react';
 
 const GenerateIndicatorsFieldsRDQA = ({
       indicatorsFieldsConfigsForRDQA,
@@ -35,7 +34,7 @@ const GenerateIndicatorsFieldsRDQA = ({
                         </tr>
                   </thead>
                   <tbody>
-                        {indicatorsFieldsConfigsForRDQA?.map((ind, indexInd) => (
+                        {indicatorsFieldsConfigsForRDQA?.map((ind) => (
                               <tr key={uuid()}>
                                     <td
                                           style={{
@@ -64,12 +63,13 @@ const GenerateIndicatorsFieldsRDQA = ({
                                                             })
                                                       )}
                                                       showSearch
+                                                      clearIcon
                                                       allowClear
                                                       optionFilterProp="label"
                                                       value={ind?.value?.id}
                                                       onSelect={value => {
                                                             setIndicatorsFieldsConfigsForRDQA(
-                                                                  indicatorsFieldsConfigsForRDQA.map((i, indexi) => {
+                                                                  indicatorsFieldsConfigsForRDQA.map((i) => {
                                                                         if (ind.id === i.id) {
                                                                               return {
                                                                                     ...i,
@@ -86,8 +86,6 @@ const GenerateIndicatorsFieldsRDQA = ({
                                                       }}
                                                 />
                                           </div>
-
-                                         
                                     </td>
                                     <td
                                           style={{
@@ -125,6 +123,7 @@ const GenerateIndicatorsFieldsRDQA = ({
                                                                         })
                                                                   )}
                                                                   showSearch
+                                                                  clearIcon
                                                                   allowClear
                                                                   optionFilterProp="label"
                                                                   value={
@@ -134,7 +133,7 @@ const GenerateIndicatorsFieldsRDQA = ({
                                                                   onSelect={value => {
                                                                         setIndicatorsFieldsConfigsForRDQA(
                                                                               indicatorsFieldsConfigsForRDQA.map(
-                                                                                    (i, indexj) => {
+                                                                                    (i) => {
                                                                                           if (i.id === ind.id) {
                                                                                                 return {
                                                                                                       ...i,
@@ -171,7 +170,6 @@ const GenerateIndicatorsFieldsRDQA = ({
                                                       </div>
                                                 </div>
                                           ))}
-
                                     </td>
                               </tr>
                         ))}

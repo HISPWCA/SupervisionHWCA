@@ -126,6 +126,8 @@ const Setting = () => {
       const [loadingSaveVisualizationInDatastore, setLoadingSaveVisualizationInDatastore] = useState(false);
       const [loadingDataStoreVisualizations, setLoadingDataStoreVisualizations] = useState(false);
 
+      const [updateAllFieldsWhenHaveOneStage, setUpdateAllFieldsWhenHaveOneStage] = useState(false);
+
       const [formState, setFormState] = useState({
             selectedConfigurationType: DQR,
             selectedSupervisionGenerationType: TYPE_GENERATION_AS_EVENT,
@@ -1635,7 +1637,11 @@ const Setting = () => {
                   }
 
                   setPeriodFormState(dataStorePeriodConfigs);
-                  await loadProgramStages(prog?.program?.id);
+                  const progStates = await loadProgramStages(prog?.program?.id);
+
+                  if (progStates?.length === 1) {
+                        setUpdateAllFieldsWhenHaveOneStage(true);
+                  }
 
                   setProgramStageConfigurations(prog.programStageConfigurations || []);
             } catch (err) {
@@ -2339,7 +2345,12 @@ const Setting = () => {
                                                 )}
                                           </span>
                                           <span
-                                                style={{ background: 'orange', padding: '2px 5px', marginLeft: '10px' }}
+                                                style={{
+                                                      background: 'orange',
+                                                      padding: '2px 5px',
+                                                      marginLeft: '10px',
+                                                      color: '#fff'
+                                                }}
                                           >
                                                 {formStateForRDQA?.selectedProgramStageForConfiguration?.displayName}
                                           </span>
@@ -3921,20 +3932,35 @@ const Setting = () => {
       }, []);
 
       useEffect(() => {
-            if (dataStoreGlobalSettings && !formState?.isFieldEditingMode) {
-                  formState?.selectedConfigurationType === DQR && initFields();
-                  formState?.selectedConfigurationType === RDQA && initFieldsForRDQA();
-            }
+      
+
+            dataStoreGlobalSettings &&
+                  !currentProgramstageConfiguration &&
+                  formState?.selectedConfigurationType === DQR &&
+                  initFields();
+
+            dataStoreGlobalSettings &&
+                  !currentProgramstageConfigurationForRDQA &&
+                  formState?.selectedConfigurationType === RDQA &&
+                  initFieldsForRDQA();
       }, [
             dataStoreGlobalSettings,
             formState?.selectedConfigurationType,
             formState?.selectedProgramStageForConfiguration,
-            formStateForRDQA?.selectedProgramStageForConfiguration
+            formStateForRDQA?.selectedProgramStageForConfiguration,
+            currentProgramstageConfigurationForRDQA,
+            currentProgramstageConfiguration
       ]);
 
       useEffect(() => {
             currentItem && initUpdateIndicatorConfigStage();
       }, [currentItem, indicatorGroups, programs]);
+
+      useEffect(() => {
+            if (updateAllFieldsWhenHaveOneStage && programStageConfigurations?.length === 1) {
+                  handleEditProgramStageConfigurations(programStageConfigurations[0]);
+            }
+      }, [updateAllFieldsWhenHaveOneStage, programStageConfigurations]);
 
       return (
             <>
