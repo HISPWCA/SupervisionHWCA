@@ -322,13 +322,12 @@ const Favorites = ({ me }) => {
       const handleSelectBackgroundInformationFavorit = value => {
             const currentFav = favoritBackgroundInformationList.find(b => b.id === value);
             if (currentFav) {
-                  
                   setFormState({
                         ...formState,
                         selectedProgramStage: currentFav.formState?.selectedProgramStage,
                         selectedBackgroundInformationFavorit: currentFav,
                         inputFavorisNameForBackgroundInforation: currentFav.name
-                  })
+                  });
                   setIndicatorFieldsForRDQA(currentFav?.indicatorFieldsForRDQA || []);
             }
       };
@@ -717,7 +716,10 @@ const Favorites = ({ me }) => {
                                     ? getEachDataElementsForRDQA()
                                     : getEachDataElements(),
                         program: formState?.selectedProgram?.program,
-                        formState: formState?.selectedProgram?.configurationType === RDQA ? formState : indicatorFieldsForRDQA,
+                        formState:
+                              formState?.selectedProgram?.configurationType === RDQA
+                                    ? indicatorFieldsForRDQA
+                                    : formState,
                         createdAt: dayjs(),
                         updatedAt: dayjs()
                   };

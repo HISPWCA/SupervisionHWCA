@@ -2384,51 +2384,6 @@ const Supervision = ({ me }) => {
             }
       };
 
-      // const saveSupervisionAsTEIStrategy = async (inputFieldsList, newDataStoreSupervisions) => {
-      //       try {
-      //             if (inputFieldsList.length > 0) {
-      //                   const supervisionsList = [];
-
-      //                   for (let item of inputFieldsList) {
-      //                         const payload = {
-      //                               ...item,
-      //                               orgUnit: item.organisationUnit?.id,
-      //                               period: item.period,
-      //                               program: item.program?.id,
-      //                               fieldConfig: item.fieldConfig
-      //                         };
-
-      //                         const createdTEIObject = await generateTeiWithEnrollmentWithEvents(payload);
-
-      //                         if (createdTEIObject) {
-      //                               supervisionsList.push({
-      //                                     ...item,
-      //                                     id: uuid(),
-      //                                     planificationType: selectedPlanificationType,
-      //                                     indicators: selectedIndicators,
-      //                                     orgUnit: item.organisationUnit?.id,
-      //                                     period: item.period,
-      //                                     program: item.program,
-      //                                     fieldConfig: item.fieldConfig,
-      //                                     tei: createdTEIObject
-      //                               });
-      //                         }
-      //                   }
-      //                   let planificationPayload = {
-      //                         id: uuid(),
-      //                         program: selectedProgram,
-      //                         dataSources: mappingConfigs,
-      //                         supervisions: supervisionsList
-      //                   };
-
-      //                   const newDataStoreSupervisionsPayload = [...newDataStoreSupervisions, planificationPayload];
-      //                   await savePanificationToDataStore(newDataStoreSupervisionsPayload);
-      //             }
-      //       } catch (err) {
-      //             throw err;
-      //       }
-      // };
-
       const saveSupervisionAsEventStrategy = async (inputFieldsList, newDataStoreSupervisions) => {
             try {
                   if (inputFieldsList.length > 0) {
