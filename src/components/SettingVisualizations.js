@@ -1,6 +1,4 @@
-import { QuestionCircleOutlined } from '@ant-design/icons';
 import { Col, Input, Popconfirm, Row, Select, Table } from 'antd';
-import { RiDeleteBinLine } from 'react-icons/ri';
 import translate from '../utils/translator';
 import { Button, ButtonStrip, Modal, ModalActions, ModalContent, ModalTitle, Radio } from '@dhis2/ui';
 import { useState, useEffect } from 'react';
@@ -79,7 +77,7 @@ const SettingVisualizations = ({ programs }) => {
 
                   setFormState({ ...formState, dxElements: [...formState?.dxElements, payload] });
             }
-      }
+      };
 
       const RenderAnalyticComponentModal = () =>
             formState?.visibleAnalyticComponentModal ? (

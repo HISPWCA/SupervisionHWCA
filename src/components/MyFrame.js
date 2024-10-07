@@ -696,15 +696,6 @@ const MyFrame = (
 
 
 
-
-
-
-
-
-
-
-
-
         /* A ne pas Toucher */
         const loadFavorite = async (el, baseUrl, username, password) => {
           try {

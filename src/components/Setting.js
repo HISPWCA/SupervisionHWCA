@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, createRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Radio, Tab, TabBar } from '@dhis2/ui';
 import {
       AGGREGATE_INDICATOR,
@@ -706,9 +706,12 @@ const Setting = () => {
       const handleDeleteVisatualizationProgramConfig = async item => {
             try {
                   if (item) {
-                        const newList = dataStoreVisualizations.filter(dataFav => dataFav.id !== item.id);
+                        const newList = dataStoreVisualizations.filter(
+                              dataFav => dataFav.program?.id !== item.program?.id
+                        );
                         await saveDataToDataStore(process.env.REACT_APP_VISUALIZATION_KEY, newList, null, null, null);
-                        setDataStoreVisualizations(newList);
+                        // setDataStoreVisualizations(newList);
+                        loadDataStoreVisualizations();
                         setNotification({
                               show: true,
                               message: translate('Suppression_Effectuee'),
@@ -719,6 +722,7 @@ const Setting = () => {
                         setSelectedVisualizations([]);
                         setFavorisItems([]);
                         setCurrentVisualizationProgram(null);
+                        cleanAllVisualizationStates();
                   }
             } catch (err) {
                   setNotification({
@@ -2210,6 +2214,14 @@ const Setting = () => {
             setSelectedProgramForVisualization(value.program);
       };
 
+      const cleanAllVisualizationStates = () => {
+            setCurrentVisualizationConfig(null);
+            setFavorisItems([]);
+            setSelectedProgramForVisualization(null);
+            setSelectedMaps([]);
+            setSelectedVisualizations([]);
+      };
+
       const handleSaveVisualizationToDataStore = async () => {
             try {
                   setLoadingSaveVisualizationInDatastore(true);
@@ -2222,7 +2234,7 @@ const Setting = () => {
                               null
                         );
 
-                        if (listFromDataStore?.map(d => d.id)?.includes(selectedProgramForVisualization?.id)) {
+                        if (listFromDataStore?.map(d => d.program?.id)?.includes(selectedProgramForVisualization?.id)) {
                               throw new Error(translate('Configuration_Deja_Ajoutee'));
                         }
 
@@ -2238,7 +2250,11 @@ const Setting = () => {
                                 })
                               : [
                                       {
-                                            program: selectedProgramForVisualization,
+                                            program: selectedProgramForVisualization && {
+                                                  id: selectedProgramForVisualization.id,
+                                                  name: selectedProgramForVisualization.name,
+                                                  displayName: selectedProgramForVisualization.displayName
+                                            },
                                             visualizations: favorisItems
                                       },
                                       ...listFromDataStore
@@ -2262,8 +2278,10 @@ const Setting = () => {
                         });
                   }
 
+                  setCurrentVisualizationConfig(null);
                   setFavorisItems([]);
                   setLoadingSaveVisualizationInDatastore(false);
+                  cleanAllVisualizationStates();
             } catch (err) {
                   setLoadingSaveVisualizationInDatastore(false);
                   setNotification({
@@ -2964,10 +2982,7 @@ const Setting = () => {
                                                             }
                                                             destructive
                                                             onClick={() => {
-                                                                  setFavorisItems([]);
-                                                                  setSelectedMaps([]);
-                                                                  setSelectedVisualizations([]);
-                                                                  setSelectedProgramForVisualization(null);
+                                                                  cleanAllVisualizationStates();
                                                             }}
                                                       >
                                                             {translate('Annuler')}
@@ -2983,6 +2998,7 @@ const Setting = () => {
                                                                         />
                                                                   }
                                                                   primary
+                                                                  loading={loadingSaveVisualizationInDatastore}
                                                                   onClick={handleSaveVisualizationToDataStore}
                                                             >
                                                                   {formState?.isFieldEditingMode && (
@@ -3932,8 +3948,6 @@ const Setting = () => {
       }, []);
 
       useEffect(() => {
-      
-
             dataStoreGlobalSettings &&
                   !currentProgramstageConfiguration &&
                   formState?.selectedConfigurationType === DQR &&
