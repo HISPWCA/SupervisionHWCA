@@ -20,7 +20,8 @@ import {
       PAGE_CONFIG_VISUALIZATION,
       DQR,
       PAGE_INDICATORS_MAPPING,
-      RDQA
+      RDQA,
+      ERDQ
 } from '../utils/constants';
 import { Card, Checkbox, Col, Divider, Input, InputNumber, Popconfirm, Row, Select, Table } from 'antd';
 import {
@@ -81,6 +82,18 @@ const Setting = () => {
       const [visualizations, setVisualizations] = useState([]);
       const [maps, setMaps] = useState([]);
       const [favorisItems, setFavorisItems] = useState([]);
+
+      const [numberOfIndicatorAndRecoupement, setNumberOfIndicatorAndRecoupement] = useState({
+            DRQ: {
+                  nbrIndicator: 1,
+                  nbrRecoupement: 1
+            },
+
+            ERDQ: {
+                  nbrIndicator: 1,
+                  nbrRecoupement: 1
+            }
+      });
 
       const [indicatorName, setIndicatorName] = useState('');
       const [indicatorEtiquette, setIndicatorEtiquette] = useState('');
@@ -166,14 +179,14 @@ const Setting = () => {
             month3KeyWords: []
       });
 
-      const initFields = () => {
+      const initFields = (fieldList = null) => {
             if (
-                  dataStoreGlobalSettings[DQR] &&
+                  numberOfIndicatorAndRecoupement[DQR] &&
                   formState?.selectedConfigurationType === DQR &&
                   !formState?.isFieldEditingMode &&
                   !currentProgramstageConfiguration
             ) {
-                  const dqrConfig = dataStoreGlobalSettings[DQR];
+                  const dqrConfig = numberOfIndicatorAndRecoupement[DQR];
                   const newIndicators = [];
                   const newRecoupements = [];
                   const newConsistencyOverTimes = [];
@@ -184,13 +197,16 @@ const Setting = () => {
                         newIndicators.push({
                               id: uuid(),
                               position: i,
-                              value: null,
-                              margin: null,
-                              DHIS2MonthlyValue1: null,
-                              DHIS2MonthlyValue2: null,
-                              DHIS2MonthlyValue3: null,
-                              programArea: null,
-                              keyWords: []
+                              value: fieldList?.indicators?.find(ind => ind.position === i)?.value || null,
+                              margin: fieldList?.indicators?.find(ind => ind.position === i)?.margin || null,
+                              DHIS2MonthlyValue1:
+                                    fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue1 || null,
+                              DHIS2MonthlyValue2:
+                                    fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue2 || null,
+                              DHIS2MonthlyValue3:
+                                    fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue3 || null,
+                              programArea: fieldList?.indicators?.find(ind => ind.position === i)?.programArea || null,
+                              keyWords: fieldList?.indicators?.find(ind => ind.position === i)?.keyWords || []
                         });
                   }
 
@@ -198,11 +214,14 @@ const Setting = () => {
                         newRecoupements.push({
                               id: uuid(),
                               position: i,
-                              primaryValue: null,
-                              secondaryValue: null,
-                              margin: null,
-                              programArea: null,
-                              keyWords: []
+                              primaryValue:
+                                    fieldList?.recoupements?.find(rec => rec.position === i)?.primaryValue || null,
+                              secondaryValue:
+                                    fieldList?.recoupements?.find(rec => rec.position === i)?.secondaryValue || null,
+                              margin: fieldList?.recoupements?.find(rec => rec.position === i)?.margin || null,
+                              programArea:
+                                    fieldList?.recoupements?.find(rec => rec.position === i)?.programArea || null,
+                              keyWords: fieldList?.recoupements?.find(rec => rec.position === i)?.keyWords || []
                         });
                   }
 
@@ -210,9 +229,10 @@ const Setting = () => {
                         newConsistencyOverTimes.push({
                               id: uuid(),
                               position: i,
-                              value: null,
-                              margin: null,
-                              programArea: null
+                              value: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.value || null,
+                              margin: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.margin || null,
+                              programArea:
+                                    fieldList?.consistencyOvertimes?.find(el => el.position === i)?.programArea || null
                         });
                   }
 
@@ -220,8 +240,10 @@ const Setting = () => {
                         newDataElementCompleteness.push({
                               id: uuid(),
                               position: i,
-                              value: null,
-                              keyWords: []
+                              value:
+                                    fieldList?.completeness?.dataElements?.find(el => el.position === i)?.value || null,
+                              keyWords:
+                                    fieldList?.completeness?.dataElements?.find(el => el.position === i)?.keyWords || []
                         });
                   }
 
@@ -229,8 +251,12 @@ const Setting = () => {
                         newSourceDocumentCompleteness.push({
                               id: uuid(),
                               position: i,
-                              value: null,
-                              keyWords: []
+                              value:
+                                    fieldList?.completeness?.sourceDocuments?.find(el => el.position === i)?.value ||
+                                    null,
+                              keyWords:
+                                    fieldList?.completeness?.sourceDocuments?.find(el => el.position === i)?.keyWords ||
+                                    []
                         });
                   }
 
@@ -295,7 +321,10 @@ const Setting = () => {
 
       const initFieldsForRDQA = (fieldList = []) => {
             const newList = [];
-            const rdqaConfig = dataStoreGlobalSettings['ERDQ'];
+            const rdqaConfig = numberOfIndicatorAndRecoupement['ERDQ'];
+
+            console.log("rdqaConfig: ", rdqaConfig);
+            console.log('numberOfIndicatorAndRecoupement: ', numberOfIndicatorAndRecoupement);
 
             if (rdqaConfig?.nbrIndicator && rdqaConfig?.nbrRecoupement) {
                   for (let i = 1; i <= +rdqaConfig?.nbrIndicator; i++) {
@@ -568,7 +597,18 @@ const Setting = () => {
       const loadDataStoreGlobalSettings = async () => {
             try {
                   const response = await loadDataStore(process.env.REACT_APP_GLOBAL_SETTING_KEY, null, null, null);
-                  setDataStoreGlobalSettings(response);
+                  // setDataStoreGlobalSettings(response);
+                  setNumberOfIndicatorAndRecoupement({
+                        ...numberOfIndicatorAndRecoupement,
+                        DRQ: {
+                              nbrIndicator: response[DRQ]?.nbrIndicator || 1,
+                              nbrRecoupement: response[DRQ]?.nbrRecoupement || 1
+                        },
+                        ERDQ: {
+                              nbrIndicator: response[ERDQ]?.nbrIndicator || 1,
+                              nbrRecoupement: response[ERDQ]?.nbrRecoupement || 1
+                        }
+                  });
             } catch (err) {
                   throw err;
             }
@@ -1672,12 +1712,21 @@ const Setting = () => {
                               selectedSupervisorDataElements: value.supervisorField || [],
                               selectedStatusSupervisionDataElement: value.statusSupervisionField,
                               selectedNbrIndicatorsToShow: value.selectedNbrIndicatorsToShow,
-                              isFieldEditingMode: true,
+                              isFieldEditingMode: true
+
+                              // indicators: value.indicators,
+                              // recoupements: value.recoupements,
+                              // completeness: value.completeness,
+                              // consistencyOvertimes: value.consistencyOvertimes
+                        });
+
+                        initFields({
                               indicators: value.indicators,
                               recoupements: value.recoupements,
                               completeness: value.completeness,
                               consistencyOvertimes: value.consistencyOvertimes
                         });
+
                         setCurrentProgramstageConfiguration(value);
                   }
 
@@ -2610,6 +2659,88 @@ const Setting = () => {
             </div>
       );
 
+      const RenderNbrOfIndicatorAndRecoupement = () => (
+            <div style={{ marginTop: '20px' }}>
+                  <pre>{JSON.stringify(numberOfIndicatorAndRecoupement, null, 2)}</pre>
+                  <Card className="my-shadow" size="small">
+                        <div style={{ fontWeight: 'bold' }}>{translate('Number_Of_Indicator_And_Recoupements')}</div>
+                        <div
+                              style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    marginTop: '10px'
+                              }}
+                        >
+                              <div style={{ marginLeft: '10px', width: '100%' }}>
+                                    <div>{translate('Number_Of_Indicator')}</div>
+                                    <div>
+                                          <Input
+                                                style={{ width: '100%' }}
+                                                type="number"
+                                                onChange={e => {
+                                                      formState?.selectedConfigurationType === DQR
+                                                            ? setNumberOfIndicatorAndRecoupement({
+                                                                    ...numberOfIndicatorAndRecoupement,
+                                                                    DRQ: {
+                                                                          ...numberOfIndicatorAndRecoupement.DRQ,
+                                                                          nbrIndicator: parseInt(e.target.value)
+                                                                    }
+                                                              })
+                                                            : setNumberOfIndicatorAndRecoupement({
+                                                                    ...numberOfIndicatorAndRecoupement,
+                                                                    ERDQ: {
+                                                                          ...numberOfIndicatorAndRecoupement.ERDQ,
+                                                                          nbrIndicator: parseInt(e.target.value)
+                                                                    }
+                                                              });
+                                                }}
+                                                value={
+                                                      formState?.selectedConfigurationType === DQR
+                                                            ? numberOfIndicatorAndRecoupement?.DRQ?.nbrIndicator
+                                                            : numberOfIndicatorAndRecoupement?.ERDQ?.nbrIndicator
+                                                }
+                                                placeholder={translate('Number_Of_Indicator')}
+                                          />
+                                    </div>
+                              </div>
+                              <div style={{ width: '100%' }}>
+                                    <div>{translate('Number_Of_Recoupement')}</div>
+                                    <div>
+                                          <Input
+                                                type="number"
+                                                style={{ width: '100%' }}
+                                                onChange={e => {
+                                                      formState?.selectedConfigurationType === DQR
+                                                            ? setNumberOfIndicatorAndRecoupement({
+                                                                    ...numberOfIndicatorAndRecoupement,
+                                                                    DRQ: {
+                                                                          ...numberOfIndicatorAndRecoupement.DRQ,
+                                                                          nbrRecoupement: parseInt(e.target.value)
+                                                                    }
+                                                              })
+                                                            : setNumberOfIndicatorAndRecoupement({
+                                                                    ...numberOfIndicatorAndRecoupement,
+                                                                    ERDQ: {
+                                                                          ...numberOfIndicatorAndRecoupement.ERDQ,
+                                                                          nbrRecoupement: parseInt(e.target.value)
+                                                                    }
+                                                              });
+                                                }}
+                                                value={
+                                                      formState?.selectedConfigurationType === DQR
+                                                            ? numberOfIndicatorAndRecoupement?.DRQ?.nbrRecoupement
+                                                            : numberOfIndicatorAndRecoupement?.ERDQ?.nbrRecoupement
+                                                }
+                                                placeholder={translate('Number_Of_Recoupement')}
+                                          />
+                                    </div>
+                              </div>
+                        </div>
+                  </Card>
+            </div>
+      );
+
       const RenderPageSupervisionConfig = () => (
             <>
                   <Row gutter={[8, 10]}>
@@ -2621,11 +2752,13 @@ const Setting = () => {
                                                 {formState?.selectedConfigurationType === DQR ? (
                                                       <>
                                                             {RenderProgramStageConfiguration()}
+                                                            {RenderNbrOfIndicatorAndRecoupement()}
                                                             {RenderIndicatorAndRecoupementConfigFields()}
                                                       </>
                                                 ) : (
                                                       <>
                                                             {RenderProgramStageConfigurationForRDQA()}
+                                                            {RenderNbrOfIndicatorAndRecoupement()}
                                                             {RenderIndicatorAndRecoupementConfigFieldsForRDQA()}
                                                       </>
                                                 )}
@@ -3958,7 +4091,7 @@ const Setting = () => {
                   formState?.selectedConfigurationType === RDQA &&
                   initFieldsForRDQA();
       }, [
-            dataStoreGlobalSettings,
+            numberOfIndicatorAndRecoupement,
             formState?.selectedConfigurationType,
             formState?.selectedProgramStageForConfiguration,
             formStateForRDQA?.selectedProgramStageForConfiguration,

@@ -313,5 +313,8 @@
     "Keys_Word_Help": "Ajouter tous les mots clés en appuyant sur la touche entrée , ses informations seront utilisées au niveau du tableau de bord et du côté android pour le changement des noms des éléments",
     "Keys_Word_Month1": "Mots clés Mois 1",
     "Keys_Word_Month2": "Mots clés Mois 2",
-    "Keys_Word_Month3": "Mots clés Mois 3"
+    "Keys_Word_Month3": "Mots clés Mois 3",
+    "Number_Of_Indicator_And_Recoupements": "Nombre d'indicateurs et de recoupements",
+    "Number_Of_Recoupement": "Nombre de recoupements",
+    "Number_Of_Indicator": "Nombre d'indicateurs"
 }
