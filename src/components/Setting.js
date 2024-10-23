@@ -1734,6 +1734,7 @@ const Setting = () => {
                               ...formState,
                               isFieldEditingMode: true
                         });
+
                         setFormStateForRDQA({
                               ...formStateForRDQA,
                               selectedProgramStageForConfiguration: foundProgramStage,
@@ -4080,6 +4081,7 @@ const Setting = () => {
       }, []);
 
       useEffect(() => {
+            console.log('Refresh init fields : ');
             numberOfIndicatorAndRecoupement &&
                   !currentProgramstageConfiguration &&
                   formState?.selectedConfigurationType === DQR &&
