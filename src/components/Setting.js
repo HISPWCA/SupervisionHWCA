@@ -75,7 +75,6 @@ const Setting = () => {
       const [dataStoreVisualizations, setDataStoreVisualizations] = useState([]);
       const [currentVisualizationProgram, setCurrentVisualizationProgram] = useState(null);
       const [indicatorsFieldsConfigsForRDQA, setIndicatorsFieldsConfigsForRDQA] = useState([]);
-      const [dataStoreGlobalSettings, setDataStoreGlobalSettings] = useState(null);
       const [currentVisualizationConfig, setCurrentVisualizationConfig] = useState(null);
       const [dataStorePeriodConfigs, setDataStorePeriodConfigs] = useState(null);
 
@@ -84,7 +83,7 @@ const Setting = () => {
       const [favorisItems, setFavorisItems] = useState([]);
 
       const [numberOfIndicatorAndRecoupement, setNumberOfIndicatorAndRecoupement] = useState({
-            DRQ: {
+            DQR: {
                   nbrIndicator: 1,
                   nbrRecoupement: 1
             },
@@ -181,12 +180,12 @@ const Setting = () => {
 
       const initFields = (fieldList = null) => {
             if (
-                  numberOfIndicatorAndRecoupement[DQR] &&
+                  numberOfIndicatorAndRecoupement.DQR &&
                   formState?.selectedConfigurationType === DQR &&
                   !formState?.isFieldEditingMode &&
                   !currentProgramstageConfiguration
             ) {
-                  const dqrConfig = numberOfIndicatorAndRecoupement[DQR];
+                  const dqrConfig = numberOfIndicatorAndRecoupement.DQR;
                   const newIndicators = [];
                   const newRecoupements = [];
                   const newConsistencyOverTimes = [];
@@ -321,9 +320,9 @@ const Setting = () => {
 
       const initFieldsForRDQA = (fieldList = []) => {
             const newList = [];
-            const rdqaConfig = numberOfIndicatorAndRecoupement['ERDQ'];
+            const rdqaConfig = numberOfIndicatorAndRecoupement[ERDQ];
 
-            console.log("rdqaConfig: ", rdqaConfig);
+            console.log('rdqaConfig: ', rdqaConfig);
             console.log('numberOfIndicatorAndRecoupement: ', numberOfIndicatorAndRecoupement);
 
             if (rdqaConfig?.nbrIndicator && rdqaConfig?.nbrRecoupement) {
@@ -600,9 +599,9 @@ const Setting = () => {
                   // setDataStoreGlobalSettings(response);
                   setNumberOfIndicatorAndRecoupement({
                         ...numberOfIndicatorAndRecoupement,
-                        DRQ: {
-                              nbrIndicator: response[DRQ]?.nbrIndicator || 1,
-                              nbrRecoupement: response[DRQ]?.nbrRecoupement || 1
+                        DQR: {
+                              nbrIndicator: response[DQR]?.nbrIndicator || 1,
+                              nbrRecoupement: response[DQR]?.nbrRecoupement || 1
                         },
                         ERDQ: {
                               nbrIndicator: response[ERDQ]?.nbrIndicator || 1,
@@ -2682,8 +2681,8 @@ const Setting = () => {
                                                       formState?.selectedConfigurationType === DQR
                                                             ? setNumberOfIndicatorAndRecoupement({
                                                                     ...numberOfIndicatorAndRecoupement,
-                                                                    DRQ: {
-                                                                          ...numberOfIndicatorAndRecoupement.DRQ,
+                                                                    DQR: {
+                                                                          ...numberOfIndicatorAndRecoupement.DQR,
                                                                           nbrIndicator: parseInt(e.target.value)
                                                                     }
                                                               })
@@ -2697,7 +2696,7 @@ const Setting = () => {
                                                 }}
                                                 value={
                                                       formState?.selectedConfigurationType === DQR
-                                                            ? numberOfIndicatorAndRecoupement?.DRQ?.nbrIndicator
+                                                            ? numberOfIndicatorAndRecoupement?.DQR?.nbrIndicator
                                                             : numberOfIndicatorAndRecoupement?.ERDQ?.nbrIndicator
                                                 }
                                                 placeholder={translate('Number_Of_Indicator')}
@@ -2714,8 +2713,8 @@ const Setting = () => {
                                                       formState?.selectedConfigurationType === DQR
                                                             ? setNumberOfIndicatorAndRecoupement({
                                                                     ...numberOfIndicatorAndRecoupement,
-                                                                    DRQ: {
-                                                                          ...numberOfIndicatorAndRecoupement.DRQ,
+                                                                    DQR: {
+                                                                          ...numberOfIndicatorAndRecoupement.DQR,
                                                                           nbrRecoupement: parseInt(e.target.value)
                                                                     }
                                                               })
@@ -2729,7 +2728,7 @@ const Setting = () => {
                                                 }}
                                                 value={
                                                       formState?.selectedConfigurationType === DQR
-                                                            ? numberOfIndicatorAndRecoupement?.DRQ?.nbrRecoupement
+                                                            ? numberOfIndicatorAndRecoupement?.DQR?.nbrRecoupement
                                                             : numberOfIndicatorAndRecoupement?.ERDQ?.nbrRecoupement
                                                 }
                                                 placeholder={translate('Number_Of_Recoupement')}
@@ -4081,12 +4080,12 @@ const Setting = () => {
       }, []);
 
       useEffect(() => {
-            dataStoreGlobalSettings &&
+            numberOfIndicatorAndRecoupement &&
                   !currentProgramstageConfiguration &&
                   formState?.selectedConfigurationType === DQR &&
                   initFields();
 
-            dataStoreGlobalSettings &&
+            numberOfIndicatorAndRecoupement &&
                   !currentProgramstageConfigurationForRDQA &&
                   formState?.selectedConfigurationType === RDQA &&
                   initFieldsForRDQA();
