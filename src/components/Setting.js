@@ -214,10 +214,7 @@ const Setting = () => {
             const newSourceDocumentCompleteness = [];
 
             for (let i = 1; i <= +dqrConfig.nbrIndicator; i++) {
-                  console.log(
-                        'fieldList?.indicators?.find(ind => ind.position === i): ',
-                        fieldList?.indicators?.find(ind => ind.position === i)
-                  );
+                  
                   newIndicators.push({
                         id: uuid(),
                         position: i,
