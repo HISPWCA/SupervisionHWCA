@@ -1570,28 +1570,6 @@ const Supervision = ({ me }) => {
                   // const availableProgramStages = [];
                   const newEventsList = [];
 
-                  //  Récuperation dans une list les programmes stage
-                  // for (let mapping of mappingConfigs) {
-                  //   if (
-                  //     !availableProgramStages.includes(mapping.programStage?.id) &&
-                  //     mapping.programStage?.id === payload?.programStage?.id
-                  //   ) {
-                  //     availableProgramStages.push(mapping.programStage.id);
-                  //   }
-                  // }
-
-                  // if (payload.fieldConfig?.supervisor?.programStage?.id) {
-                  //   if (
-                  //     !availableProgramStages.includes(
-                  //       payload.fieldConfig?.supervisor?.programStage?.id
-                  //     )
-                  //   ) {
-                  //     availableProgramStages.push(
-                  //       payload.fieldConfig?.supervisor?.programStage?.id
-                  //     );
-                  //   }
-                  // }
-
                   // for (let stage of availableProgramStages) {
                   const eventPayload = {
                         eventDate: payload.period
@@ -1733,6 +1711,282 @@ const Supervision = ({ me }) => {
                               eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValues];
                         }
                   }
+
+                  // Period implémentation
+
+                  let newDataValueList = [];
+                  if (payload.programStageConfig?.indicators?.length > 0) {
+                        const indicatorsList = payload.programStageConfig?.indicators;
+                        for (let dv of eventPayload.dataValues) {
+                              const foundInd = indicatorsList.find(ind => ind.value?.id === dv.dataElement);
+                              if (foundInd) {
+                                    const foundAggrageMappingElement = dataStoreIndicatorsMapping?.find(
+                                          d => d.indicator === dv.value
+                                    ).dhis2;
+
+                                    if (foundAggrageMappingElement) {
+                                          const elementMONTH_1 = foundInd.DHIS2MonthlyValue1;
+                                          const elementMONTH_2 = foundInd.DHIS2MonthlyValue2;
+                                          const elementMONTH_3 = foundInd.DHIS2MonthlyValue3;
+                                          const elementMONTH_4 = foundInd.DHIS2MonthlyValue4;
+                                          const elementMONTH_5 = foundInd.DHIS2MonthlyValue5;
+                                          const elementMONTH_6 = foundInd.DHIS2MonthlyValue6;
+                                          const elementMONTH_7 = foundInd.DHIS2MonthlyValue7;
+                                          const elementMONTH_8 = foundInd.DHIS2MonthlyValue8;
+                                          const elementMONTH_9 = foundInd.DHIS2MonthlyValue9;
+                                          const elementMONTH_10 = foundInd.DHIS2MonthlyValue10;
+
+                                          let periodPayload = {
+                                                eventDate: eventPayload.eventDate,
+                                                orgUnit: eventPayload.orgUnit,
+                                                trackedEntityInstance: eventPayload.trackedEntityInstance,
+                                                programStage: eventPayload.programStage
+                                          };
+
+                                          if (elementMONTH_1) {
+                                                const period = dayjs(eventPayload.eventDate)
+                                                      .subtract(1, 'month')
+                                                      .format('YYYYMM');
+                                                const orgUnitId = eventPayload.orgUnit;
+                                                const dx = foundAggrageMappingElement.id;
+                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                periodPayload.month1 = {
+                                                      position: 1,
+                                                      dataElement: elementMONTH_1,
+                                                      value,
+                                                      period: dayjs(period).format('YYYY/MM'),
+                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                };
+
+                                                if (value) {
+                                                      newDataValueList.push({
+                                                            dataElement: elementMONTH_1.id,
+                                                            value: value
+                                                      });
+                                                }
+                                          }
+                                          if (elementMONTH_2) {
+                                                const period = dayjs(eventPayload.eventDate)
+                                                      .subtract(2, 'month')
+                                                      .format('YYYYMM');
+                                                const orgUnitId = eventPayload.orgUnit;
+                                                const dx = foundAggrageMappingElement.id;
+                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                periodPayload.month2 = {
+                                                      position: 2,
+                                                      dataElement: elementMONTH_2,
+                                                      value,
+                                                      period: dayjs(period).format('YYYY/MM'),
+                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                };
+
+                                                if (value) {
+                                                      newDataValueList.push({
+                                                            dataElement: elementMONTH_2.id,
+                                                            value: value
+                                                      });
+                                                }
+                                          }
+                                          if (elementMONTH_3) {
+                                                const period = dayjs(eventPayload.eventDate)
+                                                      .subtract(3, 'month')
+                                                      .format('YYYYMM');
+                                                const orgUnitId = eventPayload.orgUnit;
+                                                const dx = foundAggrageMappingElement.id;
+                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                periodPayload.month3 = {
+                                                      position: 3,
+                                                      dataElement: elementMONTH_3,
+                                                      value,
+                                                      period: dayjs(period).format('YYYY/MM'),
+                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                };
+
+                                                if (value) {
+                                                      newDataValueList.push({
+                                                            dataElement: elementMONTH_3.id,
+                                                            value: value
+                                                      });
+                                                }
+                                          }
+                                          if (elementMONTH_4) {
+                                                const period = dayjs(eventPayload.eventDate)
+                                                      .subtract(4, 'month')
+                                                      .format('YYYYMM');
+                                                const orgUnitId = eventPayload.orgUnit;
+                                                const dx = foundAggrageMappingElement.id;
+                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                periodPayload.month4 = {
+                                                      position: 4,
+                                                      dataElement: elementMONTH_4,
+                                                      value,
+                                                      period: dayjs(period).format('YYYY/MM'),
+                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                };
+
+                                                if (value) {
+                                                      newDataValueList.push({
+                                                            dataElement: elementMONTH_4.id,
+                                                            value: value
+                                                      });
+                                                }
+                                          }
+
+                                          if (elementMONTH_5) {
+                                                const period = dayjs(eventPayload.eventDate)
+                                                      .subtract(5, 'month')
+                                                      .format('YYYYMM');
+                                                const orgUnitId = eventPayload.orgUnit;
+                                                const dx = foundAggrageMappingElement.id;
+                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                periodPayload.month5 = {
+                                                      position: 5,
+                                                      dataElement: elementMONTH_5,
+                                                      value,
+                                                      period: dayjs(period).format('YYYY/MM'),
+                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                };
+
+                                                if (value) {
+                                                      newDataValueList.push({
+                                                            dataElement: elementMONTH_5.id,
+                                                            value: value
+                                                      });
+                                                }
+                                          }
+
+                                          if (elementMONTH_6) {
+                                                const period = dayjs(eventPayload.eventDate)
+                                                      .subtract(6, 'month')
+                                                      .format('YYYYMM');
+                                                const orgUnitId = eventPayload.orgUnit;
+                                                const dx = foundAggrageMappingElement.id;
+                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                periodPayload.month6 = {
+                                                      position: 6,
+                                                      dataElement: elementMONTH_6,
+                                                      value,
+                                                      period: dayjs(period).format('YYYY/MM'),
+                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                };
+
+                                                if (value) {
+                                                      newDataValueList.push({
+                                                            dataElement: elementMONTH_6.id,
+                                                            value: value
+                                                      });
+                                                }
+                                          }
+
+                                          if (elementMONTH_7) {
+                                                const period = dayjs(eventPayload.eventDate)
+                                                      .subtract(7, 'month')
+                                                      .format('YYYYMM');
+                                                const orgUnitId = eventPayload.orgUnit;
+                                                const dx = foundAggrageMappingElement.id;
+                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                periodPayload.month7 = {
+                                                      position: 7,
+                                                      dataElement: elementMONTH_7,
+                                                      value,
+                                                      period: dayjs(period).format('YYYY/MM'),
+                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                };
+
+                                                if (value) {
+                                                      newDataValueList.push({
+                                                            dataElement: elementMONTH_7.id,
+                                                            value: value
+                                                      });
+                                                }
+                                          }
+
+                                          if (elementMONTH_8) {
+                                                const period = dayjs(eventPayload.eventDate)
+                                                      .subtract(8, 'month')
+                                                      .format('YYYYMM');
+                                                const orgUnitId = eventPayload.orgUnit;
+                                                const dx = foundAggrageMappingElement.id;
+                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                periodPayload.month8 = {
+                                                      position: 8,
+                                                      dataElement: elementMONTH_8,
+                                                      value,
+                                                      period: dayjs(period).format('YYYY/MM'),
+                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                };
+
+                                                if (value) {
+                                                      newDataValueList.push({
+                                                            dataElement: elementMONTH_8.id,
+                                                            value: value
+                                                      });
+                                                }
+                                          }
+
+                                          if (elementMONTH_9) {
+                                                const period = dayjs(eventPayload.eventDate)
+                                                      .subtract(9, 'month')
+                                                      .format('YYYYMM');
+                                                const orgUnitId = eventPayload.orgUnit;
+                                                const dx = foundAggrageMappingElement.id;
+                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                periodPayload.month9 = {
+                                                      position: 9,
+                                                      dataElement: elementMONTH_9,
+                                                      value,
+                                                      period: dayjs(period).format('YYYY/MM'),
+                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                };
+
+                                                if (value) {
+                                                      newDataValueList.push({
+                                                            dataElement: elementMONTH_9.id,
+                                                            value: value
+                                                      });
+                                                }
+                                          }
+
+                                          if (elementMONTH_10) {
+                                                const period = dayjs(eventPayload.eventDate)
+                                                      .subtract(10, 'month')
+                                                      .format('YYYYMM');
+                                                const orgUnitId = eventPayload.orgUnit;
+                                                const dx = foundAggrageMappingElement.id;
+                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                periodPayload.month10 = {
+                                                      position: 10,
+                                                      dataElement: elementMONTH_10,
+                                                      value,
+                                                      period: dayjs(period).format('YYYY/MM'),
+                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                };
+
+                                                if (value) {
+                                                      newDataValueList.push({
+                                                            dataElement: elementMONTH_10.id,
+                                                            value: value
+                                                      });
+                                                }
+                                          }
+
+                                          await updatePeriodsConfigs(periodPayload);
+                                    }
+                              }
+                        }
+                  }
+
+                  eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValueList];
 
                   if (!newEventsList.map(ev => ev.programStage).includes(payload.programStage?.id)) {
                         newEventsList.push(eventPayload);
@@ -1949,10 +2203,18 @@ const Supervision = ({ me }) => {
                                           const foundAggrageMappingElement = dataStoreIndicatorsMapping?.find(
                                                 d => d.indicator === dv.value
                                           ).dhis2;
+
                                           if (foundAggrageMappingElement) {
                                                 const elementMONTH_1 = foundInd.DHIS2MonthlyValue1;
                                                 const elementMONTH_2 = foundInd.DHIS2MonthlyValue2;
                                                 const elementMONTH_3 = foundInd.DHIS2MonthlyValue3;
+                                                const elementMONTH_4 = foundInd.DHIS2MonthlyValue4;
+                                                const elementMONTH_5 = foundInd.DHIS2MonthlyValue5;
+                                                const elementMONTH_6 = foundInd.DHIS2MonthlyValue6;
+                                                const elementMONTH_7 = foundInd.DHIS2MonthlyValue7;
+                                                const elementMONTH_8 = foundInd.DHIS2MonthlyValue8;
+                                                const elementMONTH_9 = foundInd.DHIS2MonthlyValue9;
+                                                const elementMONTH_10 = foundInd.DHIS2MonthlyValue10;
 
                                                 let periodPayload = {
                                                       eventDate: eventPayload.eventDate,
@@ -2030,11 +2292,180 @@ const Supervision = ({ me }) => {
                                                             });
                                                       }
                                                 }
+                                                if (elementMONTH_4) {
+                                                      const period = dayjs(eventPayload.eventDate)
+                                                            .subtract(4, 'month')
+                                                            .format('YYYYMM');
+                                                      const orgUnitId = eventPayload.orgUnit;
+                                                      const dx = foundAggrageMappingElement.id;
+                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                      periodPayload.month4 = {
+                                                            position: 4,
+                                                            dataElement: elementMONTH_4,
+                                                            value,
+                                                            period: dayjs(period).format('YYYY/MM'),
+                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                      };
+
+                                                      if (value) {
+                                                            newDataValueList.push({
+                                                                  dataElement: elementMONTH_4.id,
+                                                                  value: value
+                                                            });
+                                                      }
+                                                }
+
+                                                if (elementMONTH_5) {
+                                                      const period = dayjs(eventPayload.eventDate)
+                                                            .subtract(5, 'month')
+                                                            .format('YYYYMM');
+                                                      const orgUnitId = eventPayload.orgUnit;
+                                                      const dx = foundAggrageMappingElement.id;
+                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                      periodPayload.month5 = {
+                                                            position: 5,
+                                                            dataElement: elementMONTH_5,
+                                                            value,
+                                                            period: dayjs(period).format('YYYY/MM'),
+                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                      };
+
+                                                      if (value) {
+                                                            newDataValueList.push({
+                                                                  dataElement: elementMONTH_5.id,
+                                                                  value: value
+                                                            });
+                                                      }
+                                                }
+
+                                                if (elementMONTH_6) {
+                                                      const period = dayjs(eventPayload.eventDate)
+                                                            .subtract(6, 'month')
+                                                            .format('YYYYMM');
+                                                      const orgUnitId = eventPayload.orgUnit;
+                                                      const dx = foundAggrageMappingElement.id;
+                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                      periodPayload.month6 = {
+                                                            position: 6,
+                                                            dataElement: elementMONTH_6,
+                                                            value,
+                                                            period: dayjs(period).format('YYYY/MM'),
+                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                      };
+
+                                                      if (value) {
+                                                            newDataValueList.push({
+                                                                  dataElement: elementMONTH_6.id,
+                                                                  value: value
+                                                            });
+                                                      }
+                                                }
+
+                                                if (elementMONTH_7) {
+                                                      const period = dayjs(eventPayload.eventDate)
+                                                            .subtract(7, 'month')
+                                                            .format('YYYYMM');
+                                                      const orgUnitId = eventPayload.orgUnit;
+                                                      const dx = foundAggrageMappingElement.id;
+                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                      periodPayload.month7 = {
+                                                            position: 7,
+                                                            dataElement: elementMONTH_7,
+                                                            value,
+                                                            period: dayjs(period).format('YYYY/MM'),
+                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                      };
+
+                                                      if (value) {
+                                                            newDataValueList.push({
+                                                                  dataElement: elementMONTH_7.id,
+                                                                  value: value
+                                                            });
+                                                      }
+                                                }
+
+                                                if (elementMONTH_8) {
+                                                      const period = dayjs(eventPayload.eventDate)
+                                                            .subtract(8, 'month')
+                                                            .format('YYYYMM');
+                                                      const orgUnitId = eventPayload.orgUnit;
+                                                      const dx = foundAggrageMappingElement.id;
+                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                      periodPayload.month8 = {
+                                                            position: 8,
+                                                            dataElement: elementMONTH_8,
+                                                            value,
+                                                            period: dayjs(period).format('YYYY/MM'),
+                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                      };
+
+                                                      if (value) {
+                                                            newDataValueList.push({
+                                                                  dataElement: elementMONTH_8.id,
+                                                                  value: value
+                                                            });
+                                                      }
+                                                }
+
+                                                if (elementMONTH_9) {
+                                                      const period = dayjs(eventPayload.eventDate)
+                                                            .subtract(9, 'month')
+                                                            .format('YYYYMM');
+                                                      const orgUnitId = eventPayload.orgUnit;
+                                                      const dx = foundAggrageMappingElement.id;
+                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                      periodPayload.month9 = {
+                                                            position: 9,
+                                                            dataElement: elementMONTH_9,
+                                                            value,
+                                                            period: dayjs(period).format('YYYY/MM'),
+                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                      };
+
+                                                      if (value) {
+                                                            newDataValueList.push({
+                                                                  dataElement: elementMONTH_9.id,
+                                                                  value: value
+                                                            });
+                                                      }
+                                                }
+
+                                                if (elementMONTH_10) {
+                                                      const period = dayjs(eventPayload.eventDate)
+                                                            .subtract(10, 'month')
+                                                            .format('YYYYMM');
+                                                      const orgUnitId = eventPayload.orgUnit;
+                                                      const dx = foundAggrageMappingElement.id;
+                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                      periodPayload.month10 = {
+                                                            position: 10,
+                                                            dataElement: elementMONTH_10,
+                                                            value,
+                                                            period: dayjs(period).format('YYYY/MM'),
+                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                      };
+
+                                                      if (value) {
+                                                            newDataValueList.push({
+                                                                  dataElement: elementMONTH_10.id,
+                                                                  value: value
+                                                            });
+                                                      }
+                                                }
+
                                                 await updatePeriodsConfigs(periodPayload);
                                           }
                                     }
                               }
                         }
+
                         eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValueList];
 
                         if (!newEventsList.map(ev => ev.programStage).includes(payload.programStage?.id)) {
@@ -2054,235 +2485,235 @@ const Supervision = ({ me }) => {
             }
       };
 
-      const generateEnrollmentsAsNewSupervision = async payload => {
-            try {
-                  const existingTEI_List_response = await axios.get(
-                        `${TRACKED_ENTITY_INSTANCES_ROUTE}?ou=${payload.orgUnit}&order=created:DESC&program=${selectedProgram?.program?.id}&fields=*&ouMode=SELECTED`
-                  );
-                  const existingTEI_List = existingTEI_List_response.data.trackedEntityInstances;
+      // const generateEnrollmentsAsNewSupervision = async payload => {
+      //       try {
+      //             const existingTEI_List_response = await axios.get(
+      //                   `${TRACKED_ENTITY_INSTANCES_ROUTE}?ou=${payload.orgUnit}&order=created:DESC&program=${selectedProgram?.program?.id}&fields=*&ouMode=SELECTED`
+      //             );
+      //             const existingTEI_List = existingTEI_List_response.data.trackedEntityInstances;
 
-                  if (existingTEI_List.length === 0) {
-                        return await generateTeiWithEnrollmentWithEvents(payload);
-                  } else {
-                        const current_tei = existingTEI_List[0];
+      //             if (existingTEI_List.length === 0) {
+      //                   return await generateTeiWithEnrollmentWithEvents(payload);
+      //             } else {
+      //                   const current_tei = existingTEI_List[0];
 
-                        const enrollment = {
-                              orgUnit: payload.orgUnit,
-                              trackedEntityInstance: current_tei.trackedEntityInstance,
-                              program: payload.program
-                        };
+      //                   const enrollment = {
+      //                         orgUnit: payload.orgUnit,
+      //                         trackedEntityInstance: current_tei.trackedEntityInstance,
+      //                         program: payload.program
+      //                   };
 
-                        const createdEnrollment = await createEnrollment(enrollment);
-                        const enrollment_id = createdEnrollment?.response?.importSummaries[0]?.reference;
+      //                   const createdEnrollment = await createEnrollment(enrollment);
+      //                   const enrollment_id = createdEnrollment?.response?.importSummaries[0]?.reference;
 
-                        if (!enrollment_id) throw new Error(translate('Erreur_Creation_Enrolement'));
+      //                   if (!enrollment_id) throw new Error(translate('Erreur_Creation_Enrolement'));
 
-                        const availableProgramStages = [];
-                        const newEventsList = [];
+      //                   const availableProgramStages = [];
+      //                   const newEventsList = [];
 
-                        //  Récuperation dans une list les programmes stage
-                        for (let mapping of mappingConfigs) {
-                              if (!availableProgramStages.includes(mapping.programStage?.id)) {
-                                    availableProgramStages.push(mapping.programStage.id);
-                              }
-                        }
+      //                   //  Récuperation dans une list les programmes stage
+      //                   for (let mapping of mappingConfigs) {
+      //                         if (!availableProgramStages.includes(mapping.programStage?.id)) {
+      //                               availableProgramStages.push(mapping.programStage.id);
+      //                         }
+      //                   }
 
-                        if (payload.fieldConfig?.supervisor?.programStage?.id) {
-                              if (!availableProgramStages.includes(payload.fieldConfig?.supervisor?.programStage?.id)) {
-                                    availableProgramStages.push(payload.fieldConfig?.supervisor?.programStage?.id);
-                              }
-                        }
+      //                   if (payload.fieldConfig?.supervisor?.programStage?.id) {
+      //                         if (!availableProgramStages.includes(payload.fieldConfig?.supervisor?.programStage?.id)) {
+      //                               availableProgramStages.push(payload.fieldConfig?.supervisor?.programStage?.id);
+      //                         }
+      //                   }
 
-                        for (let stage of availableProgramStages) {
-                              const eventPayload = {
-                                    eventDate: payload.period
-                                          ? dayjs(payload.period).format('YYYY-MM-DD')
-                                          : dayjs().format('YYYY-MM-DD'),
-                                    program: payload.program,
-                                    orgUnit: payload.orgUnit,
-                                    enrollment: enrollment_id,
-                                    programStage: stage,
-                                    trackedEntityInstance: current_tei.trackedEntityInstance,
-                                    dataValues: []
-                              };
+      //                   for (let stage of availableProgramStages) {
+      //                         const eventPayload = {
+      //                               eventDate: payload.period
+      //                                     ? dayjs(payload.period).format('YYYY-MM-DD')
+      //                                     : dayjs().format('YYYY-MM-DD'),
+      //                               program: payload.program,
+      //                               orgUnit: payload.orgUnit,
+      //                               enrollment: enrollment_id,
+      //                               programStage: stage,
+      //                               trackedEntityInstance: current_tei.trackedEntityInstance,
+      //                               dataValues: []
+      //                         };
 
-                              if (mappingConfigs?.length > 0) {
-                                    eventPayload.status = 'ACTIVE';
-                                    eventPayload.eventDate = payload.period
-                                          ? dayjs(payload.period).format('YYYY-MM-DD')
-                                          : dayjs().format('YYYY-MM-DD');
-                                    eventPayload.dueDate = payload.period
-                                          ? dayjs(payload.period).format('YYYY-MM-DD')
-                                          : dayjs().format('YYYY-MM-DD');
-                                    eventPayload.dataValues = mappingConfigs
-                                          .filter(ev => ev.programStage?.id === stage)
-                                          .map(ev => ({
-                                                dataElement: ev.dataElement?.id,
-                                                value: ev.indicator?.displayName
-                                          }));
-                              } else {
-                                    eventPayload.status = 'SCHEDULE';
-                                    eventPayload.dueDate = payload.period
-                                          ? dayjs(payload.period).format('YYYY-MM-DD')
-                                          : dayjs().format('YYYY-MM-DD');
-                              }
+      //                         if (mappingConfigs?.length > 0) {
+      //                               eventPayload.status = 'ACTIVE';
+      //                               eventPayload.eventDate = payload.period
+      //                                     ? dayjs(payload.period).format('YYYY-MM-DD')
+      //                                     : dayjs().format('YYYY-MM-DD');
+      //                               eventPayload.dueDate = payload.period
+      //                                     ? dayjs(payload.period).format('YYYY-MM-DD')
+      //                                     : dayjs().format('YYYY-MM-DD');
+      //                               eventPayload.dataValues = mappingConfigs
+      //                                     .filter(ev => ev.programStage?.id === stage)
+      //                                     .map(ev => ({
+      //                                           dataElement: ev.dataElement?.id,
+      //                                           value: ev.indicator?.displayName
+      //                                     }));
+      //                         } else {
+      //                               eventPayload.status = 'SCHEDULE';
+      //                               eventPayload.dueDate = payload.period
+      //                                     ? dayjs(payload.period).format('YYYY-MM-DD')
+      //                                     : dayjs().format('YYYY-MM-DD');
+      //                         }
 
-                              // Ajoute des dataValues superviseurs
-                              if (payload.programStageConfig?.supervisorField?.length > 0) {
-                                    const newDataValues = [];
+      //                         // Ajoute des dataValues superviseurs
+      //                         if (payload.programStageConfig?.supervisorField?.length > 0) {
+      //                               const newDataValues = [];
 
-                                    /*
-                                     * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son INFÉRIEUR au nombres de superviseurs sélectionnés
-                                     */
+      //                               /*
+      //                                * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son INFÉRIEUR au nombres de superviseurs sélectionnés
+      //                                */
 
-                                    const newSupervisorsList = [
-                                          ...payload.supervisors?.map(s => s.displayName),
-                                          ...payload.otherSupervisors
-                                    ];
+      //                               const newSupervisorsList = [
+      //                                     ...payload.supervisors?.map(s => s.displayName),
+      //                                     ...payload.otherSupervisors
+      //                               ];
 
-                                    if (
-                                          payload.programStageConfig?.supervisorField?.length <
-                                          newSupervisorsList?.length
-                                    ) {
-                                          const supervisorArrayCurrent = newSupervisorsList?.slice(
-                                                0,
-                                                payload.programStageConfig?.supervisorField?.length
-                                          );
-                                          const supervisorArraylast = newSupervisorsList?.slice(
-                                                payload.programStageConfig?.supervisorField?.length
-                                          );
+      //                               if (
+      //                                     payload.programStageConfig?.supervisorField?.length <
+      //                                     newSupervisorsList?.length
+      //                               ) {
+      //                                     const supervisorArrayCurrent = newSupervisorsList?.slice(
+      //                                           0,
+      //                                           payload.programStageConfig?.supervisorField?.length
+      //                                     );
+      //                                     const supervisorArraylast = newSupervisorsList?.slice(
+      //                                           payload.programStageConfig?.supervisorField?.length
+      //                                     );
 
-                                          for (
-                                                let i = 0;
-                                                i < payload.programStageConfig?.supervisorField?.length;
-                                                i++
-                                          ) {
-                                                for (let j = 0; j < supervisorArrayCurrent.length; j++) {
-                                                      if (i === j) {
-                                                            const currentDE =
-                                                                  payload.programStageConfig?.supervisorField[i];
-                                                            const currentSUP = supervisorArrayCurrent[j];
-                                                            if (
-                                                                  currentDE &&
-                                                                  currentSUP &&
-                                                                  !newDataValues
-                                                                        .map(dv => dv.dataElement)
-                                                                        .includes(currentDE.id)
-                                                            ) {
-                                                                  if (
-                                                                        i ===
-                                                                        payload.programStageConfig?.supervisorField
-                                                                              ?.length -
-                                                                              1
-                                                                  ) {
-                                                                        newDataValues.push({
-                                                                              dataElement: currentDE.id,
-                                                                              value: `${currentSUP},${supervisorArraylast?.join(
-                                                                                    ','
-                                                                              )}`
-                                                                        });
-                                                                  } else {
-                                                                        newDataValues.push({
-                                                                              dataElement: currentDE.id,
-                                                                              value: currentSUP
-                                                                        });
-                                                                  }
-                                                            }
-                                                      }
-                                                }
-                                          }
-                                    }
+      //                                     for (
+      //                                           let i = 0;
+      //                                           i < payload.programStageConfig?.supervisorField?.length;
+      //                                           i++
+      //                                     ) {
+      //                                           for (let j = 0; j < supervisorArrayCurrent.length; j++) {
+      //                                                 if (i === j) {
+      //                                                       const currentDE =
+      //                                                             payload.programStageConfig?.supervisorField[i];
+      //                                                       const currentSUP = supervisorArrayCurrent[j];
+      //                                                       if (
+      //                                                             currentDE &&
+      //                                                             currentSUP &&
+      //                                                             !newDataValues
+      //                                                                   .map(dv => dv.dataElement)
+      //                                                                   .includes(currentDE.id)
+      //                                                       ) {
+      //                                                             if (
+      //                                                                   i ===
+      //                                                                   payload.programStageConfig?.supervisorField
+      //                                                                         ?.length -
+      //                                                                         1
+      //                                                             ) {
+      //                                                                   newDataValues.push({
+      //                                                                         dataElement: currentDE.id,
+      //                                                                         value: `${currentSUP},${supervisorArraylast?.join(
+      //                                                                               ','
+      //                                                                         )}`
+      //                                                                   });
+      //                                                             } else {
+      //                                                                   newDataValues.push({
+      //                                                                         dataElement: currentDE.id,
+      //                                                                         value: currentSUP
+      //                                                                   });
+      //                                                             }
+      //                                                       }
+      //                                                 }
+      //                                           }
+      //                                     }
+      //                               }
 
-                                    /*
-                                     * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son EGALE au nombres de superviseurs sélectionnés
-                                     */
-                                    if (
-                                          payload.programStageConfig?.supervisorField?.length ===
-                                          newSupervisorsList?.length
-                                    ) {
-                                          for (
-                                                let i = 0;
-                                                i < payload.programStageConfig?.supervisorField?.length;
-                                                i++
-                                          ) {
-                                                for (let j = 0; j < newSupervisorsList.length; j++) {
-                                                      if (i === j) {
-                                                            const currentDE =
-                                                                  payload.programStageConfig?.supervisorField[i];
-                                                            const currentSUP = newSupervisorsList[j];
-                                                            if (
-                                                                  currentDE &&
-                                                                  currentSUP &&
-                                                                  !newDataValues
-                                                                        .map(dv => dv.dataElement)
-                                                                        .includes(currentDE.id)
-                                                            ) {
-                                                                  newDataValues.push({
-                                                                        dataElement: currentDE.id,
-                                                                        value: currentSUP
-                                                                  });
-                                                            }
-                                                      }
-                                                }
-                                          }
-                                    }
+      //                               /*
+      //                                * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son EGALE au nombres de superviseurs sélectionnés
+      //                                */
+      //                               if (
+      //                                     payload.programStageConfig?.supervisorField?.length ===
+      //                                     newSupervisorsList?.length
+      //                               ) {
+      //                                     for (
+      //                                           let i = 0;
+      //                                           i < payload.programStageConfig?.supervisorField?.length;
+      //                                           i++
+      //                                     ) {
+      //                                           for (let j = 0; j < newSupervisorsList.length; j++) {
+      //                                                 if (i === j) {
+      //                                                       const currentDE =
+      //                                                             payload.programStageConfig?.supervisorField[i];
+      //                                                       const currentSUP = newSupervisorsList[j];
+      //                                                       if (
+      //                                                             currentDE &&
+      //                                                             currentSUP &&
+      //                                                             !newDataValues
+      //                                                                   .map(dv => dv.dataElement)
+      //                                                                   .includes(currentDE.id)
+      //                                                       ) {
+      //                                                             newDataValues.push({
+      //                                                                   dataElement: currentDE.id,
+      //                                                                   value: currentSUP
+      //                                                             });
+      //                                                       }
+      //                                                 }
+      //                                           }
+      //                                     }
+      //                               }
 
-                                    /*
-                                     * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son SUPERIEUR au nombres de superviseurs sélectionnés
-                                     */
-                                    if (
-                                          payload.programStageConfig?.supervisorField?.length >
-                                          newSupervisorsList?.length
-                                    ) {
-                                          for (
-                                                let i = 0;
-                                                i < payload.programStageConfig?.supervisorField?.length;
-                                                i++
-                                          ) {
-                                                for (let j = 0; j < newSupervisorsList?.length; j++) {
-                                                      if (i === j) {
-                                                            const currentDE =
-                                                                  payload.programStageConfig?.supervisorField[i];
-                                                            const currentSUP = newSupervisorsList[j];
-                                                            if (
-                                                                  currentDE &&
-                                                                  currentSUP &&
-                                                                  !newDataValues
-                                                                        .map(dv => dv.dataElement)
-                                                                        .includes(currentDE.id)
-                                                            ) {
-                                                                  newDataValues.push({
-                                                                        dataElement: currentDE.id,
-                                                                        value: currentSUP
-                                                                  });
-                                                            }
-                                                      }
-                                                }
-                                          }
-                                    }
+      //                               /*
+      //                                * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son SUPERIEUR au nombres de superviseurs sélectionnés
+      //                                */
+      //                               if (
+      //                                     payload.programStageConfig?.supervisorField?.length >
+      //                                     newSupervisorsList?.length
+      //                               ) {
+      //                                     for (
+      //                                           let i = 0;
+      //                                           i < payload.programStageConfig?.supervisorField?.length;
+      //                                           i++
+      //                                     ) {
+      //                                           for (let j = 0; j < newSupervisorsList?.length; j++) {
+      //                                                 if (i === j) {
+      //                                                       const currentDE =
+      //                                                             payload.programStageConfig?.supervisorField[i];
+      //                                                       const currentSUP = newSupervisorsList[j];
+      //                                                       if (
+      //                                                             currentDE &&
+      //                                                             currentSUP &&
+      //                                                             !newDataValues
+      //                                                                   .map(dv => dv.dataElement)
+      //                                                                   .includes(currentDE.id)
+      //                                                       ) {
+      //                                                             newDataValues.push({
+      //                                                                   dataElement: currentDE.id,
+      //                                                                   value: currentSUP
+      //                                                             });
+      //                                                       }
+      //                                                 }
+      //                                           }
+      //                                     }
+      //                               }
 
-                                    if (newDataValues.length > 0) {
-                                          eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValues];
-                                    }
-                              }
+      //                               if (newDataValues.length > 0) {
+      //                                     eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValues];
+      //                               }
+      //                         }
 
-                              if (!newEventsList.map(ev => ev.programStage).includes(payload.programStage?.id)) {
-                                    newEventsList.push(eventPayload);
-                              }
-                        }
+      //                         if (!newEventsList.map(ev => ev.programStage).includes(payload.programStage?.id)) {
+      //                               newEventsList.push(eventPayload);
+      //                         }
+      //                   }
 
-                        await createEvents({ events: newEventsList });
+      //                   await createEvents({ events: newEventsList });
 
-                        const currentTEI = await axios.get(
-                              `${TRACKED_ENTITY_INSTANCES_ROUTE}/${current_tei.trackedEntityInstance}?program=${selectedProgram.program?.id}&fields=*,enrollments`
-                        );
-                        const currentTEIData = currentTEI.data;
-                        return currentTEIData;
-                  }
-            } catch (err) {
-                  throw err;
-            }
-      };
+      //                   const currentTEI = await axios.get(
+      //                         `${TRACKED_ENTITY_INSTANCES_ROUTE}/${current_tei.trackedEntityInstance}?program=${selectedProgram.program?.id}&fields=*,enrollments`
+      //                   );
+      //                   const currentTEIData = currentTEI.data;
+      //                   return currentTEIData;
+      //             }
+      //       } catch (err) {
+      //             throw err;
+      //       }
+      // };
 
       const handleSelectIndicators = values =>
             setSelectedIndicators(
@@ -2440,53 +2871,6 @@ const Supervision = ({ me }) => {
 
                         const newDataStoreSupervisionsPayload = [...newDataStoreSupervisions, planificationPayload];
 
-                        await savePanificationToDataStore(newDataStoreSupervisionsPayload);
-                  }
-            } catch (err) {
-                  throw err;
-            }
-      };
-
-
-      const saveSupervisionAsEnrollmentStrategy = async (inputFieldsList, newDataStoreSupervisions) => {
-            try {
-                  if (inputFieldsList.length > 0) {
-                        const supervisionsList = [];
-
-                        for (let item of inputFieldsList) {
-                              const payload = {
-                                    ...item,
-                                    orgUnit: item.organisationUnit?.id,
-                                    period: item.period,
-                                    program: item.program?.id,
-                                    fieldConfig: item.fieldConfig
-                              };
-
-                              const createdTEIObject = await generateEnrollmentsAsNewSupervision(payload);
-
-                              if (createdTEIObject) {
-                                    supervisionsList.push({
-                                          ...item,
-                                          id: uuid(),
-                                          planificationType: selectedPlanificationType,
-                                          indicators: selectedIndicators,
-                                          orgUnit: item.organisationUnit?.id,
-                                          period: item.period,
-                                          program: item.program,
-                                          fieldConfig: item.fieldConfig,
-                                          tei: createdTEIObject
-                                    });
-                              }
-                        }
-
-                        let planificationPayload = {
-                              id: uuid(),
-                              program: selectedProgram,
-                              dataSources: mappingConfigs,
-                              supervisions: supervisionsList
-                        };
-
-                        const newDataStoreSupervisionsPayload = [...newDataStoreSupervisions, planificationPayload];
                         await savePanificationToDataStore(newDataStoreSupervisionsPayload);
                   }
             } catch (err) {
