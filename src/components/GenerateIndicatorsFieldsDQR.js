@@ -7,8 +7,18 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
       return (
             <>
                   <div style={{ marginTop: '10px' }}>
-                        <div style={{ marginBottom: '10px', fontWeight: 'bold' }}>
-                              {translate('Indicators_Configuration')}
+                        <div style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
+                              <span>{translate('Indicators_Configuration')}</span>
+                              <span
+                                    style={{
+                                          background: 'orange',
+                                          padding: '2px 5px',
+                                          marginLeft: '10px',
+                                          color: '#fff'
+                                    }}
+                              >
+                                    {formState?.selectedProgramStageForConfiguration?.displayName}
+                              </span>
                         </div>
                         <table style={{ borderCollapse: 'collapse', width: '100%' }}>
                               <thead>

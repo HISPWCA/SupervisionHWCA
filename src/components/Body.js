@@ -216,7 +216,10 @@ export const Body = () => {
                               width: '100%'
                         }}
                   >
-                        <span style={{ marginRight: '10px' }}>HWCA</span>( Version : {process.env.REACT_APP_VERSION} )
+                        <a target="_blank" href="https://hispwca.org/hispwca/">
+                              <span style={{ marginRight: '10px' }}>Hisp West and Central Africa</span>( Version :{' '}
+                              {process.env.REACT_APP_VERSION} )
+                        </a>
                   </div>
             </div>
       );

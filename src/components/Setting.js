@@ -179,7 +179,14 @@ const Setting = () => {
       const [periodFormState, setPeriodFormState] = useState({
             month1KeyWords: [],
             month2KeyWords: [],
-            month3KeyWords: []
+            month3KeyWords: [],
+            month4KeyWords: [],
+            month5KeyWords: [],
+            month6KeyWords: [],
+            month7KeyWords: [],
+            month8KeyWords: [],
+            month9KeyWords: [],
+            month10KeyWords: []
       });
 
       const initialiserNumberOfIndicatorAndRecoupement = data => {
@@ -1215,7 +1222,7 @@ const Setting = () => {
                   }
 
                   let glabalConfigPayload = {
-                        ...dataStoreGlobalConfig
+                        ...dataStoreGlobalSettings
                   };
 
                   if (formState?.selectedConfigurationType === DQR) {
@@ -1247,6 +1254,7 @@ const Setting = () => {
                               ? translate('Mise_A_Jour_Effectuer')
                               : translate('Configuration_Added_For_Program_stage')
                   });
+                  loadDataStoreGlobalSettings();
             } catch (err) {
                   setNotification({
                         show: true,
@@ -2687,7 +2695,7 @@ const Setting = () => {
                                     marginTop: '10px'
                               }}
                         >
-                              <div style={{ marginLeft: '10px', width: '100%' }}>
+                              <div style={{ marginRight: '10px', width: '100%' }}>
                                     <div>{translate('Number_Of_Indicator')}</div>
                                     <div>
                                           <Input
