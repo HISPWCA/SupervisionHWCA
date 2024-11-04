@@ -1735,6 +1735,11 @@ const Supervision = ({ me }) => {
                                           const elementMONTH_8 = foundInd?.DHIS2MonthlyValue8;
                                           const elementMONTH_9 = foundInd?.DHIS2MonthlyValue9;
                                           const elementMONTH_10 = foundInd?.DHIS2MonthlyValue10;
+                                          const elementMONTH_11 = foundInd?.DHIS2MonthlyValue11;
+                                          const elementMONTH_12 = foundInd?.DHIS2MonthlyValue12;
+                                          const elementMONTH_13 = foundInd?.DHIS2MonthlyValue13;
+                                          const elementMONTH_14 = foundInd?.DHIS2MonthlyValue14;
+                                          const elementMONTH_15 = foundInd?.DHIS2MonthlyValue15;
 
                                           let periodPayload = {
                                                 eventDate: eventPayload.eventDate,
@@ -1980,6 +1985,126 @@ const Supervision = ({ me }) => {
                                                 }
                                           }
 
+                                          if (elementMONTH_11) {
+                                                const period = dayjs(eventPayload.eventDate)
+                                                      .subtract(11, 'month')
+                                                      .format('YYYYMM');
+                                                const orgUnitId = eventPayload.orgUnit;
+                                                const dx = foundAggrageMappingElement.id;
+                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                periodPayload.month11 = {
+                                                      position: 11,
+                                                      dataElement: elementMONTH_11,
+                                                      value,
+                                                      period: dayjs(period).format('YYYY/MM'),
+                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                };
+
+                                                if (value) {
+                                                      newDataValueList.push({
+                                                            dataElement: elementMONTH_11.id,
+                                                            value: value
+                                                      });
+                                                }
+                                          }
+
+                                          if (elementMONTH_12) {
+                                                const period = dayjs(eventPayload.eventDate)
+                                                      .subtract(12, 'month')
+                                                      .format('YYYYMM');
+                                                const orgUnitId = eventPayload.orgUnit;
+                                                const dx = foundAggrageMappingElement.id;
+                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                periodPayload.month12 = {
+                                                      position: 12,
+                                                      dataElement: elementMONTH_12,
+                                                      value,
+                                                      period: dayjs(period).format('YYYY/MM'),
+                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                };
+
+                                                if (value) {
+                                                      newDataValueList.push({
+                                                            dataElement: elementMONTH_12.id,
+                                                            value: value
+                                                      });
+                                                }
+                                          }
+
+                                          if (elementMONTH_13) {
+                                                const period = dayjs(eventPayload.eventDate)
+                                                      .subtract(13, 'month')
+                                                      .format('YYYYMM');
+                                                const orgUnitId = eventPayload.orgUnit;
+                                                const dx = foundAggrageMappingElement.id;
+                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                periodPayload.month13 = {
+                                                      position: 13,
+                                                      dataElement: elementMONTH_13,
+                                                      value,
+                                                      period: dayjs(period).format('YYYY/MM'),
+                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                };
+
+                                                if (value) {
+                                                      newDataValueList.push({
+                                                            dataElement: elementMONTH_13.id,
+                                                            value: value
+                                                      });
+                                                }
+                                          }
+
+                                          if (elementMONTH_14) {
+                                                const period = dayjs(eventPayload.eventDate)
+                                                      .subtract(14, 'month')
+                                                      .format('YYYYMM');
+                                                const orgUnitId = eventPayload.orgUnit;
+                                                const dx = foundAggrageMappingElement.id;
+                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                periodPayload.month14 = {
+                                                      position: 14,
+                                                      dataElement: elementMONTH_14,
+                                                      value,
+                                                      period: dayjs(period).format('YYYY/MM'),
+                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                };
+
+                                                if (value) {
+                                                      newDataValueList.push({
+                                                            dataElement: elementMONTH_14.id,
+                                                            value: value
+                                                      });
+                                                }
+                                          }
+
+                                          if (elementMONTH_15) {
+                                                const period = dayjs(eventPayload.eventDate)
+                                                      .subtract(15, 'month')
+                                                      .format('YYYYMM');
+                                                const orgUnitId = eventPayload.orgUnit;
+                                                const dx = foundAggrageMappingElement.id;
+                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                periodPayload.month15 = {
+                                                      position: 15,
+                                                      dataElement: elementMONTH_15,
+                                                      value,
+                                                      period: dayjs(period).format('YYYY/MM'),
+                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                };
+
+                                                if (value) {
+                                                      newDataValueList.push({
+                                                            dataElement: elementMONTH_15.id,
+                                                            value: value
+                                                      });
+                                                }
+                                          }
+
                                           await updatePeriodsConfigs(periodPayload);
                                     }
                               }
@@ -2215,6 +2340,11 @@ const Supervision = ({ me }) => {
                                                 const elementMONTH_8 = foundInd?.DHIS2MonthlyValue8;
                                                 const elementMONTH_9 = foundInd?.DHIS2MonthlyValue9;
                                                 const elementMONTH_10 = foundInd?.DHIS2MonthlyValue10;
+                                                const elementMONTH_11 = foundInd?.DHIS2MonthlyValue11;
+                                                const elementMONTH_12 = foundInd?.DHIS2MonthlyValue12;
+                                                const elementMONTH_13 = foundInd?.DHIS2MonthlyValue13;
+                                                const elementMONTH_14 = foundInd?.DHIS2MonthlyValue14;
+                                                const elementMONTH_15 = foundInd?.DHIS2MonthlyValue15;
 
                                                 let periodPayload = {
                                                       eventDate: eventPayload.eventDate,
@@ -2455,6 +2585,126 @@ const Supervision = ({ me }) => {
                                                       if (value) {
                                                             newDataValueList.push({
                                                                   dataElement: elementMONTH_10.id,
+                                                                  value: value
+                                                            });
+                                                      }
+                                                }
+
+                                                if (elementMONTH_11) {
+                                                      const period = dayjs(eventPayload.eventDate)
+                                                            .subtract(11, 'month')
+                                                            .format('YYYYMM');
+                                                      const orgUnitId = eventPayload.orgUnit;
+                                                      const dx = foundAggrageMappingElement.id;
+                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                      periodPayload.month11 = {
+                                                            position: 11,
+                                                            dataElement: elementMONTH_11,
+                                                            value,
+                                                            period: dayjs(period).format('YYYY/MM'),
+                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                      };
+
+                                                      if (value) {
+                                                            newDataValueList.push({
+                                                                  dataElement: elementMONTH_11.id,
+                                                                  value: value
+                                                            });
+                                                      }
+                                                }
+
+                                                if (elementMONTH_12) {
+                                                      const period = dayjs(eventPayload.eventDate)
+                                                            .subtract(12, 'month')
+                                                            .format('YYYYMM');
+                                                      const orgUnitId = eventPayload.orgUnit;
+                                                      const dx = foundAggrageMappingElement.id;
+                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                      periodPayload.month12 = {
+                                                            position: 12,
+                                                            dataElement: elementMONTH_12,
+                                                            value,
+                                                            period: dayjs(period).format('YYYY/MM'),
+                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                      };
+
+                                                      if (value) {
+                                                            newDataValueList.push({
+                                                                  dataElement: elementMONTH_12.id,
+                                                                  value: value
+                                                            });
+                                                      }
+                                                }
+
+                                                if (elementMONTH_13) {
+                                                      const period = dayjs(eventPayload.eventDate)
+                                                            .subtract(13, 'month')
+                                                            .format('YYYYMM');
+                                                      const orgUnitId = eventPayload.orgUnit;
+                                                      const dx = foundAggrageMappingElement.id;
+                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                      periodPayload.month13 = {
+                                                            position: 13,
+                                                            dataElement: elementMONTH_13,
+                                                            value,
+                                                            period: dayjs(period).format('YYYY/MM'),
+                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                      };
+
+                                                      if (value) {
+                                                            newDataValueList.push({
+                                                                  dataElement: elementMONTH_13.id,
+                                                                  value: value
+                                                            });
+                                                      }
+                                                }
+
+                                                if (elementMONTH_14) {
+                                                      const period = dayjs(eventPayload.eventDate)
+                                                            .subtract(14, 'month')
+                                                            .format('YYYYMM');
+                                                      const orgUnitId = eventPayload.orgUnit;
+                                                      const dx = foundAggrageMappingElement.id;
+                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                      periodPayload.month14 = {
+                                                            position: 14,
+                                                            dataElement: elementMONTH_14,
+                                                            value,
+                                                            period: dayjs(period).format('YYYY/MM'),
+                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                      };
+
+                                                      if (value) {
+                                                            newDataValueList.push({
+                                                                  dataElement: elementMONTH_14.id,
+                                                                  value: value
+                                                            });
+                                                      }
+                                                }
+
+                                                if (elementMONTH_15) {
+                                                      const period = dayjs(eventPayload.eventDate)
+                                                            .subtract(15, 'month')
+                                                            .format('YYYYMM');
+                                                      const orgUnitId = eventPayload.orgUnit;
+                                                      const dx = foundAggrageMappingElement.id;
+                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+
+                                                      periodPayload.month15 = {
+                                                            position: 15,
+                                                            dataElement: elementMONTH_15,
+                                                            value,
+                                                            period: dayjs(period).format('YYYY/MM'),
+                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                      };
+
+                                                      if (value) {
+                                                            newDataValueList.push({
+                                                                  dataElement: elementMONTH_15.id,
                                                                   value: value
                                                             });
                                                       }
@@ -3289,15 +3539,17 @@ const Supervision = ({ me }) => {
                                                 checked={selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT}
                                           />
                                     </div>
-                                    <div style={{ marginLeft: '20px' }}>
-                                          <Radio
-                                                label={translate('Agent')}
-                                                className="cursor-pointer"
-                                                onChange={handleChangeSupervisionType}
-                                                value={TYPE_SUPERVISION_AGENT}
-                                                checked={selectedSupervisionType === TYPE_SUPERVISION_AGENT}
-                                          />
-                                    </div>
+                                    {0 > 1 && (
+                                          <div style={{ marginLeft: '20px' }}>
+                                                <Radio
+                                                      label={translate('Agent')}
+                                                      className="cursor-pointer"
+                                                      onChange={handleChangeSupervisionType}
+                                                      value={TYPE_SUPERVISION_AGENT}
+                                                      checked={selectedSupervisionType === TYPE_SUPERVISION_AGENT}
+                                                />
+                                          </div>
+                                    )}
                               </div>
                         </Card>
                   </div>

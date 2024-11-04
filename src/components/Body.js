@@ -336,7 +336,7 @@ export const Body = () => {
                                     }}
                               >
                                     <CircularLoader small />
-                                    <span style={{ marginLeft: '20px' }}>Initialization du dataStore...</span>
+                                    <span style={{ marginLeft: '20px' }}>{translate('Config_Initialization')}...</span>
                               </div>
                         )}
                         {isDataStoreInitialized && (
