@@ -1,4 +1,3 @@
-import translate from "./translator"
 
 export const MAP_BOX_API_KEY = 'dRq6SAPnk2nypi0O4fEY'
 

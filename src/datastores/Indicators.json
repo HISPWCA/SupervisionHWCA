@@ -1,0 +1,194 @@
+[
+    {
+        "children": [
+            {
+                "name": "Outpatient visits"
+            },
+            {
+                "name": "ANC 1st Visit"
+            },
+            {
+                "name": "ANC 4th Visit"
+            },
+            {
+                "name": "DTP1"
+            },
+            {
+                "name": "DTP3"
+            },
+            {
+                "name": "Institutional deliveries"
+            },
+            {
+                "name": "Live births"
+            },
+            {
+                "name": "Postnatal consultations"
+            },
+            {
+                "name": "Family planning 1st time users"
+            }
+        ],
+        "name": "HMIS"
+    },
+    {
+        "children": [
+            {
+                "name": "ANC 1st Visit"
+            },
+            {
+                "name": "ANC 4th Visit"
+            },
+            {
+                "name": "ANC Revisits"
+            },
+            {
+                "name": "Institutional Deliveries"
+            },
+            {
+                "name": "Tetanous Toxoid 1st Dose"
+            },
+            {
+                "name": "Post-Natal 1st Visit"
+            },
+            {
+                "name": "Postpartum care coverage "
+            },
+            {
+                "name": "IPT 1st Dose"
+            },
+            {
+                "name": "Other_specify"
+            }
+        ],
+        "name": "Maternal_Health"
+    },
+    {
+        "children": [
+            {
+                "name": "1st dose DPT-containing vaccine"
+            },
+            {
+                "name": "2nd dose DPT-containing vaccine"
+            },
+            {
+                "name": "3rd dose DPT-containing vaccine"
+            },
+            {
+                "name": "1st dose measles-containing vaccine"
+            },
+            {
+                "name": "1st dose PCV"
+            },
+            {
+                "name": "2nd dose PCV"
+            },
+            {
+                "name": "3rd dose PCV"
+            },
+            {
+                "name": "OPV1"
+            },
+            {
+                "name": "OPV2"
+            }
+        ],
+        "name": "Immunization"
+    },
+    {
+        "children": [
+            {
+                "name": "Number of HIV+ persons currently on ART"
+            },
+            {
+                "name": "Number counselled and tested for HIV"
+            },
+            {
+                "name": "Number of HIV+ pregnant women on prophylaxis"
+            },
+            {
+                "name": "Number of HIV+ persons initiated on ART"
+            },
+            {
+                "name": "Number of HIV+ persons still on ART after 12 months (retention)"
+            },
+            {
+                "name": "Number of pregnant women counseled and tested for HIV in ANC"
+            },
+            {
+                "name": "Number of pregnant women testing HIV+ in ANC"
+            },
+            {
+                "name": "HIV Coverage"
+            },
+            {
+                "name": "Number of HIV+ persons in palliative care"
+            }
+        ],
+        "name": "HIV_AIDS"
+    },
+    {
+        "children": [
+            {
+                "name": "Number of Notified TB cases (all forms of TB)"
+            },
+            {
+                "name": "Number of TB cases successfully treated (all forms of TB)"
+            },
+            {
+                "name": "Number of TB cases tested for HIV "
+            },
+            {
+                "name": "Number of HIV+ TB patients initiated on ART"
+            },
+            {
+                "name": "Number of MDR-TB cases detected"
+            },
+            {
+                "name": "Number of MDR-TB cases successfully treated"
+            },
+            {
+                "name": "HIV test results for registered new and relapse TB patients"
+            },
+            {
+                "name": "Proportion of HIV-positive new and relapse TB patients on antiretroviral therapy (ART) during TB treatment"
+            },
+            {
+                "name": "Other_specify"
+            }
+        ],
+        "name": "TB"
+    },
+    {
+        "children": [
+            {
+                "name": "Number of confirmed malaria cases reported"
+            },
+            {
+                "name": "Confirmed (or total) malaria cases receiving treatment "
+            },
+            {
+                "name": "Presumed malaria cases"
+            },
+            {
+                "name": "Suspected malaria cases tested"
+            },
+            {
+                "name": "Malaria cases (suspected and confirmed) receiving treatment"
+            },
+            {
+                "name": "Suspected malaria cases tested by microscopy"
+            },
+            {
+                "name": "Suspected malaria cases tested by microscopy that test positive"
+            },
+            {
+                "name": "Number of suspected malaria cases tested by RDT"
+            },
+            {
+                "name": "Number of suspected malaria cases tested by RDT that test positive"
+            }
+        ],
+        "name": "Malaria"
+    }
+]

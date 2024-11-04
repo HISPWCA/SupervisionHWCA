@@ -18,7 +18,6 @@ import Setting from './Setting';
 import Supervision from './Supervision';
 import { AiOutlineSetting } from 'react-icons/ai';
 import { RxDashboard } from 'react-icons/rx';
-import { MdAttachMoney } from 'react-icons/md';
 import { GrSchedule } from 'react-icons/gr';
 
 import { MdOutlineEditNote } from 'react-icons/md';
@@ -26,6 +25,11 @@ import translate from '../utils/translator';
 import Payment from './Payment';
 import Favorites from './Favorites';
 import { MdStars } from 'react-icons/md';
+
+import DE_Completness from '../datastores/DE_Completness.json';
+import DS_Completness from '../datastores/DS_Completness.json';
+import Cross_cuts from '../datastores/Cross_cuts.json';
+import Indicators from '../datastores/Indicators.json';
 
 export const Body = () => {
       const [renderPage, setRenderPage] = useState(PAGE_DASHBOARD);
@@ -40,6 +44,7 @@ export const Body = () => {
 
       const initDataStore = async () => {
             try {
+                  console.log('DE_Completness : ', DE_Completness);
                   setLoadingDataStoreInitialization(true);
                   loadUserSettings();
                   await loadDataStore(process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY, null, null, []);
@@ -51,16 +56,28 @@ export const Body = () => {
                   await loadDataStore(process.env.REACT_APP_MISSIONS_KEY, null, null, []);
                   await loadDataStore(process.env.REACT_APP_VISUALIZATION_KEY, null, null, []);
 
-                  await loadDataStore(process.env.REACT_APP_CROSS_CUT_KEY, null, null, []);
-                  await loadDataStore(process.env.REACT_APP_INDICATORS_KEY, null, null, []);
-                  await loadDataStore(process.env.REACT_APP_DE_COMPLETNESS_KEY, null, null, []);
+                  await loadDataStore(process.env.REACT_APP_CROSS_CUT_KEY, null, null, Cross_cuts);
+                  await loadDataStore(process.env.REACT_APP_INDICATORS_KEY, null, null, Indicators);
+                  await loadDataStore(process.env.REACT_APP_DE_COMPLETNESS_KEY, null, null, DE_Completness);
+                  await loadDataStore(process.env.REACT_APP_DS_COMPLETNESS_KEY, null, null, DS_Completness);
                   await loadDataStore(process.env.REACT_APP_INDICATORS_MAPPING_KEY, null, null, []);
-                  await loadDataStore(process.env.REACT_APP_DS_COMPLETNESS_KEY, null, null, []);
                   await loadDataStore(process.env.REACT_APP_PERIODS_CONFIG_KEY, null, null, {
                         periods: [],
                         month1KeyWords: [],
                         month2KeyWords: [],
-                        month3KeyWords: []
+                        month3KeyWords: [],
+                        month4KeyWords: [],
+                        month5KeyWords: [],
+                        month6KeyWords: [],
+                        month7KeyWords: [],
+                        month8KeyWords: [],
+                        month9KeyWords: [],
+                        month10KeyWords: [],
+                        month11KeyWords: [],
+                        month12KeyWords: [],
+                        month13KeyWords: [],
+                        month14KeyWords: [],
+                        month15KeyWords: []
                   });
                   await loadDataStore(process.env.REACT_APP_GLOBAL_SETTING_KEY, null, null, {
                         DQR: {

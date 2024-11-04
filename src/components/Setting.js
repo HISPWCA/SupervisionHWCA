@@ -186,7 +186,12 @@ const Setting = () => {
             month7KeyWords: [],
             month8KeyWords: [],
             month9KeyWords: [],
-            month10KeyWords: []
+            month10KeyWords: [],
+            month11KeyWords: [],
+            month12KeyWords: [],
+            month13KeyWords: [],
+            month14KeyWords: [],
+            month15KeyWords: []
       });
 
       const initialiserNumberOfIndicatorAndRecoupement = data => {
@@ -225,6 +230,30 @@ const Setting = () => {
                               fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue2 || null,
                         DHIS2MonthlyValue3:
                               fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue3 || null,
+                        DHIS2MonthlyValue4:
+                              fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue4 || null,
+                        DHIS2MonthlyValue5:
+                              fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue5 || null,
+                        DHIS2MonthlyValue6:
+                              fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue6 || null,
+                        DHIS2MonthlyValue7:
+                              fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue7 || null,
+                        DHIS2MonthlyValue8:
+                              fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue8 || null,
+                        DHIS2MonthlyValue9:
+                              fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue9 || null,
+                        DHIS2MonthlyValue10:
+                              fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue10 || null,
+                        DHIS2MonthlyValue11:
+                              fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue11 || null,
+                        DHIS2MonthlyValue12:
+                              fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue12 || null,
+                        DHIS2MonthlyValue13:
+                              fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue13 || null,
+                        DHIS2MonthlyValue14:
+                              fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue14 || null,
+                        DHIS2MonthlyValue15:
+                              fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue15 || null,
                         programArea: fieldList?.indicators?.find(ind => ind.position === i)?.programArea || null,
                         keyWords: fieldList?.indicators?.find(ind => ind.position === i)?.keyWords || []
                   });
@@ -324,7 +353,19 @@ const Setting = () => {
             setPeriodFormState({
                   month1KeyWords: [],
                   month2KeyWords: [],
-                  month3KeyWords: []
+                  month3KeyWords: [],
+                  month4KeyWords: [],
+                  month5KeyWords: [],
+                  month6KeyWords: [],
+                  month7KeyWords: [],
+                  month8KeyWords: [],
+                  month9KeyWords: [],
+                  month10KeyWords: [],
+                  month11KeyWords: [],
+                  month12KeyWords: [],
+                  month13KeyWords: [],
+                  month14KeyWords: [],
+                  month15KeyWords: []
             });
             setCurrentProgramstageConfiguration(null);
             setCurrentProgramstageConfigurationForRDQA(null);
@@ -887,7 +928,19 @@ const Setting = () => {
             setPeriodFormState({
                   month1KeyWords: [],
                   month2KeyWords: [],
-                  month3KeyWords: []
+                  month3KeyWords: [],
+                  month4KeyWords: [],
+                  month5KeyWords: [],
+                  month6KeyWords: [],
+                  month7KeyWords: [],
+                  month8KeyWords: [],
+                  month9KeyWords: [],
+                  month10KeyWords: [],
+                  month11KeyWords: [],
+                  month12KeyWords: [],
+                  month13KeyWords: [],
+                  month14KeyWords: [],
+                  month15KeyWords: []
             });
             setCurrentProgramstageConfiguration(null);
             setCurrentProgramstageConfigurationForRDQA(null);
@@ -2102,6 +2155,434 @@ const Setting = () => {
                                                                                           setPeriodFormState({
                                                                                                 ...periodFormState,
                                                                                                 month3KeyWords: word
+                                                                                          });
+                                                                                    }}
+                                                                              />
+                                                                        </td>
+                                                                  </tr>
+
+                                                                  <tr>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top',
+                                                                                    width: '50%'
+                                                                              }}
+                                                                        >
+                                                                              {translate('Keys_Word_Month4')}
+                                                                        </td>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top'
+                                                                              }}
+                                                                        >
+                                                                              <TagsInput
+                                                                                    style={{ width: '100%' }}
+                                                                                    value={
+                                                                                          periodFormState?.month4KeyWords
+                                                                                    }
+                                                                                    onChange={word => {
+                                                                                          setPeriodFormState({
+                                                                                                ...periodFormState,
+                                                                                                month4KeyWords: word
+                                                                                          });
+                                                                                    }}
+                                                                              />
+                                                                        </td>
+                                                                  </tr>
+
+                                                                  <tr>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top',
+                                                                                    width: '50%'
+                                                                              }}
+                                                                        >
+                                                                              {translate('Keys_Word_Month5')}
+                                                                        </td>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top'
+                                                                              }}
+                                                                        >
+                                                                              <TagsInput
+                                                                                    style={{ width: '100%' }}
+                                                                                    value={
+                                                                                          periodFormState?.month5KeyWords
+                                                                                    }
+                                                                                    onChange={word => {
+                                                                                          setPeriodFormState({
+                                                                                                ...periodFormState,
+                                                                                                month5KeyWords: word
+                                                                                          });
+                                                                                    }}
+                                                                              />
+                                                                        </td>
+                                                                  </tr>
+
+                                                                  <tr>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top',
+                                                                                    width: '50%'
+                                                                              }}
+                                                                        >
+                                                                              {translate('Keys_Word_Month6')}
+                                                                        </td>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top'
+                                                                              }}
+                                                                        >
+                                                                              <TagsInput
+                                                                                    style={{ width: '100%' }}
+                                                                                    value={
+                                                                                          periodFormState?.month6KeyWords
+                                                                                    }
+                                                                                    onChange={word => {
+                                                                                          setPeriodFormState({
+                                                                                                ...periodFormState,
+                                                                                                month6KeyWords: word
+                                                                                          });
+                                                                                    }}
+                                                                              />
+                                                                        </td>
+                                                                  </tr>
+                                                                  <tr>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top',
+                                                                                    width: '50%'
+                                                                              }}
+                                                                        >
+                                                                              {translate('Keys_Word_Month7')}
+                                                                        </td>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top'
+                                                                              }}
+                                                                        >
+                                                                              <TagsInput
+                                                                                    style={{ width: '100%' }}
+                                                                                    value={
+                                                                                          periodFormState?.month7KeyWords
+                                                                                    }
+                                                                                    onChange={word => {
+                                                                                          setPeriodFormState({
+                                                                                                ...periodFormState,
+                                                                                                month7KeyWords: word
+                                                                                          });
+                                                                                    }}
+                                                                              />
+                                                                        </td>
+                                                                  </tr>
+
+                                                                  <tr>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top',
+                                                                                    width: '50%'
+                                                                              }}
+                                                                        >
+                                                                              {translate('Keys_Word_Month7')}
+                                                                        </td>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top'
+                                                                              }}
+                                                                        >
+                                                                              <TagsInput
+                                                                                    style={{ width: '100%' }}
+                                                                                    value={
+                                                                                          periodFormState?.month7KeyWords
+                                                                                    }
+                                                                                    onChange={word => {
+                                                                                          setPeriodFormState({
+                                                                                                ...periodFormState,
+                                                                                                month7KeyWords: word
+                                                                                          });
+                                                                                    }}
+                                                                              />
+                                                                        </td>
+                                                                  </tr>
+
+                                                                  <tr>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top',
+                                                                                    width: '50%'
+                                                                              }}
+                                                                        >
+                                                                              {translate('Keys_Word_Month8')}
+                                                                        </td>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top'
+                                                                              }}
+                                                                        >
+                                                                              <TagsInput
+                                                                                    style={{ width: '100%' }}
+                                                                                    value={
+                                                                                          periodFormState?.month8KeyWords
+                                                                                    }
+                                                                                    onChange={word => {
+                                                                                          setPeriodFormState({
+                                                                                                ...periodFormState,
+                                                                                                month8KeyWords: word
+                                                                                          });
+                                                                                    }}
+                                                                              />
+                                                                        </td>
+                                                                  </tr>
+
+                                                                  <tr>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top',
+                                                                                    width: '50%'
+                                                                              }}
+                                                                        >
+                                                                              {translate('Keys_Word_Month9')}
+                                                                        </td>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top'
+                                                                              }}
+                                                                        >
+                                                                              <TagsInput
+                                                                                    style={{ width: '100%' }}
+                                                                                    value={
+                                                                                          periodFormState?.month9KeyWords
+                                                                                    }
+                                                                                    onChange={word => {
+                                                                                          setPeriodFormState({
+                                                                                                ...periodFormState,
+                                                                                                month9KeyWords: word
+                                                                                          });
+                                                                                    }}
+                                                                              />
+                                                                        </td>
+                                                                  </tr>
+
+                                                                  <tr>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top',
+                                                                                    width: '50%'
+                                                                              }}
+                                                                        >
+                                                                              {translate('Keys_Word_Month10')}
+                                                                        </td>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top'
+                                                                              }}
+                                                                        >
+                                                                              <TagsInput
+                                                                                    style={{ width: '100%' }}
+                                                                                    value={
+                                                                                          periodFormState?.month10KeyWords
+                                                                                    }
+                                                                                    onChange={word => {
+                                                                                          setPeriodFormState({
+                                                                                                ...periodFormState,
+                                                                                                month10KeyWords: word
+                                                                                          });
+                                                                                    }}
+                                                                              />
+                                                                        </td>
+                                                                  </tr>
+
+                                                                  <tr>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top',
+                                                                                    width: '50%'
+                                                                              }}
+                                                                        >
+                                                                              {translate('Keys_Word_Month11')}
+                                                                        </td>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top'
+                                                                              }}
+                                                                        >
+                                                                              <TagsInput
+                                                                                    style={{ width: '100%' }}
+                                                                                    value={
+                                                                                          periodFormState?.month11KeyWords
+                                                                                    }
+                                                                                    onChange={word => {
+                                                                                          setPeriodFormState({
+                                                                                                ...periodFormState,
+                                                                                                month11KeyWords: word
+                                                                                          });
+                                                                                    }}
+                                                                              />
+                                                                        </td>
+                                                                  </tr>
+
+                                                                  <tr>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top',
+                                                                                    width: '50%'
+                                                                              }}
+                                                                        >
+                                                                              {translate('Keys_Word_Month12')}
+                                                                        </td>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top'
+                                                                              }}
+                                                                        >
+                                                                              <TagsInput
+                                                                                    style={{ width: '100%' }}
+                                                                                    value={
+                                                                                          periodFormState?.month12KeyWords
+                                                                                    }
+                                                                                    onChange={word => {
+                                                                                          setPeriodFormState({
+                                                                                                ...periodFormState,
+                                                                                                month12KeyWords: word
+                                                                                          });
+                                                                                    }}
+                                                                              />
+                                                                        </td>
+                                                                  </tr>
+
+                                                                  <tr>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top',
+                                                                                    width: '50%'
+                                                                              }}
+                                                                        >
+                                                                              {translate('Keys_Word_Month13')}
+                                                                        </td>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top'
+                                                                              }}
+                                                                        >
+                                                                              <TagsInput
+                                                                                    style={{ width: '100%' }}
+                                                                                    value={
+                                                                                          periodFormState?.month13KeyWords
+                                                                                    }
+                                                                                    onChange={word => {
+                                                                                          setPeriodFormState({
+                                                                                                ...periodFormState,
+                                                                                                month13KeyWords: word
+                                                                                          });
+                                                                                    }}
+                                                                              />
+                                                                        </td>
+                                                                  </tr>
+
+                                                                  <tr>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top',
+                                                                                    width: '50%'
+                                                                              }}
+                                                                        >
+                                                                              {translate('Keys_Word_Month14')}
+                                                                        </td>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top'
+                                                                              }}
+                                                                        >
+                                                                              <TagsInput
+                                                                                    style={{ width: '100%' }}
+                                                                                    value={
+                                                                                          periodFormState?.month14KeyWords
+                                                                                    }
+                                                                                    onChange={word => {
+                                                                                          setPeriodFormState({
+                                                                                                ...periodFormState,
+                                                                                                month14KeyWords: word
+                                                                                          });
+                                                                                    }}
+                                                                              />
+                                                                        </td>
+                                                                  </tr>
+
+                                                                  <tr>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top',
+                                                                                    width: '50%'
+                                                                              }}
+                                                                        >
+                                                                              {translate('Keys_Word_Month15')}
+                                                                        </td>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top'
+                                                                              }}
+                                                                        >
+                                                                              <TagsInput
+                                                                                    style={{ width: '100%' }}
+                                                                                    value={
+                                                                                          periodFormState?.month15KeyWords
+                                                                                    }
+                                                                                    onChange={word => {
+                                                                                          setPeriodFormState({
+                                                                                                ...periodFormState,
+                                                                                                month15KeyWords: word
                                                                                           });
                                                                                     }}
                                                                               />

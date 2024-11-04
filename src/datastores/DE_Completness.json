@@ -1,0 +1,178 @@
+[
+    {
+        "children": [
+            {
+                "name": "Unique ID"
+            },
+            {
+                "name": "Visit date "
+            },
+            {
+                "name": "Client name"
+            },
+            {
+                "name": "Age"
+            },
+            {
+                "name": "Diagnosis (any type)"
+            },
+            {
+                "name": "Treatment given"
+            },
+            {
+                "name": "Other_specify"
+            }
+        ],
+        "name": "HMIS"
+    },
+    {
+        "children": [
+            {
+                "name": "Unique ID"
+            },
+            {
+                "name": "Visit date "
+            },
+            {
+                "name": "Visit number"
+            },
+            {
+                "name": "Mother's name"
+            },
+            {
+                "name": "Age"
+            },
+            {
+                "name": "Estimated delivery date (EDD)"
+            },
+            {
+                "name": "Iron supplement"
+            },
+            {
+                "name": "Folic acid supplement"
+            },
+            {
+                "name": "IpT1"
+            }
+        ],
+        "name": "Maternal_Health"
+    },
+    {
+        "children": [
+            {
+                "name": "Unique ID"
+            },
+            {
+                "name": "Registration date"
+            },
+            {
+                "name": "Child name"
+            },
+            {
+                "name": "Sex"
+            },
+            {
+                "name": "Birthdate (age)"
+            },
+            {
+                "name": "Name and address of parent (caretaker)"
+            },
+            {
+                "name": "BCG"
+            },
+            {
+                "name": "DTP1"
+            },
+            {
+                "name": "OPV1"
+            }
+        ],
+        "name": "Immunization"
+    },
+    {
+        "children": [
+            {
+                "name": "ART Initiation date"
+            },
+            {
+                "name": "Sex"
+            },
+            {
+                "name": "Age"
+            },
+            {
+                "name": "ART Regimen"
+            },
+            {
+                "name": "TB Testing"
+            },
+            {
+                "name": "Prophylaxis for OIs"
+            },
+            {
+                "name": "Other_specify"
+            }
+        ],
+        "name": "HIV_AIDE"
+    },
+    {
+        "children": [
+            {
+                "name": "Year of registration"
+            },
+            {
+                "name": "Sex"
+            },
+            {
+                "name": "Age"
+            },
+            {
+                "name": "Disease classification/ Anatomical site"
+            },
+            {
+                "name": "Type of patient"
+            },
+            {
+                "name": "Type of patient"
+            },
+            {
+                "name": "Other_specify"
+            }
+        ],
+        "name": "TB"
+    },
+    {
+        "children": [
+            {
+                "name": "Unique ID"
+            },
+            {
+                "name": "Visit date "
+            },
+            {
+                "name": "Client name"
+            },
+            {
+                "name": "Age"
+            },
+            {
+                "name": "Diagnosis (any type)"
+            },
+            {
+                "name": "Treatment with ACT"
+            },
+            {
+                "name": "Other_specify"
+            }
+        ],
+        "name": "Malaria"
+    },
+    {
+        "children": [
+            {
+                "name": "Other_specify"
+            }
+        ],
+        "name": "Other_specify"
+    }
+]
