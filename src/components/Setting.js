@@ -224,6 +224,8 @@ const Setting = () => {
                         position: i,
                         value: fieldList?.indicators?.find(ind => ind.position === i)?.value || null,
                         margin: fieldList?.indicators?.find(ind => ind.position === i)?.margin || null,
+                        viewMonthlyValue:
+                              fieldList?.indicators?.find(ind => ind.position === i)?.viewMonthlyValue || 3,
                         DHIS2MonthlyValue1:
                               fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue1 || null,
                         DHIS2MonthlyValue2:

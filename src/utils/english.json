@@ -330,5 +330,6 @@
 
     "Number_Of_Indicator_And_Recoupements": "Number of indicators and cross checks",
     "Number_Of_Recoupement": "Number of cross checks",
-    "Number_Of_Indicator": "Number of indicators"
+    "Number_Of_Indicator": "Number of indicators",
+    "Number_Of_DHIS2_monthly_value":"Number of DHIS2 monthly value"
 }

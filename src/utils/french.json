@@ -328,5 +328,6 @@
     "Keys_Word_Month15": "Mots clés Mois 15",
     "Number_Of_Indicator_And_Recoupements": "Nombre d'indicateurs et de recoupements",
     "Number_Of_Recoupement": "Nombre de recoupements",
-    "Number_Of_Indicator": "Nombre d'indicateurs"
+    "Number_Of_Indicator": "Nombre d'indicateurs",
+        "Number_Of_DHIS2_monthly_value": "Nombre de valeurs mensuelles DHIS2"
 }
