@@ -3289,15 +3289,17 @@ const Supervision = ({ me }) => {
                                                 checked={selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT}
                                           />
                                     </div>
-                                    <div style={{ marginLeft: '20px' }}>
-                                          <Radio
-                                                label={translate('Agent')}
-                                                className="cursor-pointer"
-                                                onChange={handleChangeSupervisionType}
-                                                value={TYPE_SUPERVISION_AGENT}
-                                                checked={selectedSupervisionType === TYPE_SUPERVISION_AGENT}
-                                          />
-                                    </div>
+                                    {0 > 1 && (
+                                          <div style={{ marginLeft: '20px' }}>
+                                                <Radio
+                                                      label={translate('Agent')}
+                                                      className="cursor-pointer"
+                                                      onChange={handleChangeSupervisionType}
+                                                      value={TYPE_SUPERVISION_AGENT}
+                                                      checked={selectedSupervisionType === TYPE_SUPERVISION_AGENT}
+                                                />
+                                          </div>
+                                    )}
                               </div>
                         </Card>
                   </div>

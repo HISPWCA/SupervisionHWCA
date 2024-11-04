@@ -18,7 +18,6 @@ import Setting from './Setting';
 import Supervision from './Supervision';
 import { AiOutlineSetting } from 'react-icons/ai';
 import { RxDashboard } from 'react-icons/rx';
-import { MdAttachMoney } from 'react-icons/md';
 import { GrSchedule } from 'react-icons/gr';
 
 import { MdOutlineEditNote } from 'react-icons/md';
@@ -319,7 +318,8 @@ export const Body = () => {
                                     }}
                               >
                                     <CircularLoader small />
-                                    <span style={{ marginLeft: '20px' }}>Initialization du dataStore...</span>
+                                    <span style={{ marginLeft: '20px' }}>{translate('Config_Initialization')}...</span>
+                                    {/* <span style={{ marginLeft: '20px' }}>Initialisation des Configurations...</span> */}
                               </div>
                         )}
                         {isDataStoreInitialized && (
