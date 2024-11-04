@@ -1722,19 +1722,19 @@ const Supervision = ({ me }) => {
                               if (foundInd) {
                                     const foundAggrageMappingElement = dataStoreIndicatorsMapping?.find(
                                           d => d.indicator === dv.value
-                                    ).dhis2;
+                                    )?.dhis2;
 
                                     if (foundAggrageMappingElement) {
-                                          const elementMONTH_1 = foundInd.DHIS2MonthlyValue1;
-                                          const elementMONTH_2 = foundInd.DHIS2MonthlyValue2;
-                                          const elementMONTH_3 = foundInd.DHIS2MonthlyValue3;
-                                          const elementMONTH_4 = foundInd.DHIS2MonthlyValue4;
-                                          const elementMONTH_5 = foundInd.DHIS2MonthlyValue5;
-                                          const elementMONTH_6 = foundInd.DHIS2MonthlyValue6;
-                                          const elementMONTH_7 = foundInd.DHIS2MonthlyValue7;
-                                          const elementMONTH_8 = foundInd.DHIS2MonthlyValue8;
-                                          const elementMONTH_9 = foundInd.DHIS2MonthlyValue9;
-                                          const elementMONTH_10 = foundInd.DHIS2MonthlyValue10;
+                                          const elementMONTH_1 = foundInd?.DHIS2MonthlyValue1;
+                                          const elementMONTH_2 = foundInd?.DHIS2MonthlyValue2;
+                                          const elementMONTH_3 = foundInd?.DHIS2MonthlyValue3;
+                                          const elementMONTH_4 = foundInd?.DHIS2MonthlyValue4;
+                                          const elementMONTH_5 = foundInd?.DHIS2MonthlyValue5;
+                                          const elementMONTH_6 = foundInd?.DHIS2MonthlyValue6;
+                                          const elementMONTH_7 = foundInd?.DHIS2MonthlyValue7;
+                                          const elementMONTH_8 = foundInd?.DHIS2MonthlyValue8;
+                                          const elementMONTH_9 = foundInd?.DHIS2MonthlyValue9;
+                                          const elementMONTH_10 = foundInd?.DHIS2MonthlyValue10;
 
                                           let periodPayload = {
                                                 eventDate: eventPayload.eventDate,
@@ -2202,19 +2202,19 @@ const Supervision = ({ me }) => {
                                     if (foundInd) {
                                           const foundAggrageMappingElement = dataStoreIndicatorsMapping?.find(
                                                 d => d.indicator === dv.value
-                                          ).dhis2;
+                                          )?.dhis2;
 
                                           if (foundAggrageMappingElement) {
-                                                const elementMONTH_1 = foundInd.DHIS2MonthlyValue1;
-                                                const elementMONTH_2 = foundInd.DHIS2MonthlyValue2;
-                                                const elementMONTH_3 = foundInd.DHIS2MonthlyValue3;
-                                                const elementMONTH_4 = foundInd.DHIS2MonthlyValue4;
-                                                const elementMONTH_5 = foundInd.DHIS2MonthlyValue5;
-                                                const elementMONTH_6 = foundInd.DHIS2MonthlyValue6;
-                                                const elementMONTH_7 = foundInd.DHIS2MonthlyValue7;
-                                                const elementMONTH_8 = foundInd.DHIS2MonthlyValue8;
-                                                const elementMONTH_9 = foundInd.DHIS2MonthlyValue9;
-                                                const elementMONTH_10 = foundInd.DHIS2MonthlyValue10;
+                                                const elementMONTH_1 = foundInd?.DHIS2MonthlyValue1;
+                                                const elementMONTH_2 = foundInd?.DHIS2MonthlyValue2;
+                                                const elementMONTH_3 = foundInd?.DHIS2MonthlyValue3;
+                                                const elementMONTH_4 = foundInd?.DHIS2MonthlyValue4;
+                                                const elementMONTH_5 = foundInd?.DHIS2MonthlyValue5;
+                                                const elementMONTH_6 = foundInd?.DHIS2MonthlyValue6;
+                                                const elementMONTH_7 = foundInd?.DHIS2MonthlyValue7;
+                                                const elementMONTH_8 = foundInd?.DHIS2MonthlyValue8;
+                                                const elementMONTH_9 = foundInd?.DHIS2MonthlyValue9;
+                                                const elementMONTH_10 = foundInd?.DHIS2MonthlyValue10;
 
                                                 let periodPayload = {
                                                       eventDate: eventPayload.eventDate,

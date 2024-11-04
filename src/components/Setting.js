@@ -214,7 +214,6 @@ const Setting = () => {
             const newSourceDocumentCompleteness = [];
 
             for (let i = 1; i <= +dqrConfig.nbrIndicator; i++) {
-                  
                   newIndicators.push({
                         id: uuid(),
                         position: i,
@@ -1238,6 +1237,14 @@ const Setting = () => {
                         null
                   );
 
+                  const responsePeriodConfigs = await loadDataStore(
+                        process.env.REACT_APP_PERIODS_CONFIG_KEY,
+                        null,
+                        null,
+                        null
+                  );
+
+                  setDataStorePeriodConfigs(responsePeriodConfigs);
                   setMappingConfigSupervisions(newList);
                   setProgramStageConfigurations([]);
 
@@ -1740,13 +1747,6 @@ const Setting = () => {
                               isFieldEditingMode: true
                         });
 
-                        // initFields({
-                        //       indicators: value.indicators,
-                        //       recoupements: value.recoupements,
-                        //       completeness: value.completeness,
-                        //       consistencyOvertimes: value.consistencyOvertimes
-                        // });
-
                         setCurrentProgramstageConfiguration(value);
                   }
 
@@ -1765,7 +1765,6 @@ const Setting = () => {
                               selectedSupervisorDataElements: value.supervisorField || [],
                               selectedStatusSupervisionDataElement: value.statusSupervisionField
                         });
-                        // initFieldsForRDQA(value.indicatorsFieldsConfigs || []);
                         setCurrentProgramstageConfigurationForRDQA(value);
                   }
             } catch (err) {
@@ -4139,13 +4138,10 @@ const Setting = () => {
 
       useEffect(() => {
             if (currentProgramstageConfigurationForRDQA && formState?.selectedConfigurationType === RDQA) {
-                  console.log('Initialisation pour RDQA des champs à cause de lupdate ');
-                  console.log('current program state : ', currentProgramstageConfigurationForRDQA);
                   initFieldsForRDQA(currentProgramstageConfigurationForRDQA?.indicatorsFieldsConfigs || []);
             }
 
             if (currentProgramstageConfiguration && formState?.selectedConfigurationType === DQR) {
-                  console.log('Update dqr');
                   initFields(currentProgramstageConfiguration);
             }
       }, [currentProgramstageConfiguration, currentProgramstageConfigurationForRDQA, numberOfIndicatorAndRecoupement]);
