@@ -330,5 +330,11 @@
     "Number_Of_Indicator_And_Recoupements": "Nombre d'indicateurs et de recoupements",
     "Number_Of_Recoupement": "Nombre de recoupements",
     "Number_Of_Indicator": "Nombre d'indicateurs",
-        "Number_Of_DHIS2_monthly_value": "Nombre de valeurs mensuelles DHIS2"
+    "Number_Of_DHIS2_monthly_value": "Nombre de valeurs mensuelles DHIS2",
+    "Enregistrer_Mapping": "Enrégistrer le mapping",
+    "Creer_Nouveau_Indicator": "Créer nouveau indicateur",
+    "New_Indicator": "Nouveau indicateur",
+    "Select_Indicator_Type": "Sélectionner un type d'indicateur",
+    "Create_New_Indicator_Type": "Créer un nouveau type d'indicateur",
+    "Name": "Nom"
 }

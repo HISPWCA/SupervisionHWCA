@@ -44,7 +44,6 @@ export const Body = () => {
 
       const initDataStore = async () => {
             try {
-                  console.log('DE_Completness : ', DE_Completness);
                   setLoadingDataStoreInitialization(true);
                   loadUserSettings();
                   await loadDataStore(process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY, null, null, []);

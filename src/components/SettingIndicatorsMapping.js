@@ -8,6 +8,8 @@ import { DataDimension } from '@dhis2/analytics';
 import { FiSave } from 'react-icons/fi';
 import MyNotification from './MyNotification';
 import { NOTIFICATION_CRITICAL, NOTIFICATION_SUCCESS } from '../utils/constants';
+import { IoMdAddCircleOutline } from 'react-icons/io';
+import SettingIndicatorsMappingNew from './SettingIndicatorsMappingNew';
 
 const SettingIndicatorsMapping = () => {
       const [notification, setNotification] = useState({
@@ -26,6 +28,8 @@ const SettingIndicatorsMapping = () => {
       const [loadingProcess, setLoadingProcess] = useState(false);
       const [loadingIndicators, setLoadingIndicators] = useState(false);
       const [loadingIndicatorsMapping, setLoadingIndicatorsMapping] = useState(false);
+
+      const [openNewIndicatorModal, setOpenNewIndicatorModal] = useState(false);
 
       const loadDataStoreIndicators = async () => {
             try {
@@ -176,14 +180,22 @@ const SettingIndicatorsMapping = () => {
                   <Card className="my-shadow" size="small" style={{ minWidth: '100%' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                               <div style={{ fontWeight: 'bold' }}>{translate('Indicators_Mapping')}</div>
-                              <div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                    <Button
+                                          primary
+                                          onClick={() => setOpenNewIndicatorModal(true)}
+                                          loading={false}
+                                          icon={<IoMdAddCircleOutline style={{ fontSize: '18px' }} />}
+                                    >
+                                          {translate('Creer_Nouveau_Indicator')}
+                                    </Button>
                                     <Button
                                           primary
                                           onClick={handleSave}
                                           loading={loadingProcess}
                                           icon={<FiSave style={{ fontSize: '18px' }} />}
                                     >
-                                          {translate('Enregistrer')}
+                                          {translate('Enregistrer_Mapping')}
                                     </Button>
                               </div>
                         </div>
@@ -427,6 +439,12 @@ const SettingIndicatorsMapping = () => {
                         </div>
                   </Card>
                   {RenderAnalyticComponentModal()}
+                  <SettingIndicatorsMappingNew
+                        open={openNewIndicatorModal}
+                        setOpen={setOpenNewIndicatorModal}
+                        loadDataStoreIndicators={loadDataStoreIndicators}
+                        dataStoreIndicators={dataStoreIndicators}
+                  />
                   <MyNotification notification={notification} setNotification={setNotification} />
             </>
       );
