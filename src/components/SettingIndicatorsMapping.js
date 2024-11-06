@@ -10,6 +10,7 @@ import MyNotification from './MyNotification';
 import { NOTIFICATION_CRITICAL, NOTIFICATION_SUCCESS } from '../utils/constants';
 import { IoMdAddCircleOutline } from 'react-icons/io';
 import SettingIndicatorsMappingNew from './SettingIndicatorsMappingNew';
+import { FaRegEdit } from 'react-icons/fa';
 
 const SettingIndicatorsMapping = () => {
       const [notification, setNotification] = useState({
@@ -30,6 +31,7 @@ const SettingIndicatorsMapping = () => {
       const [loadingIndicatorsMapping, setLoadingIndicatorsMapping] = useState(false);
 
       const [openNewIndicatorModal, setOpenNewIndicatorModal] = useState(false);
+      const [currentDataStoreMapping, setCurrentDataStoreMapping] = useState(null);
 
       const loadDataStoreIndicators = async () => {
             try {
@@ -212,7 +214,7 @@ const SettingIndicatorsMapping = () => {
                                                                   verticalAlign: 'center',
                                                                   textAlign: 'center',
                                                                   border: '1px solid #00000070',
-                                                                  width: '10%'
+                                                                  width: '8%'
                                                             }}
                                                       >
                                                             {translate('Indicator_Group')}
@@ -227,6 +229,16 @@ const SettingIndicatorsMapping = () => {
                                                             }}
                                                       >
                                                             {translate('Indicators_Mapping')}
+                                                      </th>
+                                                      <th
+                                                            style={{
+                                                                  padding: '2px 5px',
+                                                                  verticalAlign: 'center',
+                                                                  textAlign: 'center',
+                                                                  border: '1px solid #00000070'
+                                                            }}
+                                                      >
+                                                            #
                                                       </th>
                                                 </tr>
                                           </thead>
@@ -431,6 +443,26 @@ const SettingIndicatorsMapping = () => {
                                                                         </div>
                                                                   ))}
                                                             </td>
+                                                            <td
+                                                                  style={{
+                                                                        padding: '10px',
+                                                                        verticalAlign: 'center',
+                                                                        textAlign: 'center',
+                                                                        border: '1px solid #00000070'
+                                                                  }}
+                                                            >
+                                                                  <FaRegEdit
+                                                                        style={{
+                                                                              fontSize: '22px',
+                                                                              color: 'blue',
+                                                                              cursor: 'pointer'
+                                                                        }}
+                                                                        onClick={() => {
+                                                                              setCurrentDataStoreMapping(group);
+                                                                              setOpenNewIndicatorModal(true);
+                                                                        }}
+                                                                  />
+                                                            </td>
                                                       </tr>
                                                 ))}
                                           </tbody>
@@ -443,7 +475,11 @@ const SettingIndicatorsMapping = () => {
                         open={openNewIndicatorModal}
                         setOpen={setOpenNewIndicatorModal}
                         loadDataStoreIndicators={loadDataStoreIndicators}
+                        loadDataStoreIndicatorsMapping={loadDataStoreIndicatorsMapping}
                         dataStoreIndicators={dataStoreIndicators}
+                        setNotification={setNotification}
+                        currentDataStoreMapping={currentDataStoreMapping}
+                        setCurrentDataStoreMapping={setCurrentDataStoreMapping}
                   />
                   <MyNotification notification={notification} setNotification={setNotification} />
             </>

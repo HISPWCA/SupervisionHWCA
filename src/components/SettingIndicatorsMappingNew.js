@@ -1,21 +1,37 @@
 import { Button, ButtonStrip, Modal, ModalActions, ModalContent, ModalTitle, Radio } from '@dhis2/ui';
 import translate from '../utils/translator';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FiSave } from 'react-icons/fi';
-import { Input, Select } from 'antd';
+import { Input, Popconfirm, Select } from 'antd';
 import { IoMdAddCircle } from 'react-icons/io';
+import { RiDeleteBin6Line } from 'react-icons/ri';
+import { saveDataToDataStore } from '../utils/functions';
+import { NOTIFICATION_CRITICAL, NOTIFICATION_SUCCESS } from '../utils/constants';
 
-const SettingIndicatorsMappingNew = ({ open, setOpen, loadDataStoreIndicators, dataStoreIndicators }) => {
+const SettingIndicatorsMappingNew = ({
+      open,
+      setOpen,
+      loadDataStoreIndicators,
+      loadDataStoreIndicatorsMapping,
+      setNotification,
+      dataStoreIndicators,
+      currentDataStoreMapping,
+      setCurrentDataStoreMapping
+}) => {
       const [newIndicatorList, setNewIndicatorList] = useState([]);
       const [selectedIndicatorType, setSelectedIndicatorType] = useState('');
       const [inputIndicatorType, setInputIndicatorType] = useState('');
       const [inputIndicator, setInputIndicator] = useState('');
       const [type, setType] = useState('NEW');
+      const [loadingSave, setLoadingSave] = useState(false);
+      const [loadingDelete, setLoadingDelete] = useState(false);
 
       const cleanAllState = () => {
             setSelectedIndicatorType('');
             setType('NEW');
+            setInputIndicator('');
+            setInputIndicatorType('');
             setNewIndicatorList([]);
             setOpen(false);
       };
@@ -24,7 +40,46 @@ const SettingIndicatorsMappingNew = ({ open, setOpen, loadDataStoreIndicators, d
             cleanAllState();
       };
 
-      const handleSave = () => {};
+      const handleSave = async () => {
+            try {
+                  setLoadingSave(true);
+                  let payloads = dataStoreIndicators;
+                  if (type === 'SELECT') {
+                        payloads = dataStoreIndicators.map(i => {
+                              if (i.name === selectedIndicatorType) {
+                                    return { ...i, children: newIndicatorList || [] };
+                              }
+                              return i;
+                        });
+                  }
+
+                  if (type === 'NEW') {
+                        payloads = [
+                              ...dataStoreIndicators,
+                              { name: inputIndicatorType?.trim(), children: newIndicatorList || [] }
+                        ];
+                  }
+                  await saveDataToDataStore(process.env.REACT_APP_INDICATORS_KEY, payloads);
+                  setNotification({
+                        show: true,
+                        message: translate('Operation_Success'),
+                        type: NOTIFICATION_SUCCESS
+                  });
+                  setCurrentDataStoreMapping(null);
+                  loadDataStoreIndicators();
+                  loadDataStoreIndicatorsMapping();
+                  cleanAllState();
+                  setLoadingSave(false);
+            } catch (err) {
+                  console.log('err: ', err);
+                  setLoadingSave(false);
+                  setNotification({
+                        show: true,
+                        message: err.response?.data?.message || err.message,
+                        type: NOTIFICATION_CRITICAL
+                  });
+            }
+      };
 
       const handleSelectIndicatortype = value => {
             console.log('v: ', value);
@@ -65,6 +120,45 @@ const SettingIndicatorsMappingNew = ({ open, setOpen, loadDataStoreIndicators, d
                   setInputIndicator('');
             }
       };
+
+      const handleDeleteEverything = async () => {
+            try {
+                  setLoadingDelete(true);
+                  let payloads = dataStoreIndicators?.filter(i => i.name !== currentDataStoreMapping?.name) || [];
+
+                  await saveDataToDataStore(process.env.REACT_APP_INDICATORS_KEY, payloads);
+                  setNotification({
+                        show: true,
+                        message: translate('Operation_Success'),
+                        type: NOTIFICATION_SUCCESS
+                  });
+                  setCurrentDataStoreMapping(null);
+                  loadDataStoreIndicators();
+                  loadDataStoreIndicatorsMapping();
+                  cleanAllState();
+                  setLoadingDelete(false);
+            } catch (err) {
+                  console.log('err: ', err);
+                  setLoadingDelete(false);
+                  setNotification({
+                        show: true,
+                        message: err.response?.data?.message || err.message,
+                        type: NOTIFICATION_CRITICAL
+                  });
+            }
+      };
+
+      const handleDeleteIndicator = indName => {
+            setNewIndicatorList(newIndicatorList.filter(i => indName !== i.name));
+      };
+
+      useEffect(() => {
+            if (currentDataStoreMapping) {
+                  setSelectedIndicatorType(currentDataStoreMapping?.name);
+                  setNewIndicatorList(currentDataStoreMapping?.children || []);
+                  setType('SELECT');
+            }
+      }, [currentDataStoreMapping]);
 
       return (
             <>
@@ -245,7 +339,29 @@ const SettingIndicatorsMappingNew = ({ open, setOpen, loadDataStoreIndicators, d
                                                                                           }}
                                                                                     >
                                                                                           <div> {ind.name}</div>
-                                                                                          <div> delete</div>
+                                                                                          <div>
+                                                                                                <Popconfirm
+                                                                                                      title={translate(
+                                                                                                            'Delete'
+                                                                                                      )}
+                                                                                                      description={translate(
+                                                                                                            'Remove_Indicator_From_List'
+                                                                                                      )}
+                                                                                                      onConfirm={() =>
+                                                                                                            handleDeleteIndicator(
+                                                                                                                  ind.name
+                                                                                                            )
+                                                                                                      }
+                                                                                                >
+                                                                                                      <RiDeleteBin6Line
+                                                                                                            style={{
+                                                                                                                  color: 'red',
+                                                                                                                  fontSize: '18px',
+                                                                                                                  cursor: 'pointer'
+                                                                                                            }}
+                                                                                                      />
+                                                                                                </Popconfirm>
+                                                                                          </div>
                                                                                     </div>
                                                                               ))}
                                                                         </div>
@@ -258,19 +374,45 @@ const SettingIndicatorsMappingNew = ({ open, setOpen, loadDataStoreIndicators, d
                                           <></>
                                     )}
                               </ModalContent>
-                              <ModalActions>
+                              <ModalActions className="w-100">
+                                    {/* <div
+                                          style={{
+                                                justifyContent: 'space-between',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                width: '100%'
+                                          }}
+                                          className="w-100"
+                                    > */}
+                                    <ButtonStrip start>
+                                          {dataStoreIndicators?.map(i => i.name)?.includes(selectedIndicatorType) && (
+                                                <div>
+                                                      <Button destructive onClick={() => handleDeleteEverything()}>
+                                                            {translate('Remove_All')}
+                                                      </Button>
+                                                </div>
+                                          )}
+                                    </ButtonStrip>
+                                    {/* <div
+                                                style={{
+                                                      display: 'flex',
+                                                      alignItems: 'center',
+                                                      gap: '5px'
+                                                }}
+                                          > */}
                                     <ButtonStrip end>
-                                          <Button destruction onClick={handleCloseModal}>
-                                                {translate('Annuler')}
-                                          </Button>
+                                          <Button onClick={handleCloseModal}>{translate('Annuler')}</Button>
                                           <Button
                                                 primary
                                                 onClick={handleSave}
                                                 icon={<FiSave style={{ fontSize: '18px' }} />}
+                                                loading={loadingSave}
                                           >
                                                 {translate('Enregistrer')}
                                           </Button>
                                     </ButtonStrip>
+                                    {/* </div> */}
+                                    {/* </div> */}
                               </ModalActions>
                         </Modal>
                   )}

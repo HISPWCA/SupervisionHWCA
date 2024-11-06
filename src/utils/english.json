@@ -331,11 +331,15 @@
     "Number_Of_Recoupement": "Number of cross checks",
     "Number_Of_Indicator": "Number of indicators",
     "Number_Of_DHIS2_monthly_value": "Number of DHIS2 monthly value",
+    "Enregistrer_Mapping": "Save mapping",
+    "Creer_Nouveau_Indicator": "Create new Indicator",
+    "New_Indicator": "New indicator",
+    "Select_Indicator_Type": "Select indicator type",
+    "Create_New_Indicator_Type": "Create new indicator type",
+    "Name": "Name",
+    "Remove_Indicator_From_List": "Remove indicator from list",
+    "Remove_Indicator_Type_With_His_Indicators": "Remove indicator type with his indicators",
+    "Remove_All": "Delete all",
+    "Delete": "Delete"
 
-    "Enregistrer_Mapping":"Save mapping",
-    "Creer_Nouveau_Indicator":"Create new Indicator",
-    "New_Indicator":"New indicator",
-    "Select_Indicator_Type":"Select indicator type",
-    "Create_New_Indicator_Type":"Create new indicator type",
-    "Name":"Name"
 }

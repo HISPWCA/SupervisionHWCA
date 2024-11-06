@@ -336,5 +336,9 @@
     "New_Indicator": "Nouveau indicateur",
     "Select_Indicator_Type": "Sélectionner un type d'indicateur",
     "Create_New_Indicator_Type": "Créer un nouveau type d'indicateur",
-    "Name": "Nom"
+    "Name": "Nom",
+    "Remove_Indicator_From_List":"Enlever l'indicateur de la liste",
+    "Remove_Indicator_Type_With_His_Indicators":"Enlever le type d'indicateur avec ses indicateurs",
+    "Remove_All":"Supprimer tout",
+    "Delete":"Suppression"
 }
