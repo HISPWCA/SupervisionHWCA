@@ -40,8 +40,9 @@ const SettingIndicatorsMappingNew = ({ open, setOpen, loadDataStoreIndicators, d
       };
 
       const handleInputIndicatorType = e => {
+            console.log('namem: ', e.target.value);
             setInputIndicatorType(e.target.value);
-            setInputIndicatorType('');
+            setSelectedIndicatorType('');
       };
 
       const handleSelectType = ({ value }) => {
@@ -118,80 +119,84 @@ const SettingIndicatorsMappingNew = ({ open, setOpen, loadDataStoreIndicators, d
                                                 )}
                                           </div>
 
-                                          {selectedIndicatorType ||
-                                                (selectedIndicatorType && (
-                                                      <>
-                                                            <hr style={{ margin: '20px auto' }} />
-                                                            <div style={{ fontWeight: 'bold' }}>
-                                                                  {translate('Indicateurs')}
-                                                            </div>
-                                                            <table
-                                                                  style={{
-                                                                        width: '100%',
-                                                                        borderCollapse: 'collapse',
-                                                                        marginTop: '10px'
-                                                                  }}
-                                                            >
-                                                                  <thead>
-                                                                        <tr style={{ background: '#C3E9E2' }}>
-                                                                              <th
-                                                                                    style={{
-                                                                                          padding: '5px',
-                                                                                          border: '1px solid #00000090'
-                                                                                    }}
-                                                                              >
-                                                                                    {translate('Indicator_Group')}
-                                                                              </th>
-                                                                              <th
-                                                                                    style={{
-                                                                                          padding: '5px',
-                                                                                          border: '1px solid #00000090'
-                                                                                    }}
-                                                                              >
-                                                                                    {translate('Indicateurs')}
-                                                                              </th>
-                                                                        </tr>
-                                                                  </thead>
-                                                                  <tbody>
-                                                                        <tr>
-                                                                              <td style={{ padding: '5px' }}>
-                                                                                    {type === 'SELECT'
-                                                                                          ? selectedIndicatorType
-                                                                                          : inputIndicatorType}
-                                                                              </td>
-                                                                              <td>
-                                                                                    <div>
-                                                                                          {newIndicatorList?.map(
-                                                                                                (ind, index) => (
-                                                                                                      <div
-                                                                                                            key={index}
-                                                                                                            style={{
-                                                                                                                  padding: '5px',
-                                                                                                                  display: 'flex',
-                                                                                                                  alignItems:
-                                                                                                                        'center',
-                                                                                                                  justifyContent:
-                                                                                                                        'space-between'
-                                                                                                            }}
-                                                                                                      >
-                                                                                                            <div>
-                                                                                                                  {' '}
-                                                                                                                  {ind}
-                                                                                                            </div>
-                                                                                                            <div>
-                                                                                                                  {' '}
-                                                                                                                  delete
-                                                                                                            </div>
-                                                                                                      </div>
-                                                                                                )
-                                                                                          )}
-                                                                                    </div>
-                                                                              </td>
-                                                                        </tr>
-                                                                  </tbody>
-                                                            </table>
-                                                      </>
-                                                ))}
+                                          <div></div>
+
+                                          {selectedIndicatorType || inputIndicatorType ? (
+                                                <>
+                                                      <hr style={{ margin: '20px auto' }} />
+                                                      <div style={{ fontWeight: 'bold' }}>
+                                                            {translate('Indicateurs')}
+                                                      </div>
+                                                      <table
+                                                            style={{
+                                                                  width: '100%',
+                                                                  borderCollapse: 'collapse',
+                                                                  marginTop: '10px',
+                                                                  fontSize: '12px'
+                                                            }}
+                                                      >
+                                                            <thead>
+                                                                  <tr style={{ background: '#C3E9E2' }}>
+                                                                        <th
+                                                                              style={{
+                                                                                    padding: '5px',
+                                                                                    border: '1px solid #00000090',
+                                                                                    width: '40%'
+                                                                              }}
+                                                                        >
+                                                                              {translate('Indicator_Group')}
+                                                                        </th>
+                                                                        <th
+                                                                              style={{
+                                                                                    padding: '5px',
+                                                                                    border: '1px solid #00000090'
+                                                                              }}
+                                                                        >
+                                                                              {translate('Indicateurs')}
+                                                                        </th>
+                                                                  </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                  <tr>
+                                                                        <td
+                                                                              style={{
+                                                                                    padding: '5px',
+                                                                                    border: '1px solid #00000090'
+                                                                              }}
+                                                                        >
+                                                                              {type === 'SELECT'
+                                                                                    ? selectedIndicatorType
+                                                                                    : inputIndicatorType}
+                                                                        </td>
+                                                                        <td style={{ border: '1px solid #00000090' }}>
+                                                                              <div>
+                                                                                    {newIndicatorList?.map(
+                                                                                          (ind, index) => (
+                                                                                                <div
+                                                                                                      key={index}
+                                                                                                      style={{
+                                                                                                            padding: '5px',
+                                                                                                            display: 'flex',
+                                                                                                            alignItems:
+                                                                                                                  'center',
+                                                                                                            justifyContent:
+                                                                                                                  'space-between'
+                                                                                                      }}
+                                                                                                >
+                                                                                                      <div> {ind}</div>
+                                                                                                      <div> delete</div>
+                                                                                                </div>
+                                                                                          )
+                                                                                    )}
+                                                                              </div>
+                                                                        </td>
+                                                                  </tr>
+                                                            </tbody>
+                                                      </table>
+                                                </>
+                                          ) : (
+                                                <></>
+                                          )}
                                     </div>
                               </ModalContent>
                               <ModalActions>

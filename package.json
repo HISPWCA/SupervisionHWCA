@@ -10,7 +10,8 @@
     "manifest": "d2-manifest package.json build/manifest.webapp",
     "start": "d2-app-scripts start",
     "test": "d2-app-scripts test",
-    "deploy": "d2-app-scripts deploy"
+    "deploy": "d2-app-scripts deploy",
+    "b":"d2-app-scripts build"
   },
   "devDependencies": {
     "@dhis2/cli-app-scripts": "^10.3.8"
