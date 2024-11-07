@@ -2786,7 +2786,12 @@ const Setting = () => {
                               null
                         );
 
-                        if (listFromDataStore?.map(d => d.program?.id)?.includes(selectedProgramForVisualization?.id)) {
+                        if (
+                              listFromDataStore
+                                    ?.map(d => d.program?.id)
+                                    ?.includes(selectedProgramForVisualization?.id) &&
+                              !currentVisualizationConfig
+                        ) {
                               throw new Error(translate('Configuration_Deja_Ajoutee'));
                         }
 
