@@ -375,44 +375,46 @@ const SettingIndicatorsMappingNew = ({
                                     )}
                               </ModalContent>
                               <ModalActions className="w-100">
-                                    {/* <div
+                                    <div
                                           style={{
                                                 justifyContent: 'space-between',
                                                 display: 'flex',
                                                 alignItems: 'center',
-                                                width: '100%'
+                                                width: '100%',
+                                                gap: '20px'
                                           }}
                                           className="w-100"
-                                    > */}
-                                    <ButtonStrip start>
-                                          {dataStoreIndicators?.map(i => i.name)?.includes(selectedIndicatorType) && (
-                                                <div>
-                                                      <Button destructive onClick={() => handleDeleteEverything()}>
-                                                            {translate('Remove_All')}
-                                                      </Button>
-                                                </div>
-                                          )}
-                                    </ButtonStrip>
-                                    {/* <div
+                                    >
+                                          <Button onClick={handleCloseModal}>{translate('Annuler')}</Button>
+                                          <div
                                                 style={{
                                                       display: 'flex',
                                                       alignItems: 'center',
                                                       gap: '5px'
                                                 }}
-                                          > */}
-                                    <ButtonStrip end>
-                                          <Button onClick={handleCloseModal}>{translate('Annuler')}</Button>
-                                          <Button
-                                                primary
-                                                onClick={handleSave}
-                                                icon={<FiSave style={{ fontSize: '18px' }} />}
-                                                loading={loadingSave}
                                           >
-                                                {translate('Enregistrer')}
-                                          </Button>
-                                    </ButtonStrip>
-                                    {/* </div> */}
-                                    {/* </div> */}
+                                                {dataStoreIndicators
+                                                      ?.map(i => i.name)
+                                                      ?.includes(selectedIndicatorType) && (
+                                                      <div>
+                                                            <Button
+                                                                  destructive
+                                                                  onClick={() => handleDeleteEverything()}
+                                                            >
+                                                                  {translate('Remove_All')}
+                                                            </Button>
+                                                      </div>
+                                                )}
+                                                <Button
+                                                      primary
+                                                      onClick={handleSave}
+                                                      icon={<FiSave style={{ fontSize: '18px' }} />}
+                                                      loading={loadingSave}
+                                                >
+                                                      {translate('Enregistrer')}
+                                                </Button>
+                                          </div>
+                                    </div>
                               </ModalActions>
                         </Modal>
                   )}
