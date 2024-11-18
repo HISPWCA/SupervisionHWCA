@@ -3442,30 +3442,30 @@ const Supervision = ({ me }) => {
                               <Col sm={24} md={4} style={{ textAlign: 'left' }}>
                                     {isEditionMode && inputFields.length > 0 && (
                                           <div style={{ marginTop: '15px' }}>
-                                                {selectedPlanificationType === ORGANISATION_UNIT && (
-                                                      <Popconfirm
-                                                            title={translate('Confirmation_Planification_Message')}
-                                                            onConfirm={handleSupervisionPlanificationSaveBtn}
+                                                {/* {selectedPlanificationType === ORGANISATION_UNIT && ( */}
+                                                <Popconfirm
+                                                      title={translate('Confirmation_Planification_Message')}
+                                                      onConfirm={handleSupervisionPlanificationSaveBtn}
+                                                >
+                                                      <Button
+                                                            icon={
+                                                                  <FiSave
+                                                                        style={{
+                                                                              color: '#fff',
+                                                                              fontSize: '18px'
+                                                                        }}
+                                                                  />
+                                                            }
+                                                            primary
+                                                            disabled={loadingSupervisionPlanification}
+                                                            loading={loadingSupervisionPlanification}
                                                       >
-                                                            <Button
-                                                                  icon={
-                                                                        <FiSave
-                                                                              style={{
-                                                                                    color: '#fff',
-                                                                                    fontSize: '18px'
-                                                                              }}
-                                                                        />
-                                                                  }
-                                                                  primary
-                                                                  disabled={loadingSupervisionPlanification}
-                                                                  loading={loadingSupervisionPlanification}
-                                                            >
-                                                                  {translate('Planifier_Supervision')}
-                                                            </Button>
-                                                      </Popconfirm>
-                                                )}
+                                                            {translate('Planifier_Supervision')}
+                                                      </Button>
+                                                </Popconfirm>
+                                                {/* )} */}
 
-                                                {selectedPlanificationType !== ORGANISATION_UNIT && (
+                                                {/* {selectedPlanificationType !== ORGANISATION_UNIT && (
                                                       <Button
                                                             icon={
                                                                   <FiSave style={{ color: '#fff', fontSize: '18px' }} />
@@ -3480,7 +3480,7 @@ const Supervision = ({ me }) => {
                                                       >
                                                             {translate('Planifier_Supervision')}
                                                       </Button>
-                                                )}
+                                                )} */}
                                           </div>
                                     )}
                               </Col>

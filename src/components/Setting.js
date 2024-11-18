@@ -224,8 +224,7 @@ const Setting = () => {
                         position: i,
                         value: fieldList?.indicators?.find(ind => ind.position === i)?.value || null,
                         margin: fieldList?.indicators?.find(ind => ind.position === i)?.margin || null,
-                        viewMonthlyValue:
-                              fieldList?.indicators?.find(ind => ind.position === i)?.viewMonthlyValue || 3,
+                        viewMonthlyValue: fieldList?.indicators?.find(ind => ind.position === i)?.viewMonthlyValue || 3,
                         DHIS2MonthlyValue1:
                               fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue1 || null,
                         DHIS2MonthlyValue2:
@@ -414,20 +413,21 @@ const Setting = () => {
             }
       };
 
-      const updatePeriodsConfigs = async periodPayload => {
-            try {
-                  let configPayload = (await loadDataStore(
-                        process.env.REACT_APP_PERIODS_CONFIG_KEY,
-                        null,
-                        null,
-                        null
-                  )) || { periods: [], month1KeyWords: [], month2KeyWords: [], month3KeyWords: [] };
-                  if (configPayload && periodPayload) {
-                        configPayload = { ...configPayload, periods: [...configPayload.periods, periodPayload] };
-                  }
-                  await saveDataToDataStore(process.env.REACT_APP_PERIODS_CONFIG_KEY, configPayload, null, null, null);
-            } catch (err) {}
-      };
+      // const updatePeriodsConfigs = async periodPayload => {
+      //       try {
+      //             let configPayload = (await loadDataStore(
+      //                   process.env.REACT_APP_PERIODS_CONFIG_KEY,
+      //                   null,
+      //                   null,
+      //                   null
+      //             )) || { periods: [], month1KeyWords: [], month2KeyWords: [], month3KeyWords: [] };
+      //             if (configPayload && periodPayload) {
+      //                   configPayload = { ...configPayload, periods: [...configPayload.periods, periodPayload] };
+      //             }
+      //             await saveDataToDataStore(process.env.REACT_APP_PERIODS_CONFIG_KEY, configPayload, null, null, null);
+      //       } catch (err) {}
+      // };
+
       const loadPrograms = async () => {
             try {
                   setLoadingPrograms(true);
@@ -444,7 +444,7 @@ const Setting = () => {
       const loadMaps = async () => {
             try {
                   const response = await axios.get(`${MAPS_ROUTE}?paging=false&fields=id,displayName,name`);
-                  setMaps(response.data.maps?.map(m => ({ ...m, type: 'MAP' })) || []);
+                  setMaps(response.data?.maps?.map(m => ({ ...m, type: 'MAP' })) || []);
             } catch (err) {}
       };
 
@@ -504,18 +504,18 @@ const Setting = () => {
             }
       };
 
-      const loadProgramIndicatorGroups = async () => {
-            try {
-                  setLoadingIndicatorGroups(true);
+      // const loadProgramIndicatorGroups = async () => {
+      //       try {
+      //             setLoadingIndicatorGroups(true);
 
-                  const response = await axios.get(`${PROGRAM_INDICATOR_GROUPS}`);
+      //             const response = await axios.get(`${PROGRAM_INDICATOR_GROUPS}`);
 
-                  setIndicatorGroups(response.data.programIndicatorGroups);
-                  setLoadingIndicatorGroups(false);
-            } catch (err) {
-                  setLoadingIndicatorGroups(false);
-            }
-      };
+      //             setIndicatorGroups(response.data.programIndicatorGroups);
+      //             setLoadingIndicatorGroups(false);
+      //       } catch (err) {
+      //             setLoadingIndicatorGroups(false);
+      //       }
+      // };
 
       const loadProgramStages = async programID => {
             try {
@@ -896,57 +896,57 @@ const Setting = () => {
             cleanAllProgramConfigurationStates();
       };
 
-      const cleanStateAfterProgramCongurationSaved = () => {
-            setFormState({
-                  ...formState,
-                  selectedProgramStageForConfiguration: null,
-                  selectedOrganisationUnitGroup: null,
-                  selectedSupervisorDataElements: [],
-                  selectedStatusSupervisionDataElement: null,
-                  selectedSupervisionAutoGenerateID: null,
-                  selectedNbrIndicatorsToShow: null,
-                  indicators: [],
-                  recoupements: [],
-                  completeness: {
-                        dataElements: [],
-                        sourceDocuments: [],
-                        margin: null,
-                        programAreaDOC: null,
-                        programAreaDE: null
-                  },
-                  consistencyOvertimes: [],
-                  isFieldEditingMode: false
-            });
+      // const cleanStateAfterProgramCongurationSaved = () => {
+      //       setFormState({
+      //             ...formState,
+      //             selectedProgramStageForConfiguration: null,
+      //             selectedOrganisationUnitGroup: null,
+      //             selectedSupervisorDataElements: [],
+      //             selectedStatusSupervisionDataElement: null,
+      //             selectedSupervisionAutoGenerateID: null,
+      //             selectedNbrIndicatorsToShow: null,
+      //             indicators: [],
+      //             recoupements: [],
+      //             completeness: {
+      //                   dataElements: [],
+      //                   sourceDocuments: [],
+      //                   margin: null,
+      //                   programAreaDOC: null,
+      //                   programAreaDE: null
+      //             },
+      //             consistencyOvertimes: [],
+      //             isFieldEditingMode: false
+      //       });
 
-            setFormStateForRDQA({
-                  ...formStateForRDQA,
-                  selectedProgramStageForConfiguration: null,
-                  selectedOrganisationUnitGroup: null,
-                  selectedSupervisorDataElements: [],
-                  selectedStatusSupervisionDataElement: null,
-                  selectedSupervisionAutoGenerateID: null
-            });
+      //       setFormStateForRDQA({
+      //             ...formStateForRDQA,
+      //             selectedProgramStageForConfiguration: null,
+      //             selectedOrganisationUnitGroup: null,
+      //             selectedSupervisorDataElements: [],
+      //             selectedStatusSupervisionDataElement: null,
+      //             selectedSupervisionAutoGenerateID: null
+      //       });
 
-            setPeriodFormState({
-                  month1KeyWords: [],
-                  month2KeyWords: [],
-                  month3KeyWords: [],
-                  month4KeyWords: [],
-                  month5KeyWords: [],
-                  month6KeyWords: [],
-                  month7KeyWords: [],
-                  month8KeyWords: [],
-                  month9KeyWords: [],
-                  month10KeyWords: [],
-                  month11KeyWords: [],
-                  month12KeyWords: [],
-                  month13KeyWords: [],
-                  month14KeyWords: [],
-                  month15KeyWords: []
-            });
-            setCurrentProgramstageConfiguration(null);
-            setCurrentProgramstageConfigurationForRDQA(null);
-      };
+      //       setPeriodFormState({
+      //             month1KeyWords: [],
+      //             month2KeyWords: [],
+      //             month3KeyWords: [],
+      //             month4KeyWords: [],
+      //             month5KeyWords: [],
+      //             month6KeyWords: [],
+      //             month7KeyWords: [],
+      //             month8KeyWords: [],
+      //             month9KeyWords: [],
+      //             month10KeyWords: [],
+      //             month11KeyWords: [],
+      //             month12KeyWords: [],
+      //             month13KeyWords: [],
+      //             month14KeyWords: [],
+      //             month15KeyWords: []
+      //       });
+      //       setCurrentProgramstageConfiguration(null);
+      //       setCurrentProgramstageConfigurationForRDQA(null);
+      // };
 
       const handleSaveSupConfig = async () => {
             try {
@@ -994,8 +994,8 @@ const Setting = () => {
                         !formState?.isFieldEditingMode &&
                         existingConfig &&
                         existingConfig.programStageConfigurations
-                              .map(p => p.programStage?.id)
-                              .includes(formState?.selectedProgramStageForConfiguration?.id)
+                              ?.map(p => p.programStage?.id)
+                              ?.includes(formState?.selectedProgramStageForConfiguration?.id)
                   ) {
                         throw new Error(translate('ProgramStage_Already_Configured'));
                   }
@@ -1005,8 +1005,8 @@ const Setting = () => {
                         !formState?.isFieldEditingMode &&
                         existingConfig &&
                         existingConfig.programStageConfigurations
-                              .map(p => p.programStage?.id)
-                              .includes(formStateForRDQA?.selectedProgramStageForConfiguration?.id)
+                              ?.map(p => p.programStage?.id)
+                              ?.includes(formStateForRDQA?.selectedProgramStageForConfiguration?.id)
                   ) {
                         throw new Error(translate('ProgramStage_Already_Configured'));
                   }
@@ -2649,6 +2649,7 @@ const Setting = () => {
                   });
             }
       };
+      
       const RenderConfigurationForEachProgramStageList = () =>
             programStageConfigurations.length > 0 && (
                   <div style={{ marginTop: '20px', position: 'sticky', top: 5 }}>
@@ -2971,7 +2972,7 @@ const Setting = () => {
                                                                   (formState?.isFieldEditingMode &&
                                                                         currentProgramstageConfigurationForRDQA)
                                                             }
-                                                            options={programStages.map(programStage => ({
+                                                            options={programStages?.map(programStage => ({
                                                                   label: programStage.displayName,
                                                                   value: programStage.id
                                                             }))}
@@ -2996,7 +2997,7 @@ const Setting = () => {
                                                             {translate('Groupe_Unite_Organisation')}
                                                       </div>
                                                       <Select
-                                                            options={organisationUnitGroups.map(
+                                                            options={organisationUnitGroups?.map(
                                                                   organisationUnitGroup => ({
                                                                         label: organisationUnitGroup.displayName,
                                                                         value: organisationUnitGroup.id
@@ -3302,7 +3303,7 @@ const Setting = () => {
                                                 {translate('Liste_Programme_Tracker')}
                                           </div>
                                           <Table
-                                                dataSource={mappingConfigSupervisions.map(mapConf => ({
+                                                dataSource={mappingConfigSupervisions?.map(mapConf => ({
                                                       ...mapConf,
                                                       programName: mapConf?.program?.displayName,
                                                       action: { ...mapConf }
@@ -3394,13 +3395,13 @@ const Setting = () => {
       const handleAddVisualizationToFavorisList = () => {
             const newFavList = [];
             for (let m of selectedMaps) {
-                  if (!newFavList.map(f => f.id).includes(m.id)) {
+                  if (!newFavList?.map(f => f.id).includes(m.id)) {
                         newFavList.push(m);
                   }
             }
 
             for (let v of selectedVisualizations) {
-                  if (!newFavList.map(f => f.id).includes(v.id)) {
+                  if (!newFavList?.map(f => f.id).includes(v.id)) {
                         newFavList.push(v);
                   }
             }
@@ -3430,7 +3431,7 @@ const Setting = () => {
                                                             {translate('Programmes_Tracker')}
                                                       </div>
                                                       <Select
-                                                            options={programs.map(program => ({
+                                                            options={programs?.map(program => ({
                                                                   label: program.displayName,
                                                                   value: program.id
                                                             }))}
@@ -3476,7 +3477,7 @@ const Setting = () => {
                                                                               {translate('SelectVisualizations')}
                                                                         </div>
                                                                         <Select
-                                                                              options={visualizations.map(vis => ({
+                                                                              options={visualizations?.map(vis => ({
                                                                                     label: vis.displayName,
                                                                                     value: vis.id
                                                                               }))}
@@ -3488,14 +3489,14 @@ const Setting = () => {
                                                                               optionFilterProp="label"
                                                                               onChange={value =>
                                                                                     setSelectedVisualizations(
-                                                                                          value.map(v =>
+                                                                                          value?.map(v =>
                                                                                                 visualizations.find(
                                                                                                       m => m.id === v
                                                                                                 )
                                                                                           )
                                                                                     )
                                                                               }
-                                                                              value={selectedVisualizations.map(
+                                                                              value={selectedVisualizations?.map(
                                                                                     m => m.id
                                                                               )}
                                                                               mode="multiple"
@@ -3509,7 +3510,7 @@ const Setting = () => {
                                                                               {translate('SelectMaps')}
                                                                         </div>
                                                                         <Select
-                                                                              options={maps.map(map => ({
+                                                                              options={maps?.map(map => ({
                                                                                     label: map.displayName,
                                                                                     value: map.id
                                                                               }))}
@@ -3519,14 +3520,14 @@ const Setting = () => {
                                                                               optionFilterProp="label"
                                                                               onChange={value =>
                                                                                     setSelectedMaps(
-                                                                                          value.map(v =>
+                                                                                          value?.map(v =>
                                                                                                 maps.find(
                                                                                                       m => m.id === v
                                                                                                 )
                                                                                           )
                                                                                     )
                                                                               }
-                                                                              value={selectedMaps.map(m => m.id)}
+                                                                              value={selectedMaps?.map(m => m.id)}
                                                                               mode="multiple"
                                                                               allowClear
                                                                         />
@@ -3535,7 +3536,7 @@ const Setting = () => {
                                                       </div>
                                                 )}
 
-                                                {(selectedMaps.length > 0 || selectedVisualizations.length > 0) && (
+                                                {(selectedMaps.length > 0 || selectedVisualizations?.length > 0) && (
                                                       <div style={{ marginTop: '10px' }}>
                                                             <Button
                                                                   primary
@@ -3564,7 +3565,10 @@ const Setting = () => {
                                                             bordered
                                                             size="small"
                                                             pagination={false}
-                                                            dataSource={favorisItems.map(f => ({ ...f, action: f.id }))}
+                                                            dataSource={favorisItems?.map(f => ({
+                                                                  ...f,
+                                                                  action: f.id
+                                                            }))}
                                                             columns={[
                                                                   {
                                                                         title: translate('Favoris'),
@@ -3682,7 +3686,7 @@ const Setting = () => {
                                                 {translate('Visualization_Configurations')}
                                           </div>
                                           <Table
-                                                dataSource={dataStoreVisualizations.map(fav => ({
+                                                dataSource={dataStoreVisualizations?.map(fav => ({
                                                       ...fav,
                                                       programName: fav?.program?.displayName,
                                                       nbrVisualizations: fav?.visualizations?.length || 0,
@@ -3783,7 +3787,7 @@ const Setting = () => {
                                                       {translate('Liste_Config_Paiement')}
                                                 </div>
                                                 <Table
-                                                      dataSource={paymentConfigList.map(conf => ({
+                                                      dataSource={paymentConfigList?.map(conf => ({
                                                             ...conf,
                                                             programName: conf.program?.displayName,
                                                             action: conf
@@ -3940,7 +3944,7 @@ const Setting = () => {
                                                                         {translate('Groupe_Indicateurs')}
                                                                   </div>
                                                                   <Select
-                                                                        options={indicatorGroups.map(
+                                                                        options={indicatorGroups?.map(
                                                                               indicateurGroup => ({
                                                                                     label: indicateurGroup.displayName,
                                                                                     value: indicateurGroup.id
@@ -3996,7 +4000,7 @@ const Setting = () => {
                                                                         {translate('Programmes')}
                                                                   </div>
                                                                   <Select
-                                                                        options={programs.map(program => ({
+                                                                        options={programs?.map(program => ({
                                                                               label: program.displayName,
                                                                               value: program.id
                                                                         }))}
@@ -4193,7 +4197,7 @@ const Setting = () => {
                                                 {translate('Liste_Indicateurs_Configurer')}
                                           </div>
                                           <Table
-                                                dataSource={mappingConfigs.map(mapConf => ({
+                                                dataSource={mappingConfigs?.map(mapConf => ({
                                                       ...mapConf,
                                                       action: { ...mapConf }
                                                 }))}
@@ -4338,7 +4342,7 @@ const Setting = () => {
                                                                         {translate('Element_De_Donnee')}
                                                                   </div>
                                                                   <Select
-                                                                        options={dataElements.map(dataElement => ({
+                                                                        options={dataElements?.map(dataElement => ({
                                                                               label: dataElement.displayName,
                                                                               value: dataElement.id
                                                                         }))}
@@ -4360,7 +4364,7 @@ const Setting = () => {
                                                                         {translate('Indicateurs')}
                                                                   </div>
                                                                   <Select
-                                                                        options={indicators.map(ind => ({
+                                                                        options={indicators?.map(ind => ({
                                                                               value: ind.id,
                                                                               label: ind.displayName
                                                                         }))}
@@ -4419,7 +4423,7 @@ const Setting = () => {
                                                 {translate('Liste_Element_Configurer')}{' '}
                                           </div>
                                           <Table
-                                                dataSource={analyseConfigs.map(config => ({
+                                                dataSource={analyseConfigs?.map(config => ({
                                                       ...config,
                                                       nom:
                                                             config.elementType === TYPE_ANALYSE_DATA_ELEMENT
