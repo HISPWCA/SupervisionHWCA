@@ -341,6 +341,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                               <table style={{ borderCollapse: 'collapse', width: '100%' }}>
                                     <thead>
                                           <tr style={{ background: '#ccc' }}>
+                                          
                                                 <th
                                                       style={{
                                                             padding: '2px 5px',
@@ -351,6 +352,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                 >
                                                       {translate('Recoupements')}
                                                 </th>
+
                                                 <th
                                                       style={{
                                                             padding: '2px 5px',
@@ -361,6 +363,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                 >
                                                       {translate('Program_Area')}
                                                 </th>
+
                                                 <th
                                                       style={{
                                                             padding: '2px 5px',
@@ -371,6 +374,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                 >
                                                       {translate('Primary_Source')}
                                                 </th>
+
                                                 <th
                                                       style={{
                                                             padding: '2px 5px',
@@ -381,6 +385,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                 >
                                                       {translate('Secondary_Source')}
                                                 </th>
+
                                                 <th
                                                       style={{
                                                             padding: '2px 5px',
@@ -391,6 +396,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                 >
                                                       {translate('Marge')}
                                                 </th>
+
                                           </tr>
                                     </thead>
                                     <tbody>
@@ -406,6 +412,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                       >
                                                             {`${translate('Recoupements')} ${getLetter(recIndex + 1)}`}
                                                       </td>
+
                                                       <td
                                                             style={{
                                                                   padding: '2px 5px',
@@ -464,6 +471,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                   />
                                                             </div>
                                                       </td>
+                                                     
                                                       <td
                                                             style={{
                                                                   padding: '2px 5px',
@@ -517,6 +525,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                   />
                                                             </div>
                                                       </td>
+
                                                       <td
                                                             style={{
                                                                   padding: '2px 5px',
@@ -570,6 +579,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                   />
                                                             </div>
                                                       </td>
+
                                                       <td
                                                             style={{
                                                                   padding: '2px 5px',
@@ -611,6 +621,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                   />
                                                             </div>
                                                       </td>
+
                                                 </tr>
                                           ))}
                                     </tbody>

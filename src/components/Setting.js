@@ -1786,6 +1786,9 @@ const Setting = () => {
 
       const handleEditProgramStageConfigurations = value => {
             try {
+
+                  console.log('value: ', value);
+                  
                   const foundProgramStage = programStages.find(p => p.id === value.programStage?.id);
                   if (!foundProgramStage) throw new Error('No program stage found ');
 
@@ -1820,8 +1823,11 @@ const Setting = () => {
                               selectedSupervisorDataElements: value.supervisorField || [],
                               selectedStatusSupervisionDataElement: value.statusSupervisionField
                         });
+
                         setCurrentProgramstageConfigurationForRDQA(value);
                   }
+
+
             } catch (err) {
                   setNotification({
                         show: true,
@@ -2087,7 +2093,8 @@ const Setting = () => {
                                                                               <TagsInput
                                                                                     style={{ width: '100%' }}
                                                                                     value={
-                                                                                          periodFormState?.month1KeyWords
+                                                                                          periodFormState?.month1KeyWords ||
+                                                                                          []
                                                                                     }
                                                                                     onChange={word => {
                                                                                           setPeriodFormState({
@@ -2119,7 +2126,8 @@ const Setting = () => {
                                                                               <TagsInput
                                                                                     style={{ width: '100%' }}
                                                                                     value={
-                                                                                          periodFormState?.month2KeyWords
+                                                                                          periodFormState?.month2KeyWords ||
+                                                                                          []
                                                                                     }
                                                                                     onChange={word => {
                                                                                           setPeriodFormState({
@@ -2151,7 +2159,8 @@ const Setting = () => {
                                                                               <TagsInput
                                                                                     style={{ width: '100%' }}
                                                                                     value={
-                                                                                          periodFormState?.month3KeyWords
+                                                                                          periodFormState?.month3KeyWords ||
+                                                                                          []
                                                                                     }
                                                                                     onChange={word => {
                                                                                           setPeriodFormState({
@@ -2184,7 +2193,8 @@ const Setting = () => {
                                                                               <TagsInput
                                                                                     style={{ width: '100%' }}
                                                                                     value={
-                                                                                          periodFormState?.month4KeyWords
+                                                                                          periodFormState?.month4KeyWords ||
+                                                                                          []
                                                                                     }
                                                                                     onChange={word => {
                                                                                           setPeriodFormState({
@@ -2217,7 +2227,8 @@ const Setting = () => {
                                                                               <TagsInput
                                                                                     style={{ width: '100%' }}
                                                                                     value={
-                                                                                          periodFormState?.month5KeyWords
+                                                                                          periodFormState?.month5KeyWords ||
+                                                                                          []
                                                                                     }
                                                                                     onChange={word => {
                                                                                           setPeriodFormState({
@@ -2250,7 +2261,8 @@ const Setting = () => {
                                                                               <TagsInput
                                                                                     style={{ width: '100%' }}
                                                                                     value={
-                                                                                          periodFormState?.month6KeyWords
+                                                                                          periodFormState?.month6KeyWords ||
+                                                                                          []
                                                                                     }
                                                                                     onChange={word => {
                                                                                           setPeriodFormState({
@@ -2282,7 +2294,8 @@ const Setting = () => {
                                                                               <TagsInput
                                                                                     style={{ width: '100%' }}
                                                                                     value={
-                                                                                          periodFormState?.month7KeyWords
+                                                                                          periodFormState?.month7KeyWords ||
+                                                                                          []
                                                                                     }
                                                                                     onChange={word => {
                                                                                           setPeriodFormState({
@@ -2315,7 +2328,8 @@ const Setting = () => {
                                                                               <TagsInput
                                                                                     style={{ width: '100%' }}
                                                                                     value={
-                                                                                          periodFormState?.month7KeyWords
+                                                                                          periodFormState?.month7KeyWords ||
+                                                                                          []
                                                                                     }
                                                                                     onChange={word => {
                                                                                           setPeriodFormState({
@@ -2348,7 +2362,8 @@ const Setting = () => {
                                                                               <TagsInput
                                                                                     style={{ width: '100%' }}
                                                                                     value={
-                                                                                          periodFormState?.month8KeyWords
+                                                                                          periodFormState?.month8KeyWords ||
+                                                                                          []
                                                                                     }
                                                                                     onChange={word => {
                                                                                           setPeriodFormState({
@@ -2381,7 +2396,8 @@ const Setting = () => {
                                                                               <TagsInput
                                                                                     style={{ width: '100%' }}
                                                                                     value={
-                                                                                          periodFormState?.month9KeyWords
+                                                                                          periodFormState?.month9KeyWords ||
+                                                                                          []
                                                                                     }
                                                                                     onChange={word => {
                                                                                           setPeriodFormState({
@@ -2414,7 +2430,8 @@ const Setting = () => {
                                                                               <TagsInput
                                                                                     style={{ width: '100%' }}
                                                                                     value={
-                                                                                          periodFormState?.month10KeyWords
+                                                                                          periodFormState?.month10KeyWords ||
+                                                                                          []
                                                                                     }
                                                                                     onChange={word => {
                                                                                           setPeriodFormState({
@@ -2447,7 +2464,8 @@ const Setting = () => {
                                                                               <TagsInput
                                                                                     style={{ width: '100%' }}
                                                                                     value={
-                                                                                          periodFormState?.month11KeyWords
+                                                                                          periodFormState?.month11KeyWords ||
+                                                                                          []
                                                                                     }
                                                                                     onChange={word => {
                                                                                           setPeriodFormState({
@@ -2480,7 +2498,8 @@ const Setting = () => {
                                                                               <TagsInput
                                                                                     style={{ width: '100%' }}
                                                                                     value={
-                                                                                          periodFormState?.month12KeyWords
+                                                                                          periodFormState?.month12KeyWords ||
+                                                                                          []
                                                                                     }
                                                                                     onChange={word => {
                                                                                           setPeriodFormState({
@@ -2513,7 +2532,8 @@ const Setting = () => {
                                                                               <TagsInput
                                                                                     style={{ width: '100%' }}
                                                                                     value={
-                                                                                          periodFormState?.month13KeyWords
+                                                                                          periodFormState?.month13KeyWords ||
+                                                                                          []
                                                                                     }
                                                                                     onChange={word => {
                                                                                           setPeriodFormState({
@@ -2546,7 +2566,8 @@ const Setting = () => {
                                                                               <TagsInput
                                                                                     style={{ width: '100%' }}
                                                                                     value={
-                                                                                          periodFormState?.month14KeyWords
+                                                                                          periodFormState?.month14KeyWords ||
+                                                                                          []
                                                                                     }
                                                                                     onChange={word => {
                                                                                           setPeriodFormState({
@@ -2579,7 +2600,8 @@ const Setting = () => {
                                                                               <TagsInput
                                                                                     style={{ width: '100%' }}
                                                                                     value={
-                                                                                          periodFormState?.month15KeyWords
+                                                                                          periodFormState?.month15KeyWords ||
+                                                                                          []
                                                                                     }
                                                                                     onChange={word => {
                                                                                           setPeriodFormState({

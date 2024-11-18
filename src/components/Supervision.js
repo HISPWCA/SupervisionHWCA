@@ -1359,65 +1359,65 @@ const Supervision = ({ me }) => {
                   }, [])
                   .sort((a, b) => parseInt(dayjs(b.period).valueOf()) - parseInt(dayjs(a.period).valueOf()));
 
-      const handleSaveNewMappingConfig = async () => {
-            try {
-                  setLoadingSaveDateElementMappingConfig(true);
-                  if (!selectedDataElement) throw new Error(translate('Element_De_Donner_Obligatoire'));
+      // const handleSaveNewMappingConfig = async () => {
+      //       try {
+      //             setLoadingSaveDateElementMappingConfig(true);
+      //             if (!selectedDataElement) throw new Error(translate('Element_De_Donner_Obligatoire'));
 
-                  if (!inputDataSourceDisplayName || inputDataSourceDisplayName?.trim().length === 0)
-                        throw new Error(translate('Donne_Source_Obligatoire'));
+      //             if (!inputDataSourceDisplayName || inputDataSourceDisplayName?.trim().length === 0)
+      //                   throw new Error(translate('Donne_Source_Obligatoire'));
 
-                  if (!selectedProgramStage) throw new Error(translate('Programme_Stage_Obligatoire'));
+      //             if (!selectedProgramStage) throw new Error(translate('Programme_Stage_Obligatoire'));
 
-                  if (selectedDataElement && selectedProgramStage) {
-                        const existingConfig = mappingConfigs.find(
-                              mapping =>
-                                    mapping.dataElement?.id === selectedDataElement.id &&
-                                    mapping.programStage?.id === selectedProgramStage.id
-                        );
+      //             if (selectedDataElement && selectedProgramStage) {
+      //                   const existingConfig = mappingConfigs.find(
+      //                         mapping =>
+      //                               mapping.dataElement?.id === selectedDataElement.id &&
+      //                               mapping.programStage?.id === selectedProgramStage.id
+      //                   );
 
-                        if (!existingConfig) {
-                              const payload = {
-                                    id: uuid(),
-                                    dataElement: selectedDataElement,
-                                    indicator: {
-                                          displayName: inputDataSourceDisplayName,
-                                          id: inputDataSourceID
-                                    },
-                                    programStage: {
-                                          id: selectedProgramStage.id,
-                                          displayName: selectedProgramStage.displayName
-                                    },
-                                    program: {
-                                          id: selectedProgram?.program?.id,
-                                          displayName: selectedProgram?.program?.displayName
-                                    }
-                              };
-                              const newList = [...mappingConfigs, payload];
-                              setMappingConfigs(newList);
-                              setSelectedDataElement(null);
-                              setInputDataSourceDisplayName('');
-                              setInputDataSourceID(null);
-                              setSelectedProgramStage(null);
-                              setNotification({
-                                    show: true,
-                                    type: NOTIFICATION_SUCCESS,
-                                    message: translate('Configuration_Ajoutee')
-                              });
-                              setLoadingSaveDateElementMappingConfig(false);
-                        } else {
-                              throw new Error(translate('Configuration_Deja_Ajoutee'));
-                        }
-                  }
-            } catch (err) {
-                  setNotification({
-                        show: true,
-                        type: NOTIFICATION_CRITICAL,
-                        message: err.response?.data?.message || err.message
-                  });
-                  setLoadingSaveDateElementMappingConfig(false);
-            }
-      };
+      //                   if (!existingConfig) {
+      //                         const payload = {
+      //                               id: uuid(),
+      //                               dataElement: selectedDataElement,
+      //                               indicator: {
+      //                                     displayName: inputDataSourceDisplayName,
+      //                                     id: inputDataSourceID
+      //                               },
+      //                               programStage: {
+      //                                     id: selectedProgramStage.id,
+      //                                     displayName: selectedProgramStage.displayName
+      //                               },
+      //                               program: {
+      //                                     id: selectedProgram?.program?.id,
+      //                                     displayName: selectedProgram?.program?.displayName
+      //                               }
+      //                         };
+      //                         const newList = [...mappingConfigs, payload];
+      //                         setMappingConfigs(newList);
+      //                         setSelectedDataElement(null);
+      //                         setInputDataSourceDisplayName('');
+      //                         setInputDataSourceID(null);
+      //                         setSelectedProgramStage(null);
+      //                         setNotification({
+      //                               show: true,
+      //                               type: NOTIFICATION_SUCCESS,
+      //                               message: translate('Configuration_Ajoutee')
+      //                         });
+      //                         setLoadingSaveDateElementMappingConfig(false);
+      //                   } else {
+      //                         throw new Error(translate('Configuration_Deja_Ajoutee'));
+      //                   }
+      //             }
+      //       } catch (err) {
+      //             setNotification({
+      //                   show: true,
+      //                   type: NOTIFICATION_CRITICAL,
+      //                   message: err.response?.data?.message || err.message
+      //             });
+      //             setLoadingSaveDateElementMappingConfig(false);
+      //       }
+      // };
 
       const handleChangeSupervisionType = ({ value }) => {
             setSelectedProgram(null);
@@ -1616,6 +1616,13 @@ const Supervision = ({ me }) => {
                               ...payload.supervisors?.map(s => s.displayName),
                               ...payload.otherSupervisors
                         ];
+
+
+
+                        console.log('New supervision list : ', newSupervisorsList);
+                        console.log('payload : ', payload);
+                              
+
 
                         if (payload.programStageConfig?.supervisorField?.length < newSupervisorsList?.length) {
                               const supervisorArrayCurrent = newSupervisorsList?.slice(
@@ -2197,6 +2204,7 @@ const Supervision = ({ me }) => {
                                                   value: ev.indicator?.displayName
                                             }));
                         } else {
+
                               eventPayload.status = 'SCHEDULE';
                               eventPayload.dueDate = payload.period
                                     ? dayjs(payload.period).format('YYYY-MM-DD')
@@ -2215,6 +2223,10 @@ const Supervision = ({ me }) => {
                                     ...payload.supervisors?.map(s => s.displayName),
                                     ...payload.otherSupervisors
                               ];
+
+                              console.log("New supervision list : ", newSupervisorsList)
+                              console.log('payload : ', payload);
+                              
 
                               if (payload.programStageConfig?.supervisorField?.length < newSupervisorsList?.length) {
                                     const supervisorArrayCurrent = newSupervisorsList?.slice(
@@ -4670,33 +4682,33 @@ const Supervision = ({ me }) => {
             );
       };
 
-      const handleInputSpecificStage = (specificStage, index) => {
-            setInputFields(
-                  inputFields.map((field, fieldIndex) => {
-                        if (index === fieldIndex) {
-                              return {
-                                    ...field,
-                                    specificStage
-                              };
-                        }
-                        return field;
-                  })
-            );
-      };
+      // const handleInputSpecificStage = (specificStage, index) => {
+      //       setInputFields(
+      //             inputFields.map((field, fieldIndex) => {
+      //                   if (index === fieldIndex) {
+      //                         return {
+      //                               ...field,
+      //                               specificStage
+      //                         };
+      //                   }
+      //                   return field;
+      //             })
+      //       );
+      // };
 
-      const handleInputProgramStageConfig = (programStageConfig, index) => {
-            setInputFields(
-                  inputFields.map((field, fieldIndex) => {
-                        if (index === fieldIndex) {
-                              return {
-                                    ...field,
-                                    programStageConfig
-                              };
-                        }
-                        return field;
-                  })
-            );
-      };
+      // const handleInputProgramStageConfig = (programStageConfig, index) => {
+      //       setInputFields(
+      //             inputFields.map((field, fieldIndex) => {
+      //                   if (index === fieldIndex) {
+      //                         return {
+      //                               ...field,
+      //                               programStageConfig
+      //                         };
+      //                   }
+      //                   return field;
+      //             })
+      //       );
+      // };
 
       const handleInputLibelle = (event, index) => {
             setInputFields(
@@ -5729,9 +5741,9 @@ const Supervision = ({ me }) => {
             </>
       );
 
-      const handleSaveAsFavoritesForBackgroundInformations = () => {
-            setVisibleAddFavoritBackgroundInformationModal(true);
-      };
+      // const handleSaveAsFavoritesForBackgroundInformations = () => {
+      //       setVisibleAddFavoritBackgroundInformationModal(true);
+      // };
 
       const RenderDataElementConfigList = () => (
             <>
