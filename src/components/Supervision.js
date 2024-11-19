@@ -250,6 +250,10 @@ const Supervision = ({ me }) => {
             ];
       };
 
+      const disabledDate = current => {
+            return current && current < dayjs();
+      };
+
       const handleCancelEvent = async rowEvent => {
             try {
                   const correctProgramStageFromDataStore =
@@ -340,7 +344,6 @@ const Supervision = ({ me }) => {
                                                               border: '1px solid #ccc'
                                                         }}
                                                   >
-                                                        {' '}
                                                         {cell.getValue()}
                                                   </span>
                                             )}
@@ -1126,7 +1129,8 @@ const Supervision = ({ me }) => {
                                                       current.orgUnit,
                                                       program
                                                 ),
-                                                teamLead: getTeamLead(dataStoreSupervisions, eventId),
+                                                // teamLead: getTeamLead(dataStoreSupervisions, eventId),
+
                                                 period: eventDate,
                                                 programStageId: found_event?.programStage,
                                                 event: found_event.event,
@@ -1301,7 +1305,18 @@ const Supervision = ({ me }) => {
                                                             )?.value || ''
                                                       }`,
                                                       period: ev.eventDate,
-                                                      teamLead: getTeamLead(dataStoreSupervisions, ev.event),
+                                                      // teamLead: getTeamLead(dataStoreSupervisions, ev.event),
+                                                      teamLead: ev.dataValues
+                                                            ?.find(
+                                                                  dv =>
+                                                                        dv.dataElement ===
+                                                                        selectedSupervisionsConfigProgram?.programStageConfigurations?.find(
+                                                                              p =>
+                                                                                    p.programStage?.id ===
+                                                                                    ev.programStage
+                                                                        )?.supervisorField?.[0]?.id
+                                                            )
+                                                            ?.value?.split(',')?.[0],
                                                       montant: calculateMontant(
                                                             currentEnrollment?.trackedEntityInstance,
                                                             ev.eventDate,
@@ -1358,66 +1373,6 @@ const Supervision = ({ me }) => {
                         return prev;
                   }, [])
                   .sort((a, b) => parseInt(dayjs(b.period).valueOf()) - parseInt(dayjs(a.period).valueOf()));
-
-      // const handleSaveNewMappingConfig = async () => {
-      //       try {
-      //             setLoadingSaveDateElementMappingConfig(true);
-      //             if (!selectedDataElement) throw new Error(translate('Element_De_Donner_Obligatoire'));
-
-      //             if (!inputDataSourceDisplayName || inputDataSourceDisplayName?.trim().length === 0)
-      //                   throw new Error(translate('Donne_Source_Obligatoire'));
-
-      //             if (!selectedProgramStage) throw new Error(translate('Programme_Stage_Obligatoire'));
-
-      //             if (selectedDataElement && selectedProgramStage) {
-      //                   const existingConfig = mappingConfigs.find(
-      //                         mapping =>
-      //                               mapping.dataElement?.id === selectedDataElement.id &&
-      //                               mapping.programStage?.id === selectedProgramStage.id
-      //                   );
-
-      //                   if (!existingConfig) {
-      //                         const payload = {
-      //                               id: uuid(),
-      //                               dataElement: selectedDataElement,
-      //                               indicator: {
-      //                                     displayName: inputDataSourceDisplayName,
-      //                                     id: inputDataSourceID
-      //                               },
-      //                               programStage: {
-      //                                     id: selectedProgramStage.id,
-      //                                     displayName: selectedProgramStage.displayName
-      //                               },
-      //                               program: {
-      //                                     id: selectedProgram?.program?.id,
-      //                                     displayName: selectedProgram?.program?.displayName
-      //                               }
-      //                         };
-      //                         const newList = [...mappingConfigs, payload];
-      //                         setMappingConfigs(newList);
-      //                         setSelectedDataElement(null);
-      //                         setInputDataSourceDisplayName('');
-      //                         setInputDataSourceID(null);
-      //                         setSelectedProgramStage(null);
-      //                         setNotification({
-      //                               show: true,
-      //                               type: NOTIFICATION_SUCCESS,
-      //                               message: translate('Configuration_Ajoutee')
-      //                         });
-      //                         setLoadingSaveDateElementMappingConfig(false);
-      //                   } else {
-      //                         throw new Error(translate('Configuration_Deja_Ajoutee'));
-      //                   }
-      //             }
-      //       } catch (err) {
-      //             setNotification({
-      //                   show: true,
-      //                   type: NOTIFICATION_CRITICAL,
-      //                   message: err.response?.data?.message || err.message
-      //             });
-      //             setLoadingSaveDateElementMappingConfig(false);
-      //       }
-      // };
 
       const handleChangeSupervisionType = ({ value }) => {
             setSelectedProgram(null);
@@ -1612,17 +1567,17 @@ const Supervision = ({ me }) => {
                          * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son INFÉRIEUR au nombres de superviseurs sélectionnés
                          */
 
-                        const newSupervisorsList = [
+                        let newSupervisorsList = [
                               ...payload.supervisors?.map(s => s.displayName),
                               ...payload.otherSupervisors
                         ];
 
-
-
-                        console.log('New supervision list : ', newSupervisorsList);
-                        console.log('payload : ', payload);
-                              
-
+                        if (payload?.equipe?.teamLead?.trim()?.length > 0) {
+                              newSupervisorsList = [
+                                    payload?.equipe?.teamLead,
+                                    ...newSupervisorsList.filter(s => s !== payload?.equipe?.teamLead)
+                              ];
+                        }
 
                         if (payload.programStageConfig?.supervisorField?.length < newSupervisorsList?.length) {
                               const supervisorArrayCurrent = newSupervisorsList?.slice(
@@ -2204,7 +2159,6 @@ const Supervision = ({ me }) => {
                                                   value: ev.indicator?.displayName
                                             }));
                         } else {
-
                               eventPayload.status = 'SCHEDULE';
                               eventPayload.dueDate = payload.period
                                     ? dayjs(payload.period).format('YYYY-MM-DD')
@@ -2219,14 +2173,17 @@ const Supervision = ({ me }) => {
                                * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son INFÉRIEUR au nombres de superviseurs sélectionnés
                                */
 
-                              const newSupervisorsList = [
+                              let newSupervisorsList = [
                                     ...payload.supervisors?.map(s => s.displayName),
                                     ...payload.otherSupervisors
                               ];
 
-                              console.log("New supervision list : ", newSupervisorsList)
-                              console.log('payload : ', payload);
-                              
+                              if (payload?.equipe?.teamLead?.trim()?.length > 0) {
+                                    newSupervisorsList = [
+                                          payload?.equipe?.teamLead,
+                                          ...newSupervisorsList.filter(s => s !== payload?.equipe?.teamLead)
+                                    ];
+                              }
 
                               if (payload.programStageConfig?.supervisorField?.length < newSupervisorsList?.length) {
                                     const supervisorArrayCurrent = newSupervisorsList?.slice(
@@ -2746,236 +2703,6 @@ const Supervision = ({ me }) => {
                   throw err;
             }
       };
-
-      // const generateEnrollmentsAsNewSupervision = async payload => {
-      //       try {
-      //             const existingTEI_List_response = await axios.get(
-      //                   `${TRACKED_ENTITY_INSTANCES_ROUTE}?ou=${payload.orgUnit}&order=created:DESC&program=${selectedProgram?.program?.id}&fields=*&ouMode=SELECTED`
-      //             );
-      //             const existingTEI_List = existingTEI_List_response.data.trackedEntityInstances;
-
-      //             if (existingTEI_List.length === 0) {
-      //                   return await generateTeiWithEnrollmentWithEvents(payload);
-      //             } else {
-      //                   const current_tei = existingTEI_List[0];
-
-      //                   const enrollment = {
-      //                         orgUnit: payload.orgUnit,
-      //                         trackedEntityInstance: current_tei.trackedEntityInstance,
-      //                         program: payload.program
-      //                   };
-
-      //                   const createdEnrollment = await createEnrollment(enrollment);
-      //                   const enrollment_id = createdEnrollment?.response?.importSummaries[0]?.reference;
-
-      //                   if (!enrollment_id) throw new Error(translate('Erreur_Creation_Enrolement'));
-
-      //                   const availableProgramStages = [];
-      //                   const newEventsList = [];
-
-      //                   //  Récuperation dans une list les programmes stage
-      //                   for (let mapping of mappingConfigs) {
-      //                         if (!availableProgramStages.includes(mapping.programStage?.id)) {
-      //                               availableProgramStages.push(mapping.programStage.id);
-      //                         }
-      //                   }
-
-      //                   if (payload.fieldConfig?.supervisor?.programStage?.id) {
-      //                         if (!availableProgramStages.includes(payload.fieldConfig?.supervisor?.programStage?.id)) {
-      //                               availableProgramStages.push(payload.fieldConfig?.supervisor?.programStage?.id);
-      //                         }
-      //                   }
-
-      //                   for (let stage of availableProgramStages) {
-      //                         const eventPayload = {
-      //                               eventDate: payload.period
-      //                                     ? dayjs(payload.period).format('YYYY-MM-DD')
-      //                                     : dayjs().format('YYYY-MM-DD'),
-      //                               program: payload.program,
-      //                               orgUnit: payload.orgUnit,
-      //                               enrollment: enrollment_id,
-      //                               programStage: stage,
-      //                               trackedEntityInstance: current_tei.trackedEntityInstance,
-      //                               dataValues: []
-      //                         };
-
-      //                         if (mappingConfigs?.length > 0) {
-      //                               eventPayload.status = 'ACTIVE';
-      //                               eventPayload.eventDate = payload.period
-      //                                     ? dayjs(payload.period).format('YYYY-MM-DD')
-      //                                     : dayjs().format('YYYY-MM-DD');
-      //                               eventPayload.dueDate = payload.period
-      //                                     ? dayjs(payload.period).format('YYYY-MM-DD')
-      //                                     : dayjs().format('YYYY-MM-DD');
-      //                               eventPayload.dataValues = mappingConfigs
-      //                                     .filter(ev => ev.programStage?.id === stage)
-      //                                     .map(ev => ({
-      //                                           dataElement: ev.dataElement?.id,
-      //                                           value: ev.indicator?.displayName
-      //                                     }));
-      //                         } else {
-      //                               eventPayload.status = 'SCHEDULE';
-      //                               eventPayload.dueDate = payload.period
-      //                                     ? dayjs(payload.period).format('YYYY-MM-DD')
-      //                                     : dayjs().format('YYYY-MM-DD');
-      //                         }
-
-      //                         // Ajoute des dataValues superviseurs
-      //                         if (payload.programStageConfig?.supervisorField?.length > 0) {
-      //                               const newDataValues = [];
-
-      //                               /*
-      //                                * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son INFÉRIEUR au nombres de superviseurs sélectionnés
-      //                                */
-
-      //                               const newSupervisorsList = [
-      //                                     ...payload.supervisors?.map(s => s.displayName),
-      //                                     ...payload.otherSupervisors
-      //                               ];
-
-      //                               if (
-      //                                     payload.programStageConfig?.supervisorField?.length <
-      //                                     newSupervisorsList?.length
-      //                               ) {
-      //                                     const supervisorArrayCurrent = newSupervisorsList?.slice(
-      //                                           0,
-      //                                           payload.programStageConfig?.supervisorField?.length
-      //                                     );
-      //                                     const supervisorArraylast = newSupervisorsList?.slice(
-      //                                           payload.programStageConfig?.supervisorField?.length
-      //                                     );
-
-      //                                     for (
-      //                                           let i = 0;
-      //                                           i < payload.programStageConfig?.supervisorField?.length;
-      //                                           i++
-      //                                     ) {
-      //                                           for (let j = 0; j < supervisorArrayCurrent.length; j++) {
-      //                                                 if (i === j) {
-      //                                                       const currentDE =
-      //                                                             payload.programStageConfig?.supervisorField[i];
-      //                                                       const currentSUP = supervisorArrayCurrent[j];
-      //                                                       if (
-      //                                                             currentDE &&
-      //                                                             currentSUP &&
-      //                                                             !newDataValues
-      //                                                                   .map(dv => dv.dataElement)
-      //                                                                   .includes(currentDE.id)
-      //                                                       ) {
-      //                                                             if (
-      //                                                                   i ===
-      //                                                                   payload.programStageConfig?.supervisorField
-      //                                                                         ?.length -
-      //                                                                         1
-      //                                                             ) {
-      //                                                                   newDataValues.push({
-      //                                                                         dataElement: currentDE.id,
-      //                                                                         value: `${currentSUP},${supervisorArraylast?.join(
-      //                                                                               ','
-      //                                                                         )}`
-      //                                                                   });
-      //                                                             } else {
-      //                                                                   newDataValues.push({
-      //                                                                         dataElement: currentDE.id,
-      //                                                                         value: currentSUP
-      //                                                                   });
-      //                                                             }
-      //                                                       }
-      //                                                 }
-      //                                           }
-      //                                     }
-      //                               }
-
-      //                               /*
-      //                                * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son EGALE au nombres de superviseurs sélectionnés
-      //                                */
-      //                               if (
-      //                                     payload.programStageConfig?.supervisorField?.length ===
-      //                                     newSupervisorsList?.length
-      //                               ) {
-      //                                     for (
-      //                                           let i = 0;
-      //                                           i < payload.programStageConfig?.supervisorField?.length;
-      //                                           i++
-      //                                     ) {
-      //                                           for (let j = 0; j < newSupervisorsList.length; j++) {
-      //                                                 if (i === j) {
-      //                                                       const currentDE =
-      //                                                             payload.programStageConfig?.supervisorField[i];
-      //                                                       const currentSUP = newSupervisorsList[j];
-      //                                                       if (
-      //                                                             currentDE &&
-      //                                                             currentSUP &&
-      //                                                             !newDataValues
-      //                                                                   .map(dv => dv.dataElement)
-      //                                                                   .includes(currentDE.id)
-      //                                                       ) {
-      //                                                             newDataValues.push({
-      //                                                                   dataElement: currentDE.id,
-      //                                                                   value: currentSUP
-      //                                                             });
-      //                                                       }
-      //                                                 }
-      //                                           }
-      //                                     }
-      //                               }
-
-      //                               /*
-      //                                * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son SUPERIEUR au nombres de superviseurs sélectionnés
-      //                                */
-      //                               if (
-      //                                     payload.programStageConfig?.supervisorField?.length >
-      //                                     newSupervisorsList?.length
-      //                               ) {
-      //                                     for (
-      //                                           let i = 0;
-      //                                           i < payload.programStageConfig?.supervisorField?.length;
-      //                                           i++
-      //                                     ) {
-      //                                           for (let j = 0; j < newSupervisorsList?.length; j++) {
-      //                                                 if (i === j) {
-      //                                                       const currentDE =
-      //                                                             payload.programStageConfig?.supervisorField[i];
-      //                                                       const currentSUP = newSupervisorsList[j];
-      //                                                       if (
-      //                                                             currentDE &&
-      //                                                             currentSUP &&
-      //                                                             !newDataValues
-      //                                                                   .map(dv => dv.dataElement)
-      //                                                                   .includes(currentDE.id)
-      //                                                       ) {
-      //                                                             newDataValues.push({
-      //                                                                   dataElement: currentDE.id,
-      //                                                                   value: currentSUP
-      //                                                             });
-      //                                                       }
-      //                                                 }
-      //                                           }
-      //                                     }
-      //                               }
-
-      //                               if (newDataValues.length > 0) {
-      //                                     eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValues];
-      //                               }
-      //                         }
-
-      //                         if (!newEventsList.map(ev => ev.programStage).includes(payload.programStage?.id)) {
-      //                               newEventsList.push(eventPayload);
-      //                         }
-      //                   }
-
-      //                   await createEvents({ events: newEventsList });
-
-      //                   const currentTEI = await axios.get(
-      //                         `${TRACKED_ENTITY_INSTANCES_ROUTE}/${current_tei.trackedEntityInstance}?program=${selectedProgram.program?.id}&fields=*,enrollments`
-      //                   );
-      //                   const currentTEIData = currentTEI.data;
-      //                   return currentTEIData;
-      //             }
-      //       } catch (err) {
-      //             throw err;
-      //       }
-      // };
 
       const handleSelectIndicators = values =>
             setSelectedIndicators(
@@ -4886,6 +4613,7 @@ const Supervision = ({ me }) => {
                                                                         }
                                                                   </div>
                                                                   <DatePicker
+                                                                        disabledDate={disabledDate}
                                                                         style={{ width: '100%' }}
                                                                         placeholder={translate('Periode')}
                                                                         value={inputFields[index]?.period}
@@ -5124,6 +4852,7 @@ const Supervision = ({ me }) => {
                                                                         {translate('Periode')}
                                                                   </div>
                                                                   <DatePicker
+                                                                        disabledDate={disabledDate}
                                                                         style={{ width: '100%' }}
                                                                         placeholder={translate('Periode')}
                                                                         value={inputFields[index]?.period}
@@ -5782,10 +5511,6 @@ const Supervision = ({ me }) => {
                                           action: { id: mapConf.id }
                                     }))}
                                     columns={[
-                                          // {
-                                          //       title: translate('Programme'),
-                                          //       dataIndex: 'programName'
-                                          // },
                                           {
                                                 title: translate('Programme_Stage'),
                                                 dataIndex: 'programStageName'

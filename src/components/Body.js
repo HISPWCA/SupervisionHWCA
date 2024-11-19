@@ -41,6 +41,7 @@ export const Body = () => {
       const [_, setLoadingMe] = useState(false);
 
       const [appUserGroup, setAppUserGroup] = useState(null);
+      const [appCreateFavoritUserGroup, setAppCreateFavoritUserGroup] = useState(null);
 
       const initDataStore = async () => {
             try {
@@ -119,6 +120,30 @@ export const Body = () => {
                   setErrorMessage(err?.response?.data?.message || err.message);
             }
       };
+      const initAppCreateFavoritUserGroup = async () => {
+            try {
+                  const existedGroup = await axios.get(
+                        `${USER_GROUPS_ROUTE}.json?fields=id&filter=name:eq:${process.env.REACT_APP_FAVORIT_USER_GROUP}`
+                  );
+                  if (existedGroup.data.userGroups.length === 0) {
+                        await axios.post(`${USER_GROUPS_ROUTE}.json`, {
+                              name: process.env.REACT_APP_FAVORIT_USER_GROUP
+                        });
+                        const createdUserGroup = await axios.get(
+                              `${USER_GROUPS_ROUTE}.json?fields=id&filter=name:eq:${process.env.REACT_APP_FAVORIT_USER_GROUP}`
+                        );
+
+                        if (createdUserGroup.data.userGroups.length === 0) {
+                              throw new Error('User group creation error !');
+                        }
+                        setAppCreateFavoritUserGroup(createdUserGroup.data.userGroups[0]);
+                  } else {
+                        setAppCreateFavoritUserGroup(existedGroup.data.userGroups[0]);
+                  }
+            } catch (err) {
+                  setErrorMessage(err?.response?.data?.message || err.message);
+            }
+      };
 
       const loadMe = async () => {
             try {
@@ -149,11 +174,20 @@ export const Body = () => {
             setRenderPage(currentRenderPage);
       };
 
-      const isAuthorised = () => {
+      const isAuthorisedForSetting = () => {
             if (me) {
                   if (me.authorities?.includes('ALL')) return true;
 
                   if (me.userGroups?.map(uGrp => uGrp.id)?.includes(appUserGroup?.id)) return true;
+            }
+            return false;
+      };
+
+      const isAuthorisedForFavorit = () => {
+            if (me) {
+                  if (me.authorities?.includes('ALL')) return true;
+
+                  if (me.userGroups?.map(uGrp => uGrp.id)?.includes(appCreateFavoritUserGroup?.id)) return true;
             }
             return false;
       };
@@ -197,7 +231,7 @@ export const Body = () => {
                         <span style={{ marginLeft: '10px' }}>{translate('Planifications')}</span>
                   </div>
 
-                  {isAuthorised() && (
+                  {isAuthorisedForFavorit() && (
                         <div
                               className={`menu-item ${renderPage === PAGE_FAVORIS_CREATION ? 'active' : ''}`}
                               onClick={_ => handleClickMenu(PAGE_FAVORIS_CREATION)}
@@ -209,7 +243,7 @@ export const Body = () => {
                         </div>
                   )}
 
-                  {isAuthorised() && (
+                  {isAuthorisedForSetting() && (
                         <div
                               className={`menu-item ${renderPage === PAGE_SETTINGS ? 'active' : ''}`}
                               onClick={_ => handleClickMenu(PAGE_SETTINGS)}
@@ -316,6 +350,7 @@ export const Body = () => {
 
       useEffect(() => {
             initAppUserGroup();
+            initAppCreateFavoritUserGroup();
             initDataStore();
       }, []);
       return (
