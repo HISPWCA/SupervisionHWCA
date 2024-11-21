@@ -65,3 +65,14 @@ export const getLetter = nbr => {
       if (+nbr === 4) return 'D';
       return nbr;
 };
+
+export const goToNewPage = url => {
+      let a = document.createElement('a');
+      a.setAttribute('href', url);
+      a.setAttribute('target', '_blanc');
+      a.style.display = 'none';
+
+      document.appendChild(a);
+      a.click();
+      a.remove();
+};

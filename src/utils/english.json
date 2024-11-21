@@ -340,6 +340,8 @@
     "Remove_Indicator_From_List": "Remove indicator from list",
     "Remove_Indicator_Type_With_His_Indicators": "Remove indicator type with his indicators",
     "Remove_All": "Delete all",
-    "Delete": "Delete"
-
+    "Delete": "Delete",
+    "Open_With_Old_Tracker": "Old tracker",
+    "Open_With_New_Tracker": "New tracker",
+        "Open_Event_With": "Open with: "
 }

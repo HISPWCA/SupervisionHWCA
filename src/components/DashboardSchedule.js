@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Card, Col, DatePicker, Row, Select, Table } from 'antd';
+import { Card, Col, DatePicker, Popconfirm, Row, Select, Table, Tooltip } from 'antd';
 import { Calendar, dayjsLocalizer } from 'react-big-calendar';
 import ReactEchart from 'echarts-for-react';
 import axios from 'axios';
@@ -32,7 +32,7 @@ import {
       MES_PLANIFICATIONS
 } from '../utils/constants';
 import MapView from './MapView';
-import { loadDataStore } from '../utils/functions';
+import { goToNewPage, loadDataStore } from '../utils/functions';
 import { IoMdOpen } from 'react-icons/io';
 import { BLACK, BLUE, GRAY_DARK, GREEN, ORANGE, RED, WHITE } from '../utils/couleurs';
 import { AiOutlineSearch } from 'react-icons/ai';
@@ -1245,16 +1245,32 @@ export const Dashboard = ({ me }) => {
                                 dataIndex: 'tei',
                                 render: tei => (
                                       <div style={{ textAlign: 'center' }}>
-                                            <a
-                                                  target="_blank"
-                                                  href={`${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${tei.trackedEntityInstance}&program=${tei.program}&ou=${tei.orgUnit}`}
-                                                  style={{ cursor: 'pointer' }}
+                                            <Popconfirm
+                                                  description={translate('Open_Event_With')}
+                                                  okText={translate('Open_With_Old_Tracker')}
+                                                  cancelText={translate('Open_With_Old_Tracker')}
+                                                  onCancel={() =>
+                                                        goToNewPage(
+                                                              `${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${tei.trackedEntityInstance}&program=${tei.program}&ou=${tei.orgUnit}`
+                                                        )
+                                                  }
+                                                  onConfirm={() =>
+                                                        goToNewPage(
+                                                              `${SERVER_URL}/dhis-web-capture/index.html#/enrollmentEventEdit?eventId=${tei.event}&orgUnitId={row.original.orgUnit}`
+                                                        )
+                                                  }
                                             >
-                                                  <IoMdOpen
-                                                        title={translate('Ouvrir_Dans_Le_Tracker')}
-                                                        style={{ fontSize: '18px', color: BLUE, cursor: 'pointer' }}
-                                                  />
-                                            </a>
+                                                  <Tooltip title={translate('Ouvrir_Dans_Le_Tracker')}>
+                                                        <IoMdOpen
+                                                              title={translate('Ouvrir_Dans_Le_Tracker')}
+                                                              style={{
+                                                                    fontSize: '18px',
+                                                                    color: BLUE,
+                                                                    cursor: 'pointer'
+                                                              }}
+                                                        />
+                                                  </Tooltip>
+                                            </Popconfirm>
                                       </div>
                                 )
                           }
