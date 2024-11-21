@@ -1246,7 +1246,7 @@ export const Dashboard = ({ me }) => {
                                 render: tei => (
                                       <div style={{ textAlign: 'center' }}>
                                             <Popconfirm
-                                                  description={translate('Open_Event_With')}
+                                                  title={translate('Open_Event_With')}
                                                   okText={translate('Open_With_Old_Tracker')}
                                                   cancelText={translate('Open_With_Old_Tracker')}
                                                   onCancel={() =>
@@ -1256,13 +1256,12 @@ export const Dashboard = ({ me }) => {
                                                   }
                                                   onConfirm={() =>
                                                         goToNewPage(
-                                                              `${SERVER_URL}/dhis-web-capture/index.html#/enrollmentEventEdit?eventId=${tei.event}&orgUnitId={row.original.orgUnit}`
+                                                              `${SERVER_URL}/dhis-web-capture/index.html#/enrollmentEventEdit?eventId=${tei.event}&orgUnitId=${tei.orgUnit}`
                                                         )
                                                   }
                                             >
                                                   <Tooltip title={translate('Ouvrir_Dans_Le_Tracker')}>
                                                         <IoMdOpen
-                                                              title={translate('Ouvrir_Dans_Le_Tracker')}
                                                               style={{
                                                                     fontSize: '18px',
                                                                     color: BLUE,
@@ -1315,16 +1314,31 @@ export const Dashboard = ({ me }) => {
                                 dataIndex: 'tei',
                                 render: tei => (
                                       <div style={{ textAlign: 'center' }}>
-                                            <a
-                                                  target="_blank"
-                                                  href={`${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${tei.trackedEntityInstance}&program=${tei.program}&ou=${tei.orgUnit}`}
-                                                  style={{ cursor: 'pointer' }}
+                                            <Popconfirm
+                                                  title={translate('Open_Event_With')}
+                                                  okText={translate('Open_With_Old_Tracker')}
+                                                  cancelText={translate('Open_With_Old_Tracker')}
+                                                  onCancel={() =>
+                                                        goToNewPage(
+                                                              `${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${tei.trackedEntityInstance}&program=${tei.program}&ou=${tei.orgUnit}`
+                                                        )
+                                                  }
+                                                  onConfirm={() =>
+                                                        goToNewPage(
+                                                              `${SERVER_URL}/dhis-web-capture/index.html#/enrollmentEventEdit?eventId=${tei.event}&orgUnitId=${tei.orgUnit}`
+                                                        )
+                                                  }
                                             >
-                                                  <IoMdOpen
-                                                        title={translate('Ouvrir_Dans_Le_Tracker')}
-                                                        style={{ fontSize: '18px', color: BLUE, cursor: 'pointer' }}
-                                                  />
-                                            </a>
+                                                  <Tooltip title={translate('Ouvrir_Dans_Le_Tracker')}>
+                                                        <IoMdOpen
+                                                              style={{
+                                                                    fontSize: '18px',
+                                                                    color: BLUE,
+                                                                    cursor: 'pointer'
+                                                              }}
+                                                        />
+                                                  </Tooltip>
+                                            </Popconfirm>
                                       </div>
                                 )
                           }

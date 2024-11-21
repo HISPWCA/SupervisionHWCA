@@ -72,7 +72,7 @@ export const goToNewPage = url => {
       a.setAttribute('target', '_blanc');
       a.style.display = 'none';
 
-      document.appendChild(a);
+      document.body.appendChild(a);
       a.click();
       a.remove();
 };

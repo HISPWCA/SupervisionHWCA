@@ -512,11 +512,11 @@ const Supervision = ({ me }) => {
                                 header: `${translate('Actions')}`,
                                 size: 50,
                                 Cell: ({ cell, row }) => {
-                                    console.log('row: ', row.original)
+                                      console.log('row: ', row.original);
                                       return (
                                             <div style={{ display: 'flex', alignItems: 'center' }}>
                                                   <Popconfirm
-                                                        description={translate('Open_Event_With')}
+                                                        title={translate('Open_Event_With')}
                                                         okText={translate('Open_With_Old_Tracker')}
                                                         cancelText={translate('Open_With_Old_Tracker')}
                                                         onCancel={() =>
@@ -526,13 +526,12 @@ const Supervision = ({ me }) => {
                                                         }
                                                         onConfirm={() =>
                                                               goToNewPage(
-                                                                    `${SERVER_URL}/dhis-web-capture/index.html#/enrollmentEventEdit?eventId=${row.original.event}&orgUnitId={row.original.orgUnit}`
+                                                                    `${SERVER_URL}/dhis-web-capture/index.html#/enrollmentEventEdit?eventId=${row.original.event}&orgUnitId=${row.original.orgUnit}`
                                                               )
                                                         }
                                                   >
                                                         <Tooltip title={translate('Ouvrir_Dans_Le_Tracker')}>
                                                               <IoMdOpen
-                                                                    title={translate('Ouvrir_Dans_Le_Tracker')}
                                                                     style={{
                                                                           fontSize: '20px',
                                                                           color: BLUE,
@@ -678,7 +677,6 @@ const Supervision = ({ me }) => {
                                                                                 marginTop: '2px'
                                                                           }}
                                                                     >
-                                                                          {' '}
                                                                           {sup}
                                                                     </span>
                                                               ))
@@ -727,7 +725,7 @@ const Supervision = ({ me }) => {
                                       return (
                                             <div style={{ textAlign: 'center' }}>
                                                   <Popconfirm
-                                                        description={translate('Open_Event_With')}
+                                                        title={translate('Open_Event_With')}
                                                         okText={translate('Open_With_Old_Tracker')}
                                                         cancelText={translate('Open_With_Old_Tracker')}
                                                         onCancel={() =>
@@ -737,13 +735,12 @@ const Supervision = ({ me }) => {
                                                         }
                                                         onConfirm={() =>
                                                               goToNewPage(
-                                                                    `${SERVER_URL}/dhis-web-capture/index.html#/enrollmentEventEdit?eventId=${row.original.event}&orgUnitId={row.original.orgUnit}`
+                                                                    `${SERVER_URL}/dhis-web-capture/index.html#/enrollmentEventEdit?eventId=${row.original.event}&orgUnitId=${row.original.orgUnit}`
                                                               )
                                                         }
                                                   >
                                                         <Tooltip title={translate('Ouvrir_Dans_Le_Tracker')}>
                                                               <IoMdOpen
-                                                                    title={translate('Ouvrir_Dans_Le_Tracker')}
                                                                     style={{
                                                                           fontSize: '20px',
                                                                           color: BLUE,

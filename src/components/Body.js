@@ -58,6 +58,7 @@ export const Body = () => {
 
                   await loadDataStore(process.env.REACT_APP_CROSS_CUT_KEY, null, null, Cross_cuts);
                   await loadDataStore(process.env.REACT_APP_INDICATORS_KEY, null, null, Indicators);
+                  await loadDataStore(process.env.REACT_APP_REGISTRES_KEY, null, null, Indicators);
                   await loadDataStore(process.env.REACT_APP_DE_COMPLETNESS_KEY, null, null, DE_Completness);
                   await loadDataStore(process.env.REACT_APP_DS_COMPLETNESS_KEY, null, null, DS_Completness);
                   await loadDataStore(process.env.REACT_APP_INDICATORS_MAPPING_KEY, null, null, []);
