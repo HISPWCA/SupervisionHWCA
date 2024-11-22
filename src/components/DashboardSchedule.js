@@ -1247,7 +1247,7 @@ export const Dashboard = ({ me }) => {
                                       <div style={{ textAlign: 'center' }}>
                                             <Popconfirm
                                                   title={translate('Open_Event_With')}
-                                                  okText={translate('Open_With_Old_Tracker')}
+                                                  okText={translate('Open_With_New_Tracker')}
                                                   cancelText={translate('Open_With_Old_Tracker')}
                                                   onCancel={() =>
                                                         goToNewPage(
@@ -1316,7 +1316,7 @@ export const Dashboard = ({ me }) => {
                                       <div style={{ textAlign: 'center' }}>
                                             <Popconfirm
                                                   title={translate('Open_Event_With')}
-                                                  okText={translate('Open_With_Old_Tracker')}
+                                                  okText={translate('Open_With_New_Tracker')}
                                                   cancelText={translate('Open_With_Old_Tracker')}
                                                   onCancel={() =>
                                                         goToNewPage(
