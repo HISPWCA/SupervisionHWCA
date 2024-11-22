@@ -1,6 +1,5 @@
 import { Card, Input, Select } from 'antd';
 import translate from '../utils/translator';
-import { v4 as uuid } from 'uuid';
 import { getLetter } from '../utils/functions';
 
 const FavoriteGenerateIndicatorsFieldsDQR = ({
@@ -9,7 +8,8 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
       dataStoreIndicators,
       dataStoreCrosschecks,
       dataStoreDECompletness,
-      dataStoreDSCompletness
+      dataStoreDSCompletness,
+      dataStoreRegistres
 }) => {
       const getNumberIndicatorsToShow = () => {
             let newArray = [];
@@ -341,7 +341,6 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                               <table style={{ borderCollapse: 'collapse', width: '100%' }}>
                                     <thead>
                                           <tr style={{ background: '#ccc' }}>
-                                          
                                                 <th
                                                       style={{
                                                             padding: '2px 5px',
@@ -396,7 +395,6 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                 >
                                                       {translate('Marge')}
                                                 </th>
-
                                           </tr>
                                     </thead>
                                     <tbody>
@@ -471,7 +469,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                   />
                                                             </div>
                                                       </td>
-                                                     
+
                                                       <td
                                                             style={{
                                                                   padding: '2px 5px',
@@ -621,7 +619,6 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                   />
                                                             </div>
                                                       </td>
-
                                                 </tr>
                                           ))}
                                     </tbody>
@@ -845,8 +842,38 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                         </div>
 
                         <div style={{ marginTop: '30px' }}>
-                              <div style={{ marginBottom: '10px', fontWeight: 'bold' }}>
-                                    {translate('Data_Element_&_Source_Documentation_Configurations')}
+                              <div style={{ marginBottom: '10px', display: 'flex', gap: '20px' }}>
+                                    <div style={{ marginBottom: '10px', fontWeight: 'bold' }}>
+                                          {translate('Data_Element_&_Source_Documentation_Configurations')}
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                          <div style={{ fontWeight: 'bold' }}>{translate('How_Many_Data_Element')}</div>
+                                          <div style={{ marginLeft: '10px' }}>
+                                                <Select
+                                                      style={{ width: '100px' }}
+                                                      options={getNumberIndicatorsToShow()}
+                                                      value={formState?.nbrIndicatorsToShow}
+                                                      onChange={value => {
+                                                            setFormState({ ...formState, nbrIndicatorsToShow: value });
+                                                      }}
+                                                />
+                                          </div>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                          <div style={{ fontWeight: 'bold' }}>
+                                                {translate('How_Many_Document_Source')}
+                                          </div>
+                                          <div style={{ marginLeft: '10px' }}>
+                                                <Select
+                                                      style={{ width: '100px' }}
+                                                      options={getNumberIndicatorsToShow()}
+                                                      value={formState?.nbrIndicatorsToShow}
+                                                      onChange={value => {
+                                                            setFormState({ ...formState, nbrIndicatorsToShow: value });
+                                                      }}
+                                                />
+                                          </div>
+                                    </div>
                               </div>
                               <table style={{ borderCollapse: 'collapse', width: '100%' }}>
                                     <thead>
@@ -879,7 +906,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                             border: '1px solid #00000070'
                                                       }}
                                                 >
-                                                      {translate('Source_Document')}
+                                                      {translate('Marge')}
                                                 </th>
                                                 <th
                                                       style={{
@@ -889,7 +916,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                             border: '1px solid #00000070'
                                                       }}
                                                 >
-                                                      {translate('Marge')}
+                                                      {translate('Source_Document')}
                                                 </th>
                                           </tr>
                                     </thead>
@@ -900,7 +927,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                             padding: '2px 5px',
                                                             verticalAlign: 'center',
                                                             textAlign: 'center',
-                                                            border: '1px solid blue'
+                                                            border: '1px solid #00000070'
                                                       }}
                                                 >
                                                       {`${translate('Program_Area')}`}
@@ -950,6 +977,37 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                             />
                                                       </div>
                                                 </td>
+
+                                                <td
+                                                      style={{
+                                                            padding: '2px 5px',
+                                                            verticalAlign: 'center',
+                                                            textAlign: 'center',
+                                                            border: '1px solid #00000070'
+                                                      }}
+                                                      rowSpan={3}
+                                                >
+                                                      <div>
+                                                            <Input
+                                                                  placeholder={`${translate('Marge')} `}
+                                                                  style={{ width: '100%' }}
+                                                                  min={0}
+                                                                  type="number"
+                                                                  value={formState?.completeness?.selectedSourceMargin}
+                                                                  onChange={event => {
+                                                                        setFormState({
+                                                                              ...formState,
+                                                                              completeness: {
+                                                                                    ...formState?.completeness,
+                                                                                    selectedSourceMargin:
+                                                                                          event.target.value
+                                                                              }
+                                                                        });
+                                                                  }}
+                                                            />
+                                                      </div>
+                                                </td>
+
                                                 <td
                                                       style={{
                                                             padding: '2px 5px',
@@ -957,6 +1015,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                             textAlign: 'center',
                                                             border: '1px solid blue'
                                                       }}
+                                                      rowSpan={2}
                                                 >
                                                       <div>
                                                             <Select
@@ -995,6 +1054,9 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                             />
                                                       </div>
                                                 </td>
+                                          </tr>
+
+                                          <tr>
                                                 <td
                                                       style={{
                                                             padding: '2px 5px',
@@ -1002,22 +1064,64 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                             textAlign: 'center',
                                                             border: '1px solid #00000070'
                                                       }}
-                                                      rowSpan={2}
+                                                >
+                                                      {`${translate('Register_Name')}`}
+                                                </td>
+                                                <td
+                                                      style={{
+                                                            padding: '2px 5px',
+                                                            verticalAlign: 'center',
+                                                            textAlign: 'center',
+                                                            border: '1px solid #00000070'
+                                                      }}
                                                 >
                                                       <div>
-                                                            <Input
-                                                                  placeholder={`${translate('Marge')} `}
-                                                                  style={{ width: '100%' }}
-                                                                  min={0}
-                                                                  type="number"
-                                                                  value={formState?.completeness?.selectedSourceMargin}
-                                                                  onChange={event => {
+                                                            <Select
+                                                                  placeholder={`${translate('Register_Name')}`}
+                                                                  style={{
+                                                                        width: '100%'
+                                                                  }}
+                                                                  options={dataStoreRegistres
+                                                                        ?.find(
+                                                                              d =>
+                                                                                    d.name ===
+                                                                                    formState?.completeness
+                                                                                          ?.selectedSourceProgramAreaDE
+                                                                                          ?.name
+                                                                        )
+                                                                        ?.children?.map(ind => ({
+                                                                              label: ind.name,
+                                                                              value: ind.name
+                                                                        }))}
+                                                                  disabled={
+                                                                        formState?.selectedGlobalProgramArea &&
+                                                                        formState?.completeness
+                                                                              ?.selectedSourceProgramAreaDE?.name
+                                                                  }
+                                                                  showSearch
+                                                                  allowClear
+                                                                  optionFilterProp="label"
+                                                                  value={
+                                                                        formState?.completeness?.selectedRegister?.name
+                                                                  }
+                                                                  onChange={value => {
                                                                         setFormState({
                                                                               ...formState,
                                                                               completeness: {
                                                                                     ...formState?.completeness,
-                                                                                    selectedSourceMargin:
-                                                                                          event.target.value
+                                                                                    register: dataStoreRegistres
+                                                                                          ?.find(
+                                                                                                d =>
+                                                                                                      d.name ===
+                                                                                                      formState
+                                                                                                            ?.completeness
+                                                                                                            ?.selectedSourceProgramAreaDE
+                                                                                                            ?.name
+                                                                                          )
+                                                                                          ?.children?.find(
+                                                                                                d => d =>
+                                                                                                      d.name === value
+                                                                                          )
                                                                               }
                                                                         });
                                                                   }}
@@ -1025,6 +1129,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                       </div>
                                                 </td>
                                           </tr>
+
                                           <tr>
                                                 <td
                                                       style={{
@@ -1060,6 +1165,12 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                     value: ind.name
                                                                               })
                                                                         )}
+                                                                        disabled={
+                                                                              formState?.completeness
+                                                                                    ?.selectedSourceProgramAreaDE
+                                                                                    ? false
+                                                                                    : true
+                                                                        }
                                                                         showSearch
                                                                         allowClear
                                                                         optionFilterProp="label"
@@ -1120,6 +1231,12 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                     value: ind.name
                                                                               })
                                                                         )}
+                                                                        disabled={
+                                                                              formState?.completeness
+                                                                                    ?.selectedSourceProgramAreaDS
+                                                                                    ? false
+                                                                                    : true
+                                                                        }
                                                                         showSearch
                                                                         allowClear
                                                                         optionFilterProp="label"

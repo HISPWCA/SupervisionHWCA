@@ -5,14 +5,12 @@ import { Button, ButtonStrip, Modal, ModalActions, ModalContent, ModalTitle, Rad
 import { MdStars } from 'react-icons/md';
 import { FiSave } from 'react-icons/fi';
 import { CgCloseO } from 'react-icons/cg';
-import { TbSelect } from 'react-icons/tb';
 import translate from '../utils/translator';
 import MyNotification from './MyNotification';
 import {
       ALL,
       DIRECTE,
       DQR,
-      ELEMENT_GROUP,
       FAVORIS,
       NOTIFICATION_CRITICAL,
       NOTIFICATION_SUCCESS,
@@ -21,11 +19,10 @@ import {
 } from '../utils/constants';
 
 import { loadDataStore, saveDataToDataStore } from '../utils/functions';
-import { DATA_ELEMENT_GROUPS_ROUTE, PROGRAMS_STAGE_ROUTE } from '../utils/api.routes';
+import { PROGRAMS_STAGE_ROUTE } from '../utils/api.routes';
 import axios from 'axios';
 import { v4 as uuid } from 'uuid';
 import { DataDimension } from '@dhis2/analytics';
-import { QuestionCircleOutlined } from '@ant-design/icons';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import dayjs from 'dayjs';
 import FavoriteGenerateIndicatorsFieldsDQR from './FavoriteGenerateIndicatorsFieldsDQR';
@@ -65,19 +62,13 @@ const Favorites = ({ me }) => {
             type: null
       });
 
-      const [localFormState, setLocalFormState] = useState({
-            visibleAnalyticComponentModal: false,
-            currentIndicator: null,
-            currentRecoupement: null,
-            selectedMetaDatas: []
-      });
-
-      const [selectedTypeSource, setSelectedTypeSource] = useState('DHIS2');
+      const [selectedTypeSource, _] = useState('DHIS2');
 
       const [dataStoreCrosschecks, setDataStoreCrosschecks] = useState([]);
       const [dataStoreIndicators, setDataStoreIndicators] = useState([]);
       const [dataStoreDECompletness, setDataStoreDECompletness] = useState([]);
       const [dataStoreDSCompletness, setDataStoreDSCompletness] = useState([]);
+      const [dataStoreRegistres, setDataStoreRegistres] = useState([]);
       const [dataStoreSupervisionConfigs, setDataStoreSupervisionConfigs] = useState([]);
 
       const [selectedCrosscheck, setSelectedCrosscheck] = useState(null);
@@ -99,6 +90,9 @@ const Favorites = ({ me }) => {
             recoupements: [],
             consistencyOvertimes: [],
             completeness: {
+                  nbrDocumentsSourceToShow: 0,
+                  nbrDataElementsToShow: 0,
+                  register: null,
                   dataElements: [],
                   sourceDocuments: []
             }
@@ -171,6 +165,19 @@ const Favorites = ({ me }) => {
 
                         completeness: {
                               ...currStage.completeness,
+
+                              selectedNbrDocumentsSourceToShow:
+                                    currStage.completeness?.selectedNbrDocumentsSourceToShow,
+                              nbrDocumentsSourceToShow: existingFormState?.completeness?.nbrDocumentsSourceToShow
+                                    ? existingFormState?.completeness?.nbrDocumentsSourceToShow
+                                    : currStage.completeness?.sourceDocuments?.filter(ind => ind.value)?.length || 0,
+
+                              selectedNbrDataElementsToShow: currStage.completeness?.selectedNbrDataElementsToShow,
+                              nbrDataElementsToShow: existingFormState?.completeness?.nbrDataElementsToShow
+                                    ? existingFormState?.completeness?.nbrDataElementsToShow
+                                    : currStage.completeness?.dataElements?.filter(ind => ind.value)?.length || 0,
+
+                              register: existingFormState?.completeness?.selectedSourceMargin || null,
                               dataElements:
                                     (currStage.completeness?.programAreaDE &&
                                           currStage.completeness?.dataElements
@@ -284,26 +291,6 @@ const Favorites = ({ me }) => {
             }
       };
 
-      const cleanAllStates = () => {
-            setFormState({
-                  selectedProgram: null,
-                  selectedProgramStage: null,
-                  selectedBackgroundInformationTypeConfiguration: DIRECTE,
-                  selectedBackgroundInformationFavorit: null,
-                  inputFavorisNameForBackgroundInforation: '',
-                  selectedGlobalProgramArea: null,
-                  nbrIndicatorsToShow: 0,
-                  indicators: [],
-                  recoupements: [],
-                  consistencyOvertimes: [],
-                  completeness: {
-                        dataElements: [],
-                        sourceDocuments: []
-                  }
-            });
-            setIndicatorFieldsForRDQA([]);
-      };
-
       const handleChangeSelectionTypeConfigurationForBackgroundInformation = ({ value }) => {
             setFormState({
                   ...formState,
@@ -402,26 +389,6 @@ const Favorites = ({ me }) => {
                   </div>
             </>
       );
-
-      const handleDeleteConfigItem = async value => {
-            try {
-                  if (value) {
-                        const newList = mappingConfigs.filter(mapConf => mapConf.id !== value.id);
-                        setMappingConfigs(newList);
-                        setNotification({
-                              show: true,
-                              message: translate('Suppression_Effectuee'),
-                              type: NOTIFICATION_SUCCESS
-                        });
-                  }
-            } catch (err) {
-                  setNotification({
-                        show: true,
-                        message: err.response?.data?.message || err.message,
-                        type: NOTIFICATION_CRITICAL
-                  });
-            }
-      };
 
       const handleCloseAddFavoritForBackgroundInformation = () => {
             setInputFavoritNameForBackgroundInforation('');
@@ -563,6 +530,56 @@ const Favorites = ({ me }) => {
 
             //data element et source document completness
             if (formState?.completeness) {
+                  if (formState?.completeness?.selectedRegister && formState?.completeness?.register) {
+                        let payloadRegistre = {
+                              dataElement: formState?.completeness?.register,
+                              indicator: formState?.completeness?.selectedRegister && {
+                                    id: formState?.completeness?.selectedRegister?.name,
+                                    displayName: formState?.completeness?.selectedRegister?.name
+                              },
+                              programStage,
+                              program
+                        };
+
+                        if (payloadRegistre.dataElement && payloadRegistre.indicator) newList.push(payloadRegistre);
+                  }
+
+                  if (
+                        formState?.completeness?.selectedNbrDataElementsToShow &&
+                        formState?.completeness?.nbrDataElementsToShow
+                  ) {
+                        let payloadNbrDataElementToShow = {
+                              dataElement: formState?.completeness?.nbrDataElementsToShow,
+                              indicator: formState?.completeness?.selectedNbrDataElementsToShow && {
+                                    id: formState?.completeness?.selectedNbrDataElementsToShow?.name,
+                                    displayName: formState?.completeness?.selectedNbrDataElementsToShow?.name
+                              },
+                              programStage,
+                              program
+                        };
+
+                        if (payloadNbrDataElementToShow.dataElement && payloadNbrDataElementToShow.indicator)
+                              newList.push(payloadNbrDataElementToShow);
+                  }
+
+                  if (
+                        formState?.completeness?.selectedNbrDocumentsSourceToShow &&
+                        formState?.completeness?.nbrDocumentsSourceToShow
+                  ) {
+                        let payloadNbrDocumentsSourceToShow = {
+                              dataElement: formState?.completeness?.nbrDocumentsSourceToShow,
+                              indicator: formState?.completeness?.selectedNbrDocumentsSourceToShow && {
+                                    id: formState?.completeness?.selectedNbrDocumentsSourceToShow?.name,
+                                    displayName: formState?.completeness?.selectedNbrDocumentsSourceToShow?.name
+                              },
+                              programStage,
+                              program
+                        };
+
+                        if (payloadNbrDocumentsSourceToShow.dataElement && payloadNbrDocumentsSourceToShow.indicator)
+                              newList.push(payloadNbrDocumentsSourceToShow);
+                  }
+
                   if (formState?.completeness?.programAreaDE && formState?.completeness?.selectedSourceProgramAreaDE) {
                         let payloadProgramAreaDE = {
                               dataElement: formState?.completeness?.programAreaDE,
@@ -941,6 +958,12 @@ const Favorites = ({ me }) => {
                   setDataStoreDSCompletness(response);
             } catch (err) {}
       };
+      const loadDataStoreRegistres = async () => {
+            try {
+                  const response = await loadDataStore(process.env.REACT_APP_DS_COMPLETNESS_KEY, null, null, []);
+                  setDataStoreRegistres(response);
+            } catch (err) {}
+      };
 
       const loadDataStoreBackgroundInformationFavoritsConfigs = async () => {
             try {
@@ -1175,6 +1198,7 @@ const Favorites = ({ me }) => {
                                                       dataStoreCrosschecks={dataStoreCrosschecks}
                                                       dataStoreDECompletness={dataStoreDECompletness}
                                                       dataStoreDSCompletness={dataStoreDSCompletness}
+                                                      dataStoreRegistres={dataStoreRegistres}
                                                 />
                                           )}
 
@@ -1358,6 +1382,7 @@ const Favorites = ({ me }) => {
             loadDataStoreIndicators();
             loadDataStoreDECompletness();
             loadDataStoreDSCompletness();
+            loadDataStoreRegistres();
             loadDataStoreBackgroundInformationFavoritsConfigs();
       }, []);
 
