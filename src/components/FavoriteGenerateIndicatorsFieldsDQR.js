@@ -20,6 +20,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
       };
 
       const handleSelectedGlobalProgramArea = value => {
+            console.log('clear: ', value);
             const globalIndicatorProgramArea = dataStoreIndicators.find(d => d.name === value);
             if (globalIndicatorProgramArea) {
                   setFormState({
@@ -1094,9 +1095,10 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                               value: ind.name
                                                                         }))}
                                                                   disabled={
-                                                                        formState?.selectedGlobalProgramArea &&
                                                                         formState?.completeness
                                                                               ?.selectedSourceProgramAreaDE?.name
+                                                                              ? false
+                                                                              : true
                                                                   }
                                                                   showSearch
                                                                   allowClear

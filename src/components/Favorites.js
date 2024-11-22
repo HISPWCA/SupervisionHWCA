@@ -960,7 +960,7 @@ const Favorites = ({ me }) => {
       };
       const loadDataStoreRegistres = async () => {
             try {
-                  const response = await loadDataStore(process.env.REACT_APP_DS_COMPLETNESS_KEY, null, null, []);
+                  const response = await loadDataStore(process.env.REACT_APP_REGISTRES_KEY, null, null, []);
                   setDataStoreRegistres(response);
             } catch (err) {}
       };
