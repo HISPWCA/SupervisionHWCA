@@ -2081,6 +2081,124 @@ const Setting = () => {
                                                                                     width: '50%'
                                                                               }}
                                                                         >
+                                                                              {translate('How_Many_Document_Source')}
+                                                                        </td>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top'
+                                                                              }}
+                                                                        >
+                                                                              <Select
+                                                                                    options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                                          progStageDE => ({
+                                                                                                label: progStageDE
+                                                                                                      .dataElement
+                                                                                                      ?.displayName,
+                                                                                                value: progStageDE
+                                                                                                      .dataElement?.id
+                                                                                          })
+                                                                                    )}
+                                                                                    placeholder={translate(
+                                                                                          'How_Many_Document_Source'
+                                                                                    )}
+                                                                                    style={{ width: '100%' }}
+                                                                                    onChange={value => {
+                                                                                          setFormState({
+                                                                                                ...formState,
+                                                                                                selectedNbrIndicatorsToShow:
+                                                                                                      formState?.selectedProgramStageForConfiguration?.programStageDataElements
+                                                                                                            ?.map(
+                                                                                                                  p =>
+                                                                                                                        p.dataElement
+                                                                                                            )
+                                                                                                            .find(
+                                                                                                                  dataElement =>
+                                                                                                                        dataElement.id ===
+                                                                                                                        value
+                                                                                                            )
+                                                                                          });
+                                                                                    }}
+                                                                                    value={
+                                                                                          formState
+                                                                                                ?.selectedNbrIndicatorsToShow
+                                                                                                ?.id
+                                                                                    }
+                                                                                    optionFilterProp="label"
+                                                                                    showSearch
+                                                                                    allowClear
+                                                                              />
+                                                                        </td>
+                                                                  </tr>
+                                                                  <tr>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top',
+                                                                                    width: '50%'
+                                                                              }}
+                                                                        >
+                                                                              {translate('How_Many_Data_Element')}
+                                                                        </td>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top'
+                                                                              }}
+                                                                        >
+                                                                              <Select
+                                                                                    options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                                          progStageDE => ({
+                                                                                                label: progStageDE
+                                                                                                      .dataElement
+                                                                                                      ?.displayName,
+                                                                                                value: progStageDE
+                                                                                                      .dataElement?.id
+                                                                                          })
+                                                                                    )}
+                                                                                    placeholder={translate(
+                                                                                          'How_Many_Data_Element'
+                                                                                    )}
+                                                                                    style={{ width: '100%' }}
+                                                                                    onChange={value => {
+                                                                                          setFormState({
+                                                                                                ...formState,
+                                                                                                selectedNbrIndicatorsToShow:
+                                                                                                      formState?.selectedProgramStageForConfiguration?.programStageDataElements
+                                                                                                            ?.map(
+                                                                                                                  p =>
+                                                                                                                        p.dataElement
+                                                                                                            )
+                                                                                                            .find(
+                                                                                                                  dataElement =>
+                                                                                                                        dataElement.id ===
+                                                                                                                        value
+                                                                                                            )
+                                                                                          });
+                                                                                    }}
+                                                                                    value={
+                                                                                          formState
+                                                                                                ?.selectedNbrIndicatorsToShow
+                                                                                                ?.id
+                                                                                    }
+                                                                                    optionFilterProp="label"
+                                                                                    showSearch
+                                                                                    allowClear
+                                                                              />
+                                                                        </td>
+                                                                  </tr>
+                                                                  <tr>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top',
+                                                                                    width: '50%'
+                                                                              }}
+                                                                        >
                                                                               {translate('Keys_Word_Month1')}
                                                                         </td>
                                                                         <td

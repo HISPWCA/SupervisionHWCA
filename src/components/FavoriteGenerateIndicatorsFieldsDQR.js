@@ -20,9 +20,8 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
       };
 
       const handleSelectedGlobalProgramArea = value => {
-            console.log('clear: ', value);
             const globalIndicatorProgramArea = dataStoreIndicators.find(d => d.name === value);
-            if (globalIndicatorProgramArea) {
+            if (globalIndicatorProgramArea && value) {
                   setFormState({
                         ...formState,
                         selectedGlobalProgramArea: globalIndicatorProgramArea,
@@ -50,6 +49,11 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                               selectedSourceProgramAreaDE: dataStoreDECompletness?.find(d => d.name === value),
                               selectedSourceProgramAreaDS: dataStoreDSCompletness?.find(d => d.name === value)
                         }
+                  });
+            } else {
+                  setFormState({
+                        ...formState,
+                        selectedGlobalProgramArea: null
                   });
             }
       };
@@ -1104,7 +1108,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                   allowClear
                                                                   optionFilterProp="label"
                                                                   value={
-                                                                        formState?.completeness?.selectedRegister?.name
+                                                                        formState?.completeness?.register?.name
                                                                   }
                                                                   onChange={value => {
                                                                         setFormState({

@@ -530,12 +530,12 @@ const Favorites = ({ me }) => {
 
             //data element et source document completness
             if (formState?.completeness) {
-                  if (formState?.completeness?.selectedRegister && formState?.completeness?.register) {
+                  if (formState?.completeness?.register && formState?.completeness?.register) {
                         let payloadRegistre = {
-                              dataElement: formState?.completeness?.register,
-                              indicator: formState?.completeness?.selectedRegister && {
-                                    id: formState?.completeness?.selectedRegister?.name,
-                                    displayName: formState?.completeness?.selectedRegister?.name
+                              dataElement: formState?.completeness?.selectedRegister ,
+                              indicator: formState?.completeness?.register && {
+                                    id: formState?.completeness?.register?.name,
+                                    displayName: formState?.completeness?.register?.name
                               },
                               programStage,
                               program
@@ -549,10 +549,10 @@ const Favorites = ({ me }) => {
                         formState?.completeness?.nbrDataElementsToShow
                   ) {
                         let payloadNbrDataElementToShow = {
-                              dataElement: formState?.completeness?.nbrDataElementsToShow,
-                              indicator: formState?.completeness?.selectedNbrDataElementsToShow && {
-                                    id: formState?.completeness?.selectedNbrDataElementsToShow?.name,
-                                    displayName: formState?.completeness?.selectedNbrDataElementsToShow?.name
+                              dataElement: formState?.completeness?.selectedNbrDataElementsToShow,
+                              indicator: formState?.completeness?.nbrDataElementsToShow && {
+                                    id: formState?.completeness?.nbrDataElementsToShow?.name,
+                                    displayName: formState?.completeness?.nbrDataElementsToShow?.name
                               },
                               programStage,
                               program
@@ -567,10 +567,10 @@ const Favorites = ({ me }) => {
                         formState?.completeness?.nbrDocumentsSourceToShow
                   ) {
                         let payloadNbrDocumentsSourceToShow = {
-                              dataElement: formState?.completeness?.nbrDocumentsSourceToShow,
-                              indicator: formState?.completeness?.selectedNbrDocumentsSourceToShow && {
-                                    id: formState?.completeness?.selectedNbrDocumentsSourceToShow?.name,
-                                    displayName: formState?.completeness?.selectedNbrDocumentsSourceToShow?.name
+                              dataElement: formState?.completeness?.selectedNbrDocumentsSourceToShow,
+                              indicator: formState?.completeness?.nbrDocumentsSourceToShow && {
+                                    id: formState?.completeness?.nbrDocumentsSourceToShow?.name,
+                                    displayName: formState?.completeness?.nbrDocumentsSourceToShow?.name
                               },
                               programStage,
                               program
