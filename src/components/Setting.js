@@ -337,6 +337,10 @@ const Setting = () => {
                   indicators: [],
                   recoupements: [],
                   completeness: {
+                        registerKeyWords: [],
+                        selectedNbrDataElementsToShow: null,
+                        selectedNbrDocumentsSourceToShow: null,
+                        selectedRegistre: null,
                         dataElements: [],
                         sourceDocuments: [],
                         margin: null,
@@ -900,59 +904,7 @@ const Setting = () => {
             cleanAllProgramConfigurationStates();
       };
 
-      // const cleanStateAfterProgramCongurationSaved = () => {
-      //       setFormState({
-      //             ...formState,
-      //             selectedProgramStageForConfiguration: null,
-      //             selectedOrganisationUnitGroup: null,
-      //             selectedSupervisorDataElements: [],
-      //             selectedStatusSupervisionDataElement: null,
-      //             selectedSupervisionAutoGenerateID: null,
-      //             selectedNbrIndicatorsToShow: null,
-      //             indicators: [],
-      //             recoupements: [],
-      //             completeness: {
-      //                   dataElements: [],
-      //                   sourceDocuments: [],
-      //                   margin: null,
-      //                   programAreaDOC: null,
-      //                   programAreaDE: null
-      //             },
-      //             consistencyOvertimes: [],
-      //             isFieldEditingMode: false
-      //       });
-
-      //       setFormStateForRDQA({
-      //             ...formStateForRDQA,
-      //             selectedProgramStageForConfiguration: null,
-      //             selectedOrganisationUnitGroup: null,
-      //             selectedSupervisorDataElements: [],
-      //             selectedStatusSupervisionDataElement: null,
-      //             selectedSupervisionAutoGenerateID: null
-      //       });
-
-      //       setPeriodFormState({
-      //             month1KeyWords: [],
-      //             month2KeyWords: [],
-      //             month3KeyWords: [],
-      //             month4KeyWords: [],
-      //             month5KeyWords: [],
-      //             month6KeyWords: [],
-      //             month7KeyWords: [],
-      //             month8KeyWords: [],
-      //             month9KeyWords: [],
-      //             month10KeyWords: [],
-      //             month11KeyWords: [],
-      //             month12KeyWords: [],
-      //             month13KeyWords: [],
-      //             month14KeyWords: [],
-      //             month15KeyWords: []
-      //       });
-      //       setCurrentProgramstageConfiguration(null);
-      //       setCurrentProgramstageConfigurationForRDQA(null);
-      // };
-
-      const handleSaveSupConfig = async () => {
+       const handleSaveSupConfig = async () => {
             try {
                   setLoadingSaveSupervionsConfig(true);
 
