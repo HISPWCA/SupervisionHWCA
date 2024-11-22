@@ -532,7 +532,7 @@ const Favorites = ({ me }) => {
             if (formState?.completeness) {
                   if (formState?.completeness?.register && formState?.completeness?.register) {
                         let payloadRegistre = {
-                              dataElement: formState?.completeness?.selectedRegister ,
+                              dataElement: formState?.completeness?.selectedRegister,
                               indicator: formState?.completeness?.register && {
                                     id: formState?.completeness?.register?.name,
                                     displayName: formState?.completeness?.register?.name

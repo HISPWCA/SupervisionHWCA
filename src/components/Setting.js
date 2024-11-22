@@ -158,6 +158,10 @@ const Setting = () => {
             indicators: [],
             recoupements: [],
             completeness: {
+                  selectedNbrDocumentsSourceToShow: null,
+                  selectedNbrDataElementsToShow: null,
+                  registerKeyWords: [],
+                  selectedRegistre: null,
                   dataElements: [],
                   sourceDocuments: [],
                   margin: null,
@@ -1786,9 +1790,8 @@ const Setting = () => {
 
       const handleEditProgramStageConfigurations = value => {
             try {
-
                   console.log('value: ', value);
-                  
+
                   const foundProgramStage = programStages.find(p => p.id === value.programStage?.id);
                   if (!foundProgramStage) throw new Error('No program stage found ');
 
@@ -1826,8 +1829,6 @@ const Setting = () => {
 
                         setCurrentProgramstageConfigurationForRDQA(value);
                   }
-
-
             } catch (err) {
                   setNotification({
                         show: true,
@@ -2107,7 +2108,7 @@ const Setting = () => {
                                                                                     onChange={value => {
                                                                                           setFormState({
                                                                                                 ...formState,
-                                                                                                selectedNbrIndicatorsToShow:
+                                                                                                selectedNbrDocumentsSourceToShow:
                                                                                                       formState?.selectedProgramStageForConfiguration?.programStageDataElements
                                                                                                             ?.map(
                                                                                                                   p =>
@@ -2122,7 +2123,7 @@ const Setting = () => {
                                                                                     }}
                                                                                     value={
                                                                                           formState
-                                                                                                ?.selectedNbrIndicatorsToShow
+                                                                                                ?.selectedNbrDocumentsSourceToShow
                                                                                                 ?.id
                                                                                     }
                                                                                     optionFilterProp="label"
@@ -2131,6 +2132,7 @@ const Setting = () => {
                                                                               />
                                                                         </td>
                                                                   </tr>
+
                                                                   <tr>
                                                                         <td
                                                                               style={{
@@ -2166,22 +2168,25 @@ const Setting = () => {
                                                                                     onChange={value => {
                                                                                           setFormState({
                                                                                                 ...formState,
-                                                                                                selectedNbrIndicatorsToShow:
-                                                                                                      formState?.selectedProgramStageForConfiguration?.programStageDataElements
-                                                                                                            ?.map(
-                                                                                                                  p =>
-                                                                                                                        p.dataElement
-                                                                                                            )
-                                                                                                            .find(
-                                                                                                                  dataElement =>
-                                                                                                                        dataElement.id ===
-                                                                                                                        value
-                                                                                                            )
+                                                                                                completeness: {
+                                                                                                      ...formState?.completeness,
+                                                                                                      selectedNbrDataElementsToShow:
+                                                                                                            formState?.selectedProgramStageForConfiguration?.programStageDataElements
+                                                                                                                  ?.map(
+                                                                                                                        p =>
+                                                                                                                              p.dataElement
+                                                                                                                  )
+                                                                                                                  .find(
+                                                                                                                        dataElement =>
+                                                                                                                              dataElement.id ===
+                                                                                                                              value
+                                                                                                                  )
+                                                                                                }
                                                                                           });
                                                                                     }}
                                                                                     value={
-                                                                                          formState
-                                                                                                ?.selectedNbrIndicatorsToShow
+                                                                                          formState?.completeness
+                                                                                                .selectedNbrDataElementsToShow
                                                                                                 ?.id
                                                                                     }
                                                                                     optionFilterProp="label"
@@ -2190,6 +2195,107 @@ const Setting = () => {
                                                                               />
                                                                         </td>
                                                                   </tr>
+
+                                                                  <tr>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top',
+                                                                                    width: '50%'
+                                                                              }}
+                                                                        >
+                                                                              {translate('Register_Name')}
+                                                                        </td>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top'
+                                                                              }}
+                                                                        >
+                                                                              <Select
+                                                                                    options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                                          progStageDE => ({
+                                                                                                label: progStageDE
+                                                                                                      .dataElement
+                                                                                                      ?.displayName,
+                                                                                                value: progStageDE
+                                                                                                      .dataElement?.id
+                                                                                          })
+                                                                                    )}
+                                                                                    placeholder={translate(
+                                                                                          'Register_Name'
+                                                                                    )}
+                                                                                    style={{ width: '100%' }}
+                                                                                    onChange={value => {
+                                                                                          setFormState({
+                                                                                                ...formState,
+                                                                                                completeness: {
+                                                                                                      ...formState?.completeness,
+                                                                                                      selectedRegistre:
+                                                                                                            formState?.selectedProgramStageForConfiguration?.programStageDataElements
+                                                                                                                  ?.map(
+                                                                                                                        p =>
+                                                                                                                              p.dataElement
+                                                                                                                  )
+                                                                                                                  .find(
+                                                                                                                        dataElement =>
+                                                                                                                              dataElement.id ===
+                                                                                                                              value
+                                                                                                                  )
+                                                                                                }
+                                                                                          });
+                                                                                    }}
+                                                                                    value={
+                                                                                          formState?.completeness
+                                                                                                .selectedRegistre?.id
+                                                                                    }
+                                                                                    optionFilterProp="label"
+                                                                                    showSearch
+                                                                                    allowClear
+                                                                              />
+                                                                        </td>
+                                                                  </tr>
+
+                                                                  <tr>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top',
+                                                                                    width: '50%'
+                                                                              }}
+                                                                        >
+                                                                              {translate('Register_Key_Words')}
+                                                                        </td>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top'
+                                                                              }}
+                                                                        >
+                                                                              <TagsInput
+                                                                                    style={{ width: '100%' }}
+                                                                                    value={
+                                                                                          formState?.completeness
+                                                                                                ?.registerKeyWords || []
+                                                                                    }
+                                                                                    onChange={word =>
+                                                                                          setFormState({
+                                                                                                ...formState,
+                                                                                                completeness: {
+                                                                                                      ...formState?.completeness,
+                                                                                                      registerKeyWords:
+                                                                                                            word || []
+                                                                                                }
+                                                                                          })
+                                                                                    }
+                                                                              />
+                                                                        </td>
+                                                                  </tr>
+
                                                                   <tr>
                                                                         <td
                                                                               style={{
@@ -2789,7 +2895,7 @@ const Setting = () => {
                   });
             }
       };
-      
+
       const RenderConfigurationForEachProgramStageList = () =>
             programStageConfigurations.length > 0 && (
                   <div style={{ marginTop: '20px', position: 'sticky', top: 5 }}>

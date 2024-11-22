@@ -346,5 +346,7 @@
     "Open_Event_With": "Open event with ?",
     "Register_Name":"Register name",
     "How_Many_Data_Element":"How many data element ?",
-    "How_Many_Document_Source":"How many document source ?"
+    "How_Many_Document_Source":"How many document source ?",
+
+    "Register_Key_Words":"Register key words"
 }

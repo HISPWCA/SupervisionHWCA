@@ -346,5 +346,6 @@
     "Open_Event_With": "Ouvrir l'évenement avec ? ",
     "Register_Name": "Nom du registre",
     "How_Many_Data_Element": "Combient d'élement de donnée ?",
-    "How_Many_Document_Source": "Combient de source de document ?"
+    "How_Many_Document_Source": "Combient de source de document ?",
+    "Register_Key_Words": "Mot clés du registre"
 }
