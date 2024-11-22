@@ -316,6 +316,10 @@ const Setting = () => {
                         margin: fieldList?.completeness?.margin || null,
                         programAreaDE: fieldList?.completeness?.programAreaDE || null,
                         programAreaDOC: fieldList?.completeness?.programAreaDOC || null,
+                        registerKeyWords: fieldList?.completeness?.registerKeyWords || [],
+                        selectedNbrDataElementsToShow: fieldList?.completeness?.selectedNbrDataElementsToShow || null,
+                        selectedNbrDocumentsSourceToShow: fieldList?.completeness?.selectedNbrDocumentsSourceToShow || null,
+                        selectedRegistre: fieldList?.completeness?.selectedRegistre || null,
                         dataElements: newDataElementCompleteness,
                         sourceDocuments: newSourceDocumentCompleteness
                   }
@@ -904,7 +908,7 @@ const Setting = () => {
             cleanAllProgramConfigurationStates();
       };
 
-       const handleSaveSupConfig = async () => {
+      const handleSaveSupConfig = async () => {
             try {
                   setLoadingSaveSupervionsConfig(true);
 
@@ -1757,6 +1761,13 @@ const Setting = () => {
                               selectedSupervisorDataElements: value.supervisorField || [],
                               selectedStatusSupervisionDataElement: value.statusSupervisionField,
                               selectedNbrIndicatorsToShow: value.selectedNbrIndicatorsToShow,
+                              completeness: {
+                                    ...value.completeness,
+                                    registerKeyWords: value?.completeness?.registerKeyWords || [],
+                                    selectedNbrDataElementsToShow: value?.completeness?.selectedNbrDataElementsToShow,
+                                    selectedNbrDocumentsSourceToShow:
+                                          value?.completeness?.selectedNbrDocumentsSourceToShow
+                              },
                               isFieldEditingMode: true
                         });
 
