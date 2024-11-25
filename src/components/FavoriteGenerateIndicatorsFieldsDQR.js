@@ -19,6 +19,22 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
             return newArray;
       };
 
+      const getDocumentsSourceToShow = () => {
+            let newArray = [];
+            for (let i = 1; i <= formState?.completeness?.sourceDocuments?.length || 0; i++) {
+                  newArray.push({ value: i, label: i });
+            }
+            return newArray;
+      };
+
+      const getDataElementsToShow = () => {
+            let newArray = [];
+            for (let i = 1; i <= formState?.completeness?.dataElements?.length || 0; i++) {
+                  newArray.push({ value: i, label: i });
+            }
+            return newArray;
+      };
+
       const handleSelectedGlobalProgramArea = value => {
             const globalIndicatorProgramArea = dataStoreIndicators.find(d => d.name === value);
             if (globalIndicatorProgramArea && value) {
@@ -847,34 +863,46 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                         </div>
 
                         <div style={{ marginTop: '30px' }}>
-                              <div style={{ marginBottom: '10px', display: 'flex', gap: '20px' }}>
+                              <div style={{ marginBottom: '10px', display: 'flex', gap: '50px', alignItems: 'center' }}>
                                     <div style={{ marginBottom: '10px', fontWeight: 'bold' }}>
                                           {translate('Data_Element_&_Source_Documentation_Configurations')}
                                     </div>
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <div>
                                           <div style={{ fontWeight: 'bold' }}>{translate('How_Many_Data_Element')}</div>
-                                          <div style={{ marginLeft: '10px' }}>
+                                          <div>
                                                 <Select
-                                                      style={{ width: '100px' }}
-                                                      options={getNumberIndicatorsToShow()}
-                                                      value={formState?.nbrIndicatorsToShow}
+                                                      style={{ width: '100%' }}
+                                                      options={getDataElementsToShow()}
+                                                      value={formState?.completeness?.nbrDataElementsToShow}
                                                       onChange={value => {
-                                                            setFormState({ ...formState, nbrIndicatorsToShow: value });
+                                                            setFormState({
+                                                                  ...formState,
+                                                                  completeness: {
+                                                                        ...formState?.completeness,
+                                                                        nbrDataElementsToShow: value
+                                                                  }
+                                                            });
                                                       }}
                                                 />
                                           </div>
                                     </div>
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <div>
                                           <div style={{ fontWeight: 'bold' }}>
                                                 {translate('How_Many_Document_Source')}
                                           </div>
-                                          <div style={{ marginLeft: '10px' }}>
+                                          <div>
                                                 <Select
-                                                      style={{ width: '100px' }}
-                                                      options={getNumberIndicatorsToShow()}
-                                                      value={formState?.nbrIndicatorsToShow}
+                                                      style={{ width: '100%' }}
+                                                      options={getDocumentsSourceToShow()}
+                                                      value={formState?.completeness?.nbrDocumentsSourceToShow}
                                                       onChange={value => {
-                                                            setFormState({ ...formState, nbrIndicatorsToShow: value });
+                                                            setFormState({
+                                                                  ...formState,
+                                                                  completeness: {
+                                                                        ...formState?.completeness,
+                                                                        nbrDocumentsSourceToShow: value
+                                                                  }
+                                                            });
                                                       }}
                                                 />
                                           </div>
@@ -1107,9 +1135,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                   showSearch
                                                                   allowClear
                                                                   optionFilterProp="label"
-                                                                  value={
-                                                                        formState?.completeness?.register?.name
-                                                                  }
+                                                                  value={formState?.completeness?.register?.name}
                                                                   onChange={value => {
                                                                         setFormState({
                                                                               ...formState,
@@ -1156,62 +1182,67 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                             border: '1px solid #00000070'
                                                       }}
                                                 >
-                                                      {formState?.completeness?.dataElements?.map((de, deIndex) => (
-                                                            <div key={deIndex} style={{ marginTop: '5px' }}>
-                                                                  <Select
-                                                                        placeholder={`${translate('Data_Element')} ${
-                                                                              deIndex + 1
-                                                                        }`}
-                                                                        style={{
-                                                                              width: '100%'
-                                                                        }}
-                                                                        options={formState?.completeness?.selectedSourceProgramAreaDE?.children?.map(
-                                                                              ind => ({
-                                                                                    label: ind.name,
-                                                                                    value: ind.name
-                                                                              })
-                                                                        )}
-                                                                        disabled={
-                                                                              formState?.completeness
-                                                                                    ?.selectedSourceProgramAreaDE
-                                                                                    ? false
-                                                                                    : true
-                                                                        }
-                                                                        showSearch
-                                                                        allowClear
-                                                                        optionFilterProp="label"
-                                                                        value={de?.selectedSourceDE?.name}
-                                                                        onChange={value => {
-                                                                              setFormState({
-                                                                                    ...formState,
-                                                                                    completeness: {
-                                                                                          ...formState?.completeness,
-                                                                                          dataElements:
-                                                                                                formState?.completeness?.dataElements?.map(
-                                                                                                      (i, iIndex) => {
-                                                                                                            if (
-                                                                                                                  iIndex ===
-                                                                                                                  deIndex
-                                                                                                            ) {
-                                                                                                                  return {
-                                                                                                                        ...i,
-                                                                                                                        selectedSourceDE:
-                                                                                                                              formState?.completeness?.selectedSourceProgramAreaDE?.children?.find(
-                                                                                                                                    d =>
-                                                                                                                                          d.name ===
-                                                                                                                                          value
-                                                                                                                              )
-                                                                                                                  };
+                                                      {formState?.completeness?.dataElements
+                                                            ?.slice(0, +formState?.completeness?.nbrDataElementsToShow)
+                                                            ?.map((de, deIndex) => (
+                                                                  <div key={deIndex} style={{ marginTop: '5px' }}>
+                                                                        <Select
+                                                                              placeholder={`${translate(
+                                                                                    'Data_Element'
+                                                                              )} ${deIndex + 1}`}
+                                                                              style={{
+                                                                                    width: '100%'
+                                                                              }}
+                                                                              options={formState?.completeness?.selectedSourceProgramAreaDE?.children?.map(
+                                                                                    ind => ({
+                                                                                          label: ind.name,
+                                                                                          value: ind.name
+                                                                                    })
+                                                                              )}
+                                                                              disabled={
+                                                                                    formState?.completeness
+                                                                                          ?.selectedSourceProgramAreaDE
+                                                                                          ? false
+                                                                                          : true
+                                                                              }
+                                                                              showSearch
+                                                                              allowClear
+                                                                              optionFilterProp="label"
+                                                                              value={de?.selectedSourceDE?.name}
+                                                                              onChange={value => {
+                                                                                    setFormState({
+                                                                                          ...formState,
+                                                                                          completeness: {
+                                                                                                ...formState?.completeness,
+                                                                                                dataElements:
+                                                                                                      formState?.completeness?.dataElements?.map(
+                                                                                                            (
+                                                                                                                  i,
+                                                                                                                  iIndex
+                                                                                                            ) => {
+                                                                                                                  if (
+                                                                                                                        iIndex ===
+                                                                                                                        deIndex
+                                                                                                                  ) {
+                                                                                                                        return {
+                                                                                                                              ...i,
+                                                                                                                              selectedSourceDE:
+                                                                                                                                    formState?.completeness?.selectedSourceProgramAreaDE?.children?.find(
+                                                                                                                                          d =>
+                                                                                                                                                d.name ===
+                                                                                                                                                value
+                                                                                                                                    )
+                                                                                                                        };
+                                                                                                                  }
+                                                                                                                  return i;
                                                                                                             }
-                                                                                                            return i;
-                                                                                                      }
-                                                                                                )
-                                                                                    }
-                                                                              });
-                                                                        }}
-                                                                  />
-                                                            </div>
-                                                      ))}
+                                                                                                      )
+                                                                                          }
+                                                                                    });
+                                                                              }}
+                                                                        />
+                                                                  </div>
+                                                            ))}
                                                 </td>
 
                                                 <td
@@ -1222,62 +1253,70 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                             border: '1px solid #00000070'
                                                       }}
                                                 >
-                                                      {formState?.completeness?.sourceDocuments?.map((de, deIndex) => (
-                                                            <div key={deIndex} style={{ marginTop: '5px' }}>
-                                                                  <Select
-                                                                        placeholder={`${translate('Data_Element')} ${
-                                                                              deIndex + 1
-                                                                        }`}
-                                                                        style={{
-                                                                              width: '100%'
-                                                                        }}
-                                                                        options={formState?.completeness?.selectedSourceProgramAreaDS?.children?.map(
-                                                                              ind => ({
-                                                                                    label: ind.name,
-                                                                                    value: ind.name
-                                                                              })
-                                                                        )}
-                                                                        disabled={
-                                                                              formState?.completeness
-                                                                                    ?.selectedSourceProgramAreaDS
-                                                                                    ? false
-                                                                                    : true
-                                                                        }
-                                                                        showSearch
-                                                                        allowClear
-                                                                        optionFilterProp="label"
-                                                                        value={de?.selectedSourceDS?.name}
-                                                                        onChange={value => {
-                                                                              setFormState({
-                                                                                    ...formState,
-                                                                                    completeness: {
-                                                                                          ...formState?.completeness,
-                                                                                          sourceDocuments:
-                                                                                                formState?.completeness?.sourceDocuments?.map(
-                                                                                                      (i, iIndex) => {
-                                                                                                            if (
-                                                                                                                  iIndex ===
-                                                                                                                  deIndex
-                                                                                                            ) {
-                                                                                                                  return {
-                                                                                                                        ...i,
-                                                                                                                        selectedSourceDS:
-                                                                                                                              formState?.completeness?.selectedSourceProgramAreaDS?.children?.find(
-                                                                                                                                    d =>
-                                                                                                                                          d.name ===
-                                                                                                                                          value
-                                                                                                                              )
-                                                                                                                  };
+                                                      {formState?.completeness?.sourceDocuments
+                                                            ?.slice(
+                                                                  0,
+                                                                  +formState?.completeness?.nbrDocumentsSourceToShow
+                                                            )
+                                                            ?.map((de, deIndex) => (
+                                                                  <div key={deIndex} style={{ marginTop: '5px' }}>
+                                                                        <Select
+                                                                              placeholder={`${translate(
+                                                                                    'Source_Document'
+                                                                              )} ${deIndex + 1}`}
+                                                                              style={{
+                                                                                    width: '100%'
+                                                                              }}
+                                                                              options={formState?.completeness?.selectedSourceProgramAreaDS?.children?.map(
+                                                                                    ind => ({
+                                                                                          label: ind.name,
+                                                                                          value: ind.name
+                                                                                    })
+                                                                              )}
+                                                                              disabled={
+                                                                                    formState?.completeness
+                                                                                          ?.selectedSourceProgramAreaDS
+                                                                                          ? false
+                                                                                          : true
+                                                                              }
+                                                                              showSearch
+                                                                              allowClear
+                                                                              optionFilterProp="label"
+                                                                              value={de?.selectedSourceDS?.name}
+                                                                              onChange={value => {
+                                                                                    setFormState({
+                                                                                          ...formState,
+                                                                                          completeness: {
+                                                                                                ...formState?.completeness,
+                                                                                                sourceDocuments:
+                                                                                                      formState?.completeness?.sourceDocuments?.map(
+                                                                                                            (
+                                                                                                                  i,
+                                                                                                                  iIndex
+                                                                                                            ) => {
+                                                                                                                  if (
+                                                                                                                        iIndex ===
+                                                                                                                        deIndex
+                                                                                                                  ) {
+                                                                                                                        return {
+                                                                                                                              ...i,
+                                                                                                                              selectedSourceDS:
+                                                                                                                                    formState?.completeness?.selectedSourceProgramAreaDS?.children?.find(
+                                                                                                                                          d =>
+                                                                                                                                                d.name ===
+                                                                                                                                                value
+                                                                                                                                    )
+                                                                                                                        };
+                                                                                                                  }
+                                                                                                                  return i;
                                                                                                             }
-                                                                                                            return i;
-                                                                                                      }
-                                                                                                )
-                                                                                    }
-                                                                              });
-                                                                        }}
-                                                                  />
-                                                            </div>
-                                                      ))}
+                                                                                                      )
+                                                                                          }
+                                                                                    });
+                                                                              }}
+                                                                        />
+                                                                  </div>
+                                                            ))}
                                                 </td>
                                           </tr>
                                     </tbody>

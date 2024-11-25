@@ -177,7 +177,12 @@ const Favorites = ({ me }) => {
                                     ? existingFormState?.completeness?.nbrDataElementsToShow
                                     : currStage.completeness?.dataElements?.filter(ind => ind.value)?.length || 0,
 
-                              register: existingFormState?.completeness?.selectedSourceMargin || null,
+                              register: existingFormState?.completeness?.register
+                                    ? existingFormState?.completeness?.register
+                                    : currStage.completeness?.register,
+
+                              selectedRegister: existingFormState?.completeness?.selectedRegister || null,
+                              
                               dataElements:
                                     (currStage.completeness?.programAreaDE &&
                                           currStage.completeness?.dataElements
@@ -530,7 +535,8 @@ const Favorites = ({ me }) => {
 
             //data element et source document completness
             if (formState?.completeness) {
-                  if (formState?.completeness?.register && formState?.completeness?.register) {
+
+                  if (formState?.completeness?.register && formState?.completeness?.selectedRegister) {
                         let payloadRegistre = {
                               dataElement: formState?.completeness?.selectedRegister,
                               indicator: formState?.completeness?.register && {
@@ -541,7 +547,7 @@ const Favorites = ({ me }) => {
                               program
                         };
 
-                        if (payloadRegistre.dataElement && payloadRegistre.indicator) newList.push(payloadRegistre);
+                        if (payloadRegistre.dataElement && payloadRegistre.indicator?.id) newList.push(payloadRegistre);
                   }
 
                   if (

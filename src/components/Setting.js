@@ -161,7 +161,7 @@ const Setting = () => {
                   selectedNbrDocumentsSourceToShow: null,
                   selectedNbrDataElementsToShow: null,
                   registerKeyWords: [],
-                  selectedRegistre: null,
+                  selectedRegister: null,
                   dataElements: [],
                   sourceDocuments: [],
                   margin: null,
@@ -320,7 +320,7 @@ const Setting = () => {
                         selectedNbrDataElementsToShow: fieldList?.completeness?.selectedNbrDataElementsToShow || null,
                         selectedNbrDocumentsSourceToShow:
                               fieldList?.completeness?.selectedNbrDocumentsSourceToShow || null,
-                        selectedRegistre: fieldList?.completeness?.selectedRegistre || null,
+                        selectedRegister: fieldList?.completeness?.selectedRegister || null,
                         dataElements: newDataElementCompleteness,
                         sourceDocuments: newSourceDocumentCompleteness
                   }
@@ -345,7 +345,7 @@ const Setting = () => {
                         registerKeyWords: [],
                         selectedNbrDataElementsToShow: null,
                         selectedNbrDocumentsSourceToShow: null,
-                        selectedRegistre: null,
+                        selectedRegister: null,
                         dataElements: [],
                         sourceDocuments: [],
                         margin: null,
@@ -1536,7 +1536,7 @@ const Setting = () => {
                         ...formState?.completeness,
                         selectedNbrDocumentsSourceToShow: null,
                         selectedNbrDataElementsToShow: null,
-                        selectedRegistre: null
+                        selectedRegister: null
                   },
                   selectedProgramStageForConfiguration: programStages.find(pstage => pstage.id === value)
             });
@@ -1774,7 +1774,7 @@ const Setting = () => {
                                     selectedNbrDataElementsToShow: value?.completeness?.selectedNbrDataElementsToShow,
                                     selectedNbrDocumentsSourceToShow:
                                           value?.completeness?.selectedNbrDocumentsSourceToShow,
-                                    selectedRegistre: value?.completeness?.selectedRegistre
+                                    selectedRegister: value?.completeness?.selectedRegister
                               },
                               isFieldEditingMode: true
                         });
@@ -2207,7 +2207,7 @@ const Setting = () => {
                                                                                                 ...formState,
                                                                                                 completeness: {
                                                                                                       ...formState?.completeness,
-                                                                                                      selectedRegistre:
+                                                                                                      selectedRegister:
                                                                                                             formState?.selectedProgramStageForConfiguration?.programStageDataElements
                                                                                                                   ?.map(
                                                                                                                         p =>
@@ -2223,7 +2223,7 @@ const Setting = () => {
                                                                                     }}
                                                                                     value={
                                                                                           formState?.completeness
-                                                                                                .selectedRegistre?.id
+                                                                                                .selectedRegister?.id
                                                                                     }
                                                                                     optionFilterProp="label"
                                                                                     showSearch
