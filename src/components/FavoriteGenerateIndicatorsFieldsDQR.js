@@ -1000,6 +1000,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                               ...formState,
                                                                               completeness: {
                                                                                     ...formState?.completeness,
+                                                                                    register: null,
                                                                                     selectedSourceProgramAreaDE:
                                                                                           dataStoreDECompletness?.find(
                                                                                                 d => d.name === value
@@ -1077,6 +1078,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                               ...formState,
                                                                               completeness: {
                                                                                     ...formState?.completeness,
+
                                                                                     selectedSourceProgramAreaDS:
                                                                                           dataStoreDSCompletness?.find(
                                                                                                 d => d.name === value

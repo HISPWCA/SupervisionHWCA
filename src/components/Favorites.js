@@ -111,6 +111,8 @@ const Favorites = ({ me }) => {
             );
             const existingFormState = formState?.selectedBackgroundInformationFavorit?.formState;
 
+            console.log('existingFormState : ', existingFormState);
+
             if (currStage) {
                   setFormState({
                         ...formState,
@@ -213,6 +215,8 @@ const Favorites = ({ me }) => {
                         }
                   });
             }
+
+            
       };
 
       const initFieldsForRDQA = (initValuesList = []) => {
@@ -556,6 +560,7 @@ const Favorites = ({ me }) => {
                               newList.push(payloadRegistre);
 
                         console.log("Regitre  payload: ", payloadRegistre)
+                        console.log('formState?.completeness: ', formState?.completeness);
                   }
 
                   if (
