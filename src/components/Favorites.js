@@ -182,7 +182,7 @@ const Favorites = ({ me }) => {
                                     : currStage.completeness?.register,
 
                               selectedRegister: existingFormState?.completeness?.selectedRegister || null,
-                              
+
                               dataElements:
                                     (currStage.completeness?.programAreaDE &&
                                           currStage.completeness?.dataElements
@@ -444,9 +444,11 @@ const Favorites = ({ me }) => {
                         programStage
                   };
 
-                  if (payloadProgramArea.dataElement && payloadProgramArea.indicator) newList.push(payloadProgramArea);
-                  if (payloadIndicator.dataElement && payloadIndicator.indicator) newList.push(payloadIndicator);
-                  if (payloadMargin.dataElement && payloadMargin.indicator) newList.push(payloadMargin);
+                  if (payloadProgramArea.dataElement?.id && payloadProgramArea.indicator?.id)
+                        newList.push(payloadProgramArea);
+                  if (payloadIndicator.dataElement?.id && payloadIndicator.indicator?.id)
+                        newList.push(payloadIndicator);
+                  if (payloadMargin.dataElement?.id && payloadMargin.indicator?.id) newList.push(payloadMargin);
             }
 
             // Recoupements
@@ -490,10 +492,12 @@ const Favorites = ({ me }) => {
                         program
                   };
 
-                  if (payloadProgramArea.dataElement && payloadProgramArea.indicator) newList.push(payloadProgramArea);
-                  if (payloadPrimary.dataElement && payloadPrimary.indicator) newList.push(payloadPrimary);
-                  if (payloadSecondary.dataElement && payloadSecondary.indicator) newList.push(payloadSecondary);
-                  if (payloadMargin.dataElement && payloadMargin.indicator) newList.push(payloadMargin);
+                  if (payloadProgramArea.dataElement?.id && payloadProgramArea.indicator?.id)
+                        newList.push(payloadProgramArea);
+                  if (payloadPrimary.dataElement?.id && payloadPrimary.indicator?.id) newList.push(payloadPrimary);
+                  if (payloadSecondary.dataElement?.id && payloadSecondary.indicator?.id)
+                        newList.push(payloadSecondary);
+                  if (payloadMargin.dataElement?.id && payloadMargin.indicator?.id) newList.push(payloadMargin);
             }
 
             // consistencyOvertime
@@ -528,14 +532,15 @@ const Favorites = ({ me }) => {
                         programStage
                   };
 
-                  if (payloadConsistency.dataElement && payloadConsistency.indicator) newList.push(payloadConsistency);
-                  if (payloadMargin.dataElement && payloadMargin.indicator) newList.push(payloadMargin);
-                  if (payloadProgramArea.dataElement && payloadProgramArea.indicator) newList.push(payloadProgramArea);
+                  if (payloadConsistency.dataElement?.id && payloadConsistency.indicator?.id)
+                        newList.push(payloadConsistency);
+                  if (payloadMargin.dataElement?.id && payloadMargin.indicator?.id) newList.push(payloadMargin);
+                  if (payloadProgramArea.dataElement?.id && payloadProgramArea.indicator?.id)
+                        newList.push(payloadProgramArea);
             }
 
             //data element et source document completness
             if (formState?.completeness) {
-
                   if (formState?.completeness?.register && formState?.completeness?.selectedRegister) {
                         let payloadRegistre = {
                               dataElement: formState?.completeness?.selectedRegister,
@@ -547,7 +552,10 @@ const Favorites = ({ me }) => {
                               program
                         };
 
-                        if (payloadRegistre.dataElement && payloadRegistre.indicator?.id) newList.push(payloadRegistre);
+                        if (payloadRegistre.dataElement?.id && payloadRegistre.indicator?.id)
+                              newList.push(payloadRegistre);
+
+                        console.log("Regitre  payload: ", payloadRegistre)
                   }
 
                   if (
@@ -557,14 +565,14 @@ const Favorites = ({ me }) => {
                         let payloadNbrDataElementToShow = {
                               dataElement: formState?.completeness?.selectedNbrDataElementsToShow,
                               indicator: formState?.completeness?.nbrDataElementsToShow && {
-                                    id: formState?.completeness?.nbrDataElementsToShow?.name,
-                                    displayName: formState?.completeness?.nbrDataElementsToShow?.name
+                                    id: formState?.completeness?.nbrDataElementsToShow,
+                                    displayName: formState?.completeness?.nbrDataElementsToShow
                               },
                               programStage,
                               program
                         };
 
-                        if (payloadNbrDataElementToShow.dataElement && payloadNbrDataElementToShow.indicator)
+                        if (payloadNbrDataElementToShow.dataElement?.id && payloadNbrDataElementToShow.indicator?.id)
                               newList.push(payloadNbrDataElementToShow);
                   }
 
@@ -575,14 +583,17 @@ const Favorites = ({ me }) => {
                         let payloadNbrDocumentsSourceToShow = {
                               dataElement: formState?.completeness?.selectedNbrDocumentsSourceToShow,
                               indicator: formState?.completeness?.nbrDocumentsSourceToShow && {
-                                    id: formState?.completeness?.nbrDocumentsSourceToShow?.name,
-                                    displayName: formState?.completeness?.nbrDocumentsSourceToShow?.name
+                                    id: formState?.completeness?.nbrDocumentsSourceToShow,
+                                    displayName: formState?.completeness?.nbrDocumentsSourceToShow
                               },
                               programStage,
                               program
                         };
 
-                        if (payloadNbrDocumentsSourceToShow.dataElement && payloadNbrDocumentsSourceToShow.indicator)
+                        if (
+                              payloadNbrDocumentsSourceToShow.dataElement?.id &&
+                              payloadNbrDocumentsSourceToShow.indicator?.id
+                        )
                               newList.push(payloadNbrDocumentsSourceToShow);
                   }
 
@@ -597,7 +608,7 @@ const Favorites = ({ me }) => {
                               program
                         };
 
-                        if (payloadProgramAreaDE.dataElement && payloadProgramAreaDE.indicator)
+                        if (payloadProgramAreaDE.dataElement?.id && payloadProgramAreaDE.indicator?.id)
                               newList.push(payloadProgramAreaDE);
                   }
 
@@ -612,7 +623,7 @@ const Favorites = ({ me }) => {
                               program
                         };
 
-                        if (payloadProgramAreaDS.dataElement && payloadProgramAreaDS.indicator)
+                        if (payloadProgramAreaDS.dataElement?.id && payloadProgramAreaDS.indicator?.id)
                               newList.push(payloadProgramAreaDS);
                   }
 
@@ -627,7 +638,7 @@ const Favorites = ({ me }) => {
                               program
                         };
 
-                        if (payloadMargin.dataElement && payloadMargin.indicator) newList.push(payloadMargin);
+                        if (payloadMargin.dataElement?.id && payloadMargin.indicator?.id) newList.push(payloadMargin);
                   }
 
                   for (let de of formState?.completeness?.dataElements) {
@@ -641,7 +652,7 @@ const Favorites = ({ me }) => {
                               program
                         };
 
-                        if (payloadDE.dataElement && payloadDE.indicator) newList.push(payloadDE);
+                        if (payloadDE.dataElement?.id && payloadDE.indicator?.id) newList.push(payloadDE);
                   }
 
                   for (let doc of formState?.completeness?.sourceDocuments) {
@@ -655,7 +666,7 @@ const Favorites = ({ me }) => {
                               program
                         };
 
-                        if (payloadDOC.dataElement && payloadDOC.indicator) newList.push(payloadDOC);
+                        if (payloadDOC.dataElement?.id && payloadDOC.indicator?.id) newList.push(payloadDOC);
                   }
             }
 
@@ -670,7 +681,7 @@ const Favorites = ({ me }) => {
                         program
                   };
 
-                  if (payloadIndicatorToShow.dataElement && payloadIndicatorToShow.indicator)
+                  if (payloadIndicatorToShow.dataElement?.id && payloadIndicatorToShow.indicator?.id)
                         newList.push(payloadIndicatorToShow);
             }
 
@@ -752,6 +763,8 @@ const Favorites = ({ me }) => {
                         createdAt: dayjs(),
                         updatedAt: dayjs()
                   };
+
+                  console.log('Payload : ', payload);
 
                   if (formState?.selectedBackgroundInformationFavorit && backgroundInfoList) {
                         backgroundInformationConfigList = backgroundInfoList.map(favo => {
