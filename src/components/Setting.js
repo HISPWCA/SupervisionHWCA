@@ -318,7 +318,8 @@ const Setting = () => {
                         programAreaDOC: fieldList?.completeness?.programAreaDOC || null,
                         registerKeyWords: fieldList?.completeness?.registerKeyWords || [],
                         selectedNbrDataElementsToShow: fieldList?.completeness?.selectedNbrDataElementsToShow || null,
-                        selectedNbrDocumentsSourceToShow: fieldList?.completeness?.selectedNbrDocumentsSourceToShow || null,
+                        selectedNbrDocumentsSourceToShow:
+                              fieldList?.completeness?.selectedNbrDocumentsSourceToShow || null,
                         selectedRegistre: fieldList?.completeness?.selectedRegistre || null,
                         dataElements: newDataElementCompleteness,
                         sourceDocuments: newSourceDocumentCompleteness
@@ -1531,6 +1532,12 @@ const Setting = () => {
                   selectedStatusSupervisionDataElement: null,
                   selectedNbrIndicatorsToShow: null,
                   selectedSupervisorDataElements: [],
+                  completeness: {
+                        ...formState?.completeness,
+                        selectedNbrDocumentsSourceToShow: null,
+                        selectedNbrDataElementsToShow: null,
+                        selectedRegistre: null
+                  },
                   selectedProgramStageForConfiguration: programStages.find(pstage => pstage.id === value)
             });
       };
@@ -1766,7 +1773,8 @@ const Setting = () => {
                                     registerKeyWords: value?.completeness?.registerKeyWords || [],
                                     selectedNbrDataElementsToShow: value?.completeness?.selectedNbrDataElementsToShow,
                                     selectedNbrDocumentsSourceToShow:
-                                          value?.completeness?.selectedNbrDocumentsSourceToShow
+                                          value?.completeness?.selectedNbrDocumentsSourceToShow,
+                                    selectedRegistre: value?.completeness?.selectedRegistre
                               },
                               isFieldEditingMode: true
                         });
@@ -2071,21 +2079,24 @@ const Setting = () => {
                                                                                     onChange={value => {
                                                                                           setFormState({
                                                                                                 ...formState,
-                                                                                                selectedNbrDocumentsSourceToShow:
-                                                                                                      formState?.selectedProgramStageForConfiguration?.programStageDataElements
-                                                                                                            ?.map(
-                                                                                                                  p =>
-                                                                                                                        p.dataElement
-                                                                                                            )
-                                                                                                            .find(
-                                                                                                                  dataElement =>
-                                                                                                                        dataElement.id ===
-                                                                                                                        value
-                                                                                                            )
+                                                                                                completeness: {
+                                                                                                      ...formState?.completeness,
+                                                                                                      selectedNbrDocumentsSourceToShow:
+                                                                                                            formState?.selectedProgramStageForConfiguration?.programStageDataElements
+                                                                                                                  ?.map(
+                                                                                                                        p =>
+                                                                                                                              p.dataElement
+                                                                                                                  )
+                                                                                                                  .find(
+                                                                                                                        dataElement =>
+                                                                                                                              dataElement.id ===
+                                                                                                                              value
+                                                                                                                  )
+                                                                                                }
                                                                                           });
                                                                                     }}
                                                                                     value={
-                                                                                          formState
+                                                                                          formState?.completeness
                                                                                                 ?.selectedNbrDocumentsSourceToShow
                                                                                                 ?.id
                                                                                     }
@@ -2917,28 +2928,6 @@ const Setting = () => {
                                                                         }
                                                                   />
                                                             </div>
-                                                            {/* <Popconfirm
-                                                                  title={translate('Suppression_Configuration')}
-                                                                  description={translate(
-                                                                        'Confirmation_Suppression_Configuration'
-                                                                  )}
-                                                                  icon={
-                                                                        <QuestionCircleOutlined
-                                                                              style={{ color: 'red' }}
-                                                                        />
-                                                                  }
-                                                                  onConfirm={() => {}}
-                                                            >
-                                                                  <div>
-                                                                        <RiDeleteBinLine
-                                                                              style={{
-                                                                                    color: 'red',
-                                                                                    fontSize: '18px',
-                                                                                    cursor: 'pointer'
-                                                                              }}
-                                                                        />
-                                                                  </div>
-                                                            </Popconfirm> */}
                                                       </div>
                                                 )
                                           }
