@@ -100,7 +100,7 @@ import { CgCloseO } from 'react-icons/cg';
 import { TbSelect } from 'react-icons/tb';
 import { DataDimension } from '@dhis2/analytics';
 import { IoMdOpen } from 'react-icons/io';
-import { MdStars, MdCancel } from 'react-icons/md';
+import { MdStars } from 'react-icons/md';
 import shuffle from 'shuffle-array';
 
 import dayjs from 'dayjs';
@@ -108,6 +108,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { BLUE, GRAY_DARK, GREEN, ORANGE, RED, WHITE } from '../utils/couleurs';
 import { getDefaultStatusPaymentIfStatusIsNull, getDefaultStatusSupervisionIfStatusIsNull } from './DashboardSchedule';
 import translate from '../utils/translator';
+import { useConfig } from '@dhis2/app-runtime';
 const quarterOfYear = require('dayjs/plugin/quarterOfYear');
 const weekOfYear = require('dayjs/plugin/weekOfYear');
 
@@ -120,6 +121,7 @@ const Supervision = ({ me }) => {
       const [dataStoreSupervisions, setDataStoreSupervisions] = useState([]);
       const [dataStoreIndicatorConfigs, setDataStoreIndicatorConfigs] = useState([]);
       const [dataStoreIndicatorsMapping, setDataStoreIndicatorsMapping] = useState([]);
+      const { apiVersion } = useConfig();
 
       const [isEditionMode, setEditionMode] = useState(false);
       const [noticeBox, setNoticeBox] = useState({

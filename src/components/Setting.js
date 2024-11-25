@@ -1774,7 +1774,7 @@ const Setting = () => {
                                     selectedNbrDataElementsToShow: value?.completeness?.selectedNbrDataElementsToShow,
                                     selectedNbrDocumentsSourceToShow:
                                           value?.completeness?.selectedNbrDocumentsSourceToShow,
-                                    selectedRegister: value?.completeness?.selectedRegister
+                                    selectedRegister: value?.completeness?.selectedRegister || null
                               },
                               isFieldEditingMode: true
                         });

@@ -30,7 +30,6 @@ import FavoriteGenerateIndicatorsFieldsRDQA from './FavoriteGenerateIndicatorsFi
 
 const Favorites = ({ me }) => {
       const [programStages, setProgramStages] = useState([]);
-      const [mappingConfigs, setMappingConfigs] = useState([]);
       const [favoritBackgroundInformationList, setFavoritBackgroundInformationList] = useState([]);
       const [visibleAnalyticComponentModal, setVisibleAnalyticComponentModal] = useState(false);
       const [visibleAddFavoritBackgroundInformationModal, setVisibleAddFavoritBackgroundInformationModal] =
@@ -106,117 +105,124 @@ const Favorites = ({ me }) => {
       };
 
       const initFields = () => {
-            const currStage = formState.selectedProgram?.programStageConfigurations?.find(
-                  pstage => pstage.programStage?.id === formState.selectedProgramStage?.id
-            );
-            const existingFormState = formState?.selectedBackgroundInformationFavorit?.formState;
+            if (formState?.selectedProgram?.configurationType === DQR) {
+                  const currStage = formState.selectedProgram?.programStageConfigurations?.find(
+                        pstage => pstage.programStage?.id === formState.selectedProgramStage?.id
+                  );
+                  const existingFormState = formState?.selectedBackgroundInformationFavorit?.formState;
 
-            console.log('existingFormState : ', existingFormState);
+                  console.log('----existingFormState : ', existingFormState);
+                  console.log('----formState : ', formState);
 
-            if (currStage) {
-                  setFormState({
-                        ...formState,
-                        selectedNbrIndicatorsToShow: currStage.selectedNbrIndicatorsToShow,
-                        nbrIndicatorsToShow: existingFormState?.nbrIndicatorsToShow
-                              ? existingFormState?.nbrIndicatorsToShow
-                              : currStage.indicators?.filter(ind => ind.value && ind.programArea)?.length || 0,
+                  if (currStage) {
+                        setFormState({
+                              ...formState,
+                              selectedNbrIndicatorsToShow: currStage.selectedNbrIndicatorsToShow,
+                              nbrIndicatorsToShow: existingFormState?.nbrIndicatorsToShow
+                                    ? existingFormState?.nbrIndicatorsToShow
+                                    : currStage.indicators?.filter(ind => ind.value && ind.programArea)?.length || 0,
 
-                        indicators:
-                              currStage.indicators
-                                    ?.filter(ind => ind.value && ind.programArea)
-                                    ?.map((ind, index) => ({
-                                          ...ind,
-                                          selectedSourceProgramArea:
-                                                existingFormState?.indicators[index]?.selectedSourceProgramArea || null,
-                                          selectedSourceIndicator:
-                                                existingFormState?.indicators[index]?.selectedSourceIndicator || null,
-                                          selectedSourceMargin:
-                                                existingFormState?.indicators[index]?.selectedSourceMargin || null
-                                    })) || [],
-                        recoupements:
-                              currStage.recoupements
-                                    ?.filter(rec => rec.primaryValue && rec.secondaryValue && rec.programArea)
-                                    ?.map((ind, index) => ({
-                                          ...ind,
-                                          selectedSourceProgramArea:
-                                                existingFormState?.recoupements[index]?.selectedSourceProgramArea ||
-                                                null,
-                                          selectedSourcePrimary:
-                                                existingFormState?.recoupements[index]?.selectedSourcePrimary || null,
-                                          selectedSourceSecondary:
-                                                existingFormState?.recoupements[index]?.selectedSourceSecondary || null,
-                                          selectedSourceMargin:
-                                                existingFormState?.recoupements[index]?.selectedSourceMargin || null
-                                    })) || [],
+                              indicators:
+                                    currStage.indicators
+                                          ?.filter(ind => ind.value && ind.programArea)
+                                          ?.map((ind, index) => ({
+                                                ...ind,
+                                                selectedSourceProgramArea:
+                                                      existingFormState?.indicators[index]?.selectedSourceProgramArea ||
+                                                      null,
+                                                selectedSourceIndicator:
+                                                      existingFormState?.indicators[index]?.selectedSourceIndicator ||
+                                                      null,
+                                                selectedSourceMargin:
+                                                      existingFormState?.indicators[index]?.selectedSourceMargin || null
+                                          })) || [],
+                              recoupements:
+                                    currStage.recoupements
+                                          ?.filter(rec => rec.primaryValue && rec.secondaryValue && rec.programArea)
+                                          ?.map((ind, index) => ({
+                                                ...ind,
+                                                selectedSourceProgramArea:
+                                                      existingFormState?.recoupements[index]
+                                                            ?.selectedSourceProgramArea || null,
+                                                selectedSourcePrimary:
+                                                      existingFormState?.recoupements[index]?.selectedSourcePrimary ||
+                                                      null,
+                                                selectedSourceSecondary:
+                                                      existingFormState?.recoupements[index]?.selectedSourceSecondary ||
+                                                      null,
+                                                selectedSourceMargin:
+                                                      existingFormState?.recoupements[index]?.selectedSourceMargin ||
+                                                      null
+                                          })) || [],
 
-                        consistencyOvertimes:
-                              currStage.consistencyOvertimes
-                                    ?.filter(ind => ind.value && ind.programArea)
-                                    ?.map((ind, index) => ({
-                                          ...ind,
-                                          selectedSourceProgramArea:
-                                                existingFormState?.consistencyOvertimes[index]
-                                                      ?.selectedSourceProgramArea || null,
-                                          selectedSourceConsistency:
-                                                existingFormState?.consistencyOvertimes[index]
-                                                      ?.selectedSourceConsistency || null,
-                                          selectedSourceMargin:
-                                                existingFormState?.consistencyOvertimes[index]?.selectedSourceMargin ||
-                                                null
-                                    })) || [],
+                              consistencyOvertimes:
+                                    currStage.consistencyOvertimes
+                                          ?.filter(ind => ind.value && ind.programArea)
+                                          ?.map((ind, index) => ({
+                                                ...ind,
+                                                selectedSourceProgramArea:
+                                                      existingFormState?.consistencyOvertimes[index]
+                                                            ?.selectedSourceProgramArea || null,
+                                                selectedSourceConsistency:
+                                                      existingFormState?.consistencyOvertimes[index]
+                                                            ?.selectedSourceConsistency || null,
+                                                selectedSourceMargin:
+                                                      existingFormState?.consistencyOvertimes[index]
+                                                            ?.selectedSourceMargin || null
+                                          })) || [],
 
-                        completeness: {
-                              ...currStage.completeness,
+                              completeness: {
+                                    ...currStage.completeness,
 
-                              selectedNbrDocumentsSourceToShow:
-                                    currStage.completeness?.selectedNbrDocumentsSourceToShow,
-                              nbrDocumentsSourceToShow: existingFormState?.completeness?.nbrDocumentsSourceToShow
-                                    ? existingFormState?.completeness?.nbrDocumentsSourceToShow
-                                    : currStage.completeness?.sourceDocuments?.filter(ind => ind.value)?.length || 0,
+                                    selectedNbrDocumentsSourceToShow:
+                                          currStage.completeness?.selectedNbrDocumentsSourceToShow,
+                                    nbrDocumentsSourceToShow: existingFormState?.completeness?.nbrDocumentsSourceToShow
+                                          ? existingFormState?.completeness?.nbrDocumentsSourceToShow
+                                          : currStage.completeness?.sourceDocuments?.filter(ind => ind.value)?.length ||
+                                            0,
 
-                              selectedNbrDataElementsToShow: currStage.completeness?.selectedNbrDataElementsToShow,
-                              nbrDataElementsToShow: existingFormState?.completeness?.nbrDataElementsToShow
-                                    ? existingFormState?.completeness?.nbrDataElementsToShow
-                                    : currStage.completeness?.dataElements?.filter(ind => ind.value)?.length || 0,
+                                    selectedNbrDataElementsToShow:
+                                          currStage.completeness?.selectedNbrDataElementsToShow,
+                                    nbrDataElementsToShow: existingFormState?.completeness?.nbrDataElementsToShow
+                                          ? existingFormState?.completeness?.nbrDataElementsToShow
+                                          : currStage.completeness?.dataElements?.filter(ind => ind.value)?.length || 0,
 
-                              register: existingFormState?.completeness?.register
-                                    ? existingFormState?.completeness?.register
-                                    : currStage.completeness?.register,
+                                    register: existingFormState?.completeness?.register || null,
 
-                              selectedRegister: existingFormState?.completeness?.selectedRegister || null,
+                                    selectedRegister: currStage?.completeness?.selectedRegister || null,
 
-                              dataElements:
-                                    (currStage.completeness?.programAreaDE &&
-                                          currStage.completeness?.dataElements
-                                                ?.filter(ind => ind.value)
-                                                ?.map((ind, index) => ({
-                                                      ...ind,
-                                                      selectedSourceDE:
-                                                            existingFormState?.completeness?.dataElements[index]
-                                                                  ?.selectedSourceDE || null
-                                                }))) ||
-                                    [],
-                              sourceDocuments:
-                                    (currStage.completeness?.sourceDocuments &&
-                                          currStage.completeness?.sourceDocuments
-                                                ?.filter(ind => ind.value)
-                                                ?.map((ind, index) => ({
-                                                      ...ind,
-                                                      selectedSourceDS:
-                                                            existingFormState?.completeness?.sourceDocuments[index]
-                                                                  ?.selectedSourceDS || null
-                                                }))) ||
-                                    [],
-                              selectedSourceMargin: existingFormState?.completeness?.selectedSourceMargin || null,
-                              selectedSourceProgramAreaDE:
-                                    existingFormState?.completeness?.selectedSourceProgramAreaDE || null,
-                              selectedSourceProgramAreaDS:
-                                    existingFormState?.completeness?.selectedSourceProgramAreaDS || null
-                        }
-                  });
+                                    dataElements:
+                                          (currStage.completeness?.programAreaDE &&
+                                                currStage.completeness?.dataElements
+                                                      ?.filter(ind => ind.value)
+                                                      ?.map((ind, index) => ({
+                                                            ...ind,
+                                                            selectedSourceDE:
+                                                                  existingFormState?.completeness?.dataElements[index]
+                                                                        ?.selectedSourceDE || null
+                                                      }))) ||
+                                          [],
+                                    sourceDocuments:
+                                          (currStage.completeness?.sourceDocuments &&
+                                                currStage.completeness?.sourceDocuments
+                                                      ?.filter(ind => ind.value)
+                                                      ?.map((ind, index) => ({
+                                                            ...ind,
+                                                            selectedSourceDS:
+                                                                  existingFormState?.completeness?.sourceDocuments[
+                                                                        index
+                                                                  ]?.selectedSourceDS || null
+                                                      }))) ||
+                                          [],
+                                    selectedSourceMargin: existingFormState?.completeness?.selectedSourceMargin || null,
+                                    selectedSourceProgramAreaDE:
+                                          existingFormState?.completeness?.selectedSourceProgramAreaDE || null,
+                                    selectedSourceProgramAreaDS:
+                                          existingFormState?.completeness?.selectedSourceProgramAreaDS || null
+                              }
+                        });
+                  }
             }
-
-            
       };
 
       const initFieldsForRDQA = (initValuesList = []) => {
@@ -559,7 +565,7 @@ const Favorites = ({ me }) => {
                         if (payloadRegistre.dataElement?.id && payloadRegistre.indicator?.id)
                               newList.push(payloadRegistre);
 
-                        console.log("Regitre  payload: ", payloadRegistre)
+                        console.log('Regitre  payload: ', payloadRegistre);
                         console.log('formState?.completeness: ', formState?.completeness);
                   }
 
