@@ -123,6 +123,8 @@ const Supervision = ({ me }) => {
       const [dataStoreIndicatorsMapping, setDataStoreIndicatorsMapping] = useState([]);
       const { apiVersion } = useConfig();
 
+      console.log('apiVersion: ', apiVersion);
+
       const [isEditionMode, setEditionMode] = useState(false);
       const [noticeBox, setNoticeBox] = useState({
             show: false,
