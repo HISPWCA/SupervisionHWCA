@@ -344,9 +344,15 @@
     "Open_With_Old_Tracker": "Old tracker",
     "Open_With_New_Tracker": "New tracker",
     "Open_Event_With": "Open event with ?",
-    "Register_Name":"Register name",
-    "How_Many_Data_Element":"How many data element ?",
-    "How_Many_Document_Source":"How many document source ?",
-
-    "Register_Key_Words":"Register key words"
+    "Register_Name": "Register name",
+    "How_Many_Data_Element": "How many data element ?",
+    "How_Many_Document_Source": "How many document source ?",
+    "Register_Key_Words": "Register key words",
+    "Please_Select_Period_Type": "Select period type of your element",
+    "Period_Type":"Period Type",
+    "Daily": "Daily",
+    "Weekly": "Weekly",
+    "Monthly": "Monthly",
+    "Quarterly": "Quarterly",
+    "Yearly": "Yearly"
 }

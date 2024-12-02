@@ -30,12 +30,10 @@ import {
       ModalActions,
       ModalContent,
       ModalTitle,
-      NoticeBox,
       Radio
 } from '@dhis2/ui';
 import {
       AGENT,
-      ALL,
       CANCELED,
       COMPLETED,
       DAY,
@@ -126,7 +124,7 @@ const Supervision = ({ me }) => {
       console.log('apiVersion: ', apiVersion);
 
       const [isEditionMode, setEditionMode] = useState(false);
-      
+
       const [noticeBox, setNoticeBox] = useState({
             show: false,
             message: null,
@@ -1183,7 +1181,6 @@ const Supervision = ({ me }) => {
                                                             en.program ===
                                                             selectedSupervisionsConfigProgram?.program?.id
                                                 )[0]?.orgUnitName,
-                                                // statusSupervision: dayjs(eventDate).isAfter(dayjs()) ? getDefaultStatusSupervisionIfStatusIsNull() : current.enrollments?.filter(en => en.program === selectedSupervisionsConfigProgram?.program?.id)[0]?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
                                                 statusSupervision:
                                                       found_event?.dataValues?.find(
                                                             dv =>
@@ -1278,7 +1275,6 @@ const Supervision = ({ me }) => {
                                                       libelle: en.orgUnitName,
                                                       programStageId: en?.events[0]?.programStage,
                                                       event: en?.events[0]?.event,
-                                                      // statusSupervision: dayjs(en?.events[0]?.eventDate).isAfter(dayjs()) ? getDefaultStatusSupervisionIfStatusIsNull() : en?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
                                                       statusSupervision:
                                                             en?.events[0]?.dataValues?.find(
                                                                   dv =>
@@ -1716,6 +1712,10 @@ const Supervision = ({ me }) => {
                                           d => d.indicator === dv.value
                                     )?.dhis2;
 
+                                    const periodType = dataStoreIndicatorsMapping?.find(
+                                          d => d.indicator === dv.value
+                                    )?.periodType;
+
                                     if (foundAggrageMappingElement) {
                                           const elementMONTH_1 = foundInd?.DHIS2MonthlyValue1;
                                           const elementMONTH_2 = foundInd?.DHIS2MonthlyValue2;
@@ -1741,19 +1741,28 @@ const Supervision = ({ me }) => {
                                           };
 
                                           if (elementMONTH_1) {
-                                                const period = dayjs(eventPayload.eventDate)
-                                                      .subtract(1, 'month')
-                                                      .format('YYYYMM');
+                                                const periodObject = getRightPeriodFormat(
+                                                      1,
+                                                      periodType,
+                                                      eventPayload.eventDate
+                                                );
+
+                                                console.log('periodObject: ', periodObject);
+
                                                 const orgUnitId = eventPayload.orgUnit;
                                                 const dx = foundAggrageMappingElement.id;
-                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                const value = await getAnalyticValue(
+                                                      periodObject?.analytic,
+                                                      orgUnitId,
+                                                      dx
+                                                );
 
                                                 periodPayload.month1 = {
                                                       position: 1,
                                                       dataElement: elementMONTH_1,
                                                       value,
-                                                      period: dayjs(period).format('YYYY/MM'),
-                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                      period: periodObject?.normal,
+                                                      periodString: periodObject?.normal
                                                 };
 
                                                 if (value) {
@@ -1764,19 +1773,26 @@ const Supervision = ({ me }) => {
                                                 }
                                           }
                                           if (elementMONTH_2) {
-                                                const period = dayjs(eventPayload.eventDate)
-                                                      .subtract(2, 'month')
-                                                      .format('YYYYMM');
+                                                const periodObject = getRightPeriodFormat(
+                                                      2,
+                                                      periodType,
+                                                      eventPayload.eventDate
+                                                );
+
                                                 const orgUnitId = eventPayload.orgUnit;
                                                 const dx = foundAggrageMappingElement.id;
-                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                const value = await getAnalyticValue(
+                                                      periodObject?.analytic,
+                                                      orgUnitId,
+                                                      dx
+                                                );
 
                                                 periodPayload.month2 = {
                                                       position: 2,
                                                       dataElement: elementMONTH_2,
                                                       value,
-                                                      period: dayjs(period).format('YYYY/MM'),
-                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                      period: periodObject?.normal,
+                                                      periodString: periodObject?.normal
                                                 };
 
                                                 if (value) {
@@ -1787,19 +1803,26 @@ const Supervision = ({ me }) => {
                                                 }
                                           }
                                           if (elementMONTH_3) {
-                                                const period = dayjs(eventPayload.eventDate)
-                                                      .subtract(3, 'month')
-                                                      .format('YYYYMM');
+                                                const periodObject = getRightPeriodFormat(
+                                                      3,
+                                                      periodType,
+                                                      eventPayload.eventDate
+                                                );
+
                                                 const orgUnitId = eventPayload.orgUnit;
                                                 const dx = foundAggrageMappingElement.id;
-                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                const value = await getAnalyticValue(
+                                                      periodObject?.analytic,
+                                                      orgUnitId,
+                                                      dx
+                                                );
 
                                                 periodPayload.month3 = {
                                                       position: 3,
                                                       dataElement: elementMONTH_3,
                                                       value,
-                                                      period: dayjs(period).format('YYYY/MM'),
-                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                      period: periodObject?.normal,
+                                                      periodString: periodObject?.normal
                                                 };
 
                                                 if (value) {
@@ -1810,19 +1833,26 @@ const Supervision = ({ me }) => {
                                                 }
                                           }
                                           if (elementMONTH_4) {
-                                                const period = dayjs(eventPayload.eventDate)
-                                                      .subtract(4, 'month')
-                                                      .format('YYYYMM');
+                                                const periodObject = getRightPeriodFormat(
+                                                      4,
+                                                      periodType,
+                                                      eventPayload.eventDate
+                                                );
+
                                                 const orgUnitId = eventPayload.orgUnit;
                                                 const dx = foundAggrageMappingElement.id;
-                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                const value = await getAnalyticValue(
+                                                      periodObject?.analytic,
+                                                      orgUnitId,
+                                                      dx
+                                                );
 
                                                 periodPayload.month4 = {
                                                       position: 4,
                                                       dataElement: elementMONTH_4,
                                                       value,
-                                                      period: dayjs(period).format('YYYY/MM'),
-                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                      period: periodObject?.normal,
+                                                      periodString: periodObject?.normal
                                                 };
 
                                                 if (value) {
@@ -1834,21 +1864,27 @@ const Supervision = ({ me }) => {
                                           }
 
                                           if (elementMONTH_5) {
-                                                const period = dayjs(eventPayload.eventDate)
-                                                      .subtract(5, 'month')
-                                                      .format('YYYYMM');
+                                                const periodObject = getRightPeriodFormat(
+                                                      5,
+                                                      periodType,
+                                                      eventPayload.eventDate
+                                                );
+
                                                 const orgUnitId = eventPayload.orgUnit;
                                                 const dx = foundAggrageMappingElement.id;
-                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                const value = await getAnalyticValue(
+                                                      periodObject?.analytic,
+                                                      orgUnitId,
+                                                      dx
+                                                );
 
                                                 periodPayload.month5 = {
                                                       position: 5,
                                                       dataElement: elementMONTH_5,
                                                       value,
-                                                      period: dayjs(period).format('YYYY/MM'),
-                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                      period: periodObject?.normal,
+                                                      periodString: periodObject?.normal
                                                 };
-
                                                 if (value) {
                                                       newDataValueList.push({
                                                             dataElement: elementMONTH_5.id,
@@ -1858,19 +1894,26 @@ const Supervision = ({ me }) => {
                                           }
 
                                           if (elementMONTH_6) {
-                                                const period = dayjs(eventPayload.eventDate)
-                                                      .subtract(6, 'month')
-                                                      .format('YYYYMM');
+                                                const periodObject = getRightPeriodFormat(
+                                                      6,
+                                                      periodType,
+                                                      eventPayload.eventDate
+                                                );
+
                                                 const orgUnitId = eventPayload.orgUnit;
                                                 const dx = foundAggrageMappingElement.id;
-                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                const value = await getAnalyticValue(
+                                                      periodObject?.analytic,
+                                                      orgUnitId,
+                                                      dx
+                                                );
 
                                                 periodPayload.month6 = {
                                                       position: 6,
                                                       dataElement: elementMONTH_6,
                                                       value,
-                                                      period: dayjs(period).format('YYYY/MM'),
-                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                      period: periodObject?.normal,
+                                                      periodString: periodObject?.normal
                                                 };
 
                                                 if (value) {
@@ -1882,19 +1925,26 @@ const Supervision = ({ me }) => {
                                           }
 
                                           if (elementMONTH_7) {
-                                                const period = dayjs(eventPayload.eventDate)
-                                                      .subtract(7, 'month')
-                                                      .format('YYYYMM');
+                                                const periodObject = getRightPeriodFormat(
+                                                      7,
+                                                      periodType,
+                                                      eventPayload.eventDate
+                                                );
+
                                                 const orgUnitId = eventPayload.orgUnit;
                                                 const dx = foundAggrageMappingElement.id;
-                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                const value = await getAnalyticValue(
+                                                      periodObject?.analytic,
+                                                      orgUnitId,
+                                                      dx
+                                                );
 
                                                 periodPayload.month7 = {
                                                       position: 7,
                                                       dataElement: elementMONTH_7,
                                                       value,
-                                                      period: dayjs(period).format('YYYY/MM'),
-                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                      period: periodObject?.normal,
+                                                      periodString: periodObject?.normal
                                                 };
 
                                                 if (value) {
@@ -1906,19 +1956,26 @@ const Supervision = ({ me }) => {
                                           }
 
                                           if (elementMONTH_8) {
-                                                const period = dayjs(eventPayload.eventDate)
-                                                      .subtract(8, 'month')
-                                                      .format('YYYYMM');
+                                                const periodObject = getRightPeriodFormat(
+                                                      8,
+                                                      periodType,
+                                                      eventPayload.eventDate
+                                                );
+
                                                 const orgUnitId = eventPayload.orgUnit;
                                                 const dx = foundAggrageMappingElement.id;
-                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                const value = await getAnalyticValue(
+                                                      periodObject?.analytic,
+                                                      orgUnitId,
+                                                      dx
+                                                );
 
                                                 periodPayload.month8 = {
                                                       position: 8,
                                                       dataElement: elementMONTH_8,
                                                       value,
-                                                      period: dayjs(period).format('YYYY/MM'),
-                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                      period: periodObject?.normal,
+                                                      periodString: periodObject?.normal
                                                 };
 
                                                 if (value) {
@@ -1930,19 +1987,26 @@ const Supervision = ({ me }) => {
                                           }
 
                                           if (elementMONTH_9) {
-                                                const period = dayjs(eventPayload.eventDate)
-                                                      .subtract(9, 'month')
-                                                      .format('YYYYMM');
+                                                const periodObject = getRightPeriodFormat(
+                                                      9,
+                                                      periodType,
+                                                      eventPayload.eventDate
+                                                );
+
                                                 const orgUnitId = eventPayload.orgUnit;
                                                 const dx = foundAggrageMappingElement.id;
-                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                const value = await getAnalyticValue(
+                                                      periodObject?.analytic,
+                                                      orgUnitId,
+                                                      dx
+                                                );
 
                                                 periodPayload.month9 = {
                                                       position: 9,
                                                       dataElement: elementMONTH_9,
                                                       value,
-                                                      period: dayjs(period).format('YYYY/MM'),
-                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                      period: periodObject?.normal,
+                                                      periodString: periodObject?.normal
                                                 };
 
                                                 if (value) {
@@ -1954,19 +2018,26 @@ const Supervision = ({ me }) => {
                                           }
 
                                           if (elementMONTH_10) {
-                                                const period = dayjs(eventPayload.eventDate)
-                                                      .subtract(10, 'month')
-                                                      .format('YYYYMM');
+                                                const periodObject = getRightPeriodFormat(
+                                                      10,
+                                                      periodType,
+                                                      eventPayload.eventDate
+                                                );
+
                                                 const orgUnitId = eventPayload.orgUnit;
                                                 const dx = foundAggrageMappingElement.id;
-                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                const value = await getAnalyticValue(
+                                                      periodObject?.analytic,
+                                                      orgUnitId,
+                                                      dx
+                                                );
 
                                                 periodPayload.month10 = {
                                                       position: 10,
                                                       dataElement: elementMONTH_10,
                                                       value,
-                                                      period: dayjs(period).format('YYYY/MM'),
-                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                      period: periodObject?.normal,
+                                                      periodString: periodObject?.normal
                                                 };
 
                                                 if (value) {
@@ -1978,19 +2049,26 @@ const Supervision = ({ me }) => {
                                           }
 
                                           if (elementMONTH_11) {
-                                                const period = dayjs(eventPayload.eventDate)
-                                                      .subtract(11, 'month')
-                                                      .format('YYYYMM');
+                                                const periodObject = getRightPeriodFormat(
+                                                      11,
+                                                      periodType,
+                                                      eventPayload.eventDate
+                                                );
+
                                                 const orgUnitId = eventPayload.orgUnit;
                                                 const dx = foundAggrageMappingElement.id;
-                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                const value = await getAnalyticValue(
+                                                      periodObject?.analytic,
+                                                      orgUnitId,
+                                                      dx
+                                                );
 
                                                 periodPayload.month11 = {
                                                       position: 11,
                                                       dataElement: elementMONTH_11,
                                                       value,
-                                                      period: dayjs(period).format('YYYY/MM'),
-                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                      period: periodObject?.normal,
+                                                      periodString: periodObject?.normal
                                                 };
 
                                                 if (value) {
@@ -2002,19 +2080,26 @@ const Supervision = ({ me }) => {
                                           }
 
                                           if (elementMONTH_12) {
-                                                const period = dayjs(eventPayload.eventDate)
-                                                      .subtract(12, 'month')
-                                                      .format('YYYYMM');
+                                                const periodObject = getRightPeriodFormat(
+                                                      12,
+                                                      periodType,
+                                                      eventPayload.eventDate
+                                                );
+
                                                 const orgUnitId = eventPayload.orgUnit;
                                                 const dx = foundAggrageMappingElement.id;
-                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                const value = await getAnalyticValue(
+                                                      periodObject?.analytic,
+                                                      orgUnitId,
+                                                      dx
+                                                );
 
                                                 periodPayload.month12 = {
                                                       position: 12,
                                                       dataElement: elementMONTH_12,
                                                       value,
-                                                      period: dayjs(period).format('YYYY/MM'),
-                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                      period: periodObject?.normal,
+                                                      periodString: periodObject?.normal
                                                 };
 
                                                 if (value) {
@@ -2026,19 +2111,26 @@ const Supervision = ({ me }) => {
                                           }
 
                                           if (elementMONTH_13) {
-                                                const period = dayjs(eventPayload.eventDate)
-                                                      .subtract(13, 'month')
-                                                      .format('YYYYMM');
+                                                const periodObject = getRightPeriodFormat(
+                                                      13,
+                                                      periodType,
+                                                      eventPayload.eventDate
+                                                );
+
                                                 const orgUnitId = eventPayload.orgUnit;
                                                 const dx = foundAggrageMappingElement.id;
-                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                const value = await getAnalyticValue(
+                                                      periodObject?.analytic,
+                                                      orgUnitId,
+                                                      dx
+                                                );
 
                                                 periodPayload.month13 = {
                                                       position: 13,
                                                       dataElement: elementMONTH_13,
                                                       value,
-                                                      period: dayjs(period).format('YYYY/MM'),
-                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                      period: periodObject?.normal,
+                                                      periodString: periodObject?.normal
                                                 };
 
                                                 if (value) {
@@ -2050,19 +2142,26 @@ const Supervision = ({ me }) => {
                                           }
 
                                           if (elementMONTH_14) {
-                                                const period = dayjs(eventPayload.eventDate)
-                                                      .subtract(14, 'month')
-                                                      .format('YYYYMM');
+                                                const periodObject = getRightPeriodFormat(
+                                                      14,
+                                                      periodType,
+                                                      eventPayload.eventDate
+                                                );
+
                                                 const orgUnitId = eventPayload.orgUnit;
                                                 const dx = foundAggrageMappingElement.id;
-                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                const value = await getAnalyticValue(
+                                                      periodObject?.analytic,
+                                                      orgUnitId,
+                                                      dx
+                                                );
 
                                                 periodPayload.month14 = {
                                                       position: 14,
                                                       dataElement: elementMONTH_14,
                                                       value,
-                                                      period: dayjs(period).format('YYYY/MM'),
-                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                      period: periodObject?.normal,
+                                                      periodString: periodObject?.normal
                                                 };
 
                                                 if (value) {
@@ -2074,19 +2173,26 @@ const Supervision = ({ me }) => {
                                           }
 
                                           if (elementMONTH_15) {
-                                                const period = dayjs(eventPayload.eventDate)
-                                                      .subtract(15, 'month')
-                                                      .format('YYYYMM');
+                                                const periodObject = getRightPeriodFormat(
+                                                      15,
+                                                      periodType,
+                                                      eventPayload.eventDate
+                                                );
+
                                                 const orgUnitId = eventPayload.orgUnit;
                                                 const dx = foundAggrageMappingElement.id;
-                                                const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                const value = await getAnalyticValue(
+                                                      periodObject?.analytic,
+                                                      orgUnitId,
+                                                      dx
+                                                );
 
                                                 periodPayload.month15 = {
                                                       position: 15,
                                                       dataElement: elementMONTH_15,
                                                       value,
-                                                      period: dayjs(period).format('YYYY/MM'),
-                                                      periodString: dayjs(period).format('MMM YYYY')
+                                                      period: periodObject?.normal,
+                                                      periodString: periodObject?.normal
                                                 };
 
                                                 if (value) {
@@ -2328,6 +2434,10 @@ const Supervision = ({ me }) => {
                                                 d => d.indicator === dv.value
                                           )?.dhis2;
 
+                                          const periodType = dataStoreIndicatorsMapping?.find(
+                                                d => d.indicator === dv.value
+                                          )?.periodType;
+
                                           if (foundAggrageMappingElement) {
                                                 const elementMONTH_1 = foundInd?.DHIS2MonthlyValue1;
                                                 const elementMONTH_2 = foundInd?.DHIS2MonthlyValue2;
@@ -2353,19 +2463,28 @@ const Supervision = ({ me }) => {
                                                 };
 
                                                 if (elementMONTH_1) {
-                                                      const period = dayjs(eventPayload.eventDate)
-                                                            .subtract(1, 'month')
-                                                            .format('YYYYMM');
+                                                      const periodObject = getRightPeriodFormat(
+                                                            1,
+                                                            periodType,
+                                                            eventPayload.eventDate
+                                                      );
+
+                                                      console.log('periodObject: ', periodObject);
+
                                                       const orgUnitId = eventPayload.orgUnit;
                                                       const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                      const value = await getAnalyticValue(
+                                                            periodObject?.analytic,
+                                                            orgUnitId,
+                                                            dx
+                                                      );
 
                                                       periodPayload.month1 = {
                                                             position: 1,
                                                             dataElement: elementMONTH_1,
                                                             value,
-                                                            period: dayjs(period).format('YYYY/MM'),
-                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                            period: periodObject?.normal,
+                                                            periodString: periodObject?.normal
                                                       };
 
                                                       if (value) {
@@ -2376,19 +2495,26 @@ const Supervision = ({ me }) => {
                                                       }
                                                 }
                                                 if (elementMONTH_2) {
-                                                      const period = dayjs(eventPayload.eventDate)
-                                                            .subtract(2, 'month')
-                                                            .format('YYYYMM');
+                                                      const periodObject = getRightPeriodFormat(
+                                                            2,
+                                                            periodType,
+                                                            eventPayload.eventDate
+                                                      );
+
                                                       const orgUnitId = eventPayload.orgUnit;
                                                       const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                      const value = await getAnalyticValue(
+                                                            periodObject?.analytic,
+                                                            orgUnitId,
+                                                            dx
+                                                      );
 
                                                       periodPayload.month2 = {
                                                             position: 2,
                                                             dataElement: elementMONTH_2,
                                                             value,
-                                                            period: dayjs(period).format('YYYY/MM'),
-                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                            period: periodObject?.normal,
+                                                            periodString: periodObject?.normal
                                                       };
 
                                                       if (value) {
@@ -2399,19 +2525,26 @@ const Supervision = ({ me }) => {
                                                       }
                                                 }
                                                 if (elementMONTH_3) {
-                                                      const period = dayjs(eventPayload.eventDate)
-                                                            .subtract(3, 'month')
-                                                            .format('YYYYMM');
+                                                      const periodObject = getRightPeriodFormat(
+                                                            3,
+                                                            periodType,
+                                                            eventPayload.eventDate
+                                                      );
+
                                                       const orgUnitId = eventPayload.orgUnit;
                                                       const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                      const value = await getAnalyticValue(
+                                                            periodObject?.analytic,
+                                                            orgUnitId,
+                                                            dx
+                                                      );
 
                                                       periodPayload.month3 = {
                                                             position: 3,
                                                             dataElement: elementMONTH_3,
                                                             value,
-                                                            period: dayjs(period).format('YYYY/MM'),
-                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                            period: periodObject?.normal,
+                                                            periodString: periodObject?.normal
                                                       };
 
                                                       if (value) {
@@ -2422,19 +2555,26 @@ const Supervision = ({ me }) => {
                                                       }
                                                 }
                                                 if (elementMONTH_4) {
-                                                      const period = dayjs(eventPayload.eventDate)
-                                                            .subtract(4, 'month')
-                                                            .format('YYYYMM');
+                                                      const periodObject = getRightPeriodFormat(
+                                                            4,
+                                                            periodType,
+                                                            eventPayload.eventDate
+                                                      );
+
                                                       const orgUnitId = eventPayload.orgUnit;
                                                       const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                      const value = await getAnalyticValue(
+                                                            periodObject?.analytic,
+                                                            orgUnitId,
+                                                            dx
+                                                      );
 
                                                       periodPayload.month4 = {
                                                             position: 4,
                                                             dataElement: elementMONTH_4,
                                                             value,
-                                                            period: dayjs(period).format('YYYY/MM'),
-                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                            period: periodObject?.normal,
+                                                            periodString: periodObject?.normal
                                                       };
 
                                                       if (value) {
@@ -2446,21 +2586,27 @@ const Supervision = ({ me }) => {
                                                 }
 
                                                 if (elementMONTH_5) {
-                                                      const period = dayjs(eventPayload.eventDate)
-                                                            .subtract(5, 'month')
-                                                            .format('YYYYMM');
+                                                      const periodObject = getRightPeriodFormat(
+                                                            5,
+                                                            periodType,
+                                                            eventPayload.eventDate
+                                                      );
+
                                                       const orgUnitId = eventPayload.orgUnit;
                                                       const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                      const value = await getAnalyticValue(
+                                                            periodObject?.analytic,
+                                                            orgUnitId,
+                                                            dx
+                                                      );
 
                                                       periodPayload.month5 = {
                                                             position: 5,
                                                             dataElement: elementMONTH_5,
                                                             value,
-                                                            period: dayjs(period).format('YYYY/MM'),
-                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                            period: periodObject?.normal,
+                                                            periodString: periodObject?.normal
                                                       };
-
                                                       if (value) {
                                                             newDataValueList.push({
                                                                   dataElement: elementMONTH_5.id,
@@ -2470,19 +2616,26 @@ const Supervision = ({ me }) => {
                                                 }
 
                                                 if (elementMONTH_6) {
-                                                      const period = dayjs(eventPayload.eventDate)
-                                                            .subtract(6, 'month')
-                                                            .format('YYYYMM');
+                                                      const periodObject = getRightPeriodFormat(
+                                                            6,
+                                                            periodType,
+                                                            eventPayload.eventDate
+                                                      );
+
                                                       const orgUnitId = eventPayload.orgUnit;
                                                       const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                      const value = await getAnalyticValue(
+                                                            periodObject?.analytic,
+                                                            orgUnitId,
+                                                            dx
+                                                      );
 
                                                       periodPayload.month6 = {
                                                             position: 6,
                                                             dataElement: elementMONTH_6,
                                                             value,
-                                                            period: dayjs(period).format('YYYY/MM'),
-                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                            period: periodObject?.normal,
+                                                            periodString: periodObject?.normal
                                                       };
 
                                                       if (value) {
@@ -2494,19 +2647,26 @@ const Supervision = ({ me }) => {
                                                 }
 
                                                 if (elementMONTH_7) {
-                                                      const period = dayjs(eventPayload.eventDate)
-                                                            .subtract(7, 'month')
-                                                            .format('YYYYMM');
+                                                      const periodObject = getRightPeriodFormat(
+                                                            7,
+                                                            periodType,
+                                                            eventPayload.eventDate
+                                                      );
+
                                                       const orgUnitId = eventPayload.orgUnit;
                                                       const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                      const value = await getAnalyticValue(
+                                                            periodObject?.analytic,
+                                                            orgUnitId,
+                                                            dx
+                                                      );
 
                                                       periodPayload.month7 = {
                                                             position: 7,
                                                             dataElement: elementMONTH_7,
                                                             value,
-                                                            period: dayjs(period).format('YYYY/MM'),
-                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                            period: periodObject?.normal,
+                                                            periodString: periodObject?.normal
                                                       };
 
                                                       if (value) {
@@ -2518,19 +2678,26 @@ const Supervision = ({ me }) => {
                                                 }
 
                                                 if (elementMONTH_8) {
-                                                      const period = dayjs(eventPayload.eventDate)
-                                                            .subtract(8, 'month')
-                                                            .format('YYYYMM');
+                                                      const periodObject = getRightPeriodFormat(
+                                                            8,
+                                                            periodType,
+                                                            eventPayload.eventDate
+                                                      );
+
                                                       const orgUnitId = eventPayload.orgUnit;
                                                       const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                      const value = await getAnalyticValue(
+                                                            periodObject?.analytic,
+                                                            orgUnitId,
+                                                            dx
+                                                      );
 
                                                       periodPayload.month8 = {
                                                             position: 8,
                                                             dataElement: elementMONTH_8,
                                                             value,
-                                                            period: dayjs(period).format('YYYY/MM'),
-                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                            period: periodObject?.normal,
+                                                            periodString: periodObject?.normal
                                                       };
 
                                                       if (value) {
@@ -2542,19 +2709,26 @@ const Supervision = ({ me }) => {
                                                 }
 
                                                 if (elementMONTH_9) {
-                                                      const period = dayjs(eventPayload.eventDate)
-                                                            .subtract(9, 'month')
-                                                            .format('YYYYMM');
+                                                      const periodObject = getRightPeriodFormat(
+                                                            9,
+                                                            periodType,
+                                                            eventPayload.eventDate
+                                                      );
+
                                                       const orgUnitId = eventPayload.orgUnit;
                                                       const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                      const value = await getAnalyticValue(
+                                                            periodObject?.analytic,
+                                                            orgUnitId,
+                                                            dx
+                                                      );
 
                                                       periodPayload.month9 = {
                                                             position: 9,
                                                             dataElement: elementMONTH_9,
                                                             value,
-                                                            period: dayjs(period).format('YYYY/MM'),
-                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                            period: periodObject?.normal,
+                                                            periodString: periodObject?.normal
                                                       };
 
                                                       if (value) {
@@ -2566,19 +2740,26 @@ const Supervision = ({ me }) => {
                                                 }
 
                                                 if (elementMONTH_10) {
-                                                      const period = dayjs(eventPayload.eventDate)
-                                                            .subtract(10, 'month')
-                                                            .format('YYYYMM');
+                                                      const periodObject = getRightPeriodFormat(
+                                                            10,
+                                                            periodType,
+                                                            eventPayload.eventDate
+                                                      );
+
                                                       const orgUnitId = eventPayload.orgUnit;
                                                       const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                      const value = await getAnalyticValue(
+                                                            periodObject?.analytic,
+                                                            orgUnitId,
+                                                            dx
+                                                      );
 
                                                       periodPayload.month10 = {
                                                             position: 10,
                                                             dataElement: elementMONTH_10,
                                                             value,
-                                                            period: dayjs(period).format('YYYY/MM'),
-                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                            period: periodObject?.normal,
+                                                            periodString: periodObject?.normal
                                                       };
 
                                                       if (value) {
@@ -2590,19 +2771,26 @@ const Supervision = ({ me }) => {
                                                 }
 
                                                 if (elementMONTH_11) {
-                                                      const period = dayjs(eventPayload.eventDate)
-                                                            .subtract(11, 'month')
-                                                            .format('YYYYMM');
+                                                      const periodObject = getRightPeriodFormat(
+                                                            11,
+                                                            periodType,
+                                                            eventPayload.eventDate
+                                                      );
+
                                                       const orgUnitId = eventPayload.orgUnit;
                                                       const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                      const value = await getAnalyticValue(
+                                                            periodObject?.analytic,
+                                                            orgUnitId,
+                                                            dx
+                                                      );
 
                                                       periodPayload.month11 = {
                                                             position: 11,
                                                             dataElement: elementMONTH_11,
                                                             value,
-                                                            period: dayjs(period).format('YYYY/MM'),
-                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                            period: periodObject?.normal,
+                                                            periodString: periodObject?.normal
                                                       };
 
                                                       if (value) {
@@ -2614,19 +2802,26 @@ const Supervision = ({ me }) => {
                                                 }
 
                                                 if (elementMONTH_12) {
-                                                      const period = dayjs(eventPayload.eventDate)
-                                                            .subtract(12, 'month')
-                                                            .format('YYYYMM');
+                                                      const periodObject = getRightPeriodFormat(
+                                                            12,
+                                                            periodType,
+                                                            eventPayload.eventDate
+                                                      );
+
                                                       const orgUnitId = eventPayload.orgUnit;
                                                       const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                      const value = await getAnalyticValue(
+                                                            periodObject?.analytic,
+                                                            orgUnitId,
+                                                            dx
+                                                      );
 
                                                       periodPayload.month12 = {
                                                             position: 12,
                                                             dataElement: elementMONTH_12,
                                                             value,
-                                                            period: dayjs(period).format('YYYY/MM'),
-                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                            period: periodObject?.normal,
+                                                            periodString: periodObject?.normal
                                                       };
 
                                                       if (value) {
@@ -2638,19 +2833,26 @@ const Supervision = ({ me }) => {
                                                 }
 
                                                 if (elementMONTH_13) {
-                                                      const period = dayjs(eventPayload.eventDate)
-                                                            .subtract(13, 'month')
-                                                            .format('YYYYMM');
+                                                      const periodObject = getRightPeriodFormat(
+                                                            13,
+                                                            periodType,
+                                                            eventPayload.eventDate
+                                                      );
+
                                                       const orgUnitId = eventPayload.orgUnit;
                                                       const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                      const value = await getAnalyticValue(
+                                                            periodObject?.analytic,
+                                                            orgUnitId,
+                                                            dx
+                                                      );
 
                                                       periodPayload.month13 = {
                                                             position: 13,
                                                             dataElement: elementMONTH_13,
                                                             value,
-                                                            period: dayjs(period).format('YYYY/MM'),
-                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                            period: periodObject?.normal,
+                                                            periodString: periodObject?.normal
                                                       };
 
                                                       if (value) {
@@ -2662,19 +2864,26 @@ const Supervision = ({ me }) => {
                                                 }
 
                                                 if (elementMONTH_14) {
-                                                      const period = dayjs(eventPayload.eventDate)
-                                                            .subtract(14, 'month')
-                                                            .format('YYYYMM');
+                                                      const periodObject = getRightPeriodFormat(
+                                                            14,
+                                                            periodType,
+                                                            eventPayload.eventDate
+                                                      );
+
                                                       const orgUnitId = eventPayload.orgUnit;
                                                       const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                      const value = await getAnalyticValue(
+                                                            periodObject?.analytic,
+                                                            orgUnitId,
+                                                            dx
+                                                      );
 
                                                       periodPayload.month14 = {
                                                             position: 14,
                                                             dataElement: elementMONTH_14,
                                                             value,
-                                                            period: dayjs(period).format('YYYY/MM'),
-                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                            period: periodObject?.normal,
+                                                            periodString: periodObject?.normal
                                                       };
 
                                                       if (value) {
@@ -2686,19 +2895,26 @@ const Supervision = ({ me }) => {
                                                 }
 
                                                 if (elementMONTH_15) {
-                                                      const period = dayjs(eventPayload.eventDate)
-                                                            .subtract(15, 'month')
-                                                            .format('YYYYMM');
+                                                      const periodObject = getRightPeriodFormat(
+                                                            15,
+                                                            periodType,
+                                                            eventPayload.eventDate
+                                                      );
+
                                                       const orgUnitId = eventPayload.orgUnit;
                                                       const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(period, orgUnitId, dx);
+                                                      const value = await getAnalyticValue(
+                                                            periodObject?.analytic,
+                                                            orgUnitId,
+                                                            dx
+                                                      );
 
                                                       periodPayload.month15 = {
                                                             position: 15,
                                                             dataElement: elementMONTH_15,
                                                             value,
-                                                            period: dayjs(period).format('YYYY/MM'),
-                                                            periodString: dayjs(period).format('MMM YYYY')
+                                                            period: periodObject?.normal,
+                                                            periodString: periodObject?.normal
                                                       };
 
                                                       if (value) {
@@ -2708,7 +2924,6 @@ const Supervision = ({ me }) => {
                                                             });
                                                       }
                                                 }
-
                                                 await updatePeriodsConfigs(periodPayload);
                                           }
                                     }
@@ -5115,6 +5330,51 @@ const Supervision = ({ me }) => {
             if (periodType === WEEK) currentPeriod = `${dayjs(period).format('YYYY')}W${dayjs(period).week()}`;
 
             return currentPeriod;
+      };
+
+      const getRightPeriodFormat = (index, periodType, period) => {
+            let result = {
+                  normal: dayjs(period).subtract(+index, 'month').format('YYYY/MM'),
+                  analytic: dayjs(period).subtract(+index, 'month').format('YYYYMM')
+            };
+
+            if (periodType === 'Monthly') {
+                  result = result;
+            }
+
+            if (periodType === 'Daily') {
+                  result = {
+                        normal: dayjs(period).subtract(+index, 'day').format('YYYY/MM/DD'),
+                        analytic: dayjs(period).subtract(+index, 'day').format('YYYYMMDD')
+                  };
+            }
+
+            if (periodType === 'Yearly') {
+                  result = {
+                        normal: dayjs(period).subtract(+index, 'year').format('YYYY'),
+                        analytic: dayjs(period).subtract(+index, 'year').format('YYYY')
+                  };
+            }
+
+            if (periodType === 'Quarterly') {
+                  const quarterPeriod = dayjs(period).subtract(+index, 'quarter');
+
+                  result = {
+                        normal: `${dayjs(quarterPeriod).format('YYYY')}-Q${dayjs(quarterPeriod).quarter()}`,
+                        analytic: `${dayjs(quarterPeriod).format('YYYY')}Q${dayjs(quarterPeriod).quarter()}`
+                  };
+            }
+
+            if (periodType === 'Weekly') {
+                  const weeklyPeriod = dayjs(period).subtract(+index, 'week');
+
+                  result = {
+                        normal: `${dayjs(weeklyPeriod).format('YYYY')}W${dayjs(weeklyPeriod).week()}`,
+                        analytic: `${dayjs(weeklyPeriod).format('YYYY')}W${dayjs(weeklyPeriod).week()}`
+                  };
+            }
+
+            return result;
       };
 
       const handleDisplayIndicatorResult = async () => {

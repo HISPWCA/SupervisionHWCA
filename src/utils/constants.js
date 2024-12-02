@@ -85,3 +85,26 @@ export const FAVORIS = 'FAVORIS';
 export const MAP = 'MAP';
 
 export const PERIOD_LIST = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+
+export const PERIOD_TYPES = [
+      {
+            name: 'Daily',
+            value: 'Daily'
+      },
+      {
+            name: 'Weekly',
+            value: 'Weekly'
+      },
+      {
+            name: 'Monthly',
+            value: 'Monthly'
+      },
+      {
+            name: 'Quarterly',
+            value: 'Quarterly'
+      },
+      {
+            name: 'Yearly',
+            value: 'Yearly'
+      }
+];

@@ -1,5 +1,5 @@
 import translate from '../utils/translator';
-import { Card, Checkbox, Col, Input, Row } from 'antd';
+import { Card, Checkbox, Col, Input, Row, Select } from 'antd';
 import { useEffect, useState } from 'react';
 import { loadDataStore, saveDataToDataStore } from '../utils/functions';
 import { Button, ButtonStrip, Modal, ModalActions, ModalContent, ModalTitle } from '@dhis2/ui';
@@ -7,7 +7,7 @@ import { TbSelect } from 'react-icons/tb';
 import { DataDimension } from '@dhis2/analytics';
 import { FiSave } from 'react-icons/fi';
 import MyNotification from './MyNotification';
-import { NOTIFICATION_CRITICAL, NOTIFICATION_SUCCESS } from '../utils/constants';
+import { NOTIFICATION_CRITICAL, NOTIFICATION_SUCCESS, PERIOD_TYPES } from '../utils/constants';
 import { IoMdAddCircleOutline } from 'react-icons/io';
 import SettingIndicatorsMappingNew from './SettingIndicatorsMappingNew';
 import { FaRegEdit } from 'react-icons/fa';
@@ -26,6 +26,7 @@ const SettingIndicatorsMapping = () => {
             selectedMetaDatas: [],
             indicators: []
       });
+      const [periodType, setPeriodType] = useState('');
       const [loadingProcess, setLoadingProcess] = useState(false);
       const [loadingIndicators, setLoadingIndicators] = useState(false);
       const [loadingIndicatorsMapping, setLoadingIndicatorsMapping] = useState(false);
@@ -71,7 +72,10 @@ const SettingIndicatorsMapping = () => {
                                     )?.useNameFromDHIS2,
                                     dhis2: dataStoreIndicatorsMapping?.find(
                                           it => it.indicator === child.name && it.group === curr.name
-                                    )?.dhis2
+                                    )?.dhis2,
+                                    periodType: dataStoreIndicatorsMapping?.find(
+                                          it => it.indicator === child.name && it.group === curr.name
+                                    )?.periodType
                               })) || [];
 
                         prev = [...prev, ...newList];
@@ -93,6 +97,24 @@ const SettingIndicatorsMapping = () => {
                               {!formState?.currentIndicator && <div>Error no data </div>}
                               {formState?.currentIndicator && (
                                     <div style={{ padding: '20px', border: '1px solid #ccc' }}>
+                                          <div style={{ margin: '20px 0px' }}>
+                                                <div>{translate('Please_Select_Period_Type')}</div>
+                                                <Select
+                                                      options={PERIOD_TYPES.map(p => ({
+                                                            label: translate(p.name),
+                                                            value: p.value
+                                                      }))}
+                                                      style={{ width: '400px', marginTop: '10px' }}
+                                                      onChange={value => setPeriodType(value)}
+                                                      value={periodType}
+                                                      placeholder={translate('Period_Type')}
+                                                />
+                                          </div>
+                                          {console.log(
+                                                'Selected formState?.selectedMetaDatas',
+                                                formState?.selectedMetaDatas
+                                          )}
+
                                           <DataDimension
                                                 selectedDimensions={formState?.selectedMetaDatas?.map(it => ({
                                                       ...it
@@ -113,7 +135,7 @@ const SettingIndicatorsMapping = () => {
                               <ButtonStrip end>
                                     <Button
                                           primary
-                                          onClick={() =>
+                                          onClick={() => {
                                                 setFormState({
                                                       ...formState,
                                                       visibleAnalyticComponentModal: false,
@@ -129,13 +151,16 @@ const SettingIndicatorsMapping = () => {
                                                                   ) {
                                                                         return {
                                                                               ...ind,
+                                                                              periodType: periodType,
                                                                               dhis2: formState?.selectedMetaDatas[0]
                                                                         };
                                                                   }
                                                                   return ind;
                                                             }) || []
-                                                })
-                                          }
+                                                });
+
+                                                setPeriodType('');
+                                          }}
                                           icon={<FiSave style={{ fontSize: '18px' }} />}
                                     >
                                           {translate('Enregistrer')}
@@ -205,7 +230,7 @@ const SettingIndicatorsMapping = () => {
                               {loadingIndicatorsMapping || loadingIndicators ? (
                                     <div>Loading...</div>
                               ) : (
-                                    <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+                                    <table style={{ borderCollapse: 'collapse', width: '100%', overflowX: 'auto' }}>
                                           <thead>
                                                 <tr style={{ background: '#ccc' }}>
                                                       <th
@@ -279,25 +304,77 @@ const SettingIndicatorsMapping = () => {
                                                                                           <div>{indicator.name}</div>
                                                                                     </Col>
                                                                                     <Col md={8}>
-                                                                                          <Input
-                                                                                                width="100%"
-                                                                                                disabled
-                                                                                                value={
-                                                                                                      formState?.indicators?.find(
-                                                                                                            it =>
-                                                                                                                  it.group ===
-                                                                                                                        group.name &&
-                                                                                                                  it.indicator ===
-                                                                                                                        indicator.name
-                                                                                                      )?.dhis2?.name
-                                                                                                }
-                                                                                          />
+                                                                                          <div
+                                                                                                style={{
+                                                                                                      display: 'flex',
+                                                                                                      alignItems:
+                                                                                                            'center',
+                                                                                                      gap: '10px'
+                                                                                                }}
+                                                                                          >
+                                                                                                <Input
+                                                                                                      width="100%"
+                                                                                                      disabled
+                                                                                                      value={
+                                                                                                            formState?.indicators?.find(
+                                                                                                                  it =>
+                                                                                                                        it.group ===
+                                                                                                                              group.name &&
+                                                                                                                        it.indicator ===
+                                                                                                                              indicator.name
+                                                                                                            )?.dhis2
+                                                                                                                  ?.name
+                                                                                                      }
+                                                                                                />
+
+                                                                                                {/* <pre>
+                                                                                                      {JSON.stringify(
+                                                                                                            formState?.indicators?.find(
+                                                                                                                  it =>
+                                                                                                                        it.group ===
+                                                                                                                              group.name &&
+                                                                                                                        it.indicator ===
+                                                                                                                              indicator.name,
+                                                                                                                  null,
+                                                                                                                  4
+                                                                                                            )
+                                                                                                      )}
+                                                                                                </pre> */}
+                                                                                                {formState?.indicators?.find(
+                                                                                                      it =>
+                                                                                                            it.group ===
+                                                                                                                  group.name &&
+                                                                                                            it.indicator ===
+                                                                                                                  indicator.name
+                                                                                                )?.periodType && (
+                                                                                                      <span
+                                                                                                            style={{
+                                                                                                                  background:
+                                                                                                                        'orange',
+                                                                                                                  fontWeight:
+                                                                                                                        'bold',
+                                                                                                                  padding: '2px'
+                                                                                                            }}
+                                                                                                      >
+                                                                                                            {
+                                                                                                                  formState?.indicators?.find(
+                                                                                                                        it =>
+                                                                                                                              it.group ===
+                                                                                                                                    group.name &&
+                                                                                                                              it.indicator ===
+                                                                                                                                    indicator.name
+                                                                                                                  )
+                                                                                                                        ?.periodType
+                                                                                                            }
+                                                                                                      </span>
+                                                                                                )}
+                                                                                          </div>
                                                                                     </Col>
                                                                                     <Col md={1}>
                                                                                           <Button
                                                                                                 primary
                                                                                                 small
-                                                                                                onClick={() =>
+                                                                                                onClick={() => {
                                                                                                       setFormState({
                                                                                                             ...formState,
                                                                                                             visibleAnalyticComponentModal: true,
@@ -307,8 +384,20 @@ const SettingIndicatorsMapping = () => {
                                                                                                                         indicator:
                                                                                                                               indicator.name
                                                                                                                   }
-                                                                                                      })
-                                                                                                }
+                                                                                                      });
+
+                                                                                                      setPeriodType(
+                                                                                                            formState?.indicators?.find(
+                                                                                                                  it =>
+                                                                                                                        it.group ===
+                                                                                                                              group.name &&
+                                                                                                                        it.indicator ===
+                                                                                                                              indicator.name
+                                                                                                            )
+                                                                                                                  ?.periodType ||
+                                                                                                                  ''
+                                                                                                      );
+                                                                                                }}
                                                                                                 icon={
                                                                                                       <TbSelect
                                                                                                             style={{

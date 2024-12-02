@@ -1,6 +1,6 @@
 {
   "name": "Sup",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "",
   "license": "BSD-3-Clause",
   "private": true,
@@ -49,7 +49,7 @@
     "name": "Sup",
     "title": "Sup",
     "description": "Sup App  ",
-    "version": "2.1.2",
+    "version": "2.1.3",
     "developer": {
       "url": "https://hispwca.org",
       "name": "HISP West & Central Africa ( HWCA) "

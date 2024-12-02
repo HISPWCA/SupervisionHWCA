@@ -347,5 +347,12 @@
     "Register_Name": "Nom du registre",
     "How_Many_Data_Element": "Combient d'élement de donnée ?",
     "How_Many_Document_Source": "Combient de source de document ?",
-    "Register_Key_Words": "Mot clés du registre"
+    "Register_Key_Words": "Mot clés du registre",
+    "Please_Select_Period_Type": "Sélectionner le type de périod de votre élement",
+    "Period_Type": "Type de période",
+    "Daily": "Journalier",
+    "Weekly": "Hebdomadaire",
+    "Monthly": "Mensuel",
+    "Quarterly": "Trimestriel",
+    "Yearly": "Annuel"
 }
