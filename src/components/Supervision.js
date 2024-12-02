@@ -126,17 +126,20 @@ const Supervision = ({ me }) => {
       console.log('apiVersion: ', apiVersion);
 
       const [isEditionMode, setEditionMode] = useState(false);
+      
       const [noticeBox, setNoticeBox] = useState({
             show: false,
             message: null,
             title: null,
             type: NOTICE_BOX_DEFAULT
       });
+
       const [notification, setNotification] = useState({
             show: false,
             message: null,
             type: null
       });
+
       const [organisationUnits, setOrganisationUnits] = useState([]);
       const [users, setUsers] = useState([]);
       const [organisationUnitGroupSets, setOrganisationUnitGroupSets] = useState([]);
