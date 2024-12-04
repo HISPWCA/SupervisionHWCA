@@ -108,6 +108,8 @@ const SettingIndicatorsMapping = () => {
                                                       onChange={value => setPeriodType(value)}
                                                       value={periodType}
                                                       placeholder={translate('Period_Type')}
+                                                      clearIcon
+                                                      allowClear
                                                 />
                                           </div>
                                           {console.log(

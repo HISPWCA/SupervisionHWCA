@@ -546,6 +546,7 @@ export const Dashboard = ({ me }) => {
                                           ...eventList.map(ev => ({
                                                 trackedEntityInstance: currentEnrollment?.trackedEntityInstance,
                                                 period: ev.eventDate,
+                                                event: ev.event,
                                                 agent: `${
                                                       current.attributes?.find(
                                                             att => att.attribute === selectedProgram?.attributeName?.id
