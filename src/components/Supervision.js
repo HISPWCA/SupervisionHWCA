@@ -121,10 +121,6 @@ const Supervision = ({ me }) => {
       const [dataStoreIndicatorsMapping, setDataStoreIndicatorsMapping] = useState([]);
       const { apiVersion } = useConfig();
 
-      console.log('apiVersion: ', apiVersion);
-
-      const [isEditionMode, setEditionMode] = useState(false);
-
       const [noticeBox, setNoticeBox] = useState({
             show: false,
             message: null,
@@ -470,7 +466,6 @@ const Supervision = ({ me }) => {
                                                                                 marginTop: '5px'
                                                                           }}
                                                                     >
-                                                                          {' '}
                                                                           {sup}
                                                                     </div>
                                                               ))
@@ -517,34 +512,29 @@ const Supervision = ({ me }) => {
                                 header: `${translate('Actions')}`,
                                 size: 50,
                                 Cell: ({ cell, row }) => {
-                                      console.log('row: ', row.original);
                                       return (
                                             <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                  <Popconfirm
-                                                        title={translate('Open_Event_With')}
-                                                        okText={translate('Open_With_New_Tracker')}
-                                                        cancelText={translate('Open_With_Old_Tracker')}
-                                                        onCancel={() =>
-                                                              goToNewPage(
-                                                                    `${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${row.original.trackedEntityInstance}&program=${row.original.program}&ou=${row.original.orgUnit}`
-                                                              )
+                                                  <Tooltip
+                                                        onClick={() =>
+                                                              parseInt(apiVersion) >=
+                                                              parseInt(process.env.REACT_APP_NEW_DHIS2_VERSION)
+                                                                    ? goToNewPage(
+                                                                            `${SERVER_URL}/dhis-web-capture/index.html#/enrollmentEventEdit?eventId=${row.original.event}&orgUnitId=${row.original.orgUnit}`
+                                                                      )
+                                                                    : goToNewPage(
+                                                                            `${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${row.original.trackedEntityInstance}&program=${row.original.program}&ou=${row.original.orgUnit}`
+                                                                      )
                                                         }
-                                                        onConfirm={() =>
-                                                              goToNewPage(
-                                                                    `${SERVER_URL}/dhis-web-capture/index.html#/enrollmentEventEdit?eventId=${row.original.event}&orgUnitId=${row.original.orgUnit}`
-                                                              )
-                                                        }
+                                                        title={translate('Ouvrir_Dans_Le_Tracker')}
                                                   >
-                                                        <Tooltip title={translate('Ouvrir_Dans_Le_Tracker')}>
-                                                              <IoMdOpen
-                                                                    style={{
-                                                                          fontSize: '20px',
-                                                                          color: BLUE,
-                                                                          cursor: 'pointer'
-                                                                    }}
-                                                              />
-                                                        </Tooltip>
-                                                  </Popconfirm>
+                                                        <IoMdOpen
+                                                              style={{
+                                                                    fontSize: '20px',
+                                                                    color: BLUE,
+                                                                    cursor: 'pointer'
+                                                              }}
+                                                        />
+                                                  </Tooltip>
                                                   <div style={{ marginLeft: '10px' }}>
                                                         <Popconfirm
                                                               title={translate('Annuler_Planification')}
@@ -729,31 +719,37 @@ const Supervision = ({ me }) => {
                                 Cell: ({ cell, row }) => {
                                       return (
                                             <div style={{ textAlign: 'center' }}>
-                                                  <Popconfirm
+                                                  {/* <Popconfirm
                                                         title={translate('Open_Event_With')}
                                                         okText={translate('Open_With_New_Tracker')}
                                                         cancelText={translate('Open_With_Old_Tracker')}
                                                         onCancel={() =>
-                                                              goToNewPage(
-                                                                    `${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${row.original.trackedEntityInstance}&program=${row.original.program}&ou=${row.original.orgUnit}`
-                                                              )
+                                                             
                                                         }
                                                         onConfirm={() =>
-                                                              goToNewPage(
-                                                                    `${SERVER_URL}/dhis-web-capture/index.html#/enrollmentEventEdit?eventId=${row.original.event}&orgUnitId=${row.original.orgUnit}`
-                                                              )
+                                                            
                                                         }
-                                                  >
-                                                        <Tooltip title={translate('Ouvrir_Dans_Le_Tracker')}>
-                                                              <IoMdOpen
-                                                                    style={{
-                                                                          fontSize: '20px',
-                                                                          color: BLUE,
-                                                                          cursor: 'pointer'
-                                                                    }}
-                                                              />
-                                                        </Tooltip>
-                                                  </Popconfirm>
+                                                  > */}
+                                                  <Tooltip title={translate('Ouvrir_Dans_Le_Tracker')}>
+                                                        <IoMdOpen
+                                                              onClick={() =>
+                                                                    parseInt(apiVersion) >=
+                                                                    parseInt(process.env.REACT_APP_NEW_DHIS2_VERSION)
+                                                                          ? goToNewPage(
+                                                                                  `${SERVER_URL}/dhis-web-capture/index.html#/enrollmentEventEdit?eventId=${row.original.event}&orgUnitId=${row.original.orgUnit}`
+                                                                            )
+                                                                          : goToNewPage(
+                                                                                  `${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${row.original.trackedEntityInstance}&program=${row.original.program}&ou=${row.original.orgUnit}`
+                                                                            )
+                                                              }
+                                                              style={{
+                                                                    fontSize: '20px',
+                                                                    color: BLUE,
+                                                                    cursor: 'pointer'
+                                                              }}
+                                                        />
+                                                  </Tooltip>
+                                                  {/* </Popconfirm> */}
                                             </div>
                                       );
                                 }

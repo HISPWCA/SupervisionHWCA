@@ -327,19 +327,6 @@ const SettingIndicatorsMapping = () => {
                                                                                                       }
                                                                                                 />
 
-                                                                                                {/* <pre>
-                                                                                                      {JSON.stringify(
-                                                                                                            formState?.indicators?.find(
-                                                                                                                  it =>
-                                                                                                                        it.group ===
-                                                                                                                              group.name &&
-                                                                                                                        it.indicator ===
-                                                                                                                              indicator.name,
-                                                                                                                  null,
-                                                                                                                  4
-                                                                                                            )
-                                                                                                      )}
-                                                                                                </pre> */}
                                                                                                 {formState?.indicators?.find(
                                                                                                       it =>
                                                                                                             it.group ===
@@ -375,9 +362,24 @@ const SettingIndicatorsMapping = () => {
                                                                                                 primary
                                                                                                 small
                                                                                                 onClick={() => {
+                                                                                                      const currentIndicator =
+                                                                                                            formState?.indicators?.find(
+                                                                                                                  it =>
+                                                                                                                        it.group ===
+                                                                                                                              group.name &&
+                                                                                                                        it.indicator ===
+                                                                                                                              indicator.name
+                                                                                                            );
+
                                                                                                       setFormState({
                                                                                                             ...formState,
                                                                                                             visibleAnalyticComponentModal: true,
+                                                                                                            selectedMetaDatas:
+                                                                                                                  currentIndicator?.dhis2
+                                                                                                                        ? [
+                                                                                                                                currentIndicator?.dhis2
+                                                                                                                          ]
+                                                                                                                        : [],
                                                                                                             currentIndicator:
                                                                                                                   {
                                                                                                                         group: group.name,
@@ -387,14 +389,7 @@ const SettingIndicatorsMapping = () => {
                                                                                                       });
 
                                                                                                       setPeriodType(
-                                                                                                            formState?.indicators?.find(
-                                                                                                                  it =>
-                                                                                                                        it.group ===
-                                                                                                                              group.name &&
-                                                                                                                        it.indicator ===
-                                                                                                                              indicator.name
-                                                                                                            )
-                                                                                                                  ?.periodType ||
+                                                                                                            currentIndicator?.periodType ||
                                                                                                                   ''
                                                                                                       );
                                                                                                 }}

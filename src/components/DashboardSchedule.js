@@ -45,6 +45,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import timezone from 'dayjs/plugin/timezone';
 import translate from '../utils/translator';
 import { v1 as uuid } from 'uuid';
+import { useConfig } from '@dhis2/app-runtime';
 
 const quarterOfYear = require('dayjs/plugin/quarterOfYear');
 const weekOfYear = require('dayjs/plugin/weekOfYear');
@@ -60,6 +61,7 @@ const localizer = dayjsLocalizer(dayjs);
 export const getDefaultStatusSupervisionIfStatusIsNull = _ => SCHEDULED.value;
 export const getDefaultStatusPaymentIfStatusIsNull = _ => NA.value;
 export const Dashboard = ({ me }) => {
+      const { apiVersion } = useConfig();
       const [organisationUnits, setOrganisationUnits] = useState([]);
       const [users, setUsers] = useState([]);
       const [dataStoreSupervisionsConfigs, setDataStoreSupervisionsConfigs] = useState([]);
@@ -1245,31 +1247,27 @@ export const Dashboard = ({ me }) => {
                                 dataIndex: 'tei',
                                 render: tei => (
                                       <div style={{ textAlign: 'center' }}>
-                                            <Popconfirm
-                                                  title={translate('Open_Event_With')}
-                                                  okText={translate('Open_With_New_Tracker')}
-                                                  cancelText={translate('Open_With_Old_Tracker')}
-                                                  onCancel={() =>
-                                                        goToNewPage(
-                                                              `${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${tei.trackedEntityInstance}&program=${tei.program}&ou=${tei.orgUnit}`
-                                                        )
+                                            <Tooltip
+                                                  onClick={() =>
+                                                        parseInt(apiVersion) >=
+                                                        parseInt(process.env.REACT_APP_NEW_DHIS2_VERSION)
+                                                              ? goToNewPage(
+                                                                      `${SERVER_URL}/dhis-web-capture/index.html#/enrollmentEventEdit?eventId=${tei.event}&orgUnitId=${tei.orgUnit}`
+                                                                )
+                                                              : goToNewPage(
+                                                                      `${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${tei.trackedEntityInstance}&program=${tei.program}&ou=${tei.orgUnit}`
+                                                                )
                                                   }
-                                                  onConfirm={() =>
-                                                        goToNewPage(
-                                                              `${SERVER_URL}/dhis-web-capture/index.html#/enrollmentEventEdit?eventId=${tei.event}&orgUnitId=${tei.orgUnit}`
-                                                        )
-                                                  }
+                                                  title={translate('Ouvrir_Dans_Le_Tracker')}
                                             >
-                                                  <Tooltip title={translate('Ouvrir_Dans_Le_Tracker')}>
-                                                        <IoMdOpen
-                                                              style={{
-                                                                    fontSize: '18px',
-                                                                    color: BLUE,
-                                                                    cursor: 'pointer'
-                                                              }}
-                                                        />
-                                                  </Tooltip>
-                                            </Popconfirm>
+                                                  <IoMdOpen
+                                                        style={{
+                                                              fontSize: '18px',
+                                                              color: BLUE,
+                                                              cursor: 'pointer'
+                                                        }}
+                                                  />
+                                            </Tooltip>
                                       </div>
                                 )
                           }
@@ -1314,31 +1312,27 @@ export const Dashboard = ({ me }) => {
                                 dataIndex: 'tei',
                                 render: tei => (
                                       <div style={{ textAlign: 'center' }}>
-                                            <Popconfirm
-                                                  title={translate('Open_Event_With')}
-                                                  okText={translate('Open_With_New_Tracker')}
-                                                  cancelText={translate('Open_With_Old_Tracker')}
-                                                  onCancel={() =>
-                                                        goToNewPage(
-                                                              `${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${tei.trackedEntityInstance}&program=${tei.program}&ou=${tei.orgUnit}`
-                                                        )
+                                            <Tooltip
+                                                  onClick={() =>
+                                                        parseInt(apiVersion) >=
+                                                        parseInt(process.env.REACT_APP_NEW_DHIS2_VERSION)
+                                                              ? goToNewPage(
+                                                                      `${SERVER_URL}/dhis-web-capture/index.html#/enrollmentEventEdit?eventId=${tei.event}&orgUnitId=${tei.orgUnit}`
+                                                                )
+                                                              : goToNewPage(
+                                                                      `${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${tei.trackedEntityInstance}&program=${tei.program}&ou=${tei.orgUnit}`
+                                                                )
                                                   }
-                                                  onConfirm={() =>
-                                                        goToNewPage(
-                                                              `${SERVER_URL}/dhis-web-capture/index.html#/enrollmentEventEdit?eventId=${tei.event}&orgUnitId=${tei.orgUnit}`
-                                                        )
-                                                  }
+                                                  title={translate('Ouvrir_Dans_Le_Tracker')}
                                             >
-                                                  <Tooltip title={translate('Ouvrir_Dans_Le_Tracker')}>
-                                                        <IoMdOpen
-                                                              style={{
-                                                                    fontSize: '18px',
-                                                                    color: BLUE,
-                                                                    cursor: 'pointer'
-                                                              }}
-                                                        />
-                                                  </Tooltip>
-                                            </Popconfirm>
+                                                  <IoMdOpen
+                                                        style={{
+                                                              fontSize: '18px',
+                                                              color: BLUE,
+                                                              cursor: 'pointer'
+                                                        }}
+                                                  />
+                                            </Tooltip>
                                       </div>
                                 )
                           }
