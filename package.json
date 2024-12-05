@@ -20,6 +20,7 @@
     "@ant-design/icons": "^5.1.0",
     "@dhis2/analytics": "^25.1.10",
     "@dhis2/app-runtime": "^3.9.3",
+    "@dhis2/d2-i18n": "^1.1.3",
     "@dhis2/ui": "^10.1.6",
     "@emotion/react": "^11.11.0",
     "@mantine/core": "^6.0.11",
