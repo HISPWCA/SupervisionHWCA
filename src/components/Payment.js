@@ -93,7 +93,6 @@ const Payment = ({ me }) => {
                 e.status !== 'SCHEDULE' &&
                 e.programStage === 'qozflIwuTf6'
             ).map(event => {
-                console.log("Event : ", event)
                 event.tmpDate = dayjs(event.eventDate).format('YYYY-MM')
                 return event
             })
@@ -327,7 +326,6 @@ const Payment = ({ me }) => {
             setLoadingProcessing(false)
 
         } catch (err) {
-            console.log(err)
             setLoadingProcessing(false)
             cleanResultStates()
             setNotification({ show: true, message: err.response?.data?.message || err.message, type: NOTIFICATION_CRITICAL })
@@ -456,7 +454,6 @@ const Payment = ({ me }) => {
         }
         catch (err) {
             setLoadingOrganisationUnits(false)
-            console.log(err)
         }
     }
 

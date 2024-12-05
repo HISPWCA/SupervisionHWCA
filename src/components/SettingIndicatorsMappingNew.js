@@ -71,7 +71,6 @@ const SettingIndicatorsMappingNew = ({
                   cleanAllState();
                   setLoadingSave(false);
             } catch (err) {
-                  console.log('err: ', err);
                   setLoadingSave(false);
                   setNotification({
                         show: true,
@@ -82,7 +81,6 @@ const SettingIndicatorsMappingNew = ({
       };
 
       const handleSelectIndicatortype = value => {
-            console.log('v: ', value);
             if (value) {
                   const found_indicator_type = dataStoreIndicators?.find(i => i.name === value);
 
@@ -96,7 +94,6 @@ const SettingIndicatorsMappingNew = ({
       };
 
       const handleInputIndicatorType = e => {
-            console.log('namem: ', e.target.value);
             setInputIndicatorType(e.target.value);
             setSelectedIndicatorType('');
       };
@@ -138,7 +135,6 @@ const SettingIndicatorsMappingNew = ({
                   cleanAllState();
                   setLoadingDelete(false);
             } catch (err) {
-                  console.log('err: ', err);
                   setLoadingDelete(false);
                   setNotification({
                         show: true,

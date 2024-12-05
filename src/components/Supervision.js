@@ -1745,8 +1745,6 @@ const Supervision = ({ me }) => {
                                                       eventPayload.eventDate
                                                 );
 
-                                                console.log('periodObject: ', periodObject);
-
                                                 const orgUnitId = eventPayload.orgUnit;
                                                 const dx = foundAggrageMappingElement.id;
                                                 const value = await getAnalyticValue(
@@ -2467,8 +2465,6 @@ const Supervision = ({ me }) => {
                                                             eventPayload.eventDate
                                                       );
 
-                                                      console.log('periodObject: ', periodObject);
-
                                                       const orgUnitId = eventPayload.orgUnit;
                                                       const dx = foundAggrageMappingElement.id;
                                                       const value = await getAnalyticValue(
@@ -3165,7 +3161,6 @@ const Supervision = ({ me }) => {
                   );
                   return response.data?.dataValues[0]?.value;
             } catch (error) {
-                  console.log('Error getting analytic value : ', error);
             }
       };
 

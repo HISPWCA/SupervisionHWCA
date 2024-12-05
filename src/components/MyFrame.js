@@ -532,7 +532,6 @@ const MyFrame = (
             currentPlugin.load(favoriteData);
 
           } catch (err) {
-            console.log(err);
           }
         };
                 
@@ -1049,7 +1048,6 @@ const MyFrame = (
             currentPlugin.load(favoriteData);
 
           } catch (err) {
-            console.log(err);
           }
         };
 

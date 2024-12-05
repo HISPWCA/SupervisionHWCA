@@ -467,7 +467,6 @@ const SettingVisualizations = ({ programs }) => {
                               </div>
                         </Col>
                   </Row>
-                  {console.log(formState)}
                   {RenderAnalyticComponentModal()}
             </>
       );

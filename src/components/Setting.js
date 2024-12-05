@@ -1753,8 +1753,6 @@ const Setting = () => {
 
       const handleEditProgramStageConfigurations = value => {
             try {
-                  console.log('value: ', value);
-
                   const foundProgramStage = programStages.find(p => p.id === value.programStage?.id);
                   if (!foundProgramStage) throw new Error('No program stage found ');
 

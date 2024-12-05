@@ -111,9 +111,6 @@ const Favorites = ({ me }) => {
                   );
                   const existingFormState = formState?.selectedBackgroundInformationFavorit?.formState;
 
-                  console.log('----existingFormState : ', existingFormState);
-                  console.log('----formState : ', formState);
-
                   if (currStage) {
                         setFormState({
                               ...formState,
@@ -564,9 +561,6 @@ const Favorites = ({ me }) => {
 
                         if (payloadRegistre.dataElement?.id && payloadRegistre.indicator?.id)
                               newList.push(payloadRegistre);
-
-                        console.log('Regitre  payload: ', payloadRegistre);
-                        console.log('formState?.completeness: ', formState?.completeness);
                   }
 
                   if (
@@ -775,7 +769,6 @@ const Favorites = ({ me }) => {
                         updatedAt: dayjs()
                   };
 
-                  console.log('Payload : ', payload);
 
                   if (formState?.selectedBackgroundInformationFavorit && backgroundInfoList) {
                         backgroundInformationConfigList = backgroundInfoList.map(favo => {

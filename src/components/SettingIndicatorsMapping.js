@@ -112,10 +112,6 @@ const SettingIndicatorsMapping = () => {
                                                       allowClear
                                                 />
                                           </div>
-                                          {console.log(
-                                                'Selected formState?.selectedMetaDatas',
-                                                formState?.selectedMetaDatas
-                                          )}
 
                                           <DataDimension
                                                 selectedDimensions={formState?.selectedMetaDatas?.map(it => ({

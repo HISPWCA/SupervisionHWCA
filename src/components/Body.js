@@ -155,7 +155,6 @@ export const Body = () => {
                   setMe(meResponse.data);
                   setLoadingMe(false);
             } catch (err) {
-                  console.log(err);
                   setLoadingMe(false);
                   throw err;
             }
@@ -166,7 +165,6 @@ export const Body = () => {
                   const response = await axios.get(`${ME_SETTINGS_ROUTE}`);
                   localStorage.setItem('userLang', response.data?.keyUiLocale ? response.data?.keyUiLocale : 'fr');
             } catch (err) {
-                  console.log(err);
                   throw err;
             }
       };

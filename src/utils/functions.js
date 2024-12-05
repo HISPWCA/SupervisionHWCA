@@ -53,7 +53,6 @@ export const createDataToDataStore = async (key_string, payload) => {
 
             return true;
       } catch (err) {
-            console.log(err);
             throw err;
       }
 };

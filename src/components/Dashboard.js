@@ -181,7 +181,6 @@ export const Dashboard = ({ me }) => {
                   win.print();
                   // setLoadingPrint(false)
             } catch (err) {
-                  console.log('error  print :  ', err);
                   // setLoadingPrint(false)
             }
       };
@@ -933,7 +932,6 @@ export const Dashboard = ({ me }) => {
 
                   setLoadingInjection(false);
             } catch (err) {
-                  console.log('Error: ', err);
                   setLoadingInjection(false);
             }
       };
