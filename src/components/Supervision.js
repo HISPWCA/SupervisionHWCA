@@ -255,7 +255,7 @@ const Supervision = ({ me }) => {
       };
 
       const disabledDate = current => {
-            return current && current < dayjs();
+            return current && dayjs(new Date()).subtract(1, 'day').isBefore(current) ? false : true;
       };
 
       const handleCancelEvent = async rowEvent => {
@@ -3160,8 +3160,7 @@ const Supervision = ({ me }) => {
                         `${ANALYTICS_ROUTE}/dataValueSet.json?dimension=ou:${orgUnit}&dimension=dx:${dx}&dimension=pe:${period}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=true&includeNumDen=true&skipRounding=false&completedOnly=false`
                   );
                   return response.data?.dataValues[0]?.value;
-            } catch (error) {
-            }
+            } catch (error) {}
       };
 
       const handleSupervisionPlanificationSaveBtn = async () => {

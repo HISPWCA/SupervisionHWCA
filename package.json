@@ -1,11 +1,11 @@
 {
-  "name": "Sup",
+  "name": "Supervision",
   "version": "2.1.3",
   "description": "",
   "license": "BSD-3-Clause",
   "private": true,
   "scripts": {
-    "build": "d2-app-scripts build --no-verify --forced && yarn manifest && cd build && cp -r manifest.webapp app && cd app && zip -r ../../Sup.zip * && cd ../../ && rm -r build && mkdir build && mv Sup.zip build && clear",
+    "build": "d2-app-scripts build --no-verify --forced && yarn manifest && cd build && cp -r manifest.webapp app && cd app && zip -r ../../Supervision.zip * && cd ../../ && rm -r build && mkdir build && mv Supervision.zip build && clear",
     "prod": "yarn build",
     "manifest": "d2-manifest package.json build/manifest.webapp",
     "start": "d2-app-scripts start",
@@ -47,9 +47,9 @@
     "zustand": "^4.3.8"
   },
   "manifest.webapp": {
-    "name": "Sup",
-    "title": "Sup",
-    "description": "Sup App  ",
+    "name": "Supervision",
+    "title": "Supervision",
+    "description": "Supervision App  ",
     "version": "2.1.3",
     "developer": {
       "url": "https://hispwca.org",
