@@ -264,12 +264,20 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                               style={{
                                                                                     width: '100%'
                                                                               }}
-                                                                              options={indicator.selectedSourceProgramArea?.children?.map(
-                                                                                    ind => ({
-                                                                                          label: ind.name,
-                                                                                          value: ind.name
-                                                                                    })
-                                                                              )}
+                                                                              options={
+                                                                                    dataStoreIndicators
+                                                                                          ?.find(
+                                                                                                d =>
+                                                                                                      d.name ===
+                                                                                                      indicator
+                                                                                                            ?.selectedSourceProgramArea
+                                                                                                            ?.name
+                                                                                          )
+                                                                                          ?.children?.map(ind => ({
+                                                                                                label: ind.name,
+                                                                                                value: ind.name
+                                                                                          })) || []
+                                                                              }
                                                                               disabled={
                                                                                     !indicator.selectedSourceProgramArea
                                                                               }
@@ -293,11 +301,19 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                                                   return {
                                                                                                                         ...i,
                                                                                                                         selectedSourceIndicator:
-                                                                                                                              indicator.selectedSourceProgramArea?.children?.find(
-                                                                                                                                    d =>
-                                                                                                                                          d.name ===
-                                                                                                                                          value
-                                                                                                                              )
+                                                                                                                              dataStoreIndicators
+                                                                                                                                    ?.find(
+                                                                                                                                          d =>
+                                                                                                                                                d.name ===
+                                                                                                                                                indicator
+                                                                                                                                                      ?.selectedSourceProgramArea
+                                                                                                                                                      ?.name
+                                                                                                                                    )
+                                                                                                                                    ?.children?.find(
+                                                                                                                                          d =>
+                                                                                                                                                d.name ===
+                                                                                                                                                value
+                                                                                                                                    )
                                                                                                                   };
                                                                                                             }
                                                                                                             return i;
@@ -505,12 +521,17 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                         style={{
                                                                               width: '100%'
                                                                         }}
-                                                                        options={rec.selectedSourceProgramArea?.children?.map(
-                                                                              ind => ({
+                                                                        options={dataStoreCrosschecks
+                                                                              ?.find(
+                                                                                    c =>
+                                                                                          c.name ===
+                                                                                          rec.selectedSourceProgramArea
+                                                                                                ?.name
+                                                                              )
+                                                                              ?.children?.map(ind => ({
                                                                                     label: ind.name,
                                                                                     value: ind.name
-                                                                              })
-                                                                        )}
+                                                                              }))}
                                                                         disabled={!rec.selectedSourceProgramArea}
                                                                         showSearch
                                                                         allowClear
@@ -529,11 +550,19 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                                             return {
                                                                                                                   ...i,
                                                                                                                   selectedSourcePrimary:
-                                                                                                                        rec.selectedSourceProgramArea?.children?.find(
-                                                                                                                              d =>
-                                                                                                                                    d.name ===
-                                                                                                                                    value
-                                                                                                                        )
+                                                                                                                        dataStoreCrosschecks
+                                                                                                                              ?.find(
+                                                                                                                                    c =>
+                                                                                                                                          c.name ===
+                                                                                                                                          rec
+                                                                                                                                                .selectedSourceProgramArea
+                                                                                                                                                ?.name
+                                                                                                                              )
+                                                                                                                              ?.children?.find(
+                                                                                                                                    d =>
+                                                                                                                                          d.name ===
+                                                                                                                                          value
+                                                                                                                              )
                                                                                                             };
                                                                                                       }
                                                                                                       return i;
@@ -555,7 +584,9 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                       >
                                                             <div>
                                                                   <Select
-                                                                        placeholder={`${translate('Primary_Source')} `}
+                                                                        placeholder={`${translate(
+                                                                              'Secondary_Source'
+                                                                        )} `}
                                                                         style={{
                                                                               width: '100%'
                                                                         }}
@@ -583,11 +614,19 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                                             return {
                                                                                                                   ...i,
                                                                                                                   selectedSourceSecondary:
-                                                                                                                        rec.selectedSourceProgramArea?.children?.find(
-                                                                                                                              d =>
-                                                                                                                                    d.name ===
-                                                                                                                                    value
-                                                                                                                        )
+                                                                                                                        dataStoreCrosschecks
+                                                                                                                              ?.find(
+                                                                                                                                    c =>
+                                                                                                                                          c.name ===
+                                                                                                                                          rec
+                                                                                                                                                .selectedSourceProgramArea
+                                                                                                                                                ?.name
+                                                                                                                              )
+                                                                                                                              ?.children?.find(
+                                                                                                                                    d =>
+                                                                                                                                          d.name ===
+                                                                                                                                          value
+                                                                                                                              )
                                                                                                             };
                                                                                                       }
                                                                                                       return i;
@@ -776,12 +815,17 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                         style={{
                                                                               width: '100%'
                                                                         }}
-                                                                        options={cons.selectedSourceProgramArea?.children?.map(
-                                                                              ind => ({
+                                                                        options={dataStoreIndicators
+                                                                              ?.find(
+                                                                                    d =>
+                                                                                          d.name ===
+                                                                                          cons.selectedSourceProgramArea
+                                                                                                ?.name
+                                                                              )
+                                                                              ?.children?.map(ind => ({
                                                                                     label: ind.name,
                                                                                     value: ind.name
-                                                                              })
-                                                                        )}
+                                                                              }))}
                                                                         disabled={!cons.selectedSourceProgramArea}
                                                                         showSearch
                                                                         allowClear
@@ -800,11 +844,19 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                                             return {
                                                                                                                   ...i,
                                                                                                                   selectedSourceConsistency:
-                                                                                                                        cons.selectedSourceProgramArea?.children?.find(
-                                                                                                                              d =>
-                                                                                                                                    d.name ===
-                                                                                                                                    value
-                                                                                                                        )
+                                                                                                                        dataStoreIndicators
+                                                                                                                              ?.find(
+                                                                                                                                    d =>
+                                                                                                                                          d.name ===
+                                                                                                                                          cons
+                                                                                                                                                .selectedSourceProgramArea
+                                                                                                                                                ?.name
+                                                                                                                              )
+                                                                                                                              ?.children?.find(
+                                                                                                                                    d =>
+                                                                                                                                          d.name ===
+                                                                                                                                          value
+                                                                                                                              )
                                                                                                             };
                                                                                                       }
                                                                                                       return i;
@@ -1195,12 +1247,18 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                               style={{
                                                                                     width: '100%'
                                                                               }}
-                                                                              options={formState?.completeness?.selectedSourceProgramAreaDE?.children?.map(
-                                                                                    ind => ({
+                                                                              options={dataStoreDECompletness
+                                                                                    ?.find(
+                                                                                          c =>
+                                                                                                c.name ===
+                                                                                                formState?.completeness
+                                                                                                      ?.selectedSourceProgramAreaDE
+                                                                                                      ?.name
+                                                                                    )
+                                                                                    ?.children?.map(ind => ({
                                                                                           label: ind.name,
                                                                                           value: ind.name
-                                                                                    })
-                                                                              )}
+                                                                                    }))}
                                                                               disabled={
                                                                                     formState?.completeness
                                                                                           ?.selectedSourceProgramAreaDE
@@ -1229,11 +1287,20 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                                                         return {
                                                                                                                               ...i,
                                                                                                                               selectedSourceDE:
-                                                                                                                                    formState?.completeness?.selectedSourceProgramAreaDE?.children?.find(
-                                                                                                                                          d =>
-                                                                                                                                                d.name ===
-                                                                                                                                                value
-                                                                                                                                    )
+                                                                                                                                    dataStoreDECompletness
+                                                                                                                                          ?.find(
+                                                                                                                                                c =>
+                                                                                                                                                      c.name ===
+                                                                                                                                                      formState
+                                                                                                                                                            ?.completeness
+                                                                                                                                                            ?.selectedSourceProgramAreaDE
+                                                                                                                                                            ?.name
+                                                                                                                                          )
+                                                                                                                                          ?.children?.find(
+                                                                                                                                                d =>
+                                                                                                                                                      d.name ===
+                                                                                                                                                      value
+                                                                                                                                          )
                                                                                                                         };
                                                                                                                   }
                                                                                                                   return i;
@@ -1269,12 +1336,18 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                               style={{
                                                                                     width: '100%'
                                                                               }}
-                                                                              options={formState?.completeness?.selectedSourceProgramAreaDS?.children?.map(
-                                                                                    ind => ({
+                                                                              options={dataStoreDSCompletness
+                                                                                    ?.find(
+                                                                                          c =>
+                                                                                                c.name ===
+                                                                                                formState?.completeness
+                                                                                                      ?.selectedSourceProgramAreaDS
+                                                                                                      ?.name
+                                                                                    )
+                                                                                    ?.children?.map(ind => ({
                                                                                           label: ind.name,
                                                                                           value: ind.name
-                                                                                    })
-                                                                              )}
+                                                                                    }))}
                                                                               disabled={
                                                                                     formState?.completeness
                                                                                           ?.selectedSourceProgramAreaDS
@@ -1303,11 +1376,20 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                                                         return {
                                                                                                                               ...i,
                                                                                                                               selectedSourceDS:
-                                                                                                                                    formState?.completeness?.selectedSourceProgramAreaDS?.children?.find(
-                                                                                                                                          d =>
-                                                                                                                                                d.name ===
-                                                                                                                                                value
-                                                                                                                                    )
+                                                                                                                                    dataStoreDSCompletness
+                                                                                                                                          ?.find(
+                                                                                                                                                c =>
+                                                                                                                                                      c.name ===
+                                                                                                                                                      formState
+                                                                                                                                                            ?.completeness
+                                                                                                                                                            ?.selectedSourceProgramAreaDS
+                                                                                                                                                            ?.name
+                                                                                                                                          )
+                                                                                                                                          ?.children?.find(
+                                                                                                                                                d =>
+                                                                                                                                                      d.name ===
+                                                                                                                                                      value
+                                                                                                                                          )
                                                                                                                         };
                                                                                                                   }
                                                                                                                   return i;

@@ -352,6 +352,7 @@ export const Body = () => {
             initAppCreateFavoritUserGroup();
             initDataStore();
       }, []);
+
       return (
             <>
                   <div className="app">

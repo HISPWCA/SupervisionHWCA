@@ -5,7 +5,7 @@
   "license": "BSD-3-Clause",
   "private": true,
   "scripts": {
-    "build": "d2-app-scripts build && yarn manifest && cd build && cp -r manifest.webapp app && cd app && zip -r ../../Sup.zip * && cd ../../ && rm -r build && mkdir build && mv Sup.zip build && clear",
+    "build": "d2-app-scripts build --no-verify --forced && yarn manifest && cd build && cp -r manifest.webapp app && cd app && zip -r ../../Sup.zip * && cd ../../ && rm -r build && mkdir build && mv Sup.zip build && clear",
     "prod": "yarn build",
     "manifest": "d2-manifest package.json build/manifest.webapp",
     "start": "d2-app-scripts start",
