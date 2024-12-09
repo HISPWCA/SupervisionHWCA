@@ -11,7 +11,7 @@ import {
       PAGE_SCHEDULE
 } from '../utils/constants';
 import { BORDER_COLOR } from '../utils/couleurs';
-import { loadDataStore } from '../utils/functions';
+import { loadDataStore, saveDataToDataStore } from '../utils/functions';
 import DashboardSchedule from './DashboardSchedule';
 import Dashboard from './Dashboard';
 import Setting from './Setting';
@@ -30,6 +30,7 @@ import DE_Completness from '../datastores/DE_Completness.json';
 import DS_Completness from '../datastores/DS_Completness.json';
 import Cross_cuts from '../datastores/Cross_cuts.json';
 import Indicators from '../datastores/Indicators.json';
+import MetadataInfos from '../datastores/metadataInfos.json';
 
 export const Body = () => {
       const [renderPage, setRenderPage] = useState(PAGE_DASHBOARD);
@@ -43,6 +44,33 @@ export const Body = () => {
       const [appUserGroup, setAppUserGroup] = useState(null);
       const [appCreateFavoritUserGroup, setAppCreateFavoritUserGroup] = useState(null);
 
+      const updateMetaDataInformations = async () => {
+            try {
+                  const metaDataInfo = await loadDataStore(
+                        process.env.REACT_APP_META_INFOS_NAME,
+                        null,
+                        null,
+                        MetadataInfos && {
+                              ...MetadataInfos,
+                              metadata_version: process.env.REACT_APP_META_DATA_VERSION
+                        }
+                  );
+
+                  if (
+                        metaDataInfo &&
+                        metaDataInfo.metadata_version &&
+                        metaDataInfo.metadata_version !== process.env.REACT_APP_META_DATA_VERSION
+                  ) {
+                        saveDataToDataStore(process.env.REACT_APP_META_INFOS_NAME, {
+                              ...MetadataInfos,
+                              metadata_version: process.env.REACT_APP_META_DATA_VERSION
+                        });
+                  }
+            } catch (err) {
+                  console.log('Error : ', err);
+            }
+      };
+
       const initDataStore = async () => {
             try {
                   setLoadingDataStoreInitialization(true);
@@ -55,13 +83,18 @@ export const Body = () => {
                   await loadDataStore(process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY, null, null, []);
                   await loadDataStore(process.env.REACT_APP_MISSIONS_KEY, null, null, []);
                   await loadDataStore(process.env.REACT_APP_VISUALIZATION_KEY, null, null, []);
-
                   await loadDataStore(process.env.REACT_APP_CROSS_CUT_KEY, null, null, Cross_cuts);
                   await loadDataStore(process.env.REACT_APP_INDICATORS_KEY, null, null, Indicators);
                   await loadDataStore(process.env.REACT_APP_REGISTRES_KEY, null, null, Indicators);
                   await loadDataStore(process.env.REACT_APP_DE_COMPLETNESS_KEY, null, null, DE_Completness);
                   await loadDataStore(process.env.REACT_APP_DS_COMPLETNESS_KEY, null, null, DS_Completness);
                   await loadDataStore(process.env.REACT_APP_INDICATORS_MAPPING_KEY, null, null, []);
+                  await loadDataStore(
+                        process.env.REACT_APP_META_INFOS_NAME,
+                        null,
+                        null,
+                        MetadataInfos && { ...MetadataInfos, metadata_version: process.env.REACT_APP_META_DATA_VERSION }
+                  );
                   await loadDataStore(process.env.REACT_APP_PERIODS_CONFIG_KEY, null, null, {
                         periods: [],
                         month1KeyWords: [],
@@ -90,6 +123,7 @@ export const Body = () => {
                         },
                         ERDQ: { nbrIndicator: 3, nbrRecoupement: 3 }
                   });
+
                   await loadMe();
                   setDataStoreInitialized(true);
                   setLoadingDataStoreInitialization(false);
