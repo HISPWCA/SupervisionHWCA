@@ -979,7 +979,7 @@ const Favorites = ({ me }) => {
                               []
                         );
 
-                        console.log('dataStoreIndicatorsMapping: ', dataStoreIndicatorsMapping);
+                        console.log('dataStoreIndicatorsMapping: ', response);
                         setDataStoreIndicatorsMapping(response || []);
                   }
             } catch (err) {}
@@ -1220,24 +1220,17 @@ const Favorites = ({ me }) => {
       const filteredIndicatorsFromIndicatorsMapping = () => {
             return process.env.REACT_APP_HIDDEN_NON_MAPPED === 'YES'
                   ? dataStoreIndicators?.reduce((prev, curr) => {
-                          const foundMappingGroup = dataStoreIndicatorsMapping?.find(
-                                mapping => mapping.name === curr.name
-                          );
-
-                          console.log('foundMappingGroup : ', foundMappingGroup);
-
-                          if (foundMappingGroup) {
-                                prev.push({
-                                      name: curr.name,
-                                      children: curr.children?.filter(d =>
-                                            foundMappingGroup.children?.map(m => m.name)?.includes(d.name)
+                          prev.push({
+                                name: curr.name,
+                                children: curr.children?.filter(d =>
+                                      dataStoreIndicatorsMapping?.find(
+                                            mapping => mapping.group === curr.name && mapping.indicator === d.name
                                       )
-                                });
-                          }
+                                )
+                          });
 
                           return prev;
                     }, [])
-
                   : dataStoreIndicators;
       };
 

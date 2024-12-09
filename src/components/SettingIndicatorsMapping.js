@@ -12,6 +12,7 @@ import { IoMdAddCircleOutline } from 'react-icons/io';
 import SettingIndicatorsMappingNew from './SettingIndicatorsMappingNew';
 import { FaRegEdit } from 'react-icons/fa';
 import { SINGLE_DATA_ELEMENT_ROUTE } from '../utils/api.routes';
+import axios from 'axios';
 
 const SettingIndicatorsMapping = () => {
       const [notification, setNotification] = useState({
