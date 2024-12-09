@@ -65,6 +65,7 @@ const Favorites = ({ me }) => {
 
       const [dataStoreCrosschecks, setDataStoreCrosschecks] = useState([]);
       const [dataStoreIndicators, setDataStoreIndicators] = useState([]);
+      const [dataStoreIndicatorsMapping, setDataStoreIndicatorsMapping] = useState([]);
       const [dataStoreDECompletness, setDataStoreDECompletness] = useState([]);
       const [dataStoreDSCompletness, setDataStoreDSCompletness] = useState([]);
       const [dataStoreRegistres, setDataStoreRegistres] = useState([]);
@@ -769,7 +770,6 @@ const Favorites = ({ me }) => {
                         updatedAt: dayjs()
                   };
 
-
                   if (formState?.selectedBackgroundInformationFavorit && backgroundInfoList) {
                         backgroundInformationConfigList = backgroundInfoList.map(favo => {
                               if (favo.id === formState?.selectedBackgroundInformationFavorit?.id) {
@@ -961,10 +961,27 @@ const Favorites = ({ me }) => {
                   setDataStoreCrosschecks(response);
             } catch (err) {}
       };
+
       const loadDataStoreIndicators = async () => {
             try {
                   const response = await loadDataStore(process.env.REACT_APP_INDICATORS_KEY, null, null, []);
                   setDataStoreIndicators(response);
+            } catch (err) {}
+      };
+
+      const loadDataStoreIndicatorsMapping = async () => {
+            try {
+                  if (process.env.REACT_APP_HIDDEN_NON_MAPPED === 'YES') {
+                        const response = await loadDataStore(
+                              process.env.REACT_APP_INDICATORS_MAPPING_KEY,
+                              null,
+                              null,
+                              []
+                        );
+
+                        console.log('dataStoreIndicatorsMapping: ', dataStoreIndicatorsMapping);
+                        setDataStoreIndicatorsMapping(response || []);
+                  }
             } catch (err) {}
       };
 
@@ -1200,6 +1217,30 @@ const Favorites = ({ me }) => {
             </div>
       );
 
+      const filteredIndicatorsFromIndicatorsMapping = () => {
+            return process.env.REACT_APP_HIDDEN_NON_MAPPED === 'YES'
+                  ? dataStoreIndicators?.reduce((prev, curr) => {
+                          const foundMappingGroup = dataStoreIndicatorsMapping?.find(
+                                mapping => mapping.name === curr.name
+                          );
+
+                          console.log('foundMappingGroup : ', foundMappingGroup);
+
+                          if (foundMappingGroup) {
+                                prev.push({
+                                      name: curr.name,
+                                      children: curr.children?.filter(d =>
+                                            foundMappingGroup.children?.map(m => m.name)?.includes(d.name)
+                                      )
+                                });
+                          }
+
+                          return prev;
+                    }, [])
+
+                  : dataStoreIndicators;
+      };
+
       const RenderContent = () => (
             <div>
                   <RenderTitle />
@@ -1217,7 +1258,9 @@ const Favorites = ({ me }) => {
                                                 <FavoriteGenerateIndicatorsFieldsDQR
                                                       formState={formState}
                                                       setFormState={setFormState}
-                                                      dataStoreIndicators={dataStoreIndicators}
+                                                      dataStoreIndicators={
+                                                            filteredIndicatorsFromIndicatorsMapping() || []
+                                                      }
                                                       dataStoreCrosschecks={dataStoreCrosschecks}
                                                       dataStoreDECompletness={dataStoreDECompletness}
                                                       dataStoreDSCompletness={dataStoreDSCompletness}
@@ -1403,6 +1446,7 @@ const Favorites = ({ me }) => {
             loadDataStoreSupervisionConfigs();
             loadDataStoreCrosschecks();
             loadDataStoreIndicators();
+            loadDataStoreIndicatorsMapping();
             loadDataStoreDECompletness();
             loadDataStoreDSCompletness();
             loadDataStoreRegistres();

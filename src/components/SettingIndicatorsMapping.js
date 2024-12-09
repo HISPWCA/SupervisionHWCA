@@ -11,6 +11,7 @@ import { NOTIFICATION_CRITICAL, NOTIFICATION_SUCCESS, PERIOD_TYPES } from '../ut
 import { IoMdAddCircleOutline } from 'react-icons/io';
 import SettingIndicatorsMappingNew from './SettingIndicatorsMappingNew';
 import { FaRegEdit } from 'react-icons/fa';
+import { SINGLE_DATA_ELEMENT_ROUTE } from '../utils/api.routes';
 
 const SettingIndicatorsMapping = () => {
       const [notification, setNotification] = useState({
@@ -27,6 +28,8 @@ const SettingIndicatorsMapping = () => {
             indicators: []
       });
       const [periodType, setPeriodType] = useState('');
+      const [selectedDataSet, setSelectedDataSet] = useState(null);
+      const [availableDataSets, setAvailableDataSets] = useState([]);
       const [loadingProcess, setLoadingProcess] = useState(false);
       const [loadingIndicators, setLoadingIndicators] = useState(false);
       const [loadingIndicatorsMapping, setLoadingIndicatorsMapping] = useState(false);
@@ -73,9 +76,14 @@ const SettingIndicatorsMapping = () => {
                                     dhis2: dataStoreIndicatorsMapping?.find(
                                           it => it.indicator === child.name && it.group === curr.name
                                     )?.dhis2,
+
                                     periodType: dataStoreIndicatorsMapping?.find(
                                           it => it.indicator === child.name && it.group === curr.name
-                                    )?.periodType
+                                    )?.dataSet?.periodType,
+
+                                    dataSet: dataStoreIndicatorsMapping?.find(
+                                          it => it.indicator === child.name && it.group === curr.name
+                                    )?.dataSet
                               })) || [];
 
                         prev = [...prev, ...newList];
@@ -97,22 +105,6 @@ const SettingIndicatorsMapping = () => {
                               {!formState?.currentIndicator && <div>Error no data </div>}
                               {formState?.currentIndicator && (
                                     <div style={{ padding: '20px', border: '1px solid #ccc' }}>
-                                          <div style={{ margin: '20px 0px' }}>
-                                                <div>{translate('Please_Select_Period_Type')}</div>
-                                                <Select
-                                                      options={PERIOD_TYPES.map(p => ({
-                                                            label: translate(p.name),
-                                                            value: p.value
-                                                      }))}
-                                                      style={{ width: '400px', marginTop: '10px' }}
-                                                      onChange={value => setPeriodType(value)}
-                                                      value={periodType}
-                                                      placeholder={translate('Period_Type')}
-                                                      clearIcon
-                                                      allowClear
-                                                />
-                                          </div>
-
                                           <DataDimension
                                                 selectedDimensions={formState?.selectedMetaDatas?.map(it => ({
                                                       ...it
@@ -126,6 +118,31 @@ const SettingIndicatorsMapping = () => {
                                                 }}
                                                 displayNameProp="displayName"
                                           />
+
+                                          <div style={{ marginTop: '20px' }}>
+                                                <div>{translate('DataSet')}</div>
+                                                <Select
+                                                      disabled={availableDataSets?.length === 0}
+                                                      options={
+                                                            availableDataSets?.map(p => ({
+                                                                  label: p.name,
+                                                                  value: p.id
+                                                            })) || []
+                                                      }
+                                                      style={{ width: '100%', marginTop: '10px' }}
+                                                      onChange={value =>
+                                                            setSelectedDataSet(
+                                                                  availableDataSets?.find(p => p.id === value)
+                                                            )
+                                                      }
+                                                      value={selectedDataSet?.periodType}
+                                                      placeholder={translate('DataSet')}
+                                                      clearIcon
+                                                      allowClear
+                                                />
+                                          </div>
+
+                                          <pre>{JSON.stringify(formState?.selectedMetaDatas, null, 2)}</pre>
                                     </div>
                               )}
                         </ModalContent>
@@ -149,7 +166,8 @@ const SettingIndicatorsMapping = () => {
                                                                   ) {
                                                                         return {
                                                                               ...ind,
-                                                                              periodType: periodType,
+                                                                              periodType: selectedDataSet?.periodType,
+                                                                              dataSet: selectedDataSet,
                                                                               dhis2: formState?.selectedMetaDatas[0]
                                                                         };
                                                                   }
@@ -158,6 +176,8 @@ const SettingIndicatorsMapping = () => {
                                                 });
 
                                                 setPeriodType('');
+                                                setSelectedDataSet(null);
+                                                setAvailableDataSets([]);
                                           }}
                                           icon={<FiSave style={{ fontSize: '18px' }} />}
                                     >
@@ -191,6 +211,31 @@ const SettingIndicatorsMapping = () => {
             }
       };
 
+      const loadAvailableDataSets = async () => {
+            try {
+                  if (formState.selectedMetaDatas?.length > 0) {
+                        let route = null;
+                        
+                        if (formState.selectedMetaDatas[0]?.type === 'DATA_ELEMENT') {
+                              console.log("Cool c'est lancée");
+                              route = `${SINGLE_DATA_ELEMENT_ROUTE}/${formState.selectedMetaDatas[0]?.id}?fields=dataSetElements[dataSet[name,id,periodType]`;
+                        }
+
+                        if (formState.selectedMetaDatas[0]?.type === 'INDICATOR') {
+                              route = null;
+                        }
+
+                        if (route) {
+                              const response = await axios.get(route);
+                              console.log('response : ', response);
+                              setAvailableDataSets(response.data?.dataSetElements?.map(d => d.dataSet) || []);
+                        }
+                  }
+            } catch (err) {
+                  console.log("Error: ", err)
+            }
+      };
+
       useEffect(() => {
             initFields();
       }, [dataStoreIndicators, dataStoreIndicatorsMapping]);
@@ -199,6 +244,12 @@ const SettingIndicatorsMapping = () => {
             loadDataStoreIndicators();
             loadDataStoreIndicatorsMapping();
       }, []);
+
+      useEffect(() => {
+            if (formState?.selectedMetaDatas?.length > 0) {
+                  loadAvailableDataSets();
+            }
+      }, [formState?.selectedMetaDatas]);
 
       return (
             <>
@@ -338,7 +389,10 @@ const SettingIndicatorsMapping = () => {
                                                                                                                         'orange',
                                                                                                                   fontWeight:
                                                                                                                         'bold',
-                                                                                                                  padding: '2px'
+                                                                                                                  padding: '2px',
+                                                                                                                  borderRadius:
+                                                                                                                        '10px',
+                                                                                                                  color: 'white'
                                                                                                             }}
                                                                                                       >
                                                                                                             {

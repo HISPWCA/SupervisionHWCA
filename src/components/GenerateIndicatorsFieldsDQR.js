@@ -182,12 +182,12 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                                         marginBottom: '5px'
                                                                   }}
                                                             >
-                                                                  {translate('Number_Of_DHIS2_monthly_value')}
+                                                                  {translate('Number_Of_DHIS2_Period')}
                                                             </div>
                                                             <div>
                                                                   <Select
                                                                         placeholder={translate(
-                                                                              'Number_Of_DHIS2_monthly_value'
+                                                                              'Number_Of_DHIS2_Period'
                                                                         )}
                                                                         style={{
                                                                               width: '307px'
