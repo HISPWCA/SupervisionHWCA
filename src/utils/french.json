@@ -355,5 +355,6 @@
     "Monthly": "Mensuel",
     "Quarterly": "Trimestriel",
     "Yearly": "Annuel",
-    "DataSet": "Formulaire de saisie"
+    "DataSet": "Formulaire de saisie",
+    "WarningPeriodtypeText":"L'élement sélectionné doit etre un élement de donnée ou un indicateur"
 }

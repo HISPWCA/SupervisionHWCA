@@ -1,8 +1,8 @@
 import translate from '../utils/translator';
 import { Card, Checkbox, Col, Input, Row, Select } from 'antd';
 import { useEffect, useState } from 'react';
-import { loadDataStore, saveDataToDataStore } from '../utils/functions';
-import { Button, ButtonStrip, Modal, ModalActions, ModalContent, ModalTitle } from '@dhis2/ui';
+import { idsFromIndicatorFormula, loadDataStore, saveDataToDataStore } from '../utils/functions';
+import { Button, ButtonStrip, Modal, ModalActions, ModalContent, ModalTitle, NoticeBox } from '@dhis2/ui';
 import { TbSelect } from 'react-icons/tb';
 import { DataDimension } from '@dhis2/analytics';
 import { FiSave } from 'react-icons/fi';
@@ -11,7 +11,7 @@ import { NOTIFICATION_CRITICAL, NOTIFICATION_SUCCESS, PERIOD_TYPES } from '../ut
 import { IoMdAddCircleOutline } from 'react-icons/io';
 import SettingIndicatorsMappingNew from './SettingIndicatorsMappingNew';
 import { FaRegEdit } from 'react-icons/fa';
-import { SINGLE_DATA_ELEMENT_ROUTE } from '../utils/api.routes';
+import { SINGLE_DATA_ELEMENT_ROUTE, SINGLE_DATA_SETS_ROUTE, SINGLE_INDICATOR_ROUTE } from '../utils/api.routes';
 import axios from 'axios';
 
 const SettingIndicatorsMapping = () => {
@@ -28,7 +28,6 @@ const SettingIndicatorsMapping = () => {
             selectedMetaDatas: [],
             indicators: []
       });
-      const [periodType, setPeriodType] = useState('');
       const [selectedDataSet, setSelectedDataSet] = useState(null);
       const [availableDataSets, setAvailableDataSets] = useState([]);
       const [loadingProcess, setLoadingProcess] = useState(false);
@@ -59,6 +58,7 @@ const SettingIndicatorsMapping = () => {
                   setLoadingIndicatorsMapping(false);
             }
       };
+
       const initFields = () => {
             setFormState({
                   ...formState,
@@ -116,34 +116,55 @@ const SettingIndicatorsMapping = () => {
                                                             selectedMetaDatas:
                                                                   value?.items?.length > 0 ? [value.items[0]] : []
                                                       });
+                                                      setAvailableDataSets([]);
+                                                      setSelectedDataSet(null);
                                                 }}
                                                 displayNameProp="displayName"
                                           />
 
+                                          {formState?.selectedMetaDatas?.length > 0 &&
+                                                formState?.selectedMetaDatas[0]?.type !== 'INDICATOR' &&
+                                                formState?.selectedMetaDatas[0]?.type !== 'DATA_ELEMENT' &&
+                                                formState?.selectedMetaDatas[0]?.type !== 'DATA_ELEMENT_OPERAND' && (
+                                                      <div style={{ marginTop: '10px' }}>
+                                                            <NoticeBox
+                                                                  warning
+                                                                  title={translate('WarningPeriodtypeText')}
+                                                            />
+                                                      </div>
+                                                )}
+
                                           <div style={{ marginTop: '20px' }}>
                                                 <div>{translate('DataSet')}</div>
                                                 <Select
-                                                      disabled={availableDataSets?.length === 0}
+                                                      disabled={
+                                                            availableDataSets?.length === 0 ||
+                                                            (formState?.selectedMetaDatas?.length > 0 &&
+                                                                  formState?.selectedMetaDatas[0]?.type !==
+                                                                        'INDICATOR' &&
+                                                                  formState?.selectedMetaDatas[0]?.type !==
+                                                                        'DATA_ELEMENT' &&
+                                                                  formState?.selectedMetaDatas[0]?.type !==
+                                                                        'DATA_ELEMENT_OPERAND')
+                                                      }
                                                       options={
                                                             availableDataSets?.map(p => ({
                                                                   label: p.name,
                                                                   value: p.id
                                                             })) || []
                                                       }
-                                                      style={{ width: '100%', marginTop: '10px' }}
+                                                      style={{ width: '100%', marginTop: '5px' }}
                                                       onChange={value =>
                                                             setSelectedDataSet(
                                                                   availableDataSets?.find(p => p.id === value)
                                                             )
                                                       }
-                                                      value={selectedDataSet?.periodType}
+                                                      value={selectedDataSet?.value}
                                                       placeholder={translate('DataSet')}
                                                       clearIcon
                                                       allowClear
                                                 />
                                           </div>
-
-                                          <pre>{JSON.stringify(formState?.selectedMetaDatas, null, 2)}</pre>
                                     </div>
                               )}
                         </ModalContent>
@@ -176,7 +197,6 @@ const SettingIndicatorsMapping = () => {
                                                             }) || []
                                                 });
 
-                                                setPeriodType('');
                                                 setSelectedDataSet(null);
                                                 setAvailableDataSets([]);
                                           }}
@@ -215,26 +235,48 @@ const SettingIndicatorsMapping = () => {
       const loadAvailableDataSets = async () => {
             try {
                   if (formState.selectedMetaDatas?.length > 0) {
-                        let route = null;
-                        
-                        if (formState.selectedMetaDatas[0]?.type === 'DATA_ELEMENT') {
-                              console.log("Cool c'est lancée");
-                              route = `${SINGLE_DATA_ELEMENT_ROUTE}/${formState.selectedMetaDatas[0]?.id}?fields=dataSetElements[dataSet[name,id,periodType]`;
+                        if (
+                              formState.selectedMetaDatas[0]?.type === 'DATA_ELEMENT' ||
+                              formState.selectedMetaDatas[0]?.type === 'DATA_ELEMENT_OPERAND'
+                        ) {
+                              const route = `${SINGLE_DATA_ELEMENT_ROUTE}/${
+                                    formState.selectedMetaDatas[0]?.id?.split('.')[0]
+                              }?fields=dataSetElements[dataSet[name,id,periodType]`;
+                              const response = await axios.get(route);
+                              return setAvailableDataSets(response.data?.dataSetElements?.map(d => d.dataSet) || []);
                         }
 
                         if (formState.selectedMetaDatas[0]?.type === 'INDICATOR') {
-                              route = null;
-                        }
+                              const indicatorDetailRequest = await axios.get(
+                                    `${SINGLE_INDICATOR_ROUTE}/${formState.selectedMetaDatas[0]?.id}?fields=id,name,numerator,denominator`
+                              );
 
-                        if (route) {
-                              const response = await axios.get(route);
-                              console.log('response : ', response);
-                              setAvailableDataSets(response.data?.dataSetElements?.map(d => d.dataSet) || []);
+                              const indicatorDetail = indicatorDetailRequest?.data;
+
+                              const ids =
+                                    idsFromIndicatorFormula(
+                                          indicatorDetail?.numerator,
+                                          indicatorDetail?.denominator,
+                                          true
+                                    ) || [];
+
+                              const route = `${SINGLE_DATA_ELEMENT_ROUTE}?filter=id:in:[${ids.join(',')}]&paging=false`;
+                              const dataElementResponse = await axios.get(route);
+                              const dataElementList = dataElementResponse?.data?.dataElements;
+
+                              if (dataElementList?.length > 0) {
+                                    const responseDataSets = await axios.get(
+                                          `${SINGLE_DATA_SETS_ROUTE}?fields=id,name,periodType&filter=dataSetElements.dataElement.id:in:[${dataElementList
+                                                ?.map(d => d.id)
+                                                ?.join(',')}]&paging=false`
+                                    );
+
+                                    const dataSetList = responseDataSets?.data?.dataSets;
+                                    return setAvailableDataSets(dataSetList || []);
+                              }
                         }
                   }
-            } catch (err) {
-                  console.log("Error: ", err)
-            }
+            } catch (err) {}
       };
 
       useEffect(() => {
@@ -441,9 +483,8 @@ const SettingIndicatorsMapping = () => {
                                                                                                                   }
                                                                                                       });
 
-                                                                                                      setPeriodType(
-                                                                                                            currentIndicator?.periodType ||
-                                                                                                                  ''
+                                                                                                      setSelectedDataSet(
+                                                                                                            currentIndicator.dataSet
                                                                                                       );
                                                                                                 }}
                                                                                                 icon={

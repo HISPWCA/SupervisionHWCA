@@ -979,7 +979,6 @@ const Favorites = ({ me }) => {
                               []
                         );
 
-                        console.log('dataStoreIndicatorsMapping: ', response);
                         setDataStoreIndicatorsMapping(response || []);
                   }
             } catch (err) {}
@@ -1224,7 +1223,10 @@ const Favorites = ({ me }) => {
                                 name: curr.name,
                                 children: curr.children?.filter(d =>
                                       dataStoreIndicatorsMapping?.find(
-                                            mapping => mapping.group === curr.name && mapping.indicator === d.name
+                                            mapping =>
+                                                  mapping.group === curr.name &&
+                                                  mapping.indicator === d.name &&
+                                                  mapping.dhis2?.id
                                       )
                                 )
                           });

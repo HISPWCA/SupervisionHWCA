@@ -50,4 +50,5 @@ export const USER_GROUPS_ROUTE = API_BASE_ROUTE.concat('/userGroups.json');
 export const MAPS_ROUTE = API_BASE_ROUTE.concat('/maps.json');
 export const VISUALIZATIONS_ROUTE = API_BASE_ROUTE.concat('/visualizations.json');
 export const SINGLE_DATA_ELEMENT_ROUTE = API_BASE_ROUTE.concat('/dataElements');
+export const SINGLE_DATA_SETS_ROUTE = API_BASE_ROUTE.concat('/dataSets');
 export const SINGLE_INDICATOR_ROUTE = API_BASE_ROUTE.concat('/indicators');

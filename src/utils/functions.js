@@ -75,3 +75,44 @@ export const goToNewPage = url => {
       a.click();
       a.remove();
 };
+
+const arrayMerge = (a, b) => {
+      if (a && !isArray(a)) a = [a];
+      if (b && !isArray(b)) b = [b];
+
+      if (!a && b) return b;
+      if (!b && a) return a;
+
+      for (let i = 0; a && b && i < b.length; i++) {
+            a.push(b[i]);
+      }
+      return a;
+};
+
+const arrayRemoveDuplicates = (array, property) => {
+      var seen = {};
+      return array.filter(function (item) {
+            if (property) {
+                  return seen.hasOwnProperty(item[property]) ? false : (seen[item[property]] = true);
+            } else {
+                  return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+            }
+      });
+};
+
+export const idsFromIndicatorFormula = (numeratorFormula, denominatorFormula, dataElementOnly) => {
+      try {
+            var matches = arrayMerge(numeratorFormula.match(/#{(.*?)}/g), denominatorFormula.match(/#{(.*?)}/g));
+            if (!matches) return [];
+
+            for (let i = 0; i < matches.length; i++) {
+                  matches[i] = matches[i].slice(2, -1);
+                  if (dataElementOnly) matches[i] = matches[i].split('.')[0];
+            }
+
+            return arrayRemoveDuplicates(matches);
+      } catch (err) {
+            console.log('Error: ', err);
+            return [];
+      }
+};

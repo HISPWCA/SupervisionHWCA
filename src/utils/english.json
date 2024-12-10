@@ -355,5 +355,6 @@
     "Monthly": "Monthly",
     "Quarterly": "Quarterly",
     "Yearly": "Yearly",
-   "DataSet": "DataSet"
+   "DataSet": "DataSet",
+    "WarningPeriodtypeText": "Your selected element must be either data element or indicator"
 }
