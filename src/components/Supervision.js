@@ -5361,7 +5361,7 @@ const Supervision = ({ me }) => {
                   const weeklyPeriod = dayjs(period).subtract(+index, 'week');
 
                   result = {
-                        normal: `${dayjs(weeklyPeriod).format('YYYY')}W${dayjs(weeklyPeriod).week()}`,
+                        normal: `${dayjs(weeklyPeriod).format('YYYY')}-W${dayjs(weeklyPeriod).week()}`,
                         analytic: `${dayjs(weeklyPeriod).format('YYYY')}W${dayjs(weeklyPeriod).week()}`
                   };
             }
