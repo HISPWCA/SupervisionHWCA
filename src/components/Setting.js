@@ -1576,6 +1576,10 @@ const Setting = () => {
                               borderRadius: '8px'
                         }}
                   >
+                        <div style={{ fontWeight: 'bold', marginBottom: '25px' }}>
+                              {translate('Tracker_Program_Choice_Title')}
+                        </div>
+
                         <div>
                               <div style={{ marginBottom: '5px' }}>{translate('Programmes_Tracker')}</div>
                               <Select
@@ -1593,6 +1597,7 @@ const Setting = () => {
                                     allowClear
                               />
                         </div>
+                        
                         <div style={{ marginTop: '20px' }}>
                               <div style={{ marginTop: '5px' }}>
                                     <Radio
@@ -4711,19 +4716,19 @@ const Setting = () => {
                               <div style={{ marginBottom: '2px', position: 'sticky', top: 30 }}>
                                     <div
                                           className={`setting-menu-item ${
-                                                selectedTypeSupervisionPage === PAGE_INDICATORS_MAPPING ? 'active' : ''
-                                          }`}
-                                          onClick={() => handleClickConfigMenu(PAGE_INDICATORS_MAPPING)}
-                                    >
-                                          {translate('Indicators_Mapping')}
-                                    </div>
-                                    <div
-                                          className={`setting-menu-item ${
                                                 selectedTypeSupervisionPage === PAGE_CONFIG_SUPERVISION ? 'active' : ''
                                           }`}
                                           onClick={() => handleClickConfigMenu(PAGE_CONFIG_SUPERVISION)}
                                     >
                                           {translate('Parametre_Supervision')}
+                                    </div>
+                                    <div
+                                          className={`setting-menu-item ${
+                                                selectedTypeSupervisionPage === PAGE_INDICATORS_MAPPING ? 'active' : ''
+                                          }`}
+                                          onClick={() => handleClickConfigMenu(PAGE_INDICATORS_MAPPING)}
+                                    >
+                                          {translate('Indicators_Mapping')}
                                     </div>
                                     <div
                                           className={`setting-menu-item ${

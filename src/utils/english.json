@@ -256,8 +256,8 @@
     "SelectVisualizations": "Select Visualizataions",
     "SelectMaps": "Select Maps",
     "Favoris": "Favorite",
-    "Configuration_RDQA_Case": "Configuration for RDQA Case ",
-    "Configuration_DQR_Case": "Configuration for DQR Case ",
+    "Configuration_RDQA_Case": "Configuration type Old RDQA",
+    "Configuration_DQR_Case": "Configuration type New RDQA ( DQR - RSC )",
     "Program_Stage_Configuration_Fields_For_Recoupement_And_Indicator": "Fields Indicators and Cross check configuration ",
     "Recoupements": "Cross Check",
     "NumberOfIndicators": "Number of indicators",
@@ -356,5 +356,6 @@
     "Quarterly": "Quarterly",
     "Yearly": "Yearly",
    "DataSet": "DataSet",
-    "WarningPeriodtypeText": "Your selected element must be either data element or indicator"
+    "WarningPeriodtypeText": "Your selected element must be either data element or indicator",
+    "Tracker_Program_Choice_Title":"Tracker program choice, Supervision Type, Subject type to supervise"
 }
