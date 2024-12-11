@@ -298,7 +298,7 @@
     "Indicators_Mapping": "Indicators Mapping",
     "Indicator_Group": "Indicator type",
     "Indicator_From_Dhis2": "Indicator From DHIS2",
-    "DHIS2_monthly_value": "DHIS2 monthly value",
+    "DHIS2_monthly_value": "DHIS2 period value",
     "Visualization_Configurations": "Visualization Configurations",
     "Apply": "Apply",
     "Element_Name": "Element name",

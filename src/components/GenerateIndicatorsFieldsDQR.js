@@ -176,56 +176,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                             </div>
                                                       </div>
 
-                                                      <div style={{ marginTop: '5px' }}>
-                                                            <div
-                                                                  style={{
-                                                                        marginBottom: '5px'
-                                                                  }}
-                                                            >
-                                                                  {translate('Number_Of_DHIS2_Period')}
-                                                            </div>
-                                                            <div>
-                                                                  <Select
-                                                                        placeholder={translate(
-                                                                              'Number_Of_DHIS2_Period'
-                                                                        )}
-                                                                        style={{
-                                                                              width: '307px'
-                                                                        }}
-                                                                        options={PERIOD_LIST?.map(p => ({
-                                                                              label: p,
-                                                                              value: p
-                                                                        }))}
-                                                                        showSearch
-                                                                        allowClear
-                                                                        optionFilterProp="label"
-                                                                        value={ind?.viewMonthlyValue}
-                                                                        onChange={value => {
-                                                                              setFormState({
-                                                                                    ...formState,
-                                                                                    indicators:
-                                                                                          formState?.indicators?.map(
-                                                                                                i => {
-                                                                                                      if (
-                                                                                                            i.id ===
-                                                                                                            ind.id
-                                                                                                      ) {
-                                                                                                            return {
-                                                                                                                  ...i,
-                                                                                                                  viewMonthlyValue:
-                                                                                                                        parseInt(
-                                                                                                                              value
-                                                                                                                        )
-                                                                                                            };
-                                                                                                      }
-                                                                                                      return i;
-                                                                                                }
-                                                                                          ) || []
-                                                                              });
-                                                                        }}
-                                                                  />
-                                                            </div>
-                                                      </div>
+                                                      
 
                                                       {ind?.viewMonthlyValue &&
                                                             parseInt(ind?.viewMonthlyValue) >= 1 && (
