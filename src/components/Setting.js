@@ -21,7 +21,8 @@ import {
       DQR,
       PAGE_INDICATORS_MAPPING,
       RDQA,
-      ERDQ
+      ERDQ,
+      PERIOD_LIST
 } from '../utils/constants';
 import { Card, Checkbox, Col, Divider, Input, InputNumber, Popconfirm, Row, Select, Table } from 'antd';
 import {
@@ -2331,7 +2332,7 @@ const Setting = () => {
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
-                                                                        ) > 1 && (
+                                                                        ) >= 1 && (
                                                                               <tr>
                                                                                     <td
                                                                                           style={{
@@ -2376,7 +2377,7 @@ const Setting = () => {
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
-                                                                        ) > 2 && (
+                                                                        ) >= 2 && (
                                                                               <tr>
                                                                                     <td
                                                                                           style={{
@@ -2422,7 +2423,7 @@ const Setting = () => {
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
-                                                                        ) > 3 && (
+                                                                        ) >= 3 && (
                                                                               <tr>
                                                                                     <td
                                                                                           style={{
@@ -2468,7 +2469,7 @@ const Setting = () => {
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
-                                                                        ) > 4 && (
+                                                                        ) >= 4 && (
                                                                               <tr>
                                                                                     <td
                                                                                           style={{
@@ -2514,7 +2515,7 @@ const Setting = () => {
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
-                                                                        ) > 5 && (
+                                                                        ) >= 5 && (
                                                                               <tr>
                                                                                     <td
                                                                                           style={{
@@ -2560,7 +2561,7 @@ const Setting = () => {
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
-                                                                        ) > 6 && (
+                                                                        ) >= 6 && (
                                                                               <tr>
                                                                                     <td
                                                                                           style={{
@@ -2606,7 +2607,7 @@ const Setting = () => {
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
-                                                                        ) > 7 && (
+                                                                        ) >= 7 && (
                                                                               <tr>
                                                                                     <td
                                                                                           style={{
@@ -2652,7 +2653,7 @@ const Setting = () => {
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
-                                                                        ) > 8 && (
+                                                                        ) >= 8 && (
                                                                               <tr>
                                                                                     <td
                                                                                           style={{
@@ -2698,7 +2699,7 @@ const Setting = () => {
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
-                                                                        ) > 9 && (
+                                                                        ) >= 9 && (
                                                                               <tr>
                                                                                     <td
                                                                                           style={{
@@ -2744,7 +2745,7 @@ const Setting = () => {
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
-                                                                        ) > 10 && (
+                                                                        ) >= 10 && (
                                                                               <tr>
                                                                                     <td
                                                                                           style={{
@@ -2790,7 +2791,7 @@ const Setting = () => {
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
-                                                                        ) > 11 && (
+                                                                        ) >= 11 && (
                                                                               <tr>
                                                                                     <td
                                                                                           style={{
@@ -2836,7 +2837,7 @@ const Setting = () => {
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
-                                                                        ) > 12 && (
+                                                                        ) >= 12 && (
                                                                               <tr>
                                                                                     <td
                                                                                           style={{
@@ -2882,7 +2883,7 @@ const Setting = () => {
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
-                                                                        ) > 13 && (
+                                                                        ) >= 13 && (
                                                                               <tr>
                                                                                     <td
                                                                                           style={{
@@ -2928,7 +2929,7 @@ const Setting = () => {
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
-                                                                        ) > 14 && (
+                                                                        ) >= 14 && (
                                                                               <tr>
                                                                                     <td
                                                                                           style={{
@@ -2974,7 +2975,7 @@ const Setting = () => {
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
-                                                                        ) > 15 && (
+                                                                        ) >= 15 && (
                                                                               <tr>
                                                                                     <td
                                                                                           style={{
