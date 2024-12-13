@@ -76,6 +76,25 @@ export const goToNewPage = url => {
       a.remove();
 };
 
+/** === NUMBER === */
+function isNumber(number) {
+      return !isNaN(parseFloat(number));
+}
+
+/** === ARRAY === */
+function isArray(array) {
+      var isArray = Object.prototype.toString.call(array) === '[object Array]';
+
+      return isArray;
+}
+
+function toArray(array) {
+      var isArray = Object.prototype.toString.call(array) === '[object Array]';
+
+      if (isArray) return array;
+      else return [array];
+}
+
 const arrayMerge = (a, b) => {
       if (a && !isArray(a)) a = [a];
       if (b && !isArray(b)) b = [b];
