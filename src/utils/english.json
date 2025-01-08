@@ -308,7 +308,7 @@
     "Use_Indicator_Name_From_Dhis2": "use name from DHIS2",
     "Indicator_Keys_Word": "Indicator Key words",
     "Indicator_keys_Word_Help": "Add all indicator Key words by pressing enter keyboard , this informations is used to replace some text on dashboard and android Side",
-    "Cross_Check_Keys_Word": "Cross check Key words",
+    "Cross_Check_Keys_Word": "Cross check Key words ( Dashboard ) ",
     "Cross_Check_Keys_Word_Help": "Add all cross check Key words by pressing enter keyboard, this informations is used to replace some text on dashboard and android Side",
     "Keys_Word": "Key words",
     "Keys_Word_Help": "Add all Key words by pressing enter keyboard, this informations is used to replace some text on dashboard and android Side ",
@@ -355,7 +355,9 @@
     "Monthly": "Monthly",
     "Quarterly": "Quarterly",
     "Yearly": "Yearly",
-   "DataSet": "DataSet",
+    "DataSet": "DataSet",
     "WarningPeriodtypeText": "Your selected element must be either data element or indicator",
-    "Tracker_Program_Choice_Title":"Tracker program choice, Supervision Type, Subject type to supervise"
+    "Tracker_Program_Choice_Title": "Tracker program choice, Supervision Type, Subject type to supervise",
+    "Primary_Datasource_Key_Words":"Primary data source key words",
+    "Secondary_Datasource_Key_Words":"Secondary data source key words"
 }

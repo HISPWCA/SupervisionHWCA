@@ -1,11 +1,11 @@
 {
-  "name": "Supervision",
-  "version": "2.1.4",
+  "name": "Supervision-dev",
+  "version": "2.1.5",
   "description": "",
   "license": "BSD-3-Clause",
   "private": true,
   "scripts": {
-    "build": "d2-app-scripts build --no-verify --forced && yarn manifest && cd build && cp -r manifest.webapp app && cd app && zip -r ../../Supervision.zip * && cd ../../ && rm -r build && mkdir build && mv Supervision.zip build && clear",
+    "build": "d2-app-scripts build --no-verify --forced && yarn manifest && cd build && cp -r manifest.webapp app && cd app && zip -r ../../Supervision-dev.zip * && cd ../../ && rm -r build && mkdir build && mv Supervision-dev.zip build && clear",
     "prod": "yarn build",
     "manifest": "d2-manifest package.json build/manifest.webapp",
     "start": "d2-app-scripts start",
@@ -47,10 +47,10 @@
     "zustand": "^4.3.8"
   },
   "manifest.webapp": {
-    "name": "Supervision",
-    "title": "Supervision",
+    "name": "Supervision-dev",
+    "title": "Supervision-dev",
     "description": "Supervision App  ",
-    "version": "2.1.4",
+    "version": "2.1.5",
     "developer": {
       "url": "https://hispwca.org",
       "name": "HISP West & Central Africa ( HWCA) "

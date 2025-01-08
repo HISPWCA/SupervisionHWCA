@@ -274,7 +274,12 @@ const Setting = () => {
                               fieldList?.recoupements?.find(rec => rec.position === i)?.secondaryValue || null,
                         margin: fieldList?.recoupements?.find(rec => rec.position === i)?.margin || null,
                         programArea: fieldList?.recoupements?.find(rec => rec.position === i)?.programArea || null,
-                        keyWords: fieldList?.recoupements?.find(rec => rec.position === i)?.keyWords || []
+                        keyWords: fieldList?.recoupements?.find(rec => rec.position === i)?.keyWords || [],
+                        primaryDataSourceKeyWords:
+                              fieldList?.recoupements?.find(rec => rec.position === i)?.primaryDataSourceKeyWords || [],
+                        secondaryDataSourceKeyWords:
+                              fieldList?.recoupements?.find(rec => rec.position === i)?.secondaryDataSourceKeyWords ||
+                              []
                   });
             }
 
@@ -3456,7 +3461,7 @@ const Setting = () => {
                                                 <Col md={12}>
                                                       <div>
                                                             <div style={{ marginBottom: '5px' }}>
-                                                                  {translate('Supervision_Status_fields')}
+                                                                  {translate('Supervision_statut_fields')}
                                                             </div>
                                                             <Select
                                                                   options={formStateForRDQA?.selectedProgramStageForConfiguration?.programStageDataElements?.map(

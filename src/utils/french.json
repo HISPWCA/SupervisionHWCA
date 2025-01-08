@@ -308,7 +308,7 @@
     "Use_Indicator_Name_From_Dhis2": "Utiliser nom du DHIS2",
     "Indicator_Keys_Word": "Mots clés indicateur",
     "Indicator_keys_Word_Help": "Ajouter tous les mots clés des indicateurs en appuyant sur la touche entrée, ces informations seront utilisées au niveau du tableau de bord et du côté android pour le changement des noms des éléments",
-    "Cross_Check_Keys_Word": "Mots clés des recoupements",
+    "Cross_Check_Keys_Word": "Mots clés des recoupements( Dashboard ) ",
     "Cross_Check_Keys_Word_Help": "Ajouter tous les mots clés des recoupements en appuyant sur la touche entrée,ces informations seront utilisées au niveau du tableau de bord et du côté android pour le changement des noms des éléments",
     "Keys_Word": "Mots clés",
     "Keys_Word_Help": "Ajouter tous les mots clés en appuyant sur la touche entrée , ces informations seront utilisées au niveau du tableau de bord et du côté android pour le changement des noms des éléments",
@@ -357,5 +357,7 @@
     "Yearly": "Annuel",
     "DataSet": "Formulaire de saisie",
     "WarningPeriodtypeText": "L'élement sélectionné doit etre un élement de donnée ou un indicateur",
-    "Tracker_Program_Choice_Title": "Choix du programme Tracker, Type de supervision, Type de sujet a supervisé"
+    "Tracker_Program_Choice_Title": "Choix du programme Tracker, Type de supervision, Type de sujet a supervisé",
+    "Primary_Datasource_Key_Words": "Mot clés Source de donnée Primaire",
+    "Secondary_Datasource_Key_Words": "Mot clés Source de donnée Secondaire"
 }

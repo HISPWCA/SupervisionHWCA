@@ -11,8 +11,3 @@ export const BLACK = '#000000'
 export const JAUNE = '#FFEA00'
 export const WHITE_GREEN = '#06D6A0'
 export const GRAY_DARK = '#b4b4b4'
-
-// export const GRAY_DARK = '#E1E5F2'
-// export const GRAY_DARK = '#e6e6e6'
-// export const RED = '#EF476F'
-// export const ORANGE = '#FF7B00'

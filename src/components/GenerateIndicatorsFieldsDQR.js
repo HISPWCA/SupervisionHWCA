@@ -176,8 +176,6 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                             </div>
                                                       </div>
 
-                                                      
-
                                                       {ind?.viewMonthlyValue &&
                                                             parseInt(ind?.viewMonthlyValue) >= 1 && (
                                                                   <div style={{ marginTop: '5px' }}>
@@ -1357,6 +1355,8 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                             </div>
                                                       </div>
 
+                                                      <hr style={{ margin: '20px auto' }} />
+
                                                       <div style={{ marginTop: '5px' }}>
                                                             <div
                                                                   style={{
@@ -1417,6 +1417,50 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                                   />
                                                             </div>
                                                       </div>
+
+                                                      <div style={{ marginTop: '5px' }}>
+                                                            <div
+                                                                  style={{
+                                                                        marginBottom: '5px'
+                                                                  }}
+                                                            >
+                                                                  <div>
+                                                                        {`${translate(
+                                                                              'Primary_Datasource_Key_Words'
+                                                                        )}  ${indexRec + 1}`}
+                                                                  </div>
+                                                            </div>
+                                                            <div>
+                                                                  <TagsInput
+                                                                        style={{ width: '100%' }}
+                                                                        value={rec?.primaryDataSourceKeyWords || []}
+                                                                        onChange={word => {
+                                                                              setFormState({
+                                                                                    ...formState,
+                                                                                    recoupements:
+                                                                                          formState?.recoupements?.map(
+                                                                                                i => {
+                                                                                                      if (
+                                                                                                            i.id ===
+                                                                                                            rec.id
+                                                                                                      ) {
+                                                                                                            return {
+                                                                                                                  ...i,
+                                                                                                                  primaryDataSourceKeyWords:
+                                                                                                                        word ||
+                                                                                                                        []
+                                                                                                            };
+                                                                                                      }
+                                                                                                      return i;
+                                                                                                }
+                                                                                          ) || []
+                                                                              });
+                                                                        }}
+                                                                  />
+                                                            </div>
+                                                      </div>
+
+                                                      <hr style={{ margin: '20px auto' }} />
 
                                                       <div style={{ marginTop: '5px' }}>
                                                             <div
@@ -1486,18 +1530,53 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                                   }}
                                                             >
                                                                   <div>
+                                                                        {`${translate(
+                                                                              'Secondary_Datasource_Key_Words'
+                                                                        )}  ${indexRec + 1}`}
+                                                                  </div>
+                                                            </div>
+                                                            <div>
+                                                                  <TagsInput
+                                                                        style={{ width: '100%' }}
+                                                                        value={rec?.secondaryDataSourceKeyWords || []}
+                                                                        onChange={word => {
+                                                                              setFormState({
+                                                                                    ...formState,
+                                                                                    recoupements:
+                                                                                          formState?.recoupements?.map(
+                                                                                                i => {
+                                                                                                      if (
+                                                                                                            i.id ===
+                                                                                                            rec.id
+                                                                                                      ) {
+                                                                                                            return {
+                                                                                                                  ...i,
+                                                                                                                  secondaryDataSourceKeyWords:
+                                                                                                                        word ||
+                                                                                                                        []
+                                                                                                            };
+                                                                                                      }
+                                                                                                      return i;
+                                                                                                }
+                                                                                          ) || []
+                                                                              });
+                                                                        }}
+                                                                  />
+                                                            </div>
+                                                      </div>
+
+                                                      <hr style={{ margin: '20px auto' }} />
+
+                                                      <div style={{ marginTop: '5px' }}>
+                                                            <div
+                                                                  style={{
+                                                                        marginBottom: '5px'
+                                                                  }}
+                                                            >
+                                                                  <div>
                                                                         {`${translate('Cross_Check_Keys_Word')}  ${
                                                                               indexRec + 1
                                                                         }`}
-                                                                  </div>
-
-                                                                  <div
-                                                                        style={{
-                                                                              color: '#00000090',
-                                                                              margin: '5px 0px'
-                                                                        }}
-                                                                  >
-                                                                        {`${translate('Cross_Check_Keys_Word_Help')}`}
                                                                   </div>
                                                             </div>
                                                             <div>
