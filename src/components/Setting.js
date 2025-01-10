@@ -170,6 +170,8 @@ const Setting = () => {
                   programAreaDE: null
             },
             consistencyOvertimes: [],
+            globalProgramAreaKeyWords: [],
+            globalProgramArea: null,
             isFieldEditingMode: false
       });
 
@@ -317,6 +319,8 @@ const Setting = () => {
                   indicators: newIndicators,
                   recoupements: newRecoupements,
                   consistencyOvertimes: newConsistencyOverTimes,
+                  globalProgramArea: fieldList?.globalProgramArea || null,
+                  globalProgramAreaKeyWords: fieldList?.globalProgramAreaKeyWords || [],
                   completeness: {
                         ...formState.completeness,
                         margin: fieldList?.completeness?.margin || null,
@@ -345,6 +349,8 @@ const Setting = () => {
                   selectedStatusSupervisionDataElement: null,
                   selectedSupervisionAutoGenerateID: null,
                   selectedNbrIndicatorsToShow: null,
+                  globalProgramArea: null,
+                  globalProgramAreaKeyWords: [],
                   indicators: [],
                   recoupements: [],
                   completeness: {
@@ -904,6 +910,8 @@ const Setting = () => {
                   selectedSupervisorDataElements: [],
                   selectedStatusSupervisionDataElement: null,
                   selectedOrganisationUnitGroup: null,
+                  globalProgramArea: null,
+                  globalProgramAreaKeyWords:  [],
                   completeness: null,
                   consistencyOvertimes: [],
                   indicators: [],
@@ -997,11 +1005,14 @@ const Setting = () => {
                                                         statusSupervisionField:
                                                               formState?.selectedStatusSupervisionDataElement,
                                                         selectedNbrIndicatorsToShow:
-                                                              formState.selectedNbrIndicatorsToShow,
-                                                        indicators: formState.indicators,
-                                                        recoupements: formState.recoupements,
-                                                        completeness: formState.completeness,
-                                                        consistencyOvertimes: formState.consistencyOvertimes
+                                                              formState?.selectedNbrIndicatorsToShow,
+                                                        indicators: formState?.indicators,
+                                                        recoupements: formState?.recoupements,
+                                                        completeness: formState?.completeness,
+                                                        globalProgramArea: formState?.globalProgramArea,
+                                                        globalProgramAreaKeyWords:
+                                                              formState?.globalProgramAreaKeyWords || [],
+                                                        consistencyOvertimes: formState?.consistencyOvertimes
                                                   };
                                             }
 
@@ -1020,6 +1031,8 @@ const Setting = () => {
                                                   indicators: formState.indicators,
                                                   recoupements: formState.recoupements,
                                                   completeness: formState.completeness,
+                                                  globalProgramArea: formState?.globalProgramArea,
+                                                  globalProgramAreaKeyWords: formState?.globalProgramAreaKeyWords || [],
                                                   consistencyOvertimes: formState.consistencyOvertimes
                                             }
                                       ]
@@ -1034,6 +1047,8 @@ const Setting = () => {
                                             indicators: formState.indicators,
                                             recoupements: formState.recoupements,
                                             completeness: formState.completeness,
+                                            globalProgramArea: formState?.globalProgramArea,
+                                            globalProgramAreaKeyWords: formState?.globalProgramAreaKeyWords || [],
                                             consistencyOvertimes: formState.consistencyOvertimes
                                       }
                                 ];
@@ -1538,13 +1553,15 @@ const Setting = () => {
                   selectedStatusSupervisionDataElement: null,
                   selectedNbrIndicatorsToShow: null,
                   selectedSupervisorDataElements: [],
+                  globalProgramArea: formState?.globalProgramArea,
+                  globalProgramAreaKeyWords: formState?.globalProgramAreaKeyWords || [],
                   completeness: {
                         ...formState?.completeness,
                         selectedNbrDocumentsSourceToShow: null,
                         selectedNbrDataElementsToShow: null,
                         selectedRegister: null
                   },
-                  selectedProgramStageForConfiguration: programStages.find(pstage => pstage.id === value)
+                  selectedProgramStageForConfiguration: programStages?.find(pstage => pstage.id === value) || []
             });
       };
       const handleSelectProgramStageForConfigurationForRDQA = value => {
@@ -1777,6 +1794,8 @@ const Setting = () => {
                               selectedSupervisorDataElements: value.supervisorField || [],
                               selectedStatusSupervisionDataElement: value.statusSupervisionField,
                               selectedNbrIndicatorsToShow: value.selectedNbrIndicatorsToShow,
+                              globalProgramArea: value?.globalProgramArea,
+                              globalProgramAreaKeyWords: value?.globalProgramAreaKeyWords || [],
                               completeness: {
                                     ...value.completeness,
                                     registerKeyWords: value?.completeness?.registerKeyWords || [],
@@ -2273,6 +2292,102 @@ const Setting = () => {
                                                                                                       registerKeyWords:
                                                                                                             word || []
                                                                                                 }
+                                                                                          })
+                                                                                    }
+                                                                              />
+                                                                        </td>
+                                                                  </tr>
+
+                                                                  <tr>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top',
+                                                                                    width: '50%'
+                                                                              }}
+                                                                        >
+                                                                              {translate('Global_Program_Area')}
+                                                                        </td>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top'
+                                                                              }}
+                                                                        >
+                                                                              <Select
+                                                                                    options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                                          progStageDE => ({
+                                                                                                label: progStageDE
+                                                                                                      .dataElement
+                                                                                                      ?.displayName,
+                                                                                                value: progStageDE
+                                                                                                      .dataElement?.id
+                                                                                          })
+                                                                                    )}
+                                                                                    placeholder={translate(
+                                                                                          'Global_Program_Area'
+                                                                                    )}
+                                                                                    style={{ width: '100%' }}
+                                                                                    onChange={value => {
+                                                                                          setFormState({
+                                                                                                ...formState,
+                                                                                                globalProgramArea:
+                                                                                                      formState?.selectedProgramStageForConfiguration?.programStageDataElements
+                                                                                                            ?.map(
+                                                                                                                  p =>
+                                                                                                                        p.dataElement
+                                                                                                            )
+                                                                                                            .find(
+                                                                                                                  dataElement =>
+                                                                                                                        dataElement.id ===
+                                                                                                                        value
+                                                                                                            )
+                                                                                          });
+                                                                                    }}
+                                                                                    value={
+                                                                                          formState?.globalProgramArea
+                                                                                                ?.id
+                                                                                    }
+                                                                                    optionFilterProp="label"
+                                                                                    showSearch
+                                                                                    allowClear
+                                                                              />
+                                                                        </td>
+                                                                  </tr>
+
+                                                                  <tr>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top',
+                                                                                    width: '50%'
+                                                                              }}
+                                                                        >
+                                                                              {translate(
+                                                                                    'Keys_Word_Global_Program_Area'
+                                                                              )}
+                                                                        </td>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top'
+                                                                              }}
+                                                                        >
+                                                                              <TagsInput
+                                                                                    style={{ width: '100%' }}
+                                                                                    value={
+                                                                                          formState?.globalProgramAreaKeyWords ||
+                                                                                          []
+                                                                                    }
+                                                                                    onChange={word =>
+                                                                                          setFormState({
+                                                                                                ...formState,
+                                                                                                globalProgramAreaKeyWords:
+                                                                                                      word || []
                                                                                           })
                                                                                     }
                                                                               />

@@ -94,7 +94,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                           <span>{translate('Global_Program_Area')}</span>
                                           <span style={{ marginLeft: '10px' }}>
                                                 <Select
-                                                      placeholder={`${translate('Program_Area')} `}
+                                                      placeholder={`${translate('Global_Program_Area')} `}
                                                       style={{
                                                             minWidth: '200px'
                                                       }}
@@ -137,7 +137,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                 >
                                                       {translate('Indicateurs')}
                                                 </th>
-                                                <th
+                                               {0 > 1 && <th
                                                       style={{
                                                             padding: '2px 5px',
                                                             verticalAlign: 'top',
@@ -146,7 +146,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                       }}
                                                 >
                                                       {translate('Program_Area')}
-                                                </th>
+                                                </th>}
                                                 <th
                                                       style={{
                                                             padding: '2px 5px',
@@ -184,7 +184,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                             >
                                                                   {indicator?.value?.displayName}
                                                             </td>
-                                                            <td
+                                                          {0 > 1 &&   <td
                                                                   style={{
                                                                         padding: '2px 5px',
                                                                         verticalAlign: 'top',
@@ -247,7 +247,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                               }}
                                                                         />
                                                                   </div>
-                                                            </td>
+                                                            </td>}
                                                             <td
                                                                   style={{
                                                                         padding: '2px 5px',
@@ -389,7 +389,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                       {translate('Recoupements')}
                                                 </th>
 
-                                                <th
+                                                {0 > 1 && <th
                                                       style={{
                                                             padding: '2px 5px',
                                                             verticalAlign: 'top',
@@ -399,7 +399,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                 >
                                                       {translate('Program_Area')}
                                                 </th>
-
+}
                                                 <th
                                                       style={{
                                                             padding: '2px 5px',
@@ -448,7 +448,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                             {`${translate('Recoupements')} ${getLetter(recIndex + 1)}`}
                                                       </td>
 
-                                                      <td
+                                                     {0 > 1 && <td
                                                             style={{
                                                                   padding: '2px 5px',
                                                                   verticalAlign: 'top',
@@ -505,7 +505,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                         }}
                                                                   />
                                                             </div>
-                                                      </td>
+                                                      </td>}
 
                                                       <td
                                                             style={{
@@ -702,7 +702,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                 >
                                                       {translate('ConsistencyOverTime')}
                                                 </th>
-                                                <th
+                                              {0  > 1 &&  <th
                                                       style={{
                                                             padding: '2px 5px',
                                                             verticalAlign: 'top',
@@ -711,7 +711,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                       }}
                                                 >
                                                       {translate('Program_Area')}
-                                                </th>
+                                                </th>}
                                                 <th
                                                       style={{
                                                             padding: '2px 5px',
@@ -747,7 +747,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                       >
                                                             {`${translate('ConsistencyOverTime')} ${consIndex + 1}`}
                                                       </td>
-                                                      <td
+                                                     {0 >  1 && <td
                                                             style={{
                                                                   padding: '2px 5px',
                                                                   verticalAlign: 'top',
@@ -800,7 +800,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                         }}
                                                                   />
                                                             </div>
-                                                      </td>
+                                                      </td>}
                                                       <td
                                                             style={{
                                                                   padding: '2px 5px',
@@ -1007,7 +1007,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                     </thead>
                                     <tbody>
                                           <tr>
-                                                <td
+                                              {0 > 1 &&  <td
                                                       style={{
                                                             padding: '2px 5px',
                                                             verticalAlign: 'center',
@@ -1016,8 +1016,8 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                       }}
                                                 >
                                                       {`${translate('Program_Area')}`}
-                                                </td>
-                                                <td
+                                                </td>}
+                                                {0 > 1 && <td
                                                       style={{
                                                             padding: '2px 5px',
                                                             verticalAlign: 'center',
@@ -1062,7 +1062,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                   }}
                                                             />
                                                       </div>
-                                                </td>
+                                                </td>}
 
                                                 <td
                                                       style={{
@@ -1094,7 +1094,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                       </div>
                                                 </td>
 
-                                                <td
+                                               {0 > 1 && <td
                                                       style={{
                                                             padding: '2px 5px',
                                                             verticalAlign: 'center',
@@ -1140,7 +1140,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                   }}
                                                             />
                                                       </div>
-                                                </td>
+                                                </td>}
                                           </tr>
 
                                           <tr>
