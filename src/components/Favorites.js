@@ -116,6 +116,7 @@ const Favorites = ({ me }) => {
                         setFormState({
                               ...formState,
                               selectedNbrIndicatorsToShow: currStage.selectedNbrIndicatorsToShow,
+                              selectedGlobalProgramArea: currStage.selectedGlobalProgramArea,
                               nbrIndicatorsToShow: existingFormState?.nbrIndicatorsToShow
                                     ? existingFormState?.nbrIndicatorsToShow
                                     : currStage.indicators?.filter(ind => ind.value && ind.programArea)?.length || 0,
@@ -452,8 +453,8 @@ const Favorites = ({ me }) => {
                         programStage
                   };
 
-                  if (payloadProgramArea.dataElement?.id && payloadProgramArea.indicator?.id)
-                        newList.push(payloadProgramArea);
+                  // if (payloadProgramArea.dataElement?.id && payloadProgramArea.indicator?.id)
+                  //       newList.push(payloadProgramArea);
                   if (payloadIndicator.dataElement?.id && payloadIndicator.indicator?.id)
                         newList.push(payloadIndicator);
                   if (payloadMargin.dataElement?.id && payloadMargin.indicator?.id) newList.push(payloadMargin);
@@ -500,8 +501,8 @@ const Favorites = ({ me }) => {
                         program
                   };
 
-                  if (payloadProgramArea.dataElement?.id && payloadProgramArea.indicator?.id)
-                        newList.push(payloadProgramArea);
+                  // if (payloadProgramArea.dataElement?.id && payloadProgramArea.indicator?.id)
+                  //       newList.push(payloadProgramArea);
                   if (payloadPrimary.dataElement?.id && payloadPrimary.indicator?.id) newList.push(payloadPrimary);
                   if (payloadSecondary.dataElement?.id && payloadSecondary.indicator?.id)
                         newList.push(payloadSecondary);
@@ -543,8 +544,8 @@ const Favorites = ({ me }) => {
                   if (payloadConsistency.dataElement?.id && payloadConsistency.indicator?.id)
                         newList.push(payloadConsistency);
                   if (payloadMargin.dataElement?.id && payloadMargin.indicator?.id) newList.push(payloadMargin);
-                  if (payloadProgramArea.dataElement?.id && payloadProgramArea.indicator?.id)
-                        newList.push(payloadProgramArea);
+                  // if (payloadProgramArea.dataElement?.id && payloadProgramArea.indicator?.id)
+                  //       newList.push(payloadProgramArea);
             }
 
             //data element et source document completness
@@ -614,8 +615,8 @@ const Favorites = ({ me }) => {
                               program
                         };
 
-                        if (payloadProgramAreaDE.dataElement?.id && payloadProgramAreaDE.indicator?.id)
-                              newList.push(payloadProgramAreaDE);
+                        // if (payloadProgramAreaDE.dataElement?.id && payloadProgramAreaDE.indicator?.id)
+                        //       newList.push(payloadProgramAreaDE);
                   }
 
                   if (formState?.completeness?.programAreaDOC && formState?.completeness?.selectedSourceProgramAreaDS) {
@@ -629,8 +630,8 @@ const Favorites = ({ me }) => {
                               program
                         };
 
-                        if (payloadProgramAreaDS.dataElement?.id && payloadProgramAreaDS.indicator?.id)
-                              newList.push(payloadProgramAreaDS);
+                        // if (payloadProgramAreaDS.dataElement?.id && payloadProgramAreaDS.indicator?.id)
+                        //       newList.push(payloadProgramAreaDS);
                   }
 
                   if (formState?.completeness?.margin && formState?.completeness?.selectedSourceMargin) {
@@ -689,6 +690,21 @@ const Favorites = ({ me }) => {
 
                   if (payloadIndicatorToShow.dataElement?.id && payloadIndicatorToShow.indicator?.id)
                         newList.push(payloadIndicatorToShow);
+            }    
+            
+            if (formState?.globalProgramArea && formState?.selectedGlobalProgramArea) {
+                  let payloadGlobalProgramArea = {
+                        dataElement: formState?.globalProgramArea,
+                        indicator: formState?.selectedGlobalProgramArea && {
+                              id: formState?.selectedGlobalProgramArea,
+                              displayName: formState?.selectedGlobalProgramArea
+                        },
+                        programStage,
+                        program
+                  };
+
+                  if (payloadGlobalProgramArea.dataElement?.id && payloadGlobalProgramArea.indicator?.id)
+                        newList.push(payloadGlobalProgramArea);
             }
 
             return newList;
