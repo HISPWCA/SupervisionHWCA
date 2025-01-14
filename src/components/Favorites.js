@@ -116,9 +116,8 @@ const Favorites = ({ me }) => {
                         setFormState({
                               ...formState,
                               selectedNbrIndicatorsToShow: currStage.selectedNbrIndicatorsToShow,
-                              selectedGlobalProgramArea: existingFormState?.selectedGlobalProgramArea
-                                    ? existingFormState?.selectedGlobalProgramArea
-                                    : currStage.selectedGlobalProgramArea,
+                              selectedGlobalProgramArea: existingFormState?.selectedGlobalProgramArea,
+                              globalProgramArea: currStage.globalProgramArea,
                               nbrIndicatorsToShow: existingFormState?.nbrIndicatorsToShow
                                     ? existingFormState?.nbrIndicatorsToShow
                                     : currStage.indicators?.filter(ind => ind.value && ind.programArea)?.length || 0,
@@ -700,8 +699,8 @@ const Favorites = ({ me }) => {
                   let payloadGlobalProgramArea = {
                         dataElement: formState?.globalProgramArea,
                         indicator: formState?.selectedGlobalProgramArea && {
-                              id: formState?.selectedGlobalProgramArea,
-                              displayName: formState?.selectedGlobalProgramArea
+                              id: formState?.selectedGlobalProgramArea?.name,
+                              displayName: formState?.selectedGlobalProgramArea?.name
                         },
                         programStage,
                         program
@@ -710,6 +709,8 @@ const Favorites = ({ me }) => {
                   if (payloadGlobalProgramArea.dataElement?.id && payloadGlobalProgramArea.indicator?.id)
                         newList.push(payloadGlobalProgramArea);
             }
+
+            console.log('newList: ', newList);
 
             return newList;
       };

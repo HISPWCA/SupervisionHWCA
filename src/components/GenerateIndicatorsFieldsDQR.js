@@ -1361,8 +1361,6 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                             </div>
                                                       )}
 
-                                                      <hr style={{ margin: '20px auto' }} />
-
                                                       <div style={{ marginTop: '5px' }}>
                                                             <div
                                                                   style={{
