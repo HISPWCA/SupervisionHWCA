@@ -11,7 +11,8 @@
     "start": "d2-app-scripts start",
     "test": "d2-app-scripts test",
     "deploy": "d2-app-scripts deploy",
-    "b": "d2-app-scripts build"
+    "b": "d2-app-scripts build",
+    "clean":"sudo rm -r node_modules ./d2 && yarn && yarn prod"
   },
   "devDependencies": {
     "@dhis2/cli-app-scripts": "^10.3.8"

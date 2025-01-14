@@ -36,7 +36,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
       };
 
       const handleSelectedGlobalProgramArea = value => {
-            const globalIndicatorProgramArea = dataStoreIndicators.find(d => d.name === value);
+            const globalIndicatorProgramArea = dataStoreIndicators?.find(d => d.name === value);
             if (globalIndicatorProgramArea && value) {
                   setFormState({
                         ...formState,

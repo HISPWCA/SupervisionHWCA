@@ -116,7 +116,9 @@ const Favorites = ({ me }) => {
                         setFormState({
                               ...formState,
                               selectedNbrIndicatorsToShow: currStage.selectedNbrIndicatorsToShow,
-                              selectedGlobalProgramArea: currStage.selectedGlobalProgramArea,
+                              selectedGlobalProgramArea: existingFormState?.selectedGlobalProgramArea
+                                    ? existingFormState?.selectedGlobalProgramArea
+                                    : currStage.selectedGlobalProgramArea,
                               nbrIndicatorsToShow: existingFormState?.nbrIndicatorsToShow
                                     ? existingFormState?.nbrIndicatorsToShow
                                     : currStage.indicators?.filter(ind => ind.value && ind.programArea)?.length || 0,
@@ -690,8 +692,10 @@ const Favorites = ({ me }) => {
 
                   if (payloadIndicatorToShow.dataElement?.id && payloadIndicatorToShow.indicator?.id)
                         newList.push(payloadIndicatorToShow);
-            }    
-            
+            }
+
+            console.log(formState?.globalProgramArea);
+
             if (formState?.globalProgramArea && formState?.selectedGlobalProgramArea) {
                   let payloadGlobalProgramArea = {
                         dataElement: formState?.globalProgramArea,
@@ -1013,6 +1017,7 @@ const Favorites = ({ me }) => {
                   setDataStoreDSCompletness(response);
             } catch (err) {}
       };
+
       const loadDataStoreRegistres = async () => {
             try {
                   const response = await loadDataStore(process.env.REACT_APP_REGISTRES_KEY, null, null, []);
@@ -1479,6 +1484,7 @@ const Favorites = ({ me }) => {
 
       return (
             <>
+                  {console.log('formState: ', formState)}
                   {RenderContent()}
                   {RenderAddFavoritBackgroundInformationModal()}
                   {RenderAnalyticComponentModal()}
