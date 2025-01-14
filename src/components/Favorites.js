@@ -693,7 +693,6 @@ const Favorites = ({ me }) => {
                         newList.push(payloadIndicatorToShow);
             }
 
-            console.log(formState?.globalProgramArea);
 
             if (formState?.globalProgramArea && formState?.selectedGlobalProgramArea) {
                   let payloadGlobalProgramArea = {
@@ -710,7 +709,6 @@ const Favorites = ({ me }) => {
                         newList.push(payloadGlobalProgramArea);
             }
 
-            console.log('newList: ', newList);
 
             return newList;
       };
@@ -1485,7 +1483,6 @@ const Favorites = ({ me }) => {
 
       return (
             <>
-                  {console.log('formState: ', formState)}
                   {RenderContent()}
                   {RenderAddFavoritBackgroundInformationModal()}
                   {RenderAnalyticComponentModal()}
