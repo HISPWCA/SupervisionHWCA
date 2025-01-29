@@ -137,16 +137,18 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                 >
                                                       {translate('Indicateurs')}
                                                 </th>
-                                               {0 > 1 && <th
-                                                      style={{
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top',
-                                                            textAlign: 'center',
-                                                            border: '1px solid #00000070'
-                                                      }}
-                                                >
-                                                      {translate('Program_Area')}
-                                                </th>}
+                                                {0 > 1 && (
+                                                      <th
+                                                            style={{
+                                                                  padding: '2px 5px',
+                                                                  verticalAlign: 'top',
+                                                                  textAlign: 'center',
+                                                                  border: '1px solid #00000070'
+                                                            }}
+                                                      >
+                                                            {translate('Program_Area')}
+                                                      </th>
+                                                )}
                                                 <th
                                                       style={{
                                                             padding: '2px 5px',
@@ -184,70 +186,77 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                             >
                                                                   {indicator?.value?.displayName}
                                                             </td>
-                                                          {0 > 1 &&   <td
-                                                                  style={{
-                                                                        padding: '2px 5px',
-                                                                        verticalAlign: 'top',
-                                                                        textAlign: 'center',
-                                                                        border: '1px solid #00000070'
-                                                                  }}
-                                                            >
-                                                                  <div>
-                                                                        <Select
-                                                                              placeholder={`${translate(
-                                                                                    'Program_Area'
-                                                                              )} `}
-                                                                              style={{
-                                                                                    width: '100%'
-                                                                              }}
-                                                                              options={dataStoreIndicators?.map(
-                                                                                    ind => ({
-                                                                                          label: ind.name,
-                                                                                          value: ind.name
-                                                                                    })
-                                                                              )}
-                                                                              disabled={
-                                                                                    formState?.selectedGlobalProgramArea &&
-                                                                                    indicator?.selectedSourceProgramArea
-                                                                                          ?.name
-                                                                              }
-                                                                              showSearch
-                                                                              allowClear
-                                                                              optionFilterProp="label"
-                                                                              value={
-                                                                                    indicator?.selectedSourceProgramArea
-                                                                                          ?.name
-                                                                              }
-                                                                              onChange={value => {
-                                                                                    setFormState({
-                                                                                          ...formState,
-                                                                                          indicators:
-                                                                                                formState?.indicators?.map(
-                                                                                                      (i, iIndex) => {
-                                                                                                            if (
-                                                                                                                  iIndex ===
-                                                                                                                  indIndex
-                                                                                                            ) {
-                                                                                                                  return {
-                                                                                                                        ...i,
-                                                                                                                        selectedSourceIndicator:
-                                                                                                                              null,
-                                                                                                                        selectedSourceProgramArea:
-                                                                                                                              dataStoreIndicators.find(
-                                                                                                                                    d =>
-                                                                                                                                          d.name ===
-                                                                                                                                          value
-                                                                                                                              )
-                                                                                                                  };
+                                                            {0 > 1 && (
+                                                                  <td
+                                                                        style={{
+                                                                              padding: '2px 5px',
+                                                                              verticalAlign: 'top',
+                                                                              textAlign: 'center',
+                                                                              border: '1px solid #00000070'
+                                                                        }}
+                                                                  >
+                                                                        <div>
+                                                                              <Select
+                                                                                    placeholder={`${translate(
+                                                                                          'Program_Area'
+                                                                                    )} `}
+                                                                                    style={{
+                                                                                          width: '100%'
+                                                                                    }}
+                                                                                    options={dataStoreIndicators?.map(
+                                                                                          ind => ({
+                                                                                                label: ind.name,
+                                                                                                value: ind.name
+                                                                                          })
+                                                                                    )}
+                                                                                    disabled={
+                                                                                          formState?.selectedGlobalProgramArea &&
+                                                                                          indicator
+                                                                                                ?.selectedSourceProgramArea
+                                                                                                ?.name
+                                                                                    }
+                                                                                    showSearch
+                                                                                    allowClear
+                                                                                    optionFilterProp="label"
+                                                                                    value={
+                                                                                          indicator
+                                                                                                ?.selectedSourceProgramArea
+                                                                                                ?.name
+                                                                                    }
+                                                                                    onChange={value => {
+                                                                                          setFormState({
+                                                                                                ...formState,
+                                                                                                indicators:
+                                                                                                      formState?.indicators?.map(
+                                                                                                            (
+                                                                                                                  i,
+                                                                                                                  iIndex
+                                                                                                            ) => {
+                                                                                                                  if (
+                                                                                                                        iIndex ===
+                                                                                                                        indIndex
+                                                                                                                  ) {
+                                                                                                                        return {
+                                                                                                                              ...i,
+                                                                                                                              selectedSourceIndicator:
+                                                                                                                                    null,
+                                                                                                                              selectedSourceProgramArea:
+                                                                                                                                    dataStoreIndicators.find(
+                                                                                                                                          d =>
+                                                                                                                                                d.name ===
+                                                                                                                                                value
+                                                                                                                                    )
+                                                                                                                        };
+                                                                                                                  }
+                                                                                                                  return i;
                                                                                                             }
-                                                                                                            return i;
-                                                                                                      }
-                                                                                                )
-                                                                                    });
-                                                                              }}
-                                                                        />
-                                                                  </div>
-                                                            </td>}
+                                                                                                      )
+                                                                                          });
+                                                                                    }}
+                                                                              />
+                                                                        </div>
+                                                                  </td>
+                                                            )}
                                                             <td
                                                                   style={{
                                                                         padding: '2px 5px',
@@ -389,17 +398,18 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                       {translate('Recoupements')}
                                                 </th>
 
-                                                {0 > 1 && <th
-                                                      style={{
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top',
-                                                            textAlign: 'center',
-                                                            border: '1px solid #00000070'
-                                                      }}
-                                                >
-                                                      {translate('Program_Area')}
-                                                </th>
-}
+                                                {0 > 1 && (
+                                                      <th
+                                                            style={{
+                                                                  padding: '2px 5px',
+                                                                  verticalAlign: 'top',
+                                                                  textAlign: 'center',
+                                                                  border: '1px solid #00000070'
+                                                            }}
+                                                      >
+                                                            {translate('Program_Area')}
+                                                      </th>
+                                                )}
                                                 <th
                                                       style={{
                                                             padding: '2px 5px',
@@ -448,64 +458,72 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                             {`${translate('Recoupements')} ${getLetter(recIndex + 1)}`}
                                                       </td>
 
-                                                     {0 > 1 && <td
-                                                            style={{
-                                                                  padding: '2px 5px',
-                                                                  verticalAlign: 'top',
-                                                                  textAlign: 'center',
-                                                                  border: '1px solid #00000070'
-                                                            }}
-                                                      >
-                                                            <div>
-                                                                  <Select
-                                                                        placeholder={`${translate('Program_Area')} `}
-                                                                        style={{
-                                                                              width: '100%'
-                                                                        }}
-                                                                        options={dataStoreCrosschecks?.map(ind => ({
-                                                                              label: ind.name,
-                                                                              value: ind.name
-                                                                        }))}
-                                                                        disabled={
-                                                                              formState?.selectedGlobalProgramArea &&
-                                                                              rec?.selectedSourceProgramArea?.name
-                                                                        }
-                                                                        showSearch
-                                                                        allowClear
-                                                                        optionFilterProp="label"
-                                                                        value={rec?.selectedSourceProgramArea?.name}
-                                                                        onChange={value => {
-                                                                              setFormState({
-                                                                                    ...formState,
-                                                                                    recoupements:
-                                                                                          formState?.recoupements?.map(
-                                                                                                (i, iIndex) => {
-                                                                                                      if (
-                                                                                                            iIndex ===
-                                                                                                            recIndex
-                                                                                                      ) {
-                                                                                                            return {
-                                                                                                                  ...i,
-                                                                                                                  selectedSourcePrimary:
-                                                                                                                        null,
-                                                                                                                  selectedSourceSecondary:
-                                                                                                                        null,
-                                                                                                                  selectedSourceProgramArea:
-                                                                                                                        dataStoreCrosschecks.find(
-                                                                                                                              d =>
-                                                                                                                                    d.name ===
-                                                                                                                                    value
-                                                                                                                        )
-                                                                                                            };
+                                                      {0 > 1 && (
+                                                            <td
+                                                                  style={{
+                                                                        padding: '2px 5px',
+                                                                        verticalAlign: 'top',
+                                                                        textAlign: 'center',
+                                                                        border: '1px solid #00000070'
+                                                                  }}
+                                                            >
+                                                                  <div>
+                                                                        <Select
+                                                                              placeholder={`${translate(
+                                                                                    'Program_Area'
+                                                                              )} `}
+                                                                              style={{
+                                                                                    width: '100%'
+                                                                              }}
+                                                                              options={dataStoreCrosschecks?.map(
+                                                                                    ind => ({
+                                                                                          label: ind.name,
+                                                                                          value: ind.name
+                                                                                    })
+                                                                              )}
+                                                                              disabled={
+                                                                                    formState?.selectedGlobalProgramArea &&
+                                                                                    rec?.selectedSourceProgramArea?.name
+                                                                              }
+                                                                              showSearch
+                                                                              allowClear
+                                                                              optionFilterProp="label"
+                                                                              value={
+                                                                                    rec?.selectedSourceProgramArea?.name
+                                                                              }
+                                                                              onChange={value => {
+                                                                                    setFormState({
+                                                                                          ...formState,
+                                                                                          recoupements:
+                                                                                                formState?.recoupements?.map(
+                                                                                                      (i, iIndex) => {
+                                                                                                            if (
+                                                                                                                  iIndex ===
+                                                                                                                  recIndex
+                                                                                                            ) {
+                                                                                                                  return {
+                                                                                                                        ...i,
+                                                                                                                        selectedSourcePrimary:
+                                                                                                                              null,
+                                                                                                                        selectedSourceSecondary:
+                                                                                                                              null,
+                                                                                                                        selectedSourceProgramArea:
+                                                                                                                              dataStoreCrosschecks.find(
+                                                                                                                                    d =>
+                                                                                                                                          d.name ===
+                                                                                                                                          value
+                                                                                                                              )
+                                                                                                                  };
+                                                                                                            }
+                                                                                                            return i;
                                                                                                       }
-                                                                                                      return i;
-                                                                                                }
-                                                                                          )
-                                                                              });
-                                                                        }}
-                                                                  />
-                                                            </div>
-                                                      </td>}
+                                                                                                )
+                                                                                    });
+                                                                              }}
+                                                                        />
+                                                                  </div>
+                                                            </td>
+                                                      )}
 
                                                       <td
                                                             style={{
@@ -702,16 +720,18 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                 >
                                                       {translate('ConsistencyOverTime')}
                                                 </th>
-                                              {0  > 1 &&  <th
-                                                      style={{
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top',
-                                                            textAlign: 'center',
-                                                            border: '1px solid #00000070'
-                                                      }}
-                                                >
-                                                      {translate('Program_Area')}
-                                                </th>}
+                                                {0 > 1 && (
+                                                      <th
+                                                            style={{
+                                                                  padding: '2px 5px',
+                                                                  verticalAlign: 'top',
+                                                                  textAlign: 'center',
+                                                                  border: '1px solid #00000070'
+                                                            }}
+                                                      >
+                                                            {translate('Program_Area')}
+                                                      </th>
+                                                )}
                                                 <th
                                                       style={{
                                                             padding: '2px 5px',
@@ -747,60 +767,70 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                       >
                                                             {`${translate('ConsistencyOverTime')} ${consIndex + 1}`}
                                                       </td>
-                                                     {0 >  1 && <td
-                                                            style={{
-                                                                  padding: '2px 5px',
-                                                                  verticalAlign: 'top',
-                                                                  textAlign: 'center',
-                                                                  border: '1px solid #00000070'
-                                                            }}
-                                                      >
-                                                            <div>
-                                                                  <Select
-                                                                        placeholder={`${translate('Program_Area')} `}
-                                                                        style={{
-                                                                              width: '100%'
-                                                                        }}
-                                                                        options={dataStoreIndicators?.map(ind => ({
-                                                                              label: ind.name,
-                                                                              value: ind.name
-                                                                        }))}
-                                                                        disabled={
-                                                                              formState?.selectedGlobalProgramArea &&
-                                                                              cons?.selectedSourceProgramArea?.name
-                                                                        }
-                                                                        showSearch
-                                                                        allowClear
-                                                                        optionFilterProp="label"
-                                                                        value={cons?.selectedSourceProgramArea?.name}
-                                                                        onChange={value => {
-                                                                              setFormState({
-                                                                                    ...formState,
-                                                                                    consistencyOvertimes:
-                                                                                          formState?.consistencyOvertimes?.map(
-                                                                                                (i, iIndex) => {
-                                                                                                      if (
-                                                                                                            iIndex ===
-                                                                                                            consIndex
-                                                                                                      ) {
-                                                                                                            return {
-                                                                                                                  ...i,
-                                                                                                                  selectedSourceProgramArea:
-                                                                                                                        dataStoreIndicators.find(
-                                                                                                                              d =>
-                                                                                                                                    d.name ===
-                                                                                                                                    value
-                                                                                                                        )
-                                                                                                            };
+                                                      {0 > 1 && (
+                                                            <td
+                                                                  style={{
+                                                                        padding: '2px 5px',
+                                                                        verticalAlign: 'top',
+                                                                        textAlign: 'center',
+                                                                        border: '1px solid #00000070'
+                                                                  }}
+                                                            >
+                                                                  <div>
+                                                                        <Select
+                                                                              placeholder={`${translate(
+                                                                                    'Program_Area'
+                                                                              )} `}
+                                                                              style={{
+                                                                                    width: '100%'
+                                                                              }}
+                                                                              options={dataStoreIndicators?.map(
+                                                                                    ind => ({
+                                                                                          label: ind.name,
+                                                                                          value: ind.name
+                                                                                    })
+                                                                              )}
+                                                                              disabled={
+                                                                                    formState?.selectedGlobalProgramArea &&
+                                                                                    cons?.selectedSourceProgramArea
+                                                                                          ?.name
+                                                                              }
+                                                                              showSearch
+                                                                              allowClear
+                                                                              optionFilterProp="label"
+                                                                              value={
+                                                                                    cons?.selectedSourceProgramArea
+                                                                                          ?.name
+                                                                              }
+                                                                              onChange={value => {
+                                                                                    setFormState({
+                                                                                          ...formState,
+                                                                                          consistencyOvertimes:
+                                                                                                formState?.consistencyOvertimes?.map(
+                                                                                                      (i, iIndex) => {
+                                                                                                            if (
+                                                                                                                  iIndex ===
+                                                                                                                  consIndex
+                                                                                                            ) {
+                                                                                                                  return {
+                                                                                                                        ...i,
+                                                                                                                        selectedSourceProgramArea:
+                                                                                                                              dataStoreIndicators.find(
+                                                                                                                                    d =>
+                                                                                                                                          d.name ===
+                                                                                                                                          value
+                                                                                                                              )
+                                                                                                                  };
+                                                                                                            }
+                                                                                                            return i;
                                                                                                       }
-                                                                                                      return i;
-                                                                                                }
-                                                                                          )
-                                                                              });
-                                                                        }}
-                                                                  />
-                                                            </div>
-                                                      </td>}
+                                                                                                )
+                                                                                    });
+                                                                              }}
+                                                                        />
+                                                                  </div>
+                                                            </td>
+                                                      )}
                                                       <td
                                                             style={{
                                                                   padding: '2px 5px',
@@ -1007,62 +1037,68 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                     </thead>
                                     <tbody>
                                           <tr>
-                                              {0 > 1 &&  <td
-                                                      style={{
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'center',
-                                                            textAlign: 'center',
-                                                            border: '1px solid #00000070'
-                                                      }}
-                                                >
-                                                      {`${translate('Program_Area')}`}
-                                                </td>}
-                                                {0 > 1 && <td
-                                                      style={{
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'center',
-                                                            textAlign: 'center',
-                                                            border: '1px solid blue'
-                                                      }}
-                                                >
-                                                      <div>
-                                                            <Select
-                                                                  placeholder={`${translate('Program_Area')}`}
-                                                                  style={{
-                                                                        width: '100%'
-                                                                  }}
-                                                                  options={dataStoreDECompletness?.map(ind => ({
-                                                                        label: ind.name,
-                                                                        value: ind.name
-                                                                  }))}
-                                                                  disabled={
-                                                                        formState?.selectedGlobalProgramArea &&
-                                                                        formState?.completeness
-                                                                              ?.selectedSourceProgramAreaDE?.name
-                                                                  }
-                                                                  showSearch
-                                                                  allowClear
-                                                                  optionFilterProp="label"
-                                                                  value={
-                                                                        formState?.completeness
-                                                                              ?.selectedSourceProgramAreaDE?.name
-                                                                  }
-                                                                  onChange={value => {
-                                                                        setFormState({
-                                                                              ...formState,
-                                                                              completeness: {
-                                                                                    ...formState?.completeness,
-                                                                                    register: null,
-                                                                                    selectedSourceProgramAreaDE:
-                                                                                          dataStoreDECompletness?.find(
-                                                                                                d => d.name === value
-                                                                                          )
-                                                                              }
-                                                                        });
-                                                                  }}
-                                                            />
-                                                      </div>
-                                                </td>}
+                                                {0 > 1 && (
+                                                      <td
+                                                            style={{
+                                                                  padding: '2px 5px',
+                                                                  verticalAlign: 'center',
+                                                                  textAlign: 'center',
+                                                                  border: '1px solid #00000070'
+                                                            }}
+                                                      >
+                                                            {`${translate('Program_Area')}`}
+                                                      </td>
+                                                )}
+                                                {0 > 1 && (
+                                                      <td
+                                                            style={{
+                                                                  padding: '2px 5px',
+                                                                  verticalAlign: 'center',
+                                                                  textAlign: 'center',
+                                                                  border: '1px solid blue'
+                                                            }}
+                                                      >
+                                                            <div>
+                                                                  <Select
+                                                                        placeholder={`${translate('Program_Area')}`}
+                                                                        style={{
+                                                                              width: '100%'
+                                                                        }}
+                                                                        options={dataStoreDECompletness?.map(ind => ({
+                                                                              label: ind.name,
+                                                                              value: ind.name
+                                                                        }))}
+                                                                        disabled={
+                                                                              formState?.selectedGlobalProgramArea &&
+                                                                              formState?.completeness
+                                                                                    ?.selectedSourceProgramAreaDE?.name
+                                                                        }
+                                                                        showSearch
+                                                                        allowClear
+                                                                        optionFilterProp="label"
+                                                                        value={
+                                                                              formState?.completeness
+                                                                                    ?.selectedSourceProgramAreaDE?.name
+                                                                        }
+                                                                        onChange={value => {
+                                                                              setFormState({
+                                                                                    ...formState,
+                                                                                    completeness: {
+                                                                                          ...formState?.completeness,
+                                                                                          register: null,
+                                                                                          selectedSourceProgramAreaDE:
+                                                                                                dataStoreDECompletness?.find(
+                                                                                                      d =>
+                                                                                                            d.name ===
+                                                                                                            value
+                                                                                                )
+                                                                                    }
+                                                                              });
+                                                                        }}
+                                                                  />
+                                                            </div>
+                                                      </td>
+                                                )}
 
                                                 <td
                                                       style={{
@@ -1094,53 +1130,57 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                       </div>
                                                 </td>
 
-                                               {0 > 1 && <td
-                                                      style={{
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'center',
-                                                            textAlign: 'center',
-                                                            border: '1px solid blue'
-                                                      }}
-                                                      rowSpan={2}
-                                                >
-                                                      <div>
-                                                            <Select
-                                                                  placeholder={`${translate('Program_Area')}`}
-                                                                  style={{
-                                                                        width: '100%'
-                                                                  }}
-                                                                  options={dataStoreDSCompletness?.map(ind => ({
-                                                                        label: ind.name,
-                                                                        value: ind.name
-                                                                  }))}
-                                                                  showSearch
-                                                                  allowClear
-                                                                  optionFilterProp="label"
-                                                                  disabled={
-                                                                        formState?.selectedGlobalProgramArea &&
-                                                                        formState?.completeness
-                                                                              ?.selectedSourceProgramAreaDS?.name
-                                                                  }
-                                                                  value={
-                                                                        formState?.completeness
-                                                                              ?.selectedSourceProgramAreaDS?.name
-                                                                  }
-                                                                  onChange={value => {
-                                                                        setFormState({
-                                                                              ...formState,
-                                                                              completeness: {
-                                                                                    ...formState?.completeness,
+                                                {0 > 1 && (
+                                                      <td
+                                                            style={{
+                                                                  padding: '2px 5px',
+                                                                  verticalAlign: 'center',
+                                                                  textAlign: 'center',
+                                                                  border: '1px solid blue'
+                                                            }}
+                                                            rowSpan={2}
+                                                      >
+                                                            <div>
+                                                                  <Select
+                                                                        placeholder={`${translate('Program_Area')}`}
+                                                                        style={{
+                                                                              width: '100%'
+                                                                        }}
+                                                                        options={dataStoreDSCompletness?.map(ind => ({
+                                                                              label: ind.name,
+                                                                              value: ind.name
+                                                                        }))}
+                                                                        showSearch
+                                                                        allowClear
+                                                                        optionFilterProp="label"
+                                                                        disabled={
+                                                                              formState?.selectedGlobalProgramArea &&
+                                                                              formState?.completeness
+                                                                                    ?.selectedSourceProgramAreaDS?.name
+                                                                        }
+                                                                        value={
+                                                                              formState?.completeness
+                                                                                    ?.selectedSourceProgramAreaDS?.name
+                                                                        }
+                                                                        onChange={value => {
+                                                                              setFormState({
+                                                                                    ...formState,
+                                                                                    completeness: {
+                                                                                          ...formState?.completeness,
 
-                                                                                    selectedSourceProgramAreaDS:
-                                                                                          dataStoreDSCompletness?.find(
-                                                                                                d => d.name === value
-                                                                                          )
-                                                                              }
-                                                                        });
-                                                                  }}
-                                                            />
-                                                      </div>
-                                                </td>}
+                                                                                          selectedSourceProgramAreaDS:
+                                                                                                dataStoreDSCompletness?.find(
+                                                                                                      d =>
+                                                                                                            d.name ===
+                                                                                                            value
+                                                                                                )
+                                                                                    }
+                                                                              });
+                                                                        }}
+                                                                  />
+                                                            </div>
+                                                      </td>
+                                                )}
                                           </tr>
 
                                           <tr>

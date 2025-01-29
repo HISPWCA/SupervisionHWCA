@@ -1410,37 +1410,6 @@ export const Dashboard = ({ me }) => {
                                     )}
                               </div>
                         </Col>
-                        {0 > 1 && selectedProgram?.planificationType === AGENT && (
-                              <Col md={12} sm={24}>
-                                    <div
-                                          className="my-shadow"
-                                          style={{
-                                                backgroundColor: '#fff',
-                                                borderRadius: '8px',
-                                                padding: '10px',
-                                                marginBottom: '2px',
-                                                height: '100%',
-                                                width: '100%',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center'
-                                          }}
-                                    >
-                                          {teiList.length === 0 && (
-                                                <div style={{ fontWeight: 'bold', color: `${BLACK}90` }}>
-                                                      {' '}
-                                                      {translate('Aucune_donnees_Disponibles')} !
-                                                </div>
-                                          )}
-                                          {teiList.length > 0 && (
-                                                <ReactEchart
-                                                      style={{ height: '302px', width: '100%' }}
-                                                      option={getPieChartDatasForPayment()}
-                                                />
-                                          )}
-                                    </div>
-                              </Col>
-                        )}
                   </Row>
             </Col>
       );
@@ -1549,39 +1518,6 @@ export const Dashboard = ({ me }) => {
                                           ]}
                                     />
                               </Col>
-                              {0 > 1 && selectedPlanification === PLANIFICATION_PAR_UN_USER && users.length > 0 && (
-                                    <Col sm={24} md={4}>
-                                          <div style={{ marginBottom: '2px' }}>{translate('Utilisateurs')}</div>
-                                          <Select
-                                                placeholder={translate('Utilisateurs')}
-                                                style={{ width: '100%' }}
-                                                onChange={handleSelectPlanificationUser}
-                                                value={selectedPlanificationUser?.id}
-                                                options={users.map(user => ({
-                                                      label: user.displayName,
-                                                      value: user.id
-                                                }))}
-                                          />
-                                    </Col>
-                              )}
-
-                              {0 > 1 && (
-                                    <Col sm={24} md={3}>
-                                          <div style={{ marginBottom: '2px' }}>{translate('Superviseurs')}</div>
-                                          <Select
-                                                placeholder={translate('Superviseurs')}
-                                                style={{ width: '100%' }}
-                                                loading={loadingUsers}
-                                                mode="multiple"
-                                                onChange={handleSelectSupervisor}
-                                                value={selectedSupervisors.map(sup => sup.id)}
-                                                options={users.map(user => ({
-                                                      label: user.displayName,
-                                                      value: user.id
-                                                }))}
-                                          />
-                                    </Col>
-                              )}
 
                               <Col sm={24} md={1}>
                                     <div style={{ marginTop: '20px' }}>

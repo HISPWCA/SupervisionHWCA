@@ -1,11 +1,11 @@
 const config = {
       type: 'app',
-      name: 'Supervision-dev',
-      title: 'Supervision-dev',
+      name: 'Supervision',
+      title: 'Supervision',
       description: 'Supervision App',
       entryPoints: {
             app: './src/App.js'
       }
 };
 
-module.exports = config
+module.exports = config;
