@@ -138,7 +138,7 @@ export const Body = () => {
                   const existedGroup = await axios.get(
                         `${USER_GROUPS_ROUTE}.json?fields=id&filter=name:eq:${process.env.REACT_APP_USER_GROUP}`
                   );
-                  if (existedGroup.data.userGroups.length === 0) {
+                  if (existedGroup.data?.userGroups?.length === 0) {
                         await axios.post(`${USER_GROUPS_ROUTE}.json`, { name: process.env.REACT_APP_USER_GROUP });
                         const createdUserGroup = await axios.get(
                               `${USER_GROUPS_ROUTE}.json?fields=id&filter=name:eq:${process.env.REACT_APP_USER_GROUP}`
@@ -155,12 +155,13 @@ export const Body = () => {
                   setErrorMessage(err?.response?.data?.message || err.message);
             }
       };
+
       const initAppCreateFavoritUserGroup = async () => {
             try {
                   const existedGroup = await axios.get(
                         `${USER_GROUPS_ROUTE}.json?fields=id&filter=name:eq:${process.env.REACT_APP_FAVORIT_USER_GROUP}`
                   );
-                  if (existedGroup.data.userGroups.length === 0) {
+                  if (existedGroup.data?.userGroups?.length === 0) {
                         await axios.post(`${USER_GROUPS_ROUTE}.json`, {
                               name: process.env.REACT_APP_FAVORIT_USER_GROUP
                         });
