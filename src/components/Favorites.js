@@ -693,7 +693,6 @@ const Favorites = ({ me }) => {
                         newList.push(payloadIndicatorToShow);
             }
 
-
             if (formState?.globalProgramArea && formState?.selectedGlobalProgramArea) {
                   let payloadGlobalProgramArea = {
                         dataElement: formState?.globalProgramArea,
@@ -708,7 +707,6 @@ const Favorites = ({ me }) => {
                   if (payloadGlobalProgramArea.dataElement?.id && payloadGlobalProgramArea.indicator?.id)
                         newList.push(payloadGlobalProgramArea);
             }
-
 
             return newList;
       };
@@ -961,18 +959,6 @@ const Favorites = ({ me }) => {
                   setLoadingDeleteFavoritBackgroundInformations(false);
             }
       };
-
-      const RenderTitle = () => (
-            <div
-                  style={{
-                        padding: '20px',
-                        borderBottom: '1px solid #ccc',
-                        background: '#FFF'
-                  }}
-            >
-                  <span style={{ fontWeight: 'bold', fontSize: '18px' }}>{translate('Create_Favorites')}</span>
-            </div>
-      );
 
       const loadDataStoreCrosschecks = async () => {
             try {
@@ -1256,6 +1242,18 @@ const Favorites = ({ me }) => {
                   : dataStoreIndicators;
       };
 
+      const RenderTitle = () => (
+            <div
+                  style={{
+                        padding: '20px',
+                        borderBottom: '1px solid #ccc',
+                        background: '#FFF'
+                  }}
+            >
+                  <span style={{ fontWeight: 'bold', fontSize: '18px' }}>{translate('Create_Favorites')}</span>
+            </div>
+      );
+
       const RenderContent = () => (
             <div>
                   <RenderTitle />
@@ -1273,9 +1271,10 @@ const Favorites = ({ me }) => {
                                                 <FavoriteGenerateIndicatorsFieldsDQR
                                                       formState={formState}
                                                       setFormState={setFormState}
-                                                      dataStoreIndicators={
-                                                            filteredIndicatorsFromIndicatorsMapping() || []
-                                                      }
+                                                      // dataStoreIndicators={
+                                                      //       filteredIndicatorsFromIndicatorsMapping() || []
+                                                      // }
+                                                      dataStoreIndicators={dataStoreIndicators}
                                                       dataStoreCrosschecks={dataStoreCrosschecks}
                                                       dataStoreDECompletness={dataStoreDECompletness}
                                                       dataStoreDSCompletness={dataStoreDSCompletness}

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { DATA_STORE_ROUTE } from './api.routes';
+import { v4 as uuid } from 'uuid';
 
 export const loadDataStore = async (key_string, setLoading, setState, payload = null) => {
       try {
@@ -134,4 +135,17 @@ export const idsFromIndicatorFormula = (numeratorFormula, denominatorFormula, da
             console.log('Error: ', err);
             return [];
       }
+};
+
+export const modifierKeyInList = (groupList = []) => {
+      return (
+            groupList.map(group => ({
+                  ...group,
+                  children: group.children.map(child => ({
+                        ...child,
+                        name_fr: child.name_fr || '',
+                        id: child.id || uuid()
+                  }))
+            })) || []
+      );
 };

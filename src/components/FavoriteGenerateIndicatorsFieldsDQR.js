@@ -1,5 +1,5 @@
 import { Card, Input, Select } from 'antd';
-import translate from '../utils/translator';
+import translate, { translateDataStoreLabel } from '../utils/translator';
 import { getLetter } from '../utils/functions';
 
 const FavoriteGenerateIndicatorsFieldsDQR = ({
@@ -36,7 +36,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
       };
 
       const handleSelectedGlobalProgramArea = value => {
-            const globalIndicatorProgramArea = dataStoreIndicators?.find(d => d.name === value);
+            const globalIndicatorProgramArea = dataStoreIndicators?.find(d => d.id === value);
             if (globalIndicatorProgramArea && value) {
                   setFormState({
                         ...formState,
@@ -52,7 +52,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                               ...i,
                               selectedSourcePrimary: null,
                               selectedSourceSecondary: null,
-                              selectedSourceProgramArea: dataStoreCrosschecks.find(d => d.name === value)
+                              selectedSourceProgramArea: dataStoreCrosschecks.find(d => d.id === value)
                         })),
 
                         consistencyOvertimes: formState?.consistencyOvertimes?.map(i => ({
@@ -62,8 +62,8 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
 
                         completeness: {
                               ...formState?.completeness,
-                              selectedSourceProgramAreaDE: dataStoreDECompletness?.find(d => d.name === value),
-                              selectedSourceProgramAreaDS: dataStoreDSCompletness?.find(d => d.name === value)
+                              selectedSourceProgramAreaDE: dataStoreDECompletness?.find(d => d.id === value),
+                              selectedSourceProgramAreaDS: dataStoreDSCompletness?.find(d => d.id === value)
                         }
                   });
             } else {
@@ -99,13 +99,13 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                             minWidth: '200px'
                                                       }}
                                                       options={dataStoreIndicators?.map(ind => ({
-                                                            label: ind.name,
-                                                            value: ind.name
+                                                            label: translateDataStoreLabel(ind),
+                                                            value: ind.id
                                                       }))}
                                                       showSearch
                                                       allowClear
                                                       optionFilterProp="label"
-                                                      value={formState?.selectedGlobalProgramArea?.name}
+                                                      value={formState?.selectedGlobalProgramArea?.id}
                                                       onChange={handleSelectedGlobalProgramArea}
                                                 />
                                           </span>
@@ -205,15 +205,17 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                     }}
                                                                                     options={dataStoreIndicators?.map(
                                                                                           ind => ({
-                                                                                                label: ind.name,
-                                                                                                value: ind.name
+                                                                                                label: translateDataStoreLabel(
+                                                                                                      ind
+                                                                                                ),
+                                                                                                value: ind.id
                                                                                           })
                                                                                     )}
                                                                                     disabled={
                                                                                           formState?.selectedGlobalProgramArea &&
                                                                                           indicator
                                                                                                 ?.selectedSourceProgramArea
-                                                                                                ?.name
+                                                                                                ?.id
                                                                                     }
                                                                                     showSearch
                                                                                     allowClear
@@ -221,7 +223,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                     value={
                                                                                           indicator
                                                                                                 ?.selectedSourceProgramArea
-                                                                                                ?.name
+                                                                                                ?.id
                                                                                     }
                                                                                     onChange={value => {
                                                                                           setFormState({
@@ -243,7 +245,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                                                               selectedSourceProgramArea:
                                                                                                                                     dataStoreIndicators.find(
                                                                                                                                           d =>
-                                                                                                                                                d.name ===
+                                                                                                                                                d.id ===
                                                                                                                                                 value
                                                                                                                                     )
                                                                                                                         };
@@ -277,14 +279,16 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                     dataStoreIndicators
                                                                                           ?.find(
                                                                                                 d =>
-                                                                                                      d.name ===
+                                                                                                      d.id ===
                                                                                                       indicator
                                                                                                             ?.selectedSourceProgramArea
-                                                                                                            ?.name
+                                                                                                            ?.id
                                                                                           )
                                                                                           ?.children?.map(ind => ({
-                                                                                                label: ind.name,
-                                                                                                value: ind.name
+                                                                                                label: translateDataStoreLabel(
+                                                                                                      ind
+                                                                                                ),
+                                                                                                value: ind.id
                                                                                           })) || []
                                                                               }
                                                                               disabled={
@@ -295,7 +299,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                               optionFilterProp="label"
                                                                               value={
                                                                                     indicator?.selectedSourceIndicator
-                                                                                          ?.name
+                                                                                          ?.id
                                                                               }
                                                                               onChange={value => {
                                                                                     setFormState({

@@ -11,7 +11,7 @@ import {
       PAGE_SCHEDULE
 } from '../utils/constants';
 import { BORDER_COLOR } from '../utils/couleurs';
-import { loadDataStore, saveDataToDataStore } from '../utils/functions';
+import { loadDataStore, modifierKeyInList, saveDataToDataStore } from '../utils/functions';
 import DashboardSchedule from './DashboardSchedule';
 import Dashboard from './Dashboard';
 import Setting from './Setting';
@@ -30,6 +30,7 @@ import DE_Completness from '../datastores/DE_Completness.json';
 import DS_Completness from '../datastores/DS_Completness.json';
 import Cross_cuts from '../datastores/Cross_cuts.json';
 import Indicators from '../datastores/Indicators.json';
+import Registres from '../datastores/Registres.json';
 import MetadataInfos from '../datastores/metadataInfos.json';
 
 export const Body = () => {
@@ -83,11 +84,21 @@ export const Body = () => {
                   await loadDataStore(process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY, null, null, []);
                   await loadDataStore(process.env.REACT_APP_MISSIONS_KEY, null, null, []);
                   await loadDataStore(process.env.REACT_APP_VISUALIZATION_KEY, null, null, []);
-                  await loadDataStore(process.env.REACT_APP_CROSS_CUT_KEY, null, null, Cross_cuts);
-                  await loadDataStore(process.env.REACT_APP_INDICATORS_KEY, null, null, Indicators);
-                  await loadDataStore(process.env.REACT_APP_REGISTRES_KEY, null, null, Cross_cuts);
-                  await loadDataStore(process.env.REACT_APP_DE_COMPLETNESS_KEY, null, null, DE_Completness);
-                  await loadDataStore(process.env.REACT_APP_DS_COMPLETNESS_KEY, null, null, DS_Completness);
+                  await loadDataStore(process.env.REACT_APP_CROSS_CUT_KEY, null, null, modifierKeyInList(Cross_cuts));
+                  await loadDataStore(process.env.REACT_APP_INDICATORS_KEY, null, null, modifierKeyInList(Indicators));
+                  await loadDataStore(process.env.REACT_APP_REGISTRES_KEY, null, null, modifierKeyInList(Registres));
+                  await loadDataStore(
+                        process.env.REACT_APP_DE_COMPLETNESS_KEY,
+                        null,
+                        null,
+                        modifierKeyInList(DE_Completness)
+                  );
+                  await loadDataStore(
+                        process.env.REACT_APP_DS_COMPLETNESS_KEY,
+                        null,
+                        null,
+                        modifierKeyInList(DS_Completness)
+                  );
                   await loadDataStore(process.env.REACT_APP_INDICATORS_MAPPING_KEY, null, null, []);
                   await loadDataStore(
                         process.env.REACT_APP_META_INFOS_NAME,

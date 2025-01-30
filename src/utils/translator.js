@@ -13,4 +13,18 @@ const translate = entry => {
       }
 };
 
+export const translateDataStoreLabel = elementObject => {
+      if (!elementObject) return '';
+      switch (localStorage.getItem('userLang')) {
+            case 'fr':
+                  return elementObject['name_fr'];
+
+            case 'en':
+                  return elementObject['name'];
+
+            default:
+                  return elementObject['name'];
+      }
+};
+
 export default translate;
