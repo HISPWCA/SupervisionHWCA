@@ -105,7 +105,7 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { BLUE, GRAY_DARK, GREEN, ORANGE, RED, WHITE } from '../utils/couleurs';
 import { getDefaultStatusPaymentIfStatusIsNull, getDefaultStatusSupervisionIfStatusIsNull } from './DashboardSchedule';
-import translate from '../utils/translator';
+import translate, { translateDataStoreLabel } from '../utils/translator';
 import { useConfig } from '@dhis2/app-runtime';
 const quarterOfYear = require('dayjs/plugin/quarterOfYear');
 const weekOfYear = require('dayjs/plugin/weekOfYear');
@@ -118,6 +118,13 @@ const Supervision = ({ me }) => {
       const [dataStoreSupervisionConfigs, setDataStoreSupervisionConfigs] = useState([]);
       const [dataStoreSupervisions, setDataStoreSupervisions] = useState([]);
       const [dataStoreIndicatorConfigs, setDataStoreIndicatorConfigs] = useState([]);
+
+      const [dataStoreIndicators, setDataStoreIndicators] = useState([]);
+      const [dataStoreCrosschecks, setDataStoreCrosschecks] = useState([]);
+      const [dataStoreDECompletness, setDataStoreDECompletness] = useState([]);
+      const [dataStoreDSCompletness, setDataStoreDSCompletness] = useState([]);
+      const [dataStoreRegistres, setDataStoreRegistres] = useState([]);
+
       const [dataStoreIndicatorsMapping, setDataStoreIndicatorsMapping] = useState([]);
       const { apiVersion } = useConfig();
 
@@ -159,10 +166,7 @@ const Supervision = ({ me }) => {
       const [visibleAnalyticComponentModal, setVisibleAnalyticComponentModal] = useState(false);
       const [visibleAnalyticComponentPerformanceModal, setVisibleAnalyticComponentPerformanceModal] = useState(false);
       const [visibleAddEquipeModal, setVisibleAddEquipeModal] = useState(false);
-      const [visibleMissionName, setVisibleMissionName] = useState(false);
       const [visibleAddFavoritPerformanceModal, setVisibleAddFavoritPerformanceModal] = useState(false);
-      const [visibleAddFavoritBackgroundInformationModal, setVisibleAddFavoritBackgroundInformationModal] =
-            useState(false);
 
       const [selectedBackgroundInformationTypeConfiguration, setSelectedBackgroundInformationTypeConfiguration] =
             useState(DIRECTE);
@@ -193,11 +197,9 @@ const Supervision = ({ me }) => {
       const [selectedSelectionTypeForPerformance, setSelectedSelectionTypeForPerformance] = useState(DIRECTE);
       const [selectedElementForPerformances, setSelectedElementForPerformances] = useState([]);
       const [selectedFavoritForPerformance, setSelectedFavoritForPerformance] = useState(null);
-      const [selectedDataElementFromWhere, setSelectedDataElementFromWhere] = useState(ELEMENT_GROUP);
       const [selectedDataElementGroup, setSelectedDataElementGroup] = useState(null);
 
       const [inputFavorisName, setInputFavoritName] = useState('');
-      const [inputFavorisNameForBackgroundInforation, setInputFavoritNameForBackgroundInforation] = useState('');
       const [inputEquipeAutreSuperviseur, setInputEquipeAutreSuperviseur] = useState('');
       const [inputMeilleur, setInputMeilleur] = useState(0);
       const [inputMauvais, setInputMauvais] = useState(0);
@@ -207,17 +209,14 @@ const Supervision = ({ me }) => {
       const [inputDataSourceID, setInputDataSourceID] = useState(null);
       const [inputEquipeName, setInputEquipeName] = useState('');
       const [inputNbrOrgUnit, setInputNbrOrgUnit] = useState(0);
-      const [inputMissionName, setInputMissionName] = useState('');
 
       const [loadingDataStoreSupervisionConfigs, setLoadingDataStoreSupervisionConfigs] = useState(false);
-      const [loadingSaveFavoritBackgroundInformations, setLoadingSaveFavoritBackgroundInformations] = useState(false);
       const [loadingDataStoreSupervisions, setLoadingDataStoreSupervisions] = useState(false);
       const [loadingDataStoreIndicatorConfigs, setLoadingDataStoreIndicatorConfigs] = useState(false);
       const [loadingOrganisationUnits, setLoadingOrganisationUnits] = useState(false);
       const [loadingOrganisationUnitGroupSets, setLoadingOrganisationUnitGroupSets] = useState(false);
       const [loadingUsers, setLoadingUsers] = useState(false);
       const [loadingProgramStages, setLoadingProgramStages] = useState(false);
-      const [loadingSaveDateElementMappingConfig, setLoadingSaveDateElementMappingConfig] = useState(false);
       const [loadingSupervisionPlanification, setLoadingSupervisionPlanification] = useState(false);
       const [loadingAnalyticIndicatorResults, setLoadingAnalyticIndicatorResults] = useState(false);
       const [loadingTeiList, setLoadingTeiList] = useState(false);
@@ -959,7 +958,7 @@ const Supervision = ({ me }) => {
             } catch (err) {}
       };
 
-      const loadDataStoreIndicators = async () => {
+      const loadDataStoreIndicatorsConfigs = async () => {
             try {
                   setLoadingDataStoreIndicatorConfigs(true);
                   const response = await loadDataStore(process.env.REACT_APP_INDICATORS_CONFIG_KEY, null, null, null);
@@ -969,30 +968,40 @@ const Supervision = ({ me }) => {
                   setLoadingDataStoreIndicatorConfigs(false);
             }
       };
-      const handleSelectDataElement = value => {
-            setSelectedDataElement(
-                  selectedProgramStage.programStageDataElements
-                        ?.map(p => p.dataElement)
-                        .find(dataElement => dataElement.id === value)
-            );
+
+      const loadDataStoreIndicators = async () => {
+            try {
+                  const response = await loadDataStore(process.env.REACT_APP_INDICATORS_KEY, null, null, []);
+                  setDataStoreIndicators(response);
+            } catch (err) {}
       };
 
-      const handleAddNewMappingConfig = () => {
-            setIsNewMappingMode(!isNewMappingMode);
-
-            if (!isNewMappingMode) {
-                  setSelectedDataElement(null);
-            }
+      const loadDataStoreDECompletness = async () => {
+            try {
+                  const response = await loadDataStore(process.env.REACT_APP_DE_COMPLETNESS_KEY, null, null, []);
+                  setDataStoreDECompletness(response);
+            } catch (err) {}
       };
 
-      const handleSelectProgramStage = value => {
-            setSelectedProgramStage(programStages.find(pstage => pstage.id === value));
-            setSelectedDataElement(null);
+      const loadDataStoreDSCompletness = async () => {
+            try {
+                  const response = await loadDataStore(process.env.REACT_APP_DS_COMPLETNESS_KEY, null, null, []);
+                  setDataStoreDSCompletness(response);
+            } catch (err) {}
       };
 
-      const handleSelectedDataElementGroup = value => {
-            setSelectedDataElementGroup(dataElementGroups.find(dxGroup => dxGroup.id === value));
-            setSelectedDataElement(null);
+      const loadDataStoreRegistres = async () => {
+            try {
+                  const response = await loadDataStore(process.env.REACT_APP_REGISTRES_KEY, null, null, []);
+                  setDataStoreRegistres(response);
+            } catch (err) {}
+      };
+
+      const loadDataStoreCrosschecks = async () => {
+            try {
+                  const response = await loadDataStore(process.env.REACT_APP_CROSS_CUT_KEY, null, null, []);
+                  setDataStoreCrosschecks(response);
+            } catch (err) {}
       };
 
       const getStatusNameAndColor = status => {
@@ -1034,34 +1043,6 @@ const Supervision = ({ me }) => {
             return {
                   name: translate(`${SCHEDULED.name}`),
                   color: { background: BLUE, text: WHITE }
-            };
-      };
-
-      const getStatusNameAndColorForPayment = status => {
-            if (status === PAYMENT_DONE.value) {
-                  return {
-                        name: translate(`${PAYMENT_DONE.name}`),
-                        color: { background: GREEN, text: WHITE }
-                  };
-            }
-
-            if (status === PENDING_PAYMENT.value) {
-                  return {
-                        name: translate(`${PENDING_PAYMENT.name}`),
-                        color: { background: ORANGE, text: WHITE }
-                  };
-            }
-
-            if (status === NA.value) {
-                  return {
-                        name: translate(`${NA.name}`),
-                        color: { background: GRAY_DARK, text: WHITE }
-                  };
-            }
-
-            return {
-                  name: translate(`${NA.name}`),
-                  color: { background: GRAY_DARK, text: WHITE }
             };
       };
 
@@ -4646,34 +4627,6 @@ const Supervision = ({ me }) => {
             );
       };
 
-      // const handleInputSpecificStage = (specificStage, index) => {
-      //       setInputFields(
-      //             inputFields.map((field, fieldIndex) => {
-      //                   if (index === fieldIndex) {
-      //                         return {
-      //                               ...field,
-      //                               specificStage
-      //                         };
-      //                   }
-      //                   return field;
-      //             })
-      //       );
-      // };
-
-      // const handleInputProgramStageConfig = (programStageConfig, index) => {
-      //       setInputFields(
-      //             inputFields.map((field, fieldIndex) => {
-      //                   if (index === fieldIndex) {
-      //                         return {
-      //                               ...field,
-      //                               programStageConfig
-      //                         };
-      //                   }
-      //                   return field;
-      //             })
-      //       );
-      // };
-
       const handleInputLibelle = (event, index) => {
             setInputFields(
                   inputFields.map((field, fieldIndex) => {
@@ -4687,20 +4640,6 @@ const Supervision = ({ me }) => {
                   })
             );
       };
-
-      // const handleInputPayment = (value, index) => {
-      //     setInputFields(
-      //         inputFields.map((field, fieldIndex) => {
-      //             if (index === fieldIndex) {
-      //                 return {
-      //                     ...field,
-      //                     payment: value
-      //                 }
-      //             }
-      //             return field
-      //         })
-      //     )
-      // }
 
       const handleInputOtherSupervisor = (event, index) => {
             setInputFields(
@@ -5751,10 +5690,6 @@ const Supervision = ({ me }) => {
                   {selectedPlanificationType === RANDOM && RenderRandomForm()}
             </>
       );
-
-      // const handleSaveAsFavoritesForBackgroundInformations = () => {
-      //       setVisibleAddFavoritBackgroundInformationModal(true);
-      // };
 
       const RenderDataElementConfigList = () => (
             <>
@@ -7020,14 +6955,63 @@ const Supervision = ({ me }) => {
             setInputFields(newList);
       };
 
+      const translateAllFavorisConfig = () => {
+            let cumulateList = [];
+            //    dataStoreCrosschecks,
+            //    dataStoreIndicators,
+            //    dataStoreDECompletness,
+            //    dataStoreDSCompletness,
+            //    dataStoreRegistres;
+
+            for (let el of dataStoreCrosschecks) {
+                  cumulateList = cumulateList.concat(el.children);
+            }
+            for (let el of dataStoreIndicators) {
+                  cumulateList = cumulateList.concat(el.children);
+            }
+            for (let el of dataStoreDECompletness) {
+                  cumulateList = cumulateList.concat(el.children);
+            }
+            for (let el of dataStoreDSCompletness) {
+                  cumulateList = cumulateList.concat(el.children);
+            }
+            for (let el of dataStoreRegistres) {
+                  cumulateList = cumulateList.concat(el.children);
+            }
+
+            console.log('cumulateList: ', cumulateList);
+
+            const translatedList =
+                  mappingConfigs.map(mapConf => {
+                        const foundElement = cumulateList.find(c => c.id === mapConf.indicator.id);
+
+                        return {
+                              ...mapConf,
+                              indicator: mapConf.indicator && {
+                                    ...mapConf.indicator,
+                                    displayName: foundElement
+                                          ? translateDataStoreLabel(foundElement)
+                                          : mapConf.indicator.displayName
+                              }
+                        };
+                  }) || [];
+
+            setMappingConfigs(translatedList);
+      };
+
       useEffect(() => {
             if (me) {
+                  loadDataStoreCrosschecks();
+                  loadDataStoreIndicators();
+                  loadDataStoreDECompletness();
+                  loadDataStoreDSCompletness();
+                  loadDataStoreRegistres();
                   loadOrganisationUnits();
                   loadOrganisationUnitGroups();
                   loadDataStoreSupervisions();
                   loadDataStorePerformanceFavoritsConfigs();
                   loadDataStoreBackgroundInformationFavoritsConfigs();
-                  loadDataStoreIndicators();
+                  loadDataStoreIndicatorsConfigs();
                   loadDataStoreIndicatorsMapping();
                   loadDataElementGroups();
                   loadUsers(me?.organisationUnits?.[0]?.id);
@@ -7038,6 +7022,26 @@ const Supervision = ({ me }) => {
             initInputFields();
       }, [selectedOrganisationUnits, selectedAgents]);
 
+      useEffect(() => {
+            if (
+                  mappingConfigs?.length > 0 &&
+                  dataStoreCrosschecks?.length > 0 &&
+                  dataStoreIndicators?.length > 0 &&
+                  dataStoreDECompletness?.length > 0 &&
+                  dataStoreDSCompletness?.length > 0 &&
+                  dataStoreRegistres?.length > 0
+            ) {
+                  translateAllFavorisConfig();
+            }
+      }, [
+            mappingConfigs,
+            dataStoreCrosschecks,
+            dataStoreIndicators,
+            dataStoreDECompletness,
+            dataStoreDSCompletness,
+            dataStoreRegistres
+      ]);
+
       return (
             <>
                   {RenderTopContent()}
@@ -7047,7 +7051,7 @@ const Supervision = ({ me }) => {
                               <span style={{ marginLeft: '10px' }}>{translate('Chargement')}...</span>
                         </div>
                   )}
-                  
+
                   {!loadingDataStoreSupervisionConfigs && dataStoreSupervisionConfigs?.length > 0 && (
                         <>
                               <div style={{ padding: '10px', marginBottom: '10px' }}>

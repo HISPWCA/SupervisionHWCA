@@ -65,10 +65,10 @@ const Favorites = ({ me }) => {
 
       const [dataStoreCrosschecks, setDataStoreCrosschecks] = useState([]);
       const [dataStoreIndicators, setDataStoreIndicators] = useState([]);
-      const [dataStoreIndicatorsMapping, setDataStoreIndicatorsMapping] = useState([]);
       const [dataStoreDECompletness, setDataStoreDECompletness] = useState([]);
       const [dataStoreDSCompletness, setDataStoreDSCompletness] = useState([]);
       const [dataStoreRegistres, setDataStoreRegistres] = useState([]);
+      const [dataStoreIndicatorsMapping, setDataStoreIndicatorsMapping] = useState([]);
       const [dataStoreSupervisionConfigs, setDataStoreSupervisionConfigs] = useState([]);
 
       const [selectedCrosscheck, setSelectedCrosscheck] = useState(null);
