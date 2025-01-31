@@ -36,7 +36,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
       };
 
       const handleSelectedGlobalProgramArea = value => {
-            const globalIndicatorProgramArea = dataStoreIndicators?.find(d => d.id === value);
+            const globalIndicatorProgramArea = dataStoreIndicators?.find(d => d.name === value);
             if (globalIndicatorProgramArea && value) {
                   setFormState({
                         ...formState,
@@ -52,7 +52,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                               ...i,
                               selectedSourcePrimary: null,
                               selectedSourceSecondary: null,
-                              selectedSourceProgramArea: dataStoreCrosschecks.find(d => d.id === value)
+                              selectedSourceProgramArea: dataStoreCrosschecks.find(d => d.name === value)
                         })),
 
                         consistencyOvertimes: formState?.consistencyOvertimes?.map(i => ({
@@ -62,8 +62,8 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
 
                         completeness: {
                               ...formState?.completeness,
-                              selectedSourceProgramAreaDE: dataStoreDECompletness?.find(d => d.id === value),
-                              selectedSourceProgramAreaDS: dataStoreDSCompletness?.find(d => d.id === value)
+                              selectedSourceProgramAreaDE: dataStoreDECompletness?.find(d => d.name === value),
+                              selectedSourceProgramAreaDS: dataStoreDSCompletness?.find(d => d.name === value)
                         }
                   });
             } else {
@@ -99,13 +99,13 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                             minWidth: '200px'
                                                       }}
                                                       options={dataStoreIndicators?.map(ind => ({
-                                                            label: translateDataStoreLabel(ind),
-                                                            value: ind.id
+                                                            label: ind.name,
+                                                            value: ind.name
                                                       }))}
                                                       showSearch
                                                       allowClear
                                                       optionFilterProp="label"
-                                                      value={formState?.selectedGlobalProgramArea?.id}
+                                                      value={formState?.selectedGlobalProgramArea?.name}
                                                       onChange={handleSelectedGlobalProgramArea}
                                                 />
                                           </span>
@@ -137,7 +137,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                 >
                                                       {translate('Indicateurs')}
                                                 </th>
-                                                {0 > 1 && (
+                                                {/* {0 > 1 && (
                                                       <th
                                                             style={{
                                                                   padding: '2px 5px',
@@ -148,7 +148,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                       >
                                                             {translate('Program_Area')}
                                                       </th>
-                                                )}
+                                                )} */}
                                                 <th
                                                       style={{
                                                             padding: '2px 5px',
@@ -186,7 +186,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                             >
                                                                   {indicator?.value?.displayName}
                                                             </td>
-                                                            {0 > 1 && (
+                                                            {/* {0 > 1 && (
                                                                   <td
                                                                         style={{
                                                                               padding: '2px 5px',
@@ -258,7 +258,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                               />
                                                                         </div>
                                                                   </td>
-                                                            )}
+                                                            )} */}
                                                             <td
                                                                   style={{
                                                                         padding: '2px 5px',
@@ -279,10 +279,10 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                     dataStoreIndicators
                                                                                           ?.find(
                                                                                                 d =>
-                                                                                                      d.id ===
+                                                                                                      d.name ===
                                                                                                       indicator
                                                                                                             ?.selectedSourceProgramArea
-                                                                                                            ?.id
+                                                                                                            ?.name
                                                                                           )
                                                                                           ?.children?.map(ind => ({
                                                                                                 label: translateDataStoreLabel(
@@ -293,6 +293,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                               }
                                                                               disabled={
                                                                                     !indicator.selectedSourceProgramArea
+                                                                                          ?.id
                                                                               }
                                                                               showSearch
                                                                               allowClear
@@ -324,7 +325,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                                                                     )
                                                                                                                                     ?.children?.find(
                                                                                                                                           d =>
-                                                                                                                                                d.name ===
+                                                                                                                                                d.id ===
                                                                                                                                                 value
                                                                                                                                     )
                                                                                                                   };
