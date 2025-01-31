@@ -1165,7 +1165,7 @@ const Favorites = ({ me }) => {
                                       dataStoreIndicatorsMapping?.find(
                                             mapping =>
                                                   mapping.group === curr.name &&
-                                                  mapping.indicator === d.name &&
+                                                  mapping.indicator === d.id &&
                                                   mapping.dhis2?.id
                                       )
                                 )
@@ -1205,10 +1205,10 @@ const Favorites = ({ me }) => {
                                                 <FavoriteGenerateIndicatorsFieldsDQR
                                                       formState={formState}
                                                       setFormState={setFormState}
-                                                      // dataStoreIndicators={
-                                                      //       filteredIndicatorsFromIndicatorsMapping() || []
-                                                      // }
-                                                      dataStoreIndicators={dataStoreIndicators}
+                                                      dataStoreIndicators={
+                                                            filteredIndicatorsFromIndicatorsMapping() || []
+                                                      }
+                                                      // dataStoreIndicators={dataStoreIndicators}
                                                       dataStoreCrosschecks={dataStoreCrosschecks}
                                                       dataStoreDECompletness={dataStoreDECompletness}
                                                       dataStoreDSCompletness={dataStoreDSCompletness}

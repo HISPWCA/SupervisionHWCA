@@ -1,4 +1,4 @@
-import translate from '../utils/translator';
+import translate, { translateDataStoreLabel } from '../utils/translator';
 import { Card, Checkbox, Col, Input, Row, Select } from 'antd';
 import { useEffect, useState } from 'react';
 import { idsFromIndicatorFormula, loadDataStore, saveDataToDataStore } from '../utils/functions';
@@ -384,7 +384,7 @@ const SettingIndicatorsMapping = () => {
                                                             >
                                                                   {group.children?.map(indicator => (
                                                                         <div
-                                                                              key={indicator.name}
+                                                                              key={indicator.id}
                                                                               style={{
                                                                                     marginTop: '5px',
                                                                                     borderBottom: '1px solid #ccc',
@@ -393,7 +393,11 @@ const SettingIndicatorsMapping = () => {
                                                                         >
                                                                               <Row gutter={[5, 5]}>
                                                                                     <Col md={3}>
-                                                                                          <div>{indicator.name}</div>
+                                                                                          <div>
+                                                                                                {translateDataStoreLabel(
+                                                                                                      indicator
+                                                                                                )}
+                                                                                          </div>
                                                                                     </Col>
                                                                                     <Col md={8}>
                                                                                           <div
@@ -413,7 +417,7 @@ const SettingIndicatorsMapping = () => {
                                                                                                                         it.group ===
                                                                                                                               group.name &&
                                                                                                                         it.indicator ===
-                                                                                                                              indicator.name
+                                                                                                                              indicator.id
                                                                                                             )?.dhis2
                                                                                                                   ?.name
                                                                                                       }
@@ -424,7 +428,7 @@ const SettingIndicatorsMapping = () => {
                                                                                                             it.group ===
                                                                                                                   group.name &&
                                                                                                             it.indicator ===
-                                                                                                                  indicator.name
+                                                                                                                  indicator.id
                                                                                                 )?.periodType && (
                                                                                                       <span
                                                                                                             style={{
@@ -444,7 +448,7 @@ const SettingIndicatorsMapping = () => {
                                                                                                                               it.group ===
                                                                                                                                     group.name &&
                                                                                                                               it.indicator ===
-                                                                                                                                    indicator.name
+                                                                                                                                    indicator.id
                                                                                                                   )
                                                                                                                         ?.periodType
                                                                                                             }
@@ -463,7 +467,7 @@ const SettingIndicatorsMapping = () => {
                                                                                                                         it.group ===
                                                                                                                               group.name &&
                                                                                                                         it.indicator ===
-                                                                                                                              indicator.name
+                                                                                                                              indicator.id
                                                                                                             );
 
                                                                                                       setFormState({
@@ -479,7 +483,7 @@ const SettingIndicatorsMapping = () => {
                                                                                                                   {
                                                                                                                         group: group.name,
                                                                                                                         indicator:
-                                                                                                                              indicator.name
+                                                                                                                              indicator.id
                                                                                                                   }
                                                                                                       });
 

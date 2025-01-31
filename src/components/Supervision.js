@@ -1690,7 +1690,13 @@ const Supervision = ({ me }) => {
                               const foundInd = indicatorsList.find(ind => ind.value?.id === dv.dataElement);
                               if (foundInd) {
                                     const foundAggrageMappingElement = dataStoreIndicatorsMapping?.find(
-                                          d => d.indicator === dv.value
+                                          d => d.indicator ===   mappingConfigs
+
+
+                              // .filter(ev => ev.programStage?.id === payload.programStage?.id)
+                              // .find(ev => ev.indicator?.id)  
+
+                              
                                     )?.dhis2;
 
                                     const periodType = dataStoreIndicatorsMapping?.find(
