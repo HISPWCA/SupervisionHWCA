@@ -67,23 +67,23 @@ const SettingIndicatorsMapping = () => {
                         newList =
                               curr.children?.map(child => ({
                                     group: curr.name,
-                                    indicator: child.name,
+                                    indicator: child.id,
                                     indicatorRename: dataStoreIndicatorsMapping?.find(
-                                          it => it.indicator === child.name && it.group === curr.name
+                                          it => it.indicator === child.id && it.group === curr.name
                                     )?.indicatorRename,
                                     useNameFromDHIS2: dataStoreIndicatorsMapping?.find(
-                                          it => it.indicator === child.name && it.group === curr.name
+                                          it => it.indicator === child.id && it.group === curr.name
                                     )?.useNameFromDHIS2,
                                     dhis2: dataStoreIndicatorsMapping?.find(
-                                          it => it.indicator === child.name && it.group === curr.name
+                                          it => it.indicator === child.id && it.group === curr.name
                                     )?.dhis2,
 
                                     periodType: dataStoreIndicatorsMapping?.find(
-                                          it => it.indicator === child.name && it.group === curr.name
+                                          it => it.indicator === child.id && it.group === curr.name
                                     )?.dataSet?.periodType,
 
                                     dataSet: dataStoreIndicatorsMapping?.find(
-                                          it => it.indicator === child.name && it.group === curr.name
+                                          it => it.indicator === child.id && it.group === curr.name
                                     )?.dataSet
                               })) || [];
 
@@ -509,7 +509,7 @@ const SettingIndicatorsMapping = () => {
                                                                                                                         it.group ===
                                                                                                                               group.name &&
                                                                                                                         it.indicator ===
-                                                                                                                              indicator.name
+                                                                                                                              indicator.id
                                                                                                             )?.dhis2
                                                                                                       }
                                                                                                       checked={
@@ -518,7 +518,7 @@ const SettingIndicatorsMapping = () => {
                                                                                                                         it.group ===
                                                                                                                               group.name &&
                                                                                                                         it.indicator ===
-                                                                                                                              indicator.name
+                                                                                                                              indicator.id
                                                                                                             )
                                                                                                                   ?.useNameFromDHIS2
                                                                                                       }
@@ -533,7 +533,7 @@ const SettingIndicatorsMapping = () => {
                                                                                                                                                 it.group ===
                                                                                                                                                       group.name &&
                                                                                                                                                 it.indicator ===
-                                                                                                                                                      indicator.name
+                                                                                                                                                      indicator.id
                                                                                                                                           ) {
                                                                                                                                                 return {
                                                                                                                                                       ...it,
@@ -571,7 +571,7 @@ const SettingIndicatorsMapping = () => {
                                                                                                                         it.group ===
                                                                                                                               group.name &&
                                                                                                                         it.indicator ===
-                                                                                                                              indicator.name
+                                                                                                                              indicator.id
                                                                                                             )
                                                                                                                   ?.useNameFromDHIS2
                                                                                                       }
@@ -581,7 +581,7 @@ const SettingIndicatorsMapping = () => {
                                                                                                                         it.group ===
                                                                                                                               group.name &&
                                                                                                                         it.indicator ===
-                                                                                                                              indicator.name
+                                                                                                                              indicator.id
                                                                                                             )
                                                                                                                   ?.indicatorRename
                                                                                                       }
@@ -596,7 +596,7 @@ const SettingIndicatorsMapping = () => {
                                                                                                                                                 it.group ===
                                                                                                                                                       group.name &&
                                                                                                                                                 it.indicator ===
-                                                                                                                                                      indicator.name
+                                                                                                                                                      indicator.id
                                                                                                                                           ) {
                                                                                                                                                 return {
                                                                                                                                                       ...it,
