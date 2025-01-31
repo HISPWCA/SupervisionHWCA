@@ -217,6 +217,7 @@
     "Create_New_Configuration": "Créer une nouvelle configuration",
     "Select_Favorit": "Sélectionner la favoris",
     "Form_Field": "Indicateur / Recoupement",
+    "Data_Element_Name": "Nom de l'Elément de données",
     "Operation_Failed": "Echèc de l'opération !",
     "Operation_Success": "Opération éffectuée avec succès !",
     "Annuler_Planification": "Annuler la planification",
@@ -360,5 +361,7 @@
     "WarningPeriodtypeText": "L'élement sélectionné doit etre un élement de donnée ou un indicateur",
     "Tracker_Program_Choice_Title": "Choix du programme Tracker, Type de supervision, Type de sujet a supervisé",
     "Primary_Datasource_Key_Words": "Mot clés Source de donnée Primaire",
-    "Secondary_Datasource_Key_Words": "Mot clés Source de donnée Secondaire"
+    "Secondary_Datasource_Key_Words": "Mot clés Source de donnée Secondaire",
+    "Source_De_Donnée": "Source de donnée",
+    "Status_Supervision":"Statut"
 }

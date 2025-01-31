@@ -149,6 +149,7 @@ const Supervision = ({ me }) => {
       const [programStages, setProgramStages] = useState([]);
       const [isNewMappingMode, setIsNewMappingMode] = useState(false);
       const [mappingConfigs, setMappingConfigs] = useState([]);
+      const [nonTranslateMappingConfigs, setNonTranslateMappingConfigs] = useState([]);
       const [analyticIndicatorResults, setAnalyticIndicatorResults] = useState([]);
       const [randomResults, setRandomResults] = useState([]);
       const [_, setAnalyticErrorMessage] = useState(null);
@@ -1423,6 +1424,7 @@ const Supervision = ({ me }) => {
             setSelectedBackgroundInformationFavorit([]);
             setSelectedBackgroundInformationTypeConfiguration(DIRECTE);
             setMappingConfigs([]);
+            setNonTranslateMappingConfigs([]);
 
             loadProgramStages(sup.program?.id);
             setSelectedProgram(sup);
@@ -3089,6 +3091,7 @@ const Supervision = ({ me }) => {
 
       const cleanAllNewSupervisionState = () => {
             setIsNewMappingMode(false);
+            setNonTranslateMappingConfigs([]);
             setMappingConfigs([]);
             setProgramStages([]);
             setSelectedAgents([]);
@@ -3399,7 +3402,6 @@ const Supervision = ({ me }) => {
                               <Col sm={24} md={4} style={{ textAlign: 'left' }}>
                                     {isEditionMode && inputFields.length > 0 && (
                                           <div style={{ marginTop: '15px' }}>
-                                                {/* {selectedPlanificationType === ORGANISATION_UNIT && ( */}
                                                 <Popconfirm
                                                       title={translate('Confirmation_Planification_Message')}
                                                       onConfirm={handleSupervisionPlanificationSaveBtn}
@@ -3420,24 +3422,6 @@ const Supervision = ({ me }) => {
                                                             {translate('Planifier_Supervision')}
                                                       </Button>
                                                 </Popconfirm>
-                                                {/* )} */}
-
-                                                {/* {selectedPlanificationType !== ORGANISATION_UNIT && (
-                                                      <Button
-                                                            icon={
-                                                                  <FiSave style={{ color: '#fff', fontSize: '18px' }} />
-                                                            }
-                                                            onClick={() => {
-                                                                  setInputMissionName('');
-                                                                  setVisibleMissionName(true);
-                                                            }}
-                                                            primary
-                                                            disabled={loadingSupervisionPlanification}
-                                                            loading={loadingSupervisionPlanification}
-                                                      >
-                                                            {translate('Planifier_Supervision')}
-                                                      </Button>
-                                                )} */}
                                           </div>
                                     )}
                               </Col>
@@ -5733,7 +5717,7 @@ const Supervision = ({ me }) => {
                                                 dataIndex: 'programStageName'
                                           },
                                           {
-                                                title: translate('Form_Field'),
+                                                title: translate('Data_Element_Name'),
                                                 dataIndex: 'dataElementName'
                                           },
                                           {
@@ -5914,7 +5898,8 @@ const Supervision = ({ me }) => {
             for (let fav of currentFavs) {
                   newList = newList.concat(fav.configs || []);
             }
-            setMappingConfigs(newList || []);
+            setNonTranslateMappingConfigs(newList || []);
+            setMappingConfigs([]);
       };
 
       const RenderDataElementConfigContent = () => (
@@ -6957,11 +6942,6 @@ const Supervision = ({ me }) => {
 
       const translateAllFavorisConfig = () => {
             let cumulateList = [];
-            //    dataStoreCrosschecks,
-            //    dataStoreIndicators,
-            //    dataStoreDECompletness,
-            //    dataStoreDSCompletness,
-            //    dataStoreRegistres;
 
             for (let el of dataStoreCrosschecks) {
                   cumulateList = cumulateList.concat(el.children);
@@ -6982,7 +6962,7 @@ const Supervision = ({ me }) => {
             console.log('cumulateList: ', cumulateList);
 
             const translatedList =
-                  mappingConfigs.map(mapConf => {
+                  nonTranslateMappingConfigs.map(mapConf => {
                         const foundElement = cumulateList.find(c => c.id === mapConf.indicator.id);
 
                         return {
@@ -6997,6 +6977,7 @@ const Supervision = ({ me }) => {
                   }) || [];
 
             setMappingConfigs(translatedList);
+            setNonTranslateMappingConfigs([]);
       };
 
       useEffect(() => {
@@ -7024,7 +7005,7 @@ const Supervision = ({ me }) => {
 
       useEffect(() => {
             if (
-                  mappingConfigs?.length > 0 &&
+                  nonTranslateMappingConfigs?.length > 0 &&
                   dataStoreCrosschecks?.length > 0 &&
                   dataStoreIndicators?.length > 0 &&
                   dataStoreDECompletness?.length > 0 &&
@@ -7034,7 +7015,7 @@ const Supervision = ({ me }) => {
                   translateAllFavorisConfig();
             }
       }, [
-            mappingConfigs,
+            nonTranslateMappingConfigs,
             dataStoreCrosschecks,
             dataStoreIndicators,
             dataStoreDECompletness,
