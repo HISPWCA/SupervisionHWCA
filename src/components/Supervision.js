@@ -7047,6 +7047,7 @@ const Supervision = ({ me }) => {
                               <span style={{ marginLeft: '10px' }}>{translate('Chargement')}...</span>
                         </div>
                   )}
+                  
                   {!loadingDataStoreSupervisionConfigs && dataStoreSupervisionConfigs?.length > 0 && (
                         <>
                               <div style={{ padding: '10px', marginBottom: '10px' }}>

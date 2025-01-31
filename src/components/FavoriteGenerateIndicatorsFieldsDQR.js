@@ -137,18 +137,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                 >
                                                       {translate('Indicateurs')}
                                                 </th>
-                                                {/* {0 > 1 && (
-                                                      <th
-                                                            style={{
-                                                                  padding: '2px 5px',
-                                                                  verticalAlign: 'top',
-                                                                  textAlign: 'center',
-                                                                  border: '1px solid #00000070'
-                                                            }}
-                                                      >
-                                                            {translate('Program_Area')}
-                                                      </th>
-                                                )} */}
+
                                                 <th
                                                       style={{
                                                             padding: '2px 5px',
@@ -186,79 +175,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                             >
                                                                   {indicator?.value?.displayName}
                                                             </td>
-                                                            {/* {0 > 1 && (
-                                                                  <td
-                                                                        style={{
-                                                                              padding: '2px 5px',
-                                                                              verticalAlign: 'top',
-                                                                              textAlign: 'center',
-                                                                              border: '1px solid #00000070'
-                                                                        }}
-                                                                  >
-                                                                        <div>
-                                                                              <Select
-                                                                                    placeholder={`${translate(
-                                                                                          'Program_Area'
-                                                                                    )} `}
-                                                                                    style={{
-                                                                                          width: '100%'
-                                                                                    }}
-                                                                                    options={dataStoreIndicators?.map(
-                                                                                          ind => ({
-                                                                                                label: translateDataStoreLabel(
-                                                                                                      ind
-                                                                                                ),
-                                                                                                value: ind.id
-                                                                                          })
-                                                                                    )}
-                                                                                    disabled={
-                                                                                          formState?.selectedGlobalProgramArea &&
-                                                                                          indicator
-                                                                                                ?.selectedSourceProgramArea
-                                                                                                ?.id
-                                                                                    }
-                                                                                    showSearch
-                                                                                    allowClear
-                                                                                    optionFilterProp="label"
-                                                                                    value={
-                                                                                          indicator
-                                                                                                ?.selectedSourceProgramArea
-                                                                                                ?.id
-                                                                                    }
-                                                                                    onChange={value => {
-                                                                                          setFormState({
-                                                                                                ...formState,
-                                                                                                indicators:
-                                                                                                      formState?.indicators?.map(
-                                                                                                            (
-                                                                                                                  i,
-                                                                                                                  iIndex
-                                                                                                            ) => {
-                                                                                                                  if (
-                                                                                                                        iIndex ===
-                                                                                                                        indIndex
-                                                                                                                  ) {
-                                                                                                                        return {
-                                                                                                                              ...i,
-                                                                                                                              selectedSourceIndicator:
-                                                                                                                                    null,
-                                                                                                                              selectedSourceProgramArea:
-                                                                                                                                    dataStoreIndicators.find(
-                                                                                                                                          d =>
-                                                                                                                                                d.id ===
-                                                                                                                                                value
-                                                                                                                                    )
-                                                                                                                        };
-                                                                                                                  }
-                                                                                                                  return i;
-                                                                                                            }
-                                                                                                      )
-                                                                                          });
-                                                                                    }}
-                                                                              />
-                                                                        </div>
-                                                                  </td>
-                                                            )} */}
+
                                                             <td
                                                                   style={{
                                                                         padding: '2px 5px',
@@ -293,7 +210,6 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                               }
                                                                               disabled={
                                                                                     !indicator.selectedSourceProgramArea
-                                                                                          ?.id
                                                                               }
                                                                               showSearch
                                                                               allowClear
@@ -403,18 +319,6 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                       {translate('Recoupements')}
                                                 </th>
 
-                                                {0 > 1 && (
-                                                      <th
-                                                            style={{
-                                                                  padding: '2px 5px',
-                                                                  verticalAlign: 'top',
-                                                                  textAlign: 'center',
-                                                                  border: '1px solid #00000070'
-                                                            }}
-                                                      >
-                                                            {translate('Program_Area')}
-                                                      </th>
-                                                )}
                                                 <th
                                                       style={{
                                                             padding: '2px 5px',
@@ -463,73 +367,6 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                             {`${translate('Recoupements')} ${getLetter(recIndex + 1)}`}
                                                       </td>
 
-                                                      {0 > 1 && (
-                                                            <td
-                                                                  style={{
-                                                                        padding: '2px 5px',
-                                                                        verticalAlign: 'top',
-                                                                        textAlign: 'center',
-                                                                        border: '1px solid #00000070'
-                                                                  }}
-                                                            >
-                                                                  <div>
-                                                                        <Select
-                                                                              placeholder={`${translate(
-                                                                                    'Program_Area'
-                                                                              )} `}
-                                                                              style={{
-                                                                                    width: '100%'
-                                                                              }}
-                                                                              options={dataStoreCrosschecks?.map(
-                                                                                    ind => ({
-                                                                                          label: ind.name,
-                                                                                          value: ind.name
-                                                                                    })
-                                                                              )}
-                                                                              disabled={
-                                                                                    formState?.selectedGlobalProgramArea &&
-                                                                                    rec?.selectedSourceProgramArea?.name
-                                                                              }
-                                                                              showSearch
-                                                                              allowClear
-                                                                              optionFilterProp="label"
-                                                                              value={
-                                                                                    rec?.selectedSourceProgramArea?.name
-                                                                              }
-                                                                              onChange={value => {
-                                                                                    setFormState({
-                                                                                          ...formState,
-                                                                                          recoupements:
-                                                                                                formState?.recoupements?.map(
-                                                                                                      (i, iIndex) => {
-                                                                                                            if (
-                                                                                                                  iIndex ===
-                                                                                                                  recIndex
-                                                                                                            ) {
-                                                                                                                  return {
-                                                                                                                        ...i,
-                                                                                                                        selectedSourcePrimary:
-                                                                                                                              null,
-                                                                                                                        selectedSourceSecondary:
-                                                                                                                              null,
-                                                                                                                        selectedSourceProgramArea:
-                                                                                                                              dataStoreCrosschecks.find(
-                                                                                                                                    d =>
-                                                                                                                                          d.name ===
-                                                                                                                                          value
-                                                                                                                              )
-                                                                                                                  };
-                                                                                                            }
-                                                                                                            return i;
-                                                                                                      }
-                                                                                                )
-                                                                                    });
-                                                                              }}
-                                                                        />
-                                                                  </div>
-                                                            </td>
-                                                      )}
-
                                                       <td
                                                             style={{
                                                                   padding: '2px 5px',
@@ -552,14 +389,14 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                                 ?.name
                                                                               )
                                                                               ?.children?.map(ind => ({
-                                                                                    label: ind.name,
-                                                                                    value: ind.name
+                                                                                    label: translateDataStoreLabel(ind),
+                                                                                    value: ind.id
                                                                               }))}
                                                                         disabled={!rec.selectedSourceProgramArea}
                                                                         showSearch
                                                                         allowClear
                                                                         optionFilterProp="label"
-                                                                        value={rec?.selectedSourcePrimary?.name}
+                                                                        value={rec?.selectedSourcePrimary?.id}
                                                                         onChange={value => {
                                                                               setFormState({
                                                                                     ...formState,
@@ -583,7 +420,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                                                               )
                                                                                                                               ?.children?.find(
                                                                                                                                     d =>
-                                                                                                                                          d.name ===
+                                                                                                                                          d.id ===
                                                                                                                                           value
                                                                                                                               )
                                                                                                             };
@@ -615,15 +452,15 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                         }}
                                                                         options={rec.selectedSourceProgramArea?.children?.map(
                                                                               ind => ({
-                                                                                    label: ind.name,
-                                                                                    value: ind.name
+                                                                                    label: translateDataStoreLabel(ind),
+                                                                                    value: ind.id
                                                                               })
                                                                         )}
                                                                         disabled={!rec.selectedSourceProgramArea}
                                                                         showSearch
                                                                         allowClear
                                                                         optionFilterProp="label"
-                                                                        value={rec?.selectedSourceSecondary?.name}
+                                                                        value={rec?.selectedSourceSecondary?.id}
                                                                         onChange={value => {
                                                                               setFormState({
                                                                                     ...formState,
@@ -647,7 +484,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                                                               )
                                                                                                                               ?.children?.find(
                                                                                                                                     d =>
-                                                                                                                                          d.name ===
+                                                                                                                                          d.id ===
                                                                                                                                           value
                                                                                                                               )
                                                                                                             };
@@ -725,18 +562,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                 >
                                                       {translate('ConsistencyOverTime')}
                                                 </th>
-                                                {0 > 1 && (
-                                                      <th
-                                                            style={{
-                                                                  padding: '2px 5px',
-                                                                  verticalAlign: 'top',
-                                                                  textAlign: 'center',
-                                                                  border: '1px solid #00000070'
-                                                            }}
-                                                      >
-                                                            {translate('Program_Area')}
-                                                      </th>
-                                                )}
+
                                                 <th
                                                       style={{
                                                             padding: '2px 5px',
@@ -772,70 +598,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                       >
                                                             {`${translate('ConsistencyOverTime')} ${consIndex + 1}`}
                                                       </td>
-                                                      {0 > 1 && (
-                                                            <td
-                                                                  style={{
-                                                                        padding: '2px 5px',
-                                                                        verticalAlign: 'top',
-                                                                        textAlign: 'center',
-                                                                        border: '1px solid #00000070'
-                                                                  }}
-                                                            >
-                                                                  <div>
-                                                                        <Select
-                                                                              placeholder={`${translate(
-                                                                                    'Program_Area'
-                                                                              )} `}
-                                                                              style={{
-                                                                                    width: '100%'
-                                                                              }}
-                                                                              options={dataStoreIndicators?.map(
-                                                                                    ind => ({
-                                                                                          label: ind.name,
-                                                                                          value: ind.name
-                                                                                    })
-                                                                              )}
-                                                                              disabled={
-                                                                                    formState?.selectedGlobalProgramArea &&
-                                                                                    cons?.selectedSourceProgramArea
-                                                                                          ?.name
-                                                                              }
-                                                                              showSearch
-                                                                              allowClear
-                                                                              optionFilterProp="label"
-                                                                              value={
-                                                                                    cons?.selectedSourceProgramArea
-                                                                                          ?.name
-                                                                              }
-                                                                              onChange={value => {
-                                                                                    setFormState({
-                                                                                          ...formState,
-                                                                                          consistencyOvertimes:
-                                                                                                formState?.consistencyOvertimes?.map(
-                                                                                                      (i, iIndex) => {
-                                                                                                            if (
-                                                                                                                  iIndex ===
-                                                                                                                  consIndex
-                                                                                                            ) {
-                                                                                                                  return {
-                                                                                                                        ...i,
-                                                                                                                        selectedSourceProgramArea:
-                                                                                                                              dataStoreIndicators.find(
-                                                                                                                                    d =>
-                                                                                                                                          d.name ===
-                                                                                                                                          value
-                                                                                                                              )
-                                                                                                                  };
-                                                                                                            }
-                                                                                                            return i;
-                                                                                                      }
-                                                                                                )
-                                                                                    });
-                                                                              }}
-                                                                        />
-                                                                  </div>
-                                                            </td>
-                                                      )}
+                                                 
                                                       <td
                                                             style={{
                                                                   padding: '2px 5px',
@@ -858,14 +621,14 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                                 ?.name
                                                                               )
                                                                               ?.children?.map(ind => ({
-                                                                                    label: ind.name,
-                                                                                    value: ind.name
+                                                                                    label: translateDataStoreLabel(ind),
+                                                                                    value: ind.id
                                                                               }))}
                                                                         disabled={!cons.selectedSourceProgramArea}
                                                                         showSearch
                                                                         allowClear
                                                                         optionFilterProp="label"
-                                                                        value={cons?.selectedSourceConsistency?.name}
+                                                                        value={cons?.selectedSourceConsistency?.id}
                                                                         onChange={value => {
                                                                               setFormState({
                                                                                     ...formState,
@@ -889,7 +652,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                                                               )
                                                                                                                               ?.children?.find(
                                                                                                                                     d =>
-                                                                                                                                          d.name ===
+                                                                                                                                          d.id ===
                                                                                                                                           value
                                                                                                                               )
                                                                                                             };
@@ -968,7 +731,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                         ...formState?.completeness,
                                                                         nbrDataElementsToShow: value
                                                                   }
-                                                            });
+                                                            })
                                                       }}
                                                 />
                                           </div>
@@ -1075,8 +838,8 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                           ?.name
                                                                         )
                                                                         ?.children?.map(ind => ({
-                                                                              label: ind.name,
-                                                                              value: ind.name
+                                                                              label: translateDataStoreLabel(ind),
+                                                                              value: ind.id
                                                                         }))}
                                                                   disabled={
                                                                         formState?.completeness
@@ -1087,7 +850,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                   showSearch
                                                                   allowClear
                                                                   optionFilterProp="label"
-                                                                  value={formState?.completeness?.register?.name}
+                                                                  value={formState?.completeness?.register?.id}
                                                                   onChange={value => {
                                                                         setFormState({
                                                                               ...formState,
@@ -1103,7 +866,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                                             ?.name
                                                                                           )
                                                                                           ?.children?.find(
-                                                                                                d => d.name === value
+                                                                                                d => d.id === value
                                                                                           )
                                                                               }
                                                                         });
@@ -1172,8 +935,8 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                                       ?.name
                                                                                     )
                                                                                     ?.children?.map(ind => ({
-                                                                                          label: ind.name,
-                                                                                          value: ind.name
+                                                                                          label: translateDataStoreLabel(ind),
+                                                                                          value: ind.id
                                                                                     }))}
                                                                               disabled={
                                                                                     formState?.completeness
@@ -1184,7 +947,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                               showSearch
                                                                               allowClear
                                                                               optionFilterProp="label"
-                                                                              value={de?.selectedSourceDS?.name}
+                                                                              value={de?.selectedSourceDS?.id}
                                                                               onChange={value => {
                                                                                     setFormState({
                                                                                           ...formState,
@@ -1214,7 +977,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                                                                           )
                                                                                                                                           ?.children?.find(
                                                                                                                                                 d =>
-                                                                                                                                                      d.name ===
+                                                                                                                                                      d.id ===
                                                                                                                                                       value
                                                                                                                                           )
                                                                                                                         };
@@ -1271,8 +1034,8 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                                       ?.name
                                                                                     )
                                                                                     ?.children?.map(ind => ({
-                                                                                          label: ind.name,
-                                                                                          value: ind.name
+                                                                                          label: translateDataStoreLabel(ind),
+                                                                                          value: ind.id
                                                                                     }))}
                                                                               disabled={
                                                                                     formState?.completeness
@@ -1283,7 +1046,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                               showSearch
                                                                               allowClear
                                                                               optionFilterProp="label"
-                                                                              value={de?.selectedSourceDE?.name}
+                                                                              value={de?.selectedSourceDE?.id}
                                                                               onChange={value => {
                                                                                     setFormState({
                                                                                           ...formState,
@@ -1313,7 +1076,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                                                                           )
                                                                                                                                           ?.children?.find(
                                                                                                                                                 d =>
-                                                                                                                                                      d.name ===
+                                                                                                                                                      d.id ===
                                                                                                                                                       value
                                                                                                                                           )
                                                                                                                         };

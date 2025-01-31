@@ -427,21 +427,11 @@ const Favorites = ({ me }) => {
                   let payloadIndicator = {
                         dataElement: indicator?.value,
                         indicator: indicator?.selectedSourceIndicator && {
-                              id: indicator?.selectedSourceIndicator?.name,
+                              id: indicator?.selectedSourceIndicator?.id,
                               displayName: indicator?.selectedSourceIndicator?.name
                         },
                         programStage,
                         program
-                  };
-
-                  let payloadProgramArea = {
-                        dataElement: indicator?.programArea,
-                        indicator: indicator?.selectedSourceProgramArea && {
-                              id: indicator.selectedSourceProgramArea.name,
-                              displayName: indicator.selectedSourceProgramArea.name
-                        },
-                        program,
-                        programStage
                   };
 
                   let payloadMargin = {
@@ -454,8 +444,6 @@ const Favorites = ({ me }) => {
                         programStage
                   };
 
-                  // if (payloadProgramArea.dataElement?.id && payloadProgramArea.indicator?.id)
-                  //       newList.push(payloadProgramArea);
                   if (payloadIndicator.dataElement?.id && payloadIndicator.indicator?.id)
                         newList.push(payloadIndicator);
                   if (payloadMargin.dataElement?.id && payloadMargin.indicator?.id) newList.push(payloadMargin);
@@ -463,20 +451,10 @@ const Favorites = ({ me }) => {
 
             // Recoupements
             for (let recoupement of formState?.recoupements) {
-                  let payloadProgramArea = {
-                        dataElement: recoupement?.programArea,
-                        indicator: recoupement?.selectedSourceProgramArea && {
-                              id: recoupement?.selectedSourceProgramArea?.name,
-                              displayName: recoupement?.selectedSourceProgramArea?.name
-                        },
-                        programStage,
-                        program
-                  };
-
                   let payloadPrimary = {
                         dataElement: recoupement?.primaryValue,
                         indicator: recoupement?.selectedSourcePrimary && {
-                              id: recoupement?.selectedSourcePrimary?.name,
+                              id: recoupement?.selectedSourcePrimary?.id,
                               displayName: recoupement?.selectedSourcePrimary?.name
                         },
                         programStage,
@@ -486,7 +464,7 @@ const Favorites = ({ me }) => {
                   let payloadSecondary = {
                         dataElement: recoupement?.secondaryValue,
                         indicator: recoupement?.selectedSourceSecondary && {
-                              id: recoupement?.selectedSourceSecondary?.name,
+                              id: recoupement?.selectedSourceSecondary?.id,
                               displayName: recoupement?.selectedSourceSecondary?.name
                         },
                         programStage,
@@ -502,8 +480,6 @@ const Favorites = ({ me }) => {
                         program
                   };
 
-                  // if (payloadProgramArea.dataElement?.id && payloadProgramArea.indicator?.id)
-                  //       newList.push(payloadProgramArea);
                   if (payloadPrimary.dataElement?.id && payloadPrimary.indicator?.id) newList.push(payloadPrimary);
                   if (payloadSecondary.dataElement?.id && payloadSecondary.indicator?.id)
                         newList.push(payloadSecondary);
@@ -515,21 +491,11 @@ const Favorites = ({ me }) => {
                   let payloadConsistency = {
                         dataElement: consistencyOvertime?.value,
                         indicator: consistencyOvertime?.selectedSourceConsistency && {
-                              id: consistencyOvertime?.selectedSourceConsistency?.name,
+                              id: consistencyOvertime?.selectedSourceConsistency?.id,
                               displayName: consistencyOvertime?.selectedSourceConsistency?.name
                         },
                         programStage,
                         program
-                  };
-
-                  let payloadProgramArea = {
-                        dataElement: consistencyOvertime?.programArea,
-                        indicator: consistencyOvertime?.selectedSourceProgramArea && {
-                              id: consistencyOvertime.selectedSourceProgramArea.name,
-                              displayName: consistencyOvertime.selectedSourceProgramArea.name
-                        },
-                        program,
-                        programStage
                   };
 
                   let payloadMargin = {
@@ -545,8 +511,6 @@ const Favorites = ({ me }) => {
                   if (payloadConsistency.dataElement?.id && payloadConsistency.indicator?.id)
                         newList.push(payloadConsistency);
                   if (payloadMargin.dataElement?.id && payloadMargin.indicator?.id) newList.push(payloadMargin);
-                  // if (payloadProgramArea.dataElement?.id && payloadProgramArea.indicator?.id)
-                  //       newList.push(payloadProgramArea);
             }
 
             //data element et source document completness
@@ -555,7 +519,7 @@ const Favorites = ({ me }) => {
                         let payloadRegistre = {
                               dataElement: formState?.completeness?.selectedRegister,
                               indicator: formState?.completeness?.register && {
-                                    id: formState?.completeness?.register?.name,
+                                    id: formState?.completeness?.register?.id,
                                     displayName: formState?.completeness?.register?.name
                               },
                               programStage,
@@ -605,36 +569,6 @@ const Favorites = ({ me }) => {
                               newList.push(payloadNbrDocumentsSourceToShow);
                   }
 
-                  if (formState?.completeness?.programAreaDE && formState?.completeness?.selectedSourceProgramAreaDE) {
-                        let payloadProgramAreaDE = {
-                              dataElement: formState?.completeness?.programAreaDE,
-                              indicator: formState?.completeness?.selectedSourceProgramAreaDE && {
-                                    id: formState?.completeness?.selectedSourceProgramAreaDE?.name,
-                                    displayName: formState?.completeness?.selectedSourceProgramAreaDE?.name
-                              },
-                              programStage,
-                              program
-                        };
-
-                        // if (payloadProgramAreaDE.dataElement?.id && payloadProgramAreaDE.indicator?.id)
-                        //       newList.push(payloadProgramAreaDE);
-                  }
-
-                  if (formState?.completeness?.programAreaDOC && formState?.completeness?.selectedSourceProgramAreaDS) {
-                        let payloadProgramAreaDS = {
-                              dataElement: formState?.completeness?.programAreaDOC,
-                              indicator: formState?.completeness?.selectedSourceProgramAreaDS && {
-                                    id: formState?.completeness?.selectedSourceProgramAreaDS?.name,
-                                    displayName: formState?.completeness?.selectedSourceProgramAreaDS?.name
-                              },
-                              programStage,
-                              program
-                        };
-
-                        // if (payloadProgramAreaDS.dataElement?.id && payloadProgramAreaDS.indicator?.id)
-                        //       newList.push(payloadProgramAreaDS);
-                  }
-
                   if (formState?.completeness?.margin && formState?.completeness?.selectedSourceMargin) {
                         let payloadMargin = {
                               dataElement: formState?.completeness?.margin,
@@ -653,7 +587,7 @@ const Favorites = ({ me }) => {
                         let payloadDE = {
                               dataElement: de?.value,
                               indicator: de?.selectedSourceDE && {
-                                    id: de?.selectedSourceDE?.name,
+                                    id: de?.selectedSourceDE?.id,
                                     displayName: de?.selectedSourceDE?.name
                               },
                               programStage,
@@ -667,7 +601,7 @@ const Favorites = ({ me }) => {
                         let payloadDOC = {
                               dataElement: doc?.value,
                               indicator: doc?.selectedSourceDS && {
-                                    id: doc?.selectedSourceDS?.name,
+                                    id: doc?.selectedSourceDS?.id,
                                     displayName: doc?.selectedSourceDS?.name
                               },
                               programStage,
