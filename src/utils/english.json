@@ -361,5 +361,6 @@
     "WarningPeriodtypeText": "Your selected element must be either data element or indicator",
     "Tracker_Program_Choice_Title": "Tracker program choice, Supervision Type, Subject type to supervise",
     "Primary_Datasource_Key_Words": "Primary data source key words",
-    "Secondary_Datasource_Key_Words": "Secondary data source key words"
+    "Secondary_Datasource_Key_Words": "Secondary data source key words",
+    "Edit_Indicator":"Modify Indicator"
 }

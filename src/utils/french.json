@@ -363,5 +363,6 @@
     "Primary_Datasource_Key_Words": "Mot clés Source de donnée Primaire",
     "Secondary_Datasource_Key_Words": "Mot clés Source de donnée Secondaire",
     "Source_De_Donnée": "Source de donnée",
-    "Status_Supervision": "Statut"
+    "Status_Supervision": "Statut",
+    "Edit_Indicator": "Editer l' Indicateur"
 }

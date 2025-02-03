@@ -283,6 +283,13 @@ const SettingIndicatorsMappingNew = ({
                                                                                     inputIndicator
                                                                                           ?.trim()
                                                                                           ?.toLowerCase()
+                                                                              ) &&
+                                                                        !newIndicatorList
+                                                                              .map(i => i.name?.trim()?.toLowerCase())
+                                                                              .includes(
+                                                                                    inputIndicatorFr
+                                                                                          ?.trim()
+                                                                                          ?.toLowerCase()
                                                                               )
                                                                               ? false
                                                                               : true
@@ -364,7 +371,9 @@ const SettingIndicatorsMappingNew = ({
                                                                                                       '1px solid #00000060'
                                                                                           }}
                                                                                     >
-                                                                                          <div> {ind.name}</div>
+                                                                                          <div style={{ color:'#00000099'}}>
+                                                                                                {`${ind.name} / ${ind.name_fr}`}
+                                                                                          </div>
                                                                                           <div>
                                                                                                 <Popconfirm
                                                                                                       title={translate(

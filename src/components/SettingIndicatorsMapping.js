@@ -662,6 +662,7 @@ const SettingIndicatorsMapping = () => {
                                                                   }}
                                                             >
                                                                   <FaRegEdit
+                                                                        title={translate('Edit_Indicator')}
                                                                         style={{
                                                                               fontSize: '22px',
                                                                               color: 'blue',

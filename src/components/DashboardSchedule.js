@@ -868,22 +868,6 @@ export const Dashboard = ({ me }) => {
                         </div>
                   </div>
 
-                  {0 > 1 && (
-                        <div
-                              style={{
-                                    backgroundColor: '#fff',
-                                    padding: '10px',
-                                    borderRadius: '8px',
-                                    marginBottom: '2px',
-                                    marginTop: '10px'
-                              }}
-                              className="my-shadow"
-                        >
-                              <ReactEchart option={analyleLineOptions} style={{ height: '300px', width: '100%' }} />
-                              Single value
-                        </div>
-                  )}
-
                   <div style={{ marginTop: '10px' }}>
                         <Card size="small" className="my-shadow">
                               <Row gutter={[10, 10]}>
@@ -950,6 +934,12 @@ export const Dashboard = ({ me }) => {
                                                                                     }`
                                                                               }}
                                                                         >
+                                                                              {console.log('option: ', option)}
+                                                                              {console.log(
+                                                                                    'Color : ',
+                                                                                    getStatusNameAndColor(option.code)
+                                                                              )}
+
                                                                               {translate(option.displayName)}
                                                                         </div>
                                                                   </div>
@@ -1363,20 +1353,6 @@ export const Dashboard = ({ me }) => {
                               </div>
                         </Col>
                         <Col sm={24} md={24}>
-                              {0 > 1 && (
-                                    <div
-                                          className="my-shadow"
-                                          style={{
-                                                backgroundColor: '#fff',
-                                                borderRadius: '8px',
-                                                marginBottom: '2px',
-                                                padding: '5px'
-                                          }}
-                                    >
-                                          <MapView coordinates={coordinates} style={{ height: '500px' }} />
-                                    </div>
-                              )}
-
                               <div
                                     className="my-shadow"
                                     style={{
