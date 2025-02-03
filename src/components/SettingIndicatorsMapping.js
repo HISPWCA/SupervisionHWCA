@@ -301,6 +301,8 @@ const SettingIndicatorsMapping = () => {
                               <div style={{ fontWeight: 'bold' }}>{translate('Indicators_Mapping')}</div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                                     <Button
+                                          disabled={true}
+                                          title="Cette partie est encour de maintenance"
                                           primary
                                           onClick={() => setOpenNewIndicatorModal(true)}
                                           loading={false}
