@@ -1,5 +1,6 @@
-import { Button, ButtonStrip, Modal, ModalActions, ModalContent, ModalTitle, Radio } from '@dhis2/ui';
+import { Button, Modal, ModalActions, ModalContent, ModalTitle, Radio } from '@dhis2/ui';
 import translate from '../utils/translator';
+import { v4 as uuid } from 'uuid';
 
 import { useState, useEffect } from 'react';
 import { FiSave } from 'react-icons/fi';
@@ -23,6 +24,7 @@ const SettingIndicatorsMappingNew = ({
       const [selectedIndicatorType, setSelectedIndicatorType] = useState('');
       const [inputIndicatorType, setInputIndicatorType] = useState('');
       const [inputIndicator, setInputIndicator] = useState('');
+      const [inputIndicatorFr, setInputIndicatorFr] = useState('');
       const [type, setType] = useState('NEW');
       const [loadingSave, setLoadingSave] = useState(false);
       const [loadingDelete, setLoadingDelete] = useState(false);
@@ -31,6 +33,7 @@ const SettingIndicatorsMappingNew = ({
             setSelectedIndicatorType('');
             setType('NEW');
             setInputIndicator('');
+            setInputIndicatorFr('');
             setInputIndicatorType('');
             setNewIndicatorList([]);
             setOpen(false);
@@ -88,6 +91,7 @@ const SettingIndicatorsMappingNew = ({
                         setSelectedIndicatorType(value);
                         setNewIndicatorList(found_indicator_type.children || []);
                         setInputIndicator('');
+                        setInputIndicatorFr('');
                         setInputIndicatorType('');
                   }
             }
@@ -102,6 +106,7 @@ const SettingIndicatorsMappingNew = ({
             setType(value);
             setNewIndicatorList([]);
             setInputIndicatorType('');
+            setInputIndicatorFr('');
             setInputIndicator('');
             setSelectedIndicatorType('');
       };
@@ -109,12 +114,20 @@ const SettingIndicatorsMappingNew = ({
       const handleAddIndicator = () => {
             if (
                   inputIndicator &&
+                  inputIndicatorFr &&
                   !newIndicatorList
                         .map(i => i.name?.trim()?.toLowerCase())
-                        .includes(inputIndicator?.trim()?.toLowerCase())
+                        .includes(inputIndicator?.trim()?.toLowerCase()) &&
+                  !newIndicatorList
+                        .map(i => i.name?.trim()?.toLowerCase())
+                        .includes(inputIndicatorFr?.trim()?.toLowerCase())
             ) {
-                  setNewIndicatorList([...newIndicatorList, { name: inputIndicator?.trim() }]);
+                  setNewIndicatorList([
+                        ...newIndicatorList,
+                        { id: uuid(), name_fr: inputIndicatorFr?.trim(), name: inputIndicator?.trim() }
+                  ]);
                   setInputIndicator('');
+                  setInputIndicatorFr('');
             }
       };
 
@@ -144,8 +157,15 @@ const SettingIndicatorsMappingNew = ({
             }
       };
 
-      const handleDeleteIndicator = indName => {
-            setNewIndicatorList(newIndicatorList.filter(i => indName !== i.name));
+      const handleDeleteIndicator = id => {
+            if (!id)
+                  return console.log(
+                        "L'id de l'indicateur est null. ça veut dire que le format est incorrect. Veuillez metre à jour le format puis rééssayer."
+                  );
+
+            if (id) {
+                  setNewIndicatorList(newIndicatorList.filter(i => id !== i.id));
+            }
       };
 
       useEffect(() => {
@@ -228,18 +248,28 @@ const SettingIndicatorsMappingNew = ({
 
                                           {(selectedIndicatorType || inputIndicatorType) && (
                                                 <div style={{ display: 'flex', gap: '5px', alignItems: 'end' }}>
-                                                      <div style={{ marginTop: '10px', width: '100%' }}>
-                                                            <div>
-                                                                  <div>{translate('Indicateur')}</div>
-                                                                  <div style={{ marginTop: '5px' }}>
-                                                                        <Input
-                                                                              placeholder={translate('Name')}
-                                                                              value={inputIndicator}
-                                                                              onChange={e =>
-                                                                                    setInputIndicator(e.target.value)
-                                                                              }
-                                                                        />
-                                                                  </div>
+                                                      <div style={{ marginTop: '10px', width: '50%' }}>
+                                                            <div>{translate('Indicateur')} ( English )</div>
+                                                            <div style={{ marginTop: '5px' }}>
+                                                                  <Input
+                                                                        placeholder={translate('Name')}
+                                                                        value={inputIndicator}
+                                                                        onChange={e =>
+                                                                              setInputIndicator(e.target.value)
+                                                                        }
+                                                                  />
+                                                            </div>
+                                                      </div>
+                                                      <div style={{ marginTop: '10px', width: '50%' }}>
+                                                            <div>{translate('Indicateur')} ( Français )</div>
+                                                            <div style={{ marginTop: '5px' }}>
+                                                                  <Input
+                                                                        placeholder={translate('Name')}
+                                                                        value={inputIndicatorFr}
+                                                                        onChange={e =>
+                                                                              setInputIndicatorFr(e.target.value)
+                                                                        }
+                                                                  />
                                                             </div>
                                                       </div>
                                                       <div>
@@ -345,7 +375,7 @@ const SettingIndicatorsMappingNew = ({
                                                                                                       )}
                                                                                                       onConfirm={() =>
                                                                                                             handleDeleteIndicator(
-                                                                                                                  ind.name
+                                                                                                                  ind.id
                                                                                                             )
                                                                                                       }
                                                                                                 >

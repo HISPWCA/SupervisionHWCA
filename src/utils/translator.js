@@ -27,4 +27,6 @@ export const translateDataStoreLabel = elementObject => {
       }
 };
 
+export const getCurrentLangue = ()=> localStorage.getItem('userLang') || 'en';
+
 export default translate;

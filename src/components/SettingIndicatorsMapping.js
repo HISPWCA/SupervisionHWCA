@@ -1,4 +1,4 @@
-import translate, { translateDataStoreLabel } from '../utils/translator';
+import translate, { getCurrentLangue, translateDataStoreLabel } from '../utils/translator';
 import { Card, Checkbox, Col, Input, Row, Select } from 'antd';
 import { useEffect, useState } from 'react';
 import { idsFromIndicatorFormula, loadDataStore, saveDataToDataStore } from '../utils/functions';
@@ -71,6 +71,11 @@ const SettingIndicatorsMapping = () => {
                                     indicatorRename: dataStoreIndicatorsMapping?.find(
                                           it => it.indicator === child.id && it.group === curr.name
                                     )?.indicatorRename,
+
+                                    indicatorRename_fr: dataStoreIndicatorsMapping?.find(
+                                          it => it.indicator === child.id && it.group === curr.name
+                                    )?.indicatorRename_fr,
+
                                     useNameFromDHIS2: dataStoreIndicatorsMapping?.find(
                                           it => it.indicator === child.id && it.group === curr.name
                                     )?.useNameFromDHIS2,
@@ -301,8 +306,6 @@ const SettingIndicatorsMapping = () => {
                               <div style={{ fontWeight: 'bold' }}>{translate('Indicators_Mapping')}</div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                                     <Button
-                                          disabled={true}
-                                          title="Cette partie est encour de maintenance"
                                           primary
                                           onClick={() => setOpenNewIndicatorModal(true)}
                                           loading={false}
@@ -542,10 +545,23 @@ const SettingIndicatorsMapping = () => {
                                                                                                                                                       useNameFromDHIS2:
                                                                                                                                                             !it.useNameFromDHIS2,
                                                                                                                                                       indicatorRename:
-                                                                                                                                                            !it.useNameFromDHIS2
-                                                                                                                                                                  ? it
-                                                                                                                                                                          .dhis2
-                                                                                                                                                                          ?.name
+                                                                                                                                                            getCurrentLangue() ===
+                                                                                                                                                            'en'
+                                                                                                                                                                  ? !it.useNameFromDHIS2
+                                                                                                                                                                        ? it
+                                                                                                                                                                                .dhis2
+                                                                                                                                                                                ?.name
+                                                                                                                                                                        : null
+                                                                                                                                                                  : null,
+
+                                                                                                                                                      indicatorRename_fr:
+                                                                                                                                                            getCurrentLangue() ===
+                                                                                                                                                            'fr'
+                                                                                                                                                                  ? !it.useNameFromDHIS2
+                                                                                                                                                                        ? it
+                                                                                                                                                                                .dhis2
+                                                                                                                                                                                ?.name
+                                                                                                                                                                        : null
                                                                                                                                                                   : null
                                                                                                                                                 };
                                                                                                                                           }
@@ -578,14 +594,24 @@ const SettingIndicatorsMapping = () => {
                                                                                                                   ?.useNameFromDHIS2
                                                                                                       }
                                                                                                       value={
-                                                                                                            formState?.indicators?.find(
-                                                                                                                  it =>
-                                                                                                                        it.group ===
-                                                                                                                              group.name &&
-                                                                                                                        it.indicator ===
-                                                                                                                              indicator.id
-                                                                                                            )
-                                                                                                                  ?.indicatorRename
+                                                                                                            getCurrentLangue() ===
+                                                                                                            'en'
+                                                                                                                  ? formState?.indicators?.find(
+                                                                                                                          it =>
+                                                                                                                                it.group ===
+                                                                                                                                      group.name &&
+                                                                                                                                it.indicator ===
+                                                                                                                                      indicator.id
+                                                                                                                    )
+                                                                                                                          ?.indicatorRename
+                                                                                                                  : formState?.indicators?.find(
+                                                                                                                          it =>
+                                                                                                                                it.group ===
+                                                                                                                                      group.name &&
+                                                                                                                                it.indicator ===
+                                                                                                                                      indicator.id
+                                                                                                                    )
+                                                                                                                          ?.indicatorRename_fr
                                                                                                       }
                                                                                                       onChange={event =>
                                                                                                             setFormState(
