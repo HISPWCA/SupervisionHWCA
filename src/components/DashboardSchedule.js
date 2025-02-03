@@ -934,12 +934,6 @@ export const Dashboard = ({ me }) => {
                                                                                     }`
                                                                               }}
                                                                         >
-                                                                              {console.log('option: ', option)}
-                                                                              {console.log(
-                                                                                    'Color : ',
-                                                                                    getStatusNameAndColor(option.code)
-                                                                              )}
-
                                                                               {translate(option.displayName)}
                                                                         </div>
                                                                   </div>
