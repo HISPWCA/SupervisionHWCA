@@ -25,6 +25,7 @@ import translate from '../utils/translator';
 import Payment from './Payment';
 import Favorites from './Favorites';
 import { MdStars } from 'react-icons/md';
+import { v4 as uuid } from 'uuid';
 
 import DE_Completness from '../datastores/DE_Completness.json';
 import DS_Completness from '../datastores/DS_Completness.json';
@@ -72,6 +73,141 @@ export const Body = () => {
             }
       };
 
+      const updateDatastoreSchemas = async () => {
+            try {
+                  const metaData = await loadDataStore(process.env.REACT_APP_META_INFOS_NAME, null, null, []);
+                  if (!metaData?.dataStoreSchemaIsUpdated || metaData?.dataStoreSchemaIsUpdated === 'false') {
+                        const crosschecksList = await loadDataStore(
+                              process.env.REACT_APP_CROSS_CUT_KEY,
+                              null,
+                              null,
+                              []
+                        );
+
+                        const indicatorsList = await loadDataStore(
+                              process.env.REACT_APP_INDICATORS_KEY,
+                              null,
+                              null,
+                              []
+                        );
+
+                        const deCompletnessList = await loadDataStore(
+                              process.env.REACT_APP_DE_COMPLETNESS_KEY,
+                              null,
+                              null,
+                              []
+                        );
+                        const dsCompletnessList = await loadDataStore(
+                              process.env.REACT_APP_DS_COMPLETNESS_KEY,
+                              null,
+                              null,
+                              []
+                        );
+                        const registersList = await loadDataStore(process.env.REACT_APP_REGISTRES_KEY, null, null, []);
+
+                        console.log('cross check list : ', crosschecksList);
+                        console.log('indicator list : ', indicatorsList);
+                        console.log('register List : ', registersList);
+                        console.log('de completness list : ', deCompletnessList);
+                        console.log('ds completness list : ', dsCompletnessList);
+
+                        //                          {
+                        //     "dataSet": null,
+                        //     "dhis2": {
+                        //       "id": "fm4wnvf7wly",
+                        //       "name": "001 Test",
+                        //       "type": "PROGRAM_INDICATOR"
+                        //     },
+                        //     "group": "HMIS",
+                        //     "indicator": "b915c4e3-b2a1-4566-b049-8d6459b5be0b",
+                        //     "indicatorRename": "001 Testk",
+                        //     "indicatorRename_fr": "001 Test",
+                        //     "useNameFromDHIS2": true
+                        //   }
+
+                        if (crosschecksList?.length > 0) {
+                              saveDataToDataStore(
+                                    process.env.REACT_APP_CROSS_CUT_KEY,
+                                    crosschecksList?.map(group => ({
+                                          ...group,
+                                          children:
+                                                group.children?.map(child => ({
+                                                      ...child,
+                                                      id: child.id || uuid(),
+                                                      name_fr: child.name_fr || ''
+                                                })) || []
+                                    }))
+                              );
+                        }
+
+                        if (indicatorsList?.length > 0) {
+                              saveDataToDataStore(
+                                    process.env.REACT_APP_INDICATORS_KEY,
+                                    indicatorsList?.map(group => ({
+                                          ...group,
+                                          children:
+                                                group.children?.map(child => ({
+                                                      ...child,
+                                                      id: child.id || uuid(),
+                                                      name_fr: child.name_fr || ''
+                                                })) || []
+                                    }))
+                              );
+                        }
+
+                        if (deCompletnessList?.length > 0) {
+                              saveDataToDataStore(
+                                    process.env.REACT_APP_DE_COMPLETNESS_KEY,
+                                    deCompletnessList?.map(group => ({
+                                          ...group,
+                                          children:
+                                                group.children?.map(child => ({
+                                                      ...child,
+                                                      id: child.id || uuid(),
+                                                      name_fr: child.name_fr || ''
+                                                })) || []
+                                    }))
+                              );
+                        }
+                        if (dsCompletnessList?.length > 0) {
+                              saveDataToDataStore(
+                                    process.env.REACT_APP_DS_COMPLETNESS_KEY,
+                                    dsCompletnessList?.map(group => ({
+                                          ...group,
+                                          children:
+                                                group.children?.map(child => ({
+                                                      ...child,
+                                                      id: child.id || uuid(),
+                                                      name_fr: child.name_fr || ''
+                                                })) || []
+                                    }))
+                              );
+                        }
+                        if (registersList?.length > 0) {
+                              saveDataToDataStore(
+                                    process.env.REACT_APP_REGISTRES_KEY,
+                                    registersList?.map(group => ({
+                                          ...group,
+                                          children:
+                                                group.children?.map(child => ({
+                                                      ...child,
+                                                      id: child.id || uuid(),
+                                                      name_fr: child.name_fr || ''
+                                                })) || []
+                                    }))
+                              );
+                        }
+
+                        saveDataToDataStore(process.env.REACT_APP_META_INFOS_NAME, {
+                              ...metaData,
+                              dataStoreSchemaIsUpdated: true
+                        });
+                  }
+            } catch (err) {
+                  console.log('Error : ', err);
+            }
+      };
+
       const initDataStore = async () => {
             try {
                   setLoadingDataStoreInitialization(true);
@@ -104,7 +240,11 @@ export const Body = () => {
                         process.env.REACT_APP_META_INFOS_NAME,
                         null,
                         null,
-                        MetadataInfos && { ...MetadataInfos, metadata_version: process.env.REACT_APP_META_DATA_VERSION }
+                        MetadataInfos && {
+                              ...MetadataInfos,
+                              metadata_version: process.env.REACT_APP_META_DATA_VERSION,
+                              dataStoreSchemaIsUpdated: true
+                        }
                   );
                   await loadDataStore(process.env.REACT_APP_PERIODS_CONFIG_KEY, null, null, {
                         periods: [],
@@ -134,6 +274,8 @@ export const Body = () => {
                         },
                         ERDQ: { nbrIndicator: 3, nbrRecoupement: 3 }
                   });
+
+                  await updateDatastoreSchemas();
 
                   await loadMe();
                   setDataStoreInitialized(true);
