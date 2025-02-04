@@ -598,7 +598,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                       >
                                                             {`${translate('ConsistencyOverTime')} ${consIndex + 1}`}
                                                       </td>
-                                                 
+
                                                       <td
                                                             style={{
                                                                   padding: '2px 5px',
@@ -731,7 +731,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                         ...formState?.completeness,
                                                                         nbrDataElementsToShow: value
                                                                   }
-                                                            })
+                                                            });
                                                       }}
                                                 />
                                           </div>
@@ -935,7 +935,9 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                                       ?.name
                                                                                     )
                                                                                     ?.children?.map(ind => ({
-                                                                                          label: translateDataStoreLabel(ind),
+                                                                                          label: translateDataStoreLabel(
+                                                                                                ind
+                                                                                          ),
                                                                                           value: ind.id
                                                                                     }))}
                                                                               disabled={
@@ -1034,7 +1036,9 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                                       ?.name
                                                                                     )
                                                                                     ?.children?.map(ind => ({
-                                                                                          label: translateDataStoreLabel(ind),
+                                                                                          label: translateDataStoreLabel(
+                                                                                                ind
+                                                                                          ),
                                                                                           value: ind.id
                                                                                     }))}
                                                                               disabled={
