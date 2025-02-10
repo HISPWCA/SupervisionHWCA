@@ -156,6 +156,7 @@ const Setting = () => {
             selectedStatusSupervisionDataElement: null,
             selectedSupervisionAutoGenerateID: null,
             selectedNbrIndicatorsToShow: null,
+            selectedPeriodVerification:null,
             indicators: [],
             recoupements: [],
             completeness: {
@@ -349,6 +350,7 @@ const Setting = () => {
                   selectedStatusSupervisionDataElement: null,
                   selectedSupervisionAutoGenerateID: null,
                   selectedNbrIndicatorsToShow: null,
+                  selectedPeriodVerification: null,
                   globalProgramArea: null,
                   globalProgramAreaKeyWords: [],
                   indicators: [],
@@ -911,7 +913,7 @@ const Setting = () => {
                   selectedStatusSupervisionDataElement: null,
                   selectedOrganisationUnitGroup: null,
                   globalProgramArea: null,
-                  globalProgramAreaKeyWords:  [],
+                  globalProgramAreaKeyWords: [],
                   completeness: null,
                   consistencyOvertimes: [],
                   indicators: [],
@@ -1006,6 +1008,7 @@ const Setting = () => {
                                                               formState?.selectedStatusSupervisionDataElement,
                                                         selectedNbrIndicatorsToShow:
                                                               formState?.selectedNbrIndicatorsToShow,
+                                                        selectedPeriodVerification: formState?.selectedPeriodVerification,
                                                         indicators: formState?.indicators,
                                                         recoupements: formState?.recoupements,
                                                         completeness: formState?.completeness,
@@ -1028,6 +1031,7 @@ const Setting = () => {
                                                   statusSupervisionField:
                                                         formState?.selectedStatusSupervisionDataElement,
                                                   selectedNbrIndicatorsToShow: formState.selectedNbrIndicatorsToShow,
+                                                  selectedPeriodVerification: formState.selectedPeriodVerification,
                                                   indicators: formState.indicators,
                                                   recoupements: formState.recoupements,
                                                   completeness: formState.completeness,
@@ -1043,6 +1047,7 @@ const Setting = () => {
                                             organisationUnitGroup: formState?.selectedOrganisationUnitGroup,
                                             supervisorField: formState?.selectedSupervisorDataElements,
                                             selectedNbrIndicatorsToShow: formState.selectedNbrIndicatorsToShow,
+                                            selectedPeriodVerification: formState.selectedPeriodVerification,
                                             statusSupervisionField: formState?.selectedStatusSupervisionDataElement,
                                             indicators: formState.indicators,
                                             recoupements: formState.recoupements,
@@ -1552,6 +1557,7 @@ const Setting = () => {
                   ...formState,
                   selectedStatusSupervisionDataElement: null,
                   selectedNbrIndicatorsToShow: null,
+                  selectedPeriodVerification: null,
                   selectedSupervisorDataElements: [],
                   globalProgramArea: formState?.globalProgramArea,
                   globalProgramAreaKeyWords: formState?.globalProgramAreaKeyWords || [],
@@ -1569,6 +1575,7 @@ const Setting = () => {
                   ...formStateForRDQA,
                   selectedStatusSupervisionDataElement: null,
                   selectedNbrIndicatorsToShow: null,
+                  selectedPeriodVerification: null,
                   selectedSupervisorDataElements: [],
                   selectedProgramStageForConfiguration: programStages.find(pstage => pstage.id === value)
             });
@@ -1794,6 +1801,7 @@ const Setting = () => {
                               selectedSupervisorDataElements: value.supervisorField || [],
                               selectedStatusSupervisionDataElement: value.statusSupervisionField,
                               selectedNbrIndicatorsToShow: value.selectedNbrIndicatorsToShow,
+                              selectedPeriodVerification: value.selectedPeriodVerification,
                               globalProgramArea: value?.globalProgramArea,
                               globalProgramAreaKeyWords: value?.globalProgramAreaKeyWords || [],
                               completeness: {
@@ -1907,7 +1915,7 @@ const Setting = () => {
                                                 <Col md={12}>
                                                       <div>
                                                             <div style={{ marginBottom: '5px' }}>
-                                                                  {translate('Supervision_Status_fields')}
+                                                                  {translate('Status_Supervision')}
                                                             </div>
                                                             <Select
                                                                   options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
@@ -1917,7 +1925,7 @@ const Setting = () => {
                                                                               value: progStageDE.dataElement?.id
                                                                         })
                                                                   )}
-                                                                  placeholder={translate('Elements_De_Donnees')}
+                                                                  placeholder={translate('Status_Supervision')}
                                                                   style={{ width: '100%' }}
                                                                   onChange={handleSelectStatutSupervisionDataElement}
                                                                   value={
@@ -2189,6 +2197,65 @@ const Setting = () => {
                                                                                     value={
                                                                                           formState?.completeness
                                                                                                 .selectedNbrDataElementsToShow
+                                                                                                ?.id
+                                                                                    }
+                                                                                    optionFilterProp="label"
+                                                                                    showSearch
+                                                                                    allowClear
+                                                                              />
+                                                                        </td>
+                                                                  </tr>
+
+                                                                  <tr>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top',
+                                                                                    width: '50%'
+                                                                              }}
+                                                                        >
+                                                                              {translate('Recent_Verification_Period')}
+                                                                        </td>
+                                                                        <td
+                                                                              style={{
+                                                                                    border: '1px solid #00000070',
+                                                                                    padding: '2px 5px',
+                                                                                    verticalAlign: 'top'
+                                                                              }}
+                                                                        >
+                                                                              <Select
+                                                                                    options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                                          progStageDE => ({
+                                                                                                label: progStageDE
+                                                                                                      .dataElement
+                                                                                                      ?.displayName,
+                                                                                                value: progStageDE
+                                                                                                      .dataElement?.id
+                                                                                          })
+                                                                                    )}
+                                                                                    placeholder={translate(
+                                                                                          'Recent_Verification_Period'
+                                                                                    )}
+                                                                                    style={{ width: '100%' }}
+                                                                                    onChange={value => {
+                                                                                          setFormState({
+                                                                                                ...formState,
+                                                                                                selectedPeriodVerification:
+                                                                                                      formState?.selectedProgramStageForConfiguration?.programStageDataElements
+                                                                                                            ?.map(
+                                                                                                                  p =>
+                                                                                                                        p.dataElement
+                                                                                                            )
+                                                                                                            .find(
+                                                                                                                  dataElement =>
+                                                                                                                        dataElement.id ===
+                                                                                                                        value
+                                                                                                            )
+                                                                                          });
+                                                                                    }}
+                                                                                    value={
+                                                                                          formState?.selectedPeriodVerification
                                                                                                 ?.id
                                                                                     }
                                                                                     optionFilterProp="label"

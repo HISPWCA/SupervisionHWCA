@@ -362,6 +362,8 @@
     "Tracker_Program_Choice_Title": "Tracker program choice, Supervision Type, Subject type to supervise",
     "Primary_Datasource_Key_Words": "Primary data source key words",
     "Secondary_Datasource_Key_Words": "Secondary data source key words",
-    "Edit_Indicator":"Modify Indicator",
-    "Pending Validation":"Pending Validation"
+    "Edit_Indicator": "Modify Indicator",
+    "Pending Validation": "Pending Validation",
+    "Recent_Verification_Period": "Recent checking period",
+    "Recent_Verification_Period_Help": "Select any date from the most recent data verification period. ( for example: If your configuration takes 3 months of data, by choosing 01 May 2024, the system will understand that you want to work with data from April, March, February 2024 )"
 }

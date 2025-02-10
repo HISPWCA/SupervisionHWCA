@@ -20,6 +20,7 @@ import {
 import { IoMdAdd } from 'react-icons/io';
 import { IoListCircleOutline } from 'react-icons/io5';
 import { MdOutlineSettingsBackupRestore } from 'react-icons/md';
+import { FcInfo } from 'react-icons/fc';
 
 import {
       Button,
@@ -198,7 +199,6 @@ const Supervision = ({ me }) => {
       const [selectedSelectionTypeForPerformance, setSelectedSelectionTypeForPerformance] = useState(DIRECTE);
       const [selectedElementForPerformances, setSelectedElementForPerformances] = useState([]);
       const [selectedFavoritForPerformance, setSelectedFavoritForPerformance] = useState(null);
-      const [selectedDataElementGroup, setSelectedDataElementGroup] = useState(null);
 
       const [inputFavorisName, setInputFavoritName] = useState('');
       const [inputEquipeAutreSuperviseur, setInputEquipeAutreSuperviseur] = useState('');
@@ -1684,7 +1684,7 @@ const Supervision = ({ me }) => {
                   // Period implémentation
 
                   let newDataValueList = [];
-                  if (payload.programStageConfig?.indicators?.length > 0) {
+                  if (payload.programStageConfig?.indicators?.length > 0 && payload.periodVerification) {
                         const indicatorsList = payload.programStageConfig?.indicators;
                         for (let dv of eventPayload.dataValues) {
                               const foundInd = indicatorsList.find(ind => ind.value?.id === dv.dataElement);
@@ -1733,7 +1733,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       1,
                                                       periodType,
-                                                      eventPayload.eventDate
+                                                      eventPayload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -1763,7 +1763,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       2,
                                                       periodType,
-                                                      eventPayload.eventDate
+                                                      eventPayload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -1793,7 +1793,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       3,
                                                       periodType,
-                                                      eventPayload.eventDate
+                                                      eventPayload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -1823,7 +1823,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       4,
                                                       periodType,
-                                                      eventPayload.eventDate
+                                                      eventPayload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -1854,7 +1854,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       5,
                                                       periodType,
-                                                      eventPayload.eventDate
+                                                      eventPayload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -1884,7 +1884,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       6,
                                                       periodType,
-                                                      eventPayload.eventDate
+                                                      eventPayload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -1915,7 +1915,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       7,
                                                       periodType,
-                                                      eventPayload.eventDate
+                                                      eventPayload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -1946,7 +1946,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       8,
                                                       periodType,
-                                                      eventPayload.eventDate
+                                                      eventPayload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -1977,7 +1977,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       9,
                                                       periodType,
-                                                      eventPayload.eventDate
+                                                      eventPayload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -2008,7 +2008,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       10,
                                                       periodType,
-                                                      eventPayload.eventDate
+                                                      eventPayload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -2039,7 +2039,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       11,
                                                       periodType,
-                                                      eventPayload.eventDate
+                                                      eventPayload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -2070,7 +2070,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       12,
                                                       periodType,
-                                                      eventPayload.eventDate
+                                                      eventPayload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -2101,7 +2101,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       13,
                                                       periodType,
-                                                      eventPayload.eventDate
+                                                      eventPayload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -2132,7 +2132,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       14,
                                                       periodType,
-                                                      eventPayload.eventDate
+                                                      eventPayload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -2163,7 +2163,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       15,
                                                       periodType,
-                                                      eventPayload.eventDate
+                                                      eventPayload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -2467,7 +2467,7 @@ const Supervision = ({ me }) => {
                                                       const periodObject = getRightPeriodFormat(
                                                             1,
                                                             periodType,
-                                                            eventPayload.eventDate
+                                                            eventPayload.periodVerification
                                                       );
 
                                                       const orgUnitId = eventPayload.orgUnit;
@@ -2497,7 +2497,7 @@ const Supervision = ({ me }) => {
                                                       const periodObject = getRightPeriodFormat(
                                                             2,
                                                             periodType,
-                                                            eventPayload.eventDate
+                                                            eventPayload.periodVerification
                                                       );
 
                                                       const orgUnitId = eventPayload.orgUnit;
@@ -2527,7 +2527,7 @@ const Supervision = ({ me }) => {
                                                       const periodObject = getRightPeriodFormat(
                                                             3,
                                                             periodType,
-                                                            eventPayload.eventDate
+                                                            eventPayload.periodVerification
                                                       );
 
                                                       const orgUnitId = eventPayload.orgUnit;
@@ -2557,7 +2557,7 @@ const Supervision = ({ me }) => {
                                                       const periodObject = getRightPeriodFormat(
                                                             4,
                                                             periodType,
-                                                            eventPayload.eventDate
+                                                            eventPayload.periodVerification
                                                       );
 
                                                       const orgUnitId = eventPayload.orgUnit;
@@ -2588,7 +2588,7 @@ const Supervision = ({ me }) => {
                                                       const periodObject = getRightPeriodFormat(
                                                             5,
                                                             periodType,
-                                                            eventPayload.eventDate
+                                                            eventPayload.periodVerification
                                                       );
 
                                                       const orgUnitId = eventPayload.orgUnit;
@@ -2618,7 +2618,7 @@ const Supervision = ({ me }) => {
                                                       const periodObject = getRightPeriodFormat(
                                                             6,
                                                             periodType,
-                                                            eventPayload.eventDate
+                                                            eventPayload.periodVerification
                                                       );
 
                                                       const orgUnitId = eventPayload.orgUnit;
@@ -2649,7 +2649,7 @@ const Supervision = ({ me }) => {
                                                       const periodObject = getRightPeriodFormat(
                                                             7,
                                                             periodType,
-                                                            eventPayload.eventDate
+                                                            eventPayload.periodVerification
                                                       );
 
                                                       const orgUnitId = eventPayload.orgUnit;
@@ -2680,7 +2680,7 @@ const Supervision = ({ me }) => {
                                                       const periodObject = getRightPeriodFormat(
                                                             8,
                                                             periodType,
-                                                            eventPayload.eventDate
+                                                            eventPayload.periodVerification
                                                       );
 
                                                       const orgUnitId = eventPayload.orgUnit;
@@ -2711,7 +2711,7 @@ const Supervision = ({ me }) => {
                                                       const periodObject = getRightPeriodFormat(
                                                             9,
                                                             periodType,
-                                                            eventPayload.eventDate
+                                                            eventPayload.periodVerification
                                                       );
 
                                                       const orgUnitId = eventPayload.orgUnit;
@@ -2742,7 +2742,7 @@ const Supervision = ({ me }) => {
                                                       const periodObject = getRightPeriodFormat(
                                                             10,
                                                             periodType,
-                                                            eventPayload.eventDate
+                                                            eventPayload.periodVerification
                                                       );
 
                                                       const orgUnitId = eventPayload.orgUnit;
@@ -2773,7 +2773,7 @@ const Supervision = ({ me }) => {
                                                       const periodObject = getRightPeriodFormat(
                                                             11,
                                                             periodType,
-                                                            eventPayload.eventDate
+                                                            eventPayload.periodVerification
                                                       );
 
                                                       const orgUnitId = eventPayload.orgUnit;
@@ -2804,7 +2804,7 @@ const Supervision = ({ me }) => {
                                                       const periodObject = getRightPeriodFormat(
                                                             12,
                                                             periodType,
-                                                            eventPayload.eventDate
+                                                            eventPayload.periodVerification
                                                       );
 
                                                       const orgUnitId = eventPayload.orgUnit;
@@ -2835,7 +2835,7 @@ const Supervision = ({ me }) => {
                                                       const periodObject = getRightPeriodFormat(
                                                             13,
                                                             periodType,
-                                                            eventPayload.eventDate
+                                                            eventPayload.periodVerification
                                                       );
 
                                                       const orgUnitId = eventPayload.orgUnit;
@@ -2866,7 +2866,7 @@ const Supervision = ({ me }) => {
                                                       const periodObject = getRightPeriodFormat(
                                                             14,
                                                             periodType,
-                                                            eventPayload.eventDate
+                                                            eventPayload.periodVerification
                                                       );
 
                                                       const orgUnitId = eventPayload.orgUnit;
@@ -2897,7 +2897,7 @@ const Supervision = ({ me }) => {
                                                       const periodObject = getRightPeriodFormat(
                                                             15,
                                                             periodType,
-                                                            eventPayload.eventDate
+                                                            eventPayload.periodVerification
                                                       );
 
                                                       const orgUnitId = eventPayload.orgUnit;
@@ -3066,7 +3066,10 @@ const Supervision = ({ me }) => {
                                           const payload = {
                                                 ...item,
                                                 orgUnit: item.organisationUnit?.id,
-                                                period: item.period,
+                                                period: item.period && dayjs(item.period).format('YYYY-MM-DD'),
+                                                periodVerification:
+                                                      item.periodVerification &&
+                                                      dayjs(item.periodVerification).format('YYYY-MM-DD'),
                                                 program: item.program?.id,
                                                 fieldConfig: item.fieldConfig,
                                                 programStage: progStageConfig.programStage,
@@ -3083,7 +3086,10 @@ const Supervision = ({ me }) => {
                                                       planificationType: selectedPlanificationType,
                                                       indicators: selectedIndicators,
                                                       orgUnit: item.organisationUnit?.id,
-                                                      period: item.period,
+                                                      period: item.period && dayjs(item.period).format('YYYY-MM-DD'),
+                                                      periodVerification:
+                                                            item.periodVerification &&
+                                                            dayjs(item.periodVerification).format('YYYY-MM-DD'),
                                                       program: item.program,
                                                       programStage: progStageConfig.programStage.id,
                                                       programStageConfig: progStageConfig,
@@ -4633,13 +4639,13 @@ const Supervision = ({ me }) => {
             );
       };
 
-      const handleInputLibelle = (event, index) => {
+      const handleInputPeriodVerification = (period, index) => {
             setInputFields(
                   inputFields.map((field, fieldIndex) => {
                         if (index === fieldIndex) {
                               return {
                                     ...field,
-                                    libelle: ''.concat(event.target.value)
+                                    periodVerification: period
                               };
                         }
                         return field;
@@ -4804,6 +4810,70 @@ const Supervision = ({ me }) => {
                                                                         }
                                                                   />
                                                             </div>
+                                                      </Col>{' '}
+                                                      <Col sm={24} md={24}>
+                                                            <div>
+                                                                  <div
+                                                                        style={{
+                                                                              marginBottom: '5px',
+                                                                              display: 'flex',
+                                                                              alignItems: 'center',
+                                                                              gap: '5px'
+                                                                        }}
+                                                                  >
+                                                                        {
+                                                                              <span>
+                                                                                    {translate(
+                                                                                          'Recent_Verification_Period'
+                                                                                    )}{' '}
+                                                                                    (
+                                                                                    <span style={{ color: RED }}>
+                                                                                          {' '}
+                                                                                          *{' '}
+                                                                                    </span>
+                                                                                    )
+                                                                              </span>
+                                                                        }
+
+                                                                        <Popover
+                                                                              content={
+                                                                                    <div
+                                                                                          style={{
+                                                                                                maxWidth: '300px',
+                                                                                                border: '1px solid blue',
+                                                                                                padding: '10px',
+                                                                                                borderRadius: '10px'
+                                                                                          }}
+                                                                                    >
+                                                                                          {translate(
+                                                                                                'Recent_Verification_Period_Help'
+                                                                                          )}
+                                                                                    </div>
+                                                                              }
+                                                                        >
+                                                                              <span style={{ cursor: 'pointer' }}>
+                                                                                    <FcInfo
+                                                                                          style={{
+                                                                                                fontSize: '18px'
+                                                                                          }}
+                                                                                    />
+                                                                              </span>
+                                                                        </Popover>
+                                                                  </div>
+                                                                  <DatePicker
+                                                                        style={{ width: '100%' }}
+                                                                        placeholder={translate(
+                                                                              'Recent_Verification_Period'
+                                                                        )}
+                                                                        value={inputFields[index]?.periodVerification}
+                                                                        onChange={period =>
+                                                                              handleInputPeriodVerification(
+                                                                                    period,
+                                                                                    index
+                                                                              )
+                                                                        }
+                                                                  />
+                                                            </div>
                                                       </Col>
                                                       <Col sm={24} md={24}>
                                                             <div>
@@ -4901,258 +4971,6 @@ const Supervision = ({ me }) => {
                                                                   </Row>
                                                             </div>
                                                       </Col>
-
-                                                      {inputFields[index]?.otherSupervisors?.length > 0 && (
-                                                            <Col md={24}>
-                                                                  <div style={{ marginTop: '10px' }}>
-                                                                        <List
-                                                                              size="small"
-                                                                              bordered
-                                                                              dataSource={
-                                                                                    inputFields[index]?.otherSupervisors
-                                                                              }
-                                                                              renderItem={item => (
-                                                                                    <List.Item
-                                                                                          style={{
-                                                                                                padding: '2px 10px'
-                                                                                          }}
-                                                                                    >
-                                                                                          <div
-                                                                                                style={{
-                                                                                                      display: 'flex',
-                                                                                                      justifyContent:
-                                                                                                            'space-between',
-                                                                                                      width: '100%'
-                                                                                                }}
-                                                                                          >
-                                                                                                <div>{item}</div>
-                                                                                                <div>
-                                                                                                      <Popconfirm
-                                                                                                            title={translate(
-                                                                                                                  'Suppression'
-                                                                                                            )}
-                                                                                                            description={translate(
-                                                                                                                  'Confirmation_Suppression_Superviseur'
-                                                                                                            )}
-                                                                                                            icon={
-                                                                                                                  <QuestionCircleOutlined
-                                                                                                                        style={{
-                                                                                                                              color: 'red'
-                                                                                                                        }}
-                                                                                                                  />
-                                                                                                            }
-                                                                                                            onConfirm={() =>
-                                                                                                                  handleDeleteOtherSupervisor(
-                                                                                                                        item,
-                                                                                                                        index
-                                                                                                                  )
-                                                                                                            }
-                                                                                                      >
-                                                                                                            <RiDeleteBinLine
-                                                                                                                  style={{
-                                                                                                                        color: 'red',
-                                                                                                                        fontSize: '20px',
-                                                                                                                        cursor: 'pointer'
-                                                                                                                  }}
-                                                                                                            />
-                                                                                                      </Popconfirm>
-                                                                                                </div>
-                                                                                          </div>
-                                                                                    </List.Item>
-                                                                              )}
-                                                                        />
-                                                                  </div>
-                                                            </Col>
-                                                      )}
-                                                </Row>
-                                          </div>
-                                    </Card>
-                              </Col>
-                        ))}
-                  </Row>
-            </div>
-      );
-
-      const handleCloseAgentForm = ag => {
-            setSelectedAgents(selectedAgents.filter(agent => agent.trackedEntityInstance !== ag.trackedEntityInstance));
-            setInputFields(inputFields.filter(agent => agent.trackedEntityInstance !== ag.id));
-      };
-      const RenderAgentsForm = (colMd = 6) => (
-            <div>
-                  <Row gutter={[10, 10]}>
-                        {selectedAgents.map((agent, index) => (
-                              <Col md={colMd} sm={24} key={index}>
-                                    <Card bodyStyle={{ padding: '0px' }} className="my-shadow" size="small">
-                                          <div
-                                                style={{
-                                                      background: '#0A9396',
-                                                      color: '#FFF',
-                                                      fontWeight: 'bold',
-                                                      padding: '10px',
-                                                      position: 'relative'
-                                                }}
-                                          >
-                                                <span>{translate('Formulaire_De_Planification')}</span>
-
-                                                <span
-                                                      style={{
-                                                            marginLeft: '20px',
-                                                            background: '#fff',
-                                                            color: '#0A9396',
-                                                            fontWeight: 'bold',
-                                                            padding: '5px',
-                                                            borderRadius: '10px'
-                                                      }}
-                                                >
-                                                      {
-                                                            agent.attributes?.find(
-                                                                  att =>
-                                                                        att.attribute ===
-                                                                        selectedProgram.attributesToDisplay?.[0]?.id
-                                                            )?.value
-                                                      }
-                                                </span>
-
-                                                <span className="delete-sup">
-                                                      <Popconfirm
-                                                            title={translate('Suppression')}
-                                                            description={translate(
-                                                                  'Confirmation_Suppression_Du_Formulaire'
-                                                            )}
-                                                            icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
-                                                            onConfirm={() => handleCloseAgentForm(agent)}
-                                                      >
-                                                            <span style={{ padding: '5px' }}>X</span>
-                                                      </Popconfirm>
-                                                </span>
-                                          </div>
-                                          <div style={{ padding: '10px' }}>
-                                                <Row gutter={[10, 10]}>
-                                                      <Col sm={24} md={24}>
-                                                            <div>
-                                                                  <div style={{ marginBottom: '5px' }}>
-                                                                        {translate('Periode')}
-                                                                  </div>
-                                                                  <DatePicker
-                                                                        disabledDate={disabledDate}
-                                                                        style={{ width: '100%' }}
-                                                                        placeholder={translate('Periode')}
-                                                                        value={inputFields[index]?.period}
-                                                                        onChange={period =>
-                                                                              handleInputPeriod(period, index)
-                                                                        }
-                                                                  />
-                                                            </div>
-                                                      </Col>
-                                                      {0 > 1 && (
-                                                            <Col sm={24} md={12}>
-                                                                  <div>
-                                                                        <div style={{ marginBottom: '5px' }}>
-                                                                              {translate('Libelle')}
-                                                                        </div>
-                                                                        <Input
-                                                                              placeholder={translate('Libelle')}
-                                                                              style={{ width: '100%' }}
-                                                                              value={inputFields[index]?.libelle}
-                                                                              onChange={event =>
-                                                                                    handleInputLibelle(event, index)
-                                                                              }
-                                                                        />
-                                                                  </div>
-                                                            </Col>
-                                                      )}
-                                                      {selectedProgram?.fieldConfig?.supervisor?.dataElements?.length >
-                                                            0 && (
-                                                            <Col sm={24} md={24}>
-                                                                  <div>
-                                                                        <div style={{ marginBottom: '5px' }}>
-                                                                              {translate('Superviseurs')}
-                                                                        </div>
-                                                                        <Select
-                                                                              placeholder={translate('Superviseurs')}
-                                                                              style={{ width: '100%' }}
-                                                                              loading={loadingUsers}
-                                                                              disabled={loadingUsers}
-                                                                              value={inputFields[
-                                                                                    index
-                                                                              ]?.supervisors?.map(sup => sup.id)}
-                                                                              onChange={values =>
-                                                                                    handleInputSupervisors(
-                                                                                          values,
-                                                                                          index
-                                                                                    )
-                                                                              }
-                                                                              mode="multiple"
-                                                                              optionFilterProp="label"
-                                                                              showSearch
-                                                                              allowClear
-                                                                              options={users.map(user => ({
-                                                                                    label: user.displayName,
-                                                                                    value: user.id
-                                                                              }))}
-                                                                        />
-                                                                  </div>
-                                                            </Col>
-                                                      )}
-                                                      {selectedProgram?.fieldConfig?.supervisor?.dataElements?.length >
-                                                            0 && (
-                                                            <Col md={24}>
-                                                                  <div>
-                                                                        <div style={{ marginBottom: '5px' }}>
-                                                                              {translate('Autre_Superviseurs')}
-                                                                        </div>
-                                                                        <Row gutter={[10, 10]}>
-                                                                              <Col md={18} sm={24}>
-                                                                                    <Input
-                                                                                          placeholder={translate(
-                                                                                                'Autre_Superviseurs'
-                                                                                          )}
-                                                                                          value={
-                                                                                                inputFields[index]
-                                                                                                      ?.inputOtherSupervisor
-                                                                                          }
-                                                                                          onChange={event =>
-                                                                                                handleInputOtherSupervisor(
-                                                                                                      event,
-                                                                                                      index
-                                                                                                )
-                                                                                          }
-                                                                                    />
-                                                                              </Col>
-                                                                              <Col
-                                                                                    flex="auto"
-                                                                                    style={{ textAlign: 'right' }}
-                                                                              >
-                                                                                    <Button
-                                                                                          primary
-                                                                                          onClick={() =>
-                                                                                                handleInputAddOtherSupervisors(
-                                                                                                      index
-                                                                                                )
-                                                                                          }
-                                                                                          disabled={
-                                                                                                inputFields[
-                                                                                                      index
-                                                                                                ]?.inputOtherSupervisor?.trim() &&
-                                                                                                !inputFields[
-                                                                                                      index
-                                                                                                ]?.otherSupervisorList?.includes(
-                                                                                                      inputFields[
-                                                                                                            index
-                                                                                                      ]?.inputOtherSupervisor?.trim()
-                                                                                                )
-                                                                                                      ? false
-                                                                                                      : true
-                                                                                          }
-                                                                                    >
-                                                                                          + {translate('Ajouter')}{' '}
-                                                                                    </Button>
-                                                                              </Col>
-                                                                        </Row>
-                                                                  </div>
-                                                            </Col>
-                                                      )}
-
                                                       {inputFields[index]?.otherSupervisors?.length > 0 && (
                                                             <Col md={24}>
                                                                   <div style={{ marginTop: '10px' }}>
@@ -6864,13 +6682,6 @@ const Supervision = ({ me }) => {
                                           selectedOrganisationUnits.length > 0 && (
                                                 <Col md={24}>{RenderOrganisationUnitForm(8)}</Col>
                                           )}
-
-                                    {selectedSupervisionType === TYPE_SUPERVISION_AGENT &&
-                                          selectedAgents.length > 0 && (
-                                                <Col sm={24} md={24}>
-                                                      {RenderAgentsForm(6)}
-                                                </Col>
-                                          )}
                               </Row>
                         </>
                   )}
@@ -6882,40 +6693,6 @@ const Supervision = ({ me }) => {
                   <div style={{ width: '100%' }}>{RenderStepsContent()}</div>
             </>
       );
-
-      const initAgentInput = agentList => {
-            const newList = [];
-            for (let ag of agentList) {
-                  if (inputFields.map(inp => inp.trackedEntityInstance).includes(ag.trackedEntityInstance)) {
-                        newList.push(inputFields.find(inp => inp.trackedEntityInstance === ag.trackedEntityInstance));
-                  } else {
-                        if (ag.enrollments?.length > 0) {
-                              newList.push({
-                                    organisationUnit: {
-                                          id: ag.enrollments[0]?.orgUnit,
-                                          displayName: ag.enrollments[0]?.orgUnitName
-                                    },
-                                    trackedEntityInstance: ag.enrollments[0]?.trackedEntityInstance,
-                                    program: {
-                                          id: selectedProgram.program?.id,
-                                          displayName: selectedProgram.program?.displayName
-                                    },
-                                    fieldConfig: selectedProgram.fieldConfig,
-                                    generationType: selectedProgram.generationType,
-                                    libelle: '',
-                                    payment: null,
-                                    period: null,
-                                    supervisors: [],
-                                    otherSupervisors: [],
-                                    inputOtherSupervisor: '',
-                                    equipe: null
-                              });
-                        }
-                  }
-            }
-
-            return newList;
-      };
 
       const initInputOrganisation = ouList => {
             const newList = [];
@@ -6934,6 +6711,7 @@ const Supervision = ({ me }) => {
                               libelle: '',
                               payment: null,
                               period: null,
+                              periodVerification: null,
                               equipe: null,
                               supervisors: [],
                               otherSupervisors: [],
@@ -6953,10 +6731,6 @@ const Supervision = ({ me }) => {
                   selectedOrganisationUnits?.length > 0
             ) {
                   newList = initInputOrganisation(selectedOrganisationUnits);
-            }
-
-            if (selectedSupervisionType === TYPE_SUPERVISION_AGENT && selectedAgents && selectedAgents?.length > 0) {
-                  newList = initAgentInput(selectedAgents);
             }
 
             setInputFields(newList);
