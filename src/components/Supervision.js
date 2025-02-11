@@ -1733,7 +1733,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       1,
                                                       periodType,
-                                                      eventPayload.periodVerification
+                                                      payload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -1763,7 +1763,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       2,
                                                       periodType,
-                                                      eventPayload.periodVerification
+                                                      payload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -1793,7 +1793,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       3,
                                                       periodType,
-                                                      eventPayload.periodVerification
+                                                      payload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -1823,7 +1823,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       4,
                                                       periodType,
-                                                      eventPayload.periodVerification
+                                                      payload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -1854,7 +1854,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       5,
                                                       periodType,
-                                                      eventPayload.periodVerification
+                                                      payload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -1884,7 +1884,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       6,
                                                       periodType,
-                                                      eventPayload.periodVerification
+                                                      payload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -1915,7 +1915,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       7,
                                                       periodType,
-                                                      eventPayload.periodVerification
+                                                      payload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -1946,7 +1946,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       8,
                                                       periodType,
-                                                      eventPayload.periodVerification
+                                                      payload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -1977,7 +1977,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       9,
                                                       periodType,
-                                                      eventPayload.periodVerification
+                                                      payload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -2008,7 +2008,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       10,
                                                       periodType,
-                                                      eventPayload.periodVerification
+                                                      payload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -2039,7 +2039,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       11,
                                                       periodType,
-                                                      eventPayload.periodVerification
+                                                      payload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -2070,7 +2070,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       12,
                                                       periodType,
-                                                      eventPayload.periodVerification
+                                                      payload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -2101,7 +2101,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       13,
                                                       periodType,
-                                                      eventPayload.periodVerification
+                                                      payload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -2132,7 +2132,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       14,
                                                       periodType,
-                                                      eventPayload.periodVerification
+                                                      payload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -2163,7 +2163,7 @@ const Supervision = ({ me }) => {
                                                 const periodObject = getRightPeriodFormat(
                                                       15,
                                                       periodType,
-                                                      eventPayload.periodVerification
+                                                      payload.periodVerification
                                                 );
 
                                                 const orgUnitId = eventPayload.orgUnit;
@@ -2411,523 +2411,549 @@ const Supervision = ({ me }) => {
                               }
                         }
 
-                        let newDataValueList = [];
-                        if (payload.programStageConfig?.indicators?.length > 0) {
+                        console.log('period verification : ', payload.periodVerification);
+                        console.log(' payload.periodVerification  : ', payload.periodVerification);
+
+                        let newDataValueAsListofArray = [];
+                        if (payload.programStageConfig?.indicators?.length > 0 && payload.periodVerification) {
                               const indicatorsList = payload.programStageConfig?.indicators;
-                              for (let dv of eventPayload.dataValues) {
-                                    const foundInd = indicatorsList.find(ind => ind.value?.id === dv.dataElement);
-                                    if (foundInd) {
-                                          const foundAggrageMappingElement = dataStoreIndicatorsMapping?.find(
-                                                d =>
-                                                      d.indicator ===
-                                                      mappingConfigs
-                                                            .filter(
-                                                                  ev => ev.programStage?.id === payload.programStage?.id
-                                                            )
-                                                            .find(ev => ev.indicator?.displayName === dv.value)
-                                                            ?.indicator?.id
-                                          )?.dhis2;
 
-                                          const periodType = dataStoreIndicatorsMapping?.find(
-                                                d =>
-                                                      d.indicator ===
-                                                      mappingConfigs
-                                                            .filter(
-                                                                  ev => ev.programStage?.id === payload.programStage?.id
-                                                            )
-                                                            .find(ev => ev.indicator?.displayName === dv.value)
-                                                            ?.indicator?.id
-                                          )?.periodType;
+                              newDataValueAsListofArray = await Promise.all(
+                                    eventPayload.dataValues?.map(async dv => {
+                                          const newDvList = [];
+                                          const foundInd = indicatorsList.find(ind => ind.value?.id === dv.dataElement);
+                                          if (foundInd) {
+                                                const foundAggrageMappingElement = dataStoreIndicatorsMapping?.find(
+                                                      d =>
+                                                            d.indicator ===
+                                                            mappingConfigs
+                                                                  .filter(
+                                                                        ev =>
+                                                                              ev.programStage?.id ===
+                                                                              payload.programStage?.id
+                                                                  )
+                                                                  .find(ev => ev.indicator?.displayName === dv.value)
+                                                                  ?.indicator?.id
+                                                )?.dhis2;
 
-                                          if (foundAggrageMappingElement) {
-                                                const elementMONTH_1 = foundInd?.DHIS2MonthlyValue1;
-                                                const elementMONTH_2 = foundInd?.DHIS2MonthlyValue2;
-                                                const elementMONTH_3 = foundInd?.DHIS2MonthlyValue3;
-                                                const elementMONTH_4 = foundInd?.DHIS2MonthlyValue4;
-                                                const elementMONTH_5 = foundInd?.DHIS2MonthlyValue5;
-                                                const elementMONTH_6 = foundInd?.DHIS2MonthlyValue6;
-                                                const elementMONTH_7 = foundInd?.DHIS2MonthlyValue7;
-                                                const elementMONTH_8 = foundInd?.DHIS2MonthlyValue8;
-                                                const elementMONTH_9 = foundInd?.DHIS2MonthlyValue9;
-                                                const elementMONTH_10 = foundInd?.DHIS2MonthlyValue10;
-                                                const elementMONTH_11 = foundInd?.DHIS2MonthlyValue11;
-                                                const elementMONTH_12 = foundInd?.DHIS2MonthlyValue12;
-                                                const elementMONTH_13 = foundInd?.DHIS2MonthlyValue13;
-                                                const elementMONTH_14 = foundInd?.DHIS2MonthlyValue14;
-                                                const elementMONTH_15 = foundInd?.DHIS2MonthlyValue15;
+                                                const periodType = dataStoreIndicatorsMapping?.find(
+                                                      d =>
+                                                            d.indicator ===
+                                                            mappingConfigs
+                                                                  .filter(
+                                                                        ev =>
+                                                                              ev.programStage?.id ===
+                                                                              payload.programStage?.id
+                                                                  )
+                                                                  .find(ev => ev.indicator?.displayName === dv.value)
+                                                                  ?.indicator?.id
+                                                )?.periodType;
 
-                                                let periodPayload = {
-                                                      eventDate: eventPayload.eventDate,
-                                                      orgUnit: eventPayload.orgUnit,
-                                                      trackedEntityInstance: eventPayload.trackedEntityInstance,
-                                                      programStage: eventPayload.programStage
-                                                };
+                                                if (foundAggrageMappingElement) {
+                                                      const elementMONTH_1 = foundInd?.DHIS2MonthlyValue1;
+                                                      const elementMONTH_2 = foundInd?.DHIS2MonthlyValue2;
+                                                      const elementMONTH_3 = foundInd?.DHIS2MonthlyValue3;
+                                                      const elementMONTH_4 = foundInd?.DHIS2MonthlyValue4;
+                                                      const elementMONTH_5 = foundInd?.DHIS2MonthlyValue5;
+                                                      const elementMONTH_6 = foundInd?.DHIS2MonthlyValue6;
+                                                      const elementMONTH_7 = foundInd?.DHIS2MonthlyValue7;
+                                                      const elementMONTH_8 = foundInd?.DHIS2MonthlyValue8;
+                                                      const elementMONTH_9 = foundInd?.DHIS2MonthlyValue9;
+                                                      const elementMONTH_10 = foundInd?.DHIS2MonthlyValue10;
+                                                      const elementMONTH_11 = foundInd?.DHIS2MonthlyValue11;
+                                                      const elementMONTH_12 = foundInd?.DHIS2MonthlyValue12;
+                                                      const elementMONTH_13 = foundInd?.DHIS2MonthlyValue13;
+                                                      const elementMONTH_14 = foundInd?.DHIS2MonthlyValue14;
+                                                      const elementMONTH_15 = foundInd?.DHIS2MonthlyValue15;
 
-                                                if (elementMONTH_1) {
-                                                      const periodObject = getRightPeriodFormat(
-                                                            1,
-                                                            periodType,
-                                                            eventPayload.periodVerification
-                                                      );
-
-                                                      const orgUnitId = eventPayload.orgUnit;
-                                                      const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(
-                                                            periodObject?.analytic,
-                                                            orgUnitId,
-                                                            dx
-                                                      );
-
-                                                      periodPayload.month1 = {
-                                                            position: 1,
-                                                            dataElement: elementMONTH_1,
-                                                            value,
-                                                            period: periodObject?.normal,
-                                                            periodString: periodObject?.normal
+                                                      let periodPayload = {
+                                                            eventDate: eventPayload.eventDate,
+                                                            orgUnit: eventPayload.orgUnit,
+                                                            trackedEntityInstance: eventPayload.trackedEntityInstance,
+                                                            programStage: eventPayload.programStage
                                                       };
 
-                                                      if (value) {
-                                                            newDataValueList.push({
-                                                                  dataElement: elementMONTH_1.id,
-                                                                  value: value
-                                                            });
+                                                      if (elementMONTH_1) {
+                                                            const periodObject = getRightPeriodFormat(
+                                                                  1,
+                                                                  periodType,
+                                                                  payload.periodVerification
+                                                            );
+
+                                                            console.log('periodObject : ', periodObject);
+
+                                                            const orgUnitId = eventPayload.orgUnit;
+                                                            const dx = foundAggrageMappingElement.id;
+                                                            const value = await getAnalyticValue(
+                                                                  periodObject?.analytic,
+                                                                  orgUnitId,
+                                                                  dx
+                                                            );
+
+                                                            periodPayload.month1 = {
+                                                                  position: 1,
+                                                                  dataElement: elementMONTH_1,
+                                                                  value,
+                                                                  period: periodObject?.normal,
+                                                                  periodString: periodObject?.normal
+                                                            };
+
+                                                            if (value) {
+                                                                  newDvList.push({
+                                                                        dataElement: elementMONTH_1.id,
+                                                                        value: value
+                                                                  });
+                                                            }
                                                       }
-                                                }
-                                                if (elementMONTH_2) {
-                                                      const periodObject = getRightPeriodFormat(
-                                                            2,
-                                                            periodType,
-                                                            eventPayload.periodVerification
-                                                      );
 
-                                                      const orgUnitId = eventPayload.orgUnit;
-                                                      const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(
-                                                            periodObject?.analytic,
-                                                            orgUnitId,
-                                                            dx
-                                                      );
+                                                      if (elementMONTH_2) {
+                                                            const periodObject = getRightPeriodFormat(
+                                                                  2,
+                                                                  periodType,
+                                                                  payload.periodVerification
+                                                            );
 
-                                                      periodPayload.month2 = {
-                                                            position: 2,
-                                                            dataElement: elementMONTH_2,
-                                                            value,
-                                                            period: periodObject?.normal,
-                                                            periodString: periodObject?.normal
-                                                      };
+                                                            const orgUnitId = eventPayload.orgUnit;
+                                                            const dx = foundAggrageMappingElement.id;
+                                                            const value = await getAnalyticValue(
+                                                                  periodObject?.analytic,
+                                                                  orgUnitId,
+                                                                  dx
+                                                            );
 
-                                                      if (value) {
-                                                            newDataValueList.push({
-                                                                  dataElement: elementMONTH_2.id,
-                                                                  value: value
-                                                            });
+                                                            periodPayload.month2 = {
+                                                                  position: 2,
+                                                                  dataElement: elementMONTH_2,
+                                                                  value,
+                                                                  period: periodObject?.normal,
+                                                                  periodString: periodObject?.normal
+                                                            };
+
+                                                            if (value) {
+                                                                  newDvList.push({
+                                                                        dataElement: elementMONTH_2.id,
+                                                                        value: value
+                                                                  });
+                                                            }
                                                       }
-                                                }
-                                                if (elementMONTH_3) {
-                                                      const periodObject = getRightPeriodFormat(
-                                                            3,
-                                                            periodType,
-                                                            eventPayload.periodVerification
-                                                      );
 
-                                                      const orgUnitId = eventPayload.orgUnit;
-                                                      const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(
-                                                            periodObject?.analytic,
-                                                            orgUnitId,
-                                                            dx
-                                                      );
+                                                      if (elementMONTH_3) {
+                                                            const periodObject = getRightPeriodFormat(
+                                                                  3,
+                                                                  periodType,
+                                                                  payload.periodVerification
+                                                            );
 
-                                                      periodPayload.month3 = {
-                                                            position: 3,
-                                                            dataElement: elementMONTH_3,
-                                                            value,
-                                                            period: periodObject?.normal,
-                                                            periodString: periodObject?.normal
-                                                      };
+                                                            const orgUnitId = eventPayload.orgUnit;
+                                                            const dx = foundAggrageMappingElement.id;
+                                                            const value = await getAnalyticValue(
+                                                                  periodObject?.analytic,
+                                                                  orgUnitId,
+                                                                  dx
+                                                            );
 
-                                                      if (value) {
-                                                            newDataValueList.push({
-                                                                  dataElement: elementMONTH_3.id,
-                                                                  value: value
-                                                            });
+                                                            periodPayload.month3 = {
+                                                                  position: 3,
+                                                                  dataElement: elementMONTH_3,
+                                                                  value,
+                                                                  period: periodObject?.normal,
+                                                                  periodString: periodObject?.normal
+                                                            };
+
+                                                            if (value) {
+                                                                  newDvList.push({
+                                                                        dataElement: elementMONTH_3.id,
+                                                                        value: value
+                                                                  });
+                                                            }
                                                       }
-                                                }
-                                                if (elementMONTH_4) {
-                                                      const periodObject = getRightPeriodFormat(
-                                                            4,
-                                                            periodType,
-                                                            eventPayload.periodVerification
-                                                      );
 
-                                                      const orgUnitId = eventPayload.orgUnit;
-                                                      const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(
-                                                            periodObject?.analytic,
-                                                            orgUnitId,
-                                                            dx
-                                                      );
+                                                      if (elementMONTH_4) {
+                                                            const periodObject = getRightPeriodFormat(
+                                                                  4,
+                                                                  periodType,
+                                                                  payload.periodVerification
+                                                            );
 
-                                                      periodPayload.month4 = {
-                                                            position: 4,
-                                                            dataElement: elementMONTH_4,
-                                                            value,
-                                                            period: periodObject?.normal,
-                                                            periodString: periodObject?.normal
-                                                      };
+                                                            const orgUnitId = eventPayload.orgUnit;
+                                                            const dx = foundAggrageMappingElement.id;
+                                                            const value = await getAnalyticValue(
+                                                                  periodObject?.analytic,
+                                                                  orgUnitId,
+                                                                  dx
+                                                            );
 
-                                                      if (value) {
-                                                            newDataValueList.push({
-                                                                  dataElement: elementMONTH_4.id,
-                                                                  value: value
-                                                            });
+                                                            periodPayload.month4 = {
+                                                                  position: 4,
+                                                                  dataElement: elementMONTH_4,
+                                                                  value,
+                                                                  period: periodObject?.normal,
+                                                                  periodString: periodObject?.normal
+                                                            };
+
+                                                            if (value) {
+                                                                  newDvList.push({
+                                                                        dataElement: elementMONTH_4.id,
+                                                                        value: value
+                                                                  });
+                                                            }
                                                       }
-                                                }
 
-                                                if (elementMONTH_5) {
-                                                      const periodObject = getRightPeriodFormat(
-                                                            5,
-                                                            periodType,
-                                                            eventPayload.periodVerification
-                                                      );
+                                                      if (elementMONTH_5) {
+                                                            const periodObject = getRightPeriodFormat(
+                                                                  5,
+                                                                  periodType,
+                                                                  payload.periodVerification
+                                                            );
 
-                                                      const orgUnitId = eventPayload.orgUnit;
-                                                      const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(
-                                                            periodObject?.analytic,
-                                                            orgUnitId,
-                                                            dx
-                                                      );
+                                                            const orgUnitId = eventPayload.orgUnit;
+                                                            const dx = foundAggrageMappingElement.id;
+                                                            const value = await getAnalyticValue(
+                                                                  periodObject?.analytic,
+                                                                  orgUnitId,
+                                                                  dx
+                                                            );
 
-                                                      periodPayload.month5 = {
-                                                            position: 5,
-                                                            dataElement: elementMONTH_5,
-                                                            value,
-                                                            period: periodObject?.normal,
-                                                            periodString: periodObject?.normal
-                                                      };
-                                                      if (value) {
-                                                            newDataValueList.push({
-                                                                  dataElement: elementMONTH_5.id,
-                                                                  value: value
-                                                            });
+                                                            periodPayload.month5 = {
+                                                                  position: 5,
+                                                                  dataElement: elementMONTH_5,
+                                                                  value,
+                                                                  period: periodObject?.normal,
+                                                                  periodString: periodObject?.normal
+                                                            };
+                                                            if (value) {
+                                                                  newDvList.push({
+                                                                        dataElement: elementMONTH_5.id,
+                                                                        value: value
+                                                                  });
+                                                            }
                                                       }
-                                                }
 
-                                                if (elementMONTH_6) {
-                                                      const periodObject = getRightPeriodFormat(
-                                                            6,
-                                                            periodType,
-                                                            eventPayload.periodVerification
-                                                      );
+                                                      if (elementMONTH_6) {
+                                                            const periodObject = getRightPeriodFormat(
+                                                                  6,
+                                                                  periodType,
+                                                                  payload.periodVerification
+                                                            );
 
-                                                      const orgUnitId = eventPayload.orgUnit;
-                                                      const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(
-                                                            periodObject?.analytic,
-                                                            orgUnitId,
-                                                            dx
-                                                      );
+                                                            const orgUnitId = eventPayload.orgUnit;
+                                                            const dx = foundAggrageMappingElement.id;
+                                                            const value = await getAnalyticValue(
+                                                                  periodObject?.analytic,
+                                                                  orgUnitId,
+                                                                  dx
+                                                            );
 
-                                                      periodPayload.month6 = {
-                                                            position: 6,
-                                                            dataElement: elementMONTH_6,
-                                                            value,
-                                                            period: periodObject?.normal,
-                                                            periodString: periodObject?.normal
-                                                      };
+                                                            periodPayload.month6 = {
+                                                                  position: 6,
+                                                                  dataElement: elementMONTH_6,
+                                                                  value,
+                                                                  period: periodObject?.normal,
+                                                                  periodString: periodObject?.normal
+                                                            };
 
-                                                      if (value) {
-                                                            newDataValueList.push({
-                                                                  dataElement: elementMONTH_6.id,
-                                                                  value: value
-                                                            });
+                                                            if (value) {
+                                                                  newDvList.push({
+                                                                        dataElement: elementMONTH_6.id,
+                                                                        value: value
+                                                                  });
+                                                            }
                                                       }
-                                                }
 
-                                                if (elementMONTH_7) {
-                                                      const periodObject = getRightPeriodFormat(
-                                                            7,
-                                                            periodType,
-                                                            eventPayload.periodVerification
-                                                      );
+                                                      if (elementMONTH_7) {
+                                                            const periodObject = getRightPeriodFormat(
+                                                                  7,
+                                                                  periodType,
+                                                                  payload.periodVerification
+                                                            );
 
-                                                      const orgUnitId = eventPayload.orgUnit;
-                                                      const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(
-                                                            periodObject?.analytic,
-                                                            orgUnitId,
-                                                            dx
-                                                      );
+                                                            const orgUnitId = eventPayload.orgUnit;
+                                                            const dx = foundAggrageMappingElement.id;
+                                                            const value = await getAnalyticValue(
+                                                                  periodObject?.analytic,
+                                                                  orgUnitId,
+                                                                  dx
+                                                            );
 
-                                                      periodPayload.month7 = {
-                                                            position: 7,
-                                                            dataElement: elementMONTH_7,
-                                                            value,
-                                                            period: periodObject?.normal,
-                                                            periodString: periodObject?.normal
-                                                      };
+                                                            periodPayload.month7 = {
+                                                                  position: 7,
+                                                                  dataElement: elementMONTH_7,
+                                                                  value,
+                                                                  period: periodObject?.normal,
+                                                                  periodString: periodObject?.normal
+                                                            };
 
-                                                      if (value) {
-                                                            newDataValueList.push({
-                                                                  dataElement: elementMONTH_7.id,
-                                                                  value: value
-                                                            });
+                                                            if (value) {
+                                                                  newDvList.push({
+                                                                        dataElement: elementMONTH_7.id,
+                                                                        value: value
+                                                                  });
+                                                            }
                                                       }
-                                                }
 
-                                                if (elementMONTH_8) {
-                                                      const periodObject = getRightPeriodFormat(
-                                                            8,
-                                                            periodType,
-                                                            eventPayload.periodVerification
-                                                      );
+                                                      if (elementMONTH_8) {
+                                                            const periodObject = getRightPeriodFormat(
+                                                                  8,
+                                                                  periodType,
+                                                                  payload.periodVerification
+                                                            );
 
-                                                      const orgUnitId = eventPayload.orgUnit;
-                                                      const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(
-                                                            periodObject?.analytic,
-                                                            orgUnitId,
-                                                            dx
-                                                      );
+                                                            const orgUnitId = eventPayload.orgUnit;
+                                                            const dx = foundAggrageMappingElement.id;
+                                                            const value = await getAnalyticValue(
+                                                                  periodObject?.analytic,
+                                                                  orgUnitId,
+                                                                  dx
+                                                            );
 
-                                                      periodPayload.month8 = {
-                                                            position: 8,
-                                                            dataElement: elementMONTH_8,
-                                                            value,
-                                                            period: periodObject?.normal,
-                                                            periodString: periodObject?.normal
-                                                      };
+                                                            periodPayload.month8 = {
+                                                                  position: 8,
+                                                                  dataElement: elementMONTH_8,
+                                                                  value,
+                                                                  period: periodObject?.normal,
+                                                                  periodString: periodObject?.normal
+                                                            };
 
-                                                      if (value) {
-                                                            newDataValueList.push({
-                                                                  dataElement: elementMONTH_8.id,
-                                                                  value: value
-                                                            });
+                                                            if (value) {
+                                                                  newDvList.push({
+                                                                        dataElement: elementMONTH_8.id,
+                                                                        value: value
+                                                                  });
+                                                            }
                                                       }
-                                                }
 
-                                                if (elementMONTH_9) {
-                                                      const periodObject = getRightPeriodFormat(
-                                                            9,
-                                                            periodType,
-                                                            eventPayload.periodVerification
-                                                      );
+                                                      if (elementMONTH_9) {
+                                                            const periodObject = getRightPeriodFormat(
+                                                                  9,
+                                                                  periodType,
+                                                                  payload.periodVerification
+                                                            );
 
-                                                      const orgUnitId = eventPayload.orgUnit;
-                                                      const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(
-                                                            periodObject?.analytic,
-                                                            orgUnitId,
-                                                            dx
-                                                      );
+                                                            const orgUnitId = eventPayload.orgUnit;
+                                                            const dx = foundAggrageMappingElement.id;
+                                                            const value = await getAnalyticValue(
+                                                                  periodObject?.analytic,
+                                                                  orgUnitId,
+                                                                  dx
+                                                            );
 
-                                                      periodPayload.month9 = {
-                                                            position: 9,
-                                                            dataElement: elementMONTH_9,
-                                                            value,
-                                                            period: periodObject?.normal,
-                                                            periodString: periodObject?.normal
-                                                      };
+                                                            periodPayload.month9 = {
+                                                                  position: 9,
+                                                                  dataElement: elementMONTH_9,
+                                                                  value,
+                                                                  period: periodObject?.normal,
+                                                                  periodString: periodObject?.normal
+                                                            };
 
-                                                      if (value) {
-                                                            newDataValueList.push({
-                                                                  dataElement: elementMONTH_9.id,
-                                                                  value: value
-                                                            });
+                                                            if (value) {
+                                                                  newDvList.push({
+                                                                        dataElement: elementMONTH_9.id,
+                                                                        value: value
+                                                                  });
+                                                            }
                                                       }
-                                                }
 
-                                                if (elementMONTH_10) {
-                                                      const periodObject = getRightPeriodFormat(
-                                                            10,
-                                                            periodType,
-                                                            eventPayload.periodVerification
-                                                      );
+                                                      if (elementMONTH_10) {
+                                                            const periodObject = getRightPeriodFormat(
+                                                                  10,
+                                                                  periodType,
+                                                                  payload.periodVerification
+                                                            );
 
-                                                      const orgUnitId = eventPayload.orgUnit;
-                                                      const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(
-                                                            periodObject?.analytic,
-                                                            orgUnitId,
-                                                            dx
-                                                      );
+                                                            const orgUnitId = eventPayload.orgUnit;
+                                                            const dx = foundAggrageMappingElement.id;
+                                                            const value = await getAnalyticValue(
+                                                                  periodObject?.analytic,
+                                                                  orgUnitId,
+                                                                  dx
+                                                            );
 
-                                                      periodPayload.month10 = {
-                                                            position: 10,
-                                                            dataElement: elementMONTH_10,
-                                                            value,
-                                                            period: periodObject?.normal,
-                                                            periodString: periodObject?.normal
-                                                      };
+                                                            periodPayload.month10 = {
+                                                                  position: 10,
+                                                                  dataElement: elementMONTH_10,
+                                                                  value,
+                                                                  period: periodObject?.normal,
+                                                                  periodString: periodObject?.normal
+                                                            };
 
-                                                      if (value) {
-                                                            newDataValueList.push({
-                                                                  dataElement: elementMONTH_10.id,
-                                                                  value: value
-                                                            });
+                                                            if (value) {
+                                                                  newDvList.push({
+                                                                        dataElement: elementMONTH_10.id,
+                                                                        value: value
+                                                                  });
+                                                            }
                                                       }
-                                                }
 
-                                                if (elementMONTH_11) {
-                                                      const periodObject = getRightPeriodFormat(
-                                                            11,
-                                                            periodType,
-                                                            eventPayload.periodVerification
-                                                      );
+                                                      if (elementMONTH_11) {
+                                                            const periodObject = getRightPeriodFormat(
+                                                                  11,
+                                                                  periodType,
+                                                                  payload.periodVerification
+                                                            );
 
-                                                      const orgUnitId = eventPayload.orgUnit;
-                                                      const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(
-                                                            periodObject?.analytic,
-                                                            orgUnitId,
-                                                            dx
-                                                      );
+                                                            const orgUnitId = eventPayload.orgUnit;
+                                                            const dx = foundAggrageMappingElement.id;
+                                                            const value = await getAnalyticValue(
+                                                                  periodObject?.analytic,
+                                                                  orgUnitId,
+                                                                  dx
+                                                            );
 
-                                                      periodPayload.month11 = {
-                                                            position: 11,
-                                                            dataElement: elementMONTH_11,
-                                                            value,
-                                                            period: periodObject?.normal,
-                                                            periodString: periodObject?.normal
-                                                      };
+                                                            periodPayload.month11 = {
+                                                                  position: 11,
+                                                                  dataElement: elementMONTH_11,
+                                                                  value,
+                                                                  period: periodObject?.normal,
+                                                                  periodString: periodObject?.normal
+                                                            };
 
-                                                      if (value) {
-                                                            newDataValueList.push({
-                                                                  dataElement: elementMONTH_11.id,
-                                                                  value: value
-                                                            });
+                                                            if (value) {
+                                                                  newDvList.push({
+                                                                        dataElement: elementMONTH_11.id,
+                                                                        value: value
+                                                                  });
+                                                            }
                                                       }
-                                                }
 
-                                                if (elementMONTH_12) {
-                                                      const periodObject = getRightPeriodFormat(
-                                                            12,
-                                                            periodType,
-                                                            eventPayload.periodVerification
-                                                      );
+                                                      if (elementMONTH_12) {
+                                                            const periodObject = getRightPeriodFormat(
+                                                                  12,
+                                                                  periodType,
+                                                                  payload.periodVerification
+                                                            );
 
-                                                      const orgUnitId = eventPayload.orgUnit;
-                                                      const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(
-                                                            periodObject?.analytic,
-                                                            orgUnitId,
-                                                            dx
-                                                      );
+                                                            const orgUnitId = eventPayload.orgUnit;
+                                                            const dx = foundAggrageMappingElement.id;
+                                                            const value = await getAnalyticValue(
+                                                                  periodObject?.analytic,
+                                                                  orgUnitId,
+                                                                  dx
+                                                            );
 
-                                                      periodPayload.month12 = {
-                                                            position: 12,
-                                                            dataElement: elementMONTH_12,
-                                                            value,
-                                                            period: periodObject?.normal,
-                                                            periodString: periodObject?.normal
-                                                      };
+                                                            periodPayload.month12 = {
+                                                                  position: 12,
+                                                                  dataElement: elementMONTH_12,
+                                                                  value,
+                                                                  period: periodObject?.normal,
+                                                                  periodString: periodObject?.normal
+                                                            };
 
-                                                      if (value) {
-                                                            newDataValueList.push({
-                                                                  dataElement: elementMONTH_12.id,
-                                                                  value: value
-                                                            });
+                                                            if (value) {
+                                                                  newDvList.push({
+                                                                        dataElement: elementMONTH_12.id,
+                                                                        value: value
+                                                                  });
+                                                            }
                                                       }
-                                                }
 
-                                                if (elementMONTH_13) {
-                                                      const periodObject = getRightPeriodFormat(
-                                                            13,
-                                                            periodType,
-                                                            eventPayload.periodVerification
-                                                      );
+                                                      if (elementMONTH_13) {
+                                                            const periodObject = getRightPeriodFormat(
+                                                                  13,
+                                                                  periodType,
+                                                                  payload.periodVerification
+                                                            );
 
-                                                      const orgUnitId = eventPayload.orgUnit;
-                                                      const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(
-                                                            periodObject?.analytic,
-                                                            orgUnitId,
-                                                            dx
-                                                      );
+                                                            const orgUnitId = eventPayload.orgUnit;
+                                                            const dx = foundAggrageMappingElement.id;
+                                                            const value = await getAnalyticValue(
+                                                                  periodObject?.analytic,
+                                                                  orgUnitId,
+                                                                  dx
+                                                            );
 
-                                                      periodPayload.month13 = {
-                                                            position: 13,
-                                                            dataElement: elementMONTH_13,
-                                                            value,
-                                                            period: periodObject?.normal,
-                                                            periodString: periodObject?.normal
-                                                      };
+                                                            periodPayload.month13 = {
+                                                                  position: 13,
+                                                                  dataElement: elementMONTH_13,
+                                                                  value,
+                                                                  period: periodObject?.normal,
+                                                                  periodString: periodObject?.normal
+                                                            };
 
-                                                      if (value) {
-                                                            newDataValueList.push({
-                                                                  dataElement: elementMONTH_13.id,
-                                                                  value: value
-                                                            });
+                                                            if (value) {
+                                                                  newDvList.push({
+                                                                        dataElement: elementMONTH_13.id,
+                                                                        value: value
+                                                                  });
+                                                            }
                                                       }
-                                                }
 
-                                                if (elementMONTH_14) {
-                                                      const periodObject = getRightPeriodFormat(
-                                                            14,
-                                                            periodType,
-                                                            eventPayload.periodVerification
-                                                      );
+                                                      if (elementMONTH_14) {
+                                                            const periodObject = getRightPeriodFormat(
+                                                                  14,
+                                                                  periodType,
+                                                                  payload.periodVerification
+                                                            );
 
-                                                      const orgUnitId = eventPayload.orgUnit;
-                                                      const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(
-                                                            periodObject?.analytic,
-                                                            orgUnitId,
-                                                            dx
-                                                      );
+                                                            const orgUnitId = eventPayload.orgUnit;
+                                                            const dx = foundAggrageMappingElement.id;
+                                                            const value = await getAnalyticValue(
+                                                                  periodObject?.analytic,
+                                                                  orgUnitId,
+                                                                  dx
+                                                            );
 
-                                                      periodPayload.month14 = {
-                                                            position: 14,
-                                                            dataElement: elementMONTH_14,
-                                                            value,
-                                                            period: periodObject?.normal,
-                                                            periodString: periodObject?.normal
-                                                      };
+                                                            periodPayload.month14 = {
+                                                                  position: 14,
+                                                                  dataElement: elementMONTH_14,
+                                                                  value,
+                                                                  period: periodObject?.normal,
+                                                                  periodString: periodObject?.normal
+                                                            };
 
-                                                      if (value) {
-                                                            newDataValueList.push({
-                                                                  dataElement: elementMONTH_14.id,
-                                                                  value: value
-                                                            });
+                                                            if (value) {
+                                                                  newDvList.push({
+                                                                        dataElement: elementMONTH_14.id,
+                                                                        value: value
+                                                                  });
+                                                            }
                                                       }
-                                                }
 
-                                                if (elementMONTH_15) {
-                                                      const periodObject = getRightPeriodFormat(
-                                                            15,
-                                                            periodType,
-                                                            eventPayload.periodVerification
-                                                      );
+                                                      if (elementMONTH_15) {
+                                                            const periodObject = getRightPeriodFormat(
+                                                                  15,
+                                                                  periodType,
+                                                                  payload.periodVerification
+                                                            );
 
-                                                      const orgUnitId = eventPayload.orgUnit;
-                                                      const dx = foundAggrageMappingElement.id;
-                                                      const value = await getAnalyticValue(
-                                                            periodObject?.analytic,
-                                                            orgUnitId,
-                                                            dx
-                                                      );
+                                                            const orgUnitId = eventPayload.orgUnit;
+                                                            const dx = foundAggrageMappingElement.id;
+                                                            const value = await getAnalyticValue(
+                                                                  periodObject?.analytic,
+                                                                  orgUnitId,
+                                                                  dx
+                                                            );
 
-                                                      periodPayload.month15 = {
-                                                            position: 15,
-                                                            dataElement: elementMONTH_15,
-                                                            value,
-                                                            period: periodObject?.normal,
-                                                            periodString: periodObject?.normal
-                                                      };
+                                                            periodPayload.month15 = {
+                                                                  position: 15,
+                                                                  dataElement: elementMONTH_15,
+                                                                  value,
+                                                                  period: periodObject?.normal,
+                                                                  periodString: periodObject?.normal
+                                                            };
 
-                                                      if (value) {
-                                                            newDataValueList.push({
-                                                                  dataElement: elementMONTH_15.id,
-                                                                  value: value
-                                                            });
+                                                            if (value) {
+                                                                  newDvList.push({
+                                                                        dataElement: elementMONTH_15.id,
+                                                                        value: value
+                                                                  });
+                                                            }
                                                       }
+                                                      await updatePeriodsConfigs(periodPayload);
                                                 }
-                                                await updatePeriodsConfigs(periodPayload);
                                           }
-                                    }
-                              }
+
+                                          return newDvList;
+                                    }) || []
+                              );
                         }
+
+                        const newDataValueList = newDataValueAsListofArray.reduce(
+                              (prev, curr) => (curr?.length > 0 ? prev.concat(curr) : prev),
+                              []
+                        );
+
+                        console.log('newDataValueAsListofArray : ', newDataValueAsListofArray);
+                        console.log('newDataValueList : ', newDataValueList);
 
                         eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValueList];
 
@@ -3042,64 +3068,80 @@ const Supervision = ({ me }) => {
       const saveSupervisionAsEventStrategy = async (inputFieldsList, newDataStoreSupervisions) => {
             try {
                   if (inputFieldsList.length > 0) {
-                        const supervisionsList = [];
+                        const supervisionsListByProgramStages = await Promise.all(
+                              inputFieldsList?.map(async item => {
+                                    let listByProgramStage = [];
+                                    console.log('lancé: ', item.period);
+                                    for (let progStageConfig of selectedProgram?.programStageConfigurations) {
+                                          const found_organisationUnit = organisationUnits.find(
+                                                ou => ou.id === item.organisationUnit?.id
+                                          );
 
-                        for (let item of inputFieldsList) {
-                              for (let progStageConfig of selectedProgram?.programStageConfigurations) {
-                                    const found_organisationUnit = organisationUnits.find(
-                                          ou => ou.id === item.organisationUnit?.id
-                                    );
+                                          let is_ok =
+                                                (found_organisationUnit &&
+                                                      progStageConfig?.programStage &&
+                                                      found_organisationUnit.organisationUnitGroups
+                                                            ?.map(ouG => ouG.id)
+                                                            .includes(progStageConfig?.organisationUnitGroup?.id)) ||
+                                                false;
 
-                                    let is_ok =
-                                          (found_organisationUnit &&
-                                                progStageConfig?.programStage &&
-                                                found_organisationUnit.organisationUnitGroups
-                                                      ?.map(ouG => ouG.id)
-                                                      .includes(progStageConfig?.organisationUnitGroup?.id)) ||
-                                          false;
+                                          if (selectedProgram?.configurationType === DQR) {
+                                                is_ok = true;
+                                          }
 
-                                    if (selectedProgram?.configurationType === DQR) {
-                                          is_ok = true;
-                                    }
-
-                                    if (is_ok) {
-                                          const payload = {
-                                                ...item,
-                                                orgUnit: item.organisationUnit?.id,
-                                                period: item.period && dayjs(item.period).format('YYYY-MM-DD'),
-                                                periodVerification:
-                                                      item.periodVerification &&
-                                                      dayjs(item.periodVerification).format('YYYY-MM-DD'),
-                                                program: item.program?.id,
-                                                fieldConfig: item.fieldConfig,
-                                                programStage: progStageConfig.programStage,
-                                                programStageConfig: progStageConfig
-                                          };
-
-                                          let createdTEIObject = null;
-                                          createdTEIObject = await generateEventsAsNewSupervision(payload);
-
-                                          if (createdTEIObject) {
-                                                supervisionsList.push({
+                                          if (is_ok) {
+                                                const payload = {
                                                       ...item,
-                                                      id: uuid(),
-                                                      planificationType: selectedPlanificationType,
-                                                      indicators: selectedIndicators,
                                                       orgUnit: item.organisationUnit?.id,
                                                       period: item.period && dayjs(item.period).format('YYYY-MM-DD'),
                                                       periodVerification:
                                                             item.periodVerification &&
                                                             dayjs(item.periodVerification).format('YYYY-MM-DD'),
-                                                      program: item.program,
-                                                      programStage: progStageConfig.programStage.id,
-                                                      programStageConfig: progStageConfig,
+                                                      program: item.program?.id,
                                                       fieldConfig: item.fieldConfig,
-                                                      tei: createdTEIObject
-                                                });
+                                                      programStage: progStageConfig.programStage,
+                                                      programStageConfig: progStageConfig
+                                                };
+
+                                                let createdTEIObject = null;
+                                                createdTEIObject = await generateEventsAsNewSupervision(payload);
+
+                                                if (createdTEIObject) {
+                                                      listByProgramStage.push({
+                                                            ...item,
+                                                            id: uuid(),
+                                                            planificationType: selectedPlanificationType,
+                                                            indicators: selectedIndicators,
+                                                            orgUnit: item.organisationUnit?.id,
+                                                            period:
+                                                                  item.period &&
+                                                                  dayjs(item.period).format('YYYY-MM-DD'),
+                                                            periodVerification:
+                                                                  item.periodVerification &&
+                                                                  dayjs(item.periodVerification).format('YYYY-MM-DD'),
+                                                            program: item.program,
+                                                            programStage: progStageConfig.programStage.id,
+                                                            programStageConfig: progStageConfig,
+                                                            fieldConfig: item.fieldConfig,
+                                                            tei: createdTEIObject
+                                                      });
+                                                }
                                           }
                                     }
+
+                                    return listByProgramStage;
+                              }) || []
+                        );
+                        console.log('supervisionsListByProgramStages: ', supervisionsListByProgramStages);
+
+                        const supervisionsList = supervisionsListByProgramStages.reduce((prev, curr) => {
+                              if (curr?.length > 0) {
+                                    prev = prev.concat(curr);
                               }
-                        }
+                              return prev;
+                        }, []);
+
+                        console.log('supervisionsList: ', supervisionsList);
 
                         let planificationPayload = {
                               id: uuid(),
