@@ -2206,7 +2206,6 @@ const Supervision = ({ me }) => {
                                           }
                                     }
 
-                                    console.log('newDvList :', newDvList);
                                     return newDvList;
                               }) || []
                         );
@@ -2216,9 +2215,6 @@ const Supervision = ({ me }) => {
                         (prev, curr) => (curr?.length > 0 ? prev.concat(curr) : prev),
                         []
                   );
-
-                  console.log('newDataValueAsListofArray : ', newDataValueAsListofArray);
-                  console.log('newDataValueList : ', newDataValueList);
 
                   eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValueList];
 
@@ -2500,8 +2496,6 @@ const Supervision = ({ me }) => {
                                                                   periodType,
                                                                   payload.periodVerification
                                                             );
-
-                                                            console.log('periodObject : ', periodObject);
 
                                                             const orgUnitId = eventPayload.orgUnit;
                                                             const dx = foundAggrageMappingElement.id;
@@ -2963,8 +2957,6 @@ const Supervision = ({ me }) => {
                                                 }
                                           }
 
-                                          console.log('List dans map newDvList : ', newDvList);
-
                                           return newDvList;
                                     }) || []
                               );
@@ -2975,11 +2967,7 @@ const Supervision = ({ me }) => {
                               []
                         );
 
-                        console.log('newDataValueAsListofArray : ', newDataValueAsListofArray);
-                        console.log('newDataValueList : ', newDataValueList);
-
                         eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValueList];
-                        console.log('DV total dataValues : ', eventPayload.dataValues);
 
                         if (!newEventsList.map(ev => ev.programStage).includes(payload.programStage?.id)) {
                               newEventsList.push(eventPayload);
@@ -3155,7 +3143,6 @@ const Supervision = ({ me }) => {
                                     return listByProgramStage;
                               }) || []
                         );
-                        console.log('supervisionsListByProgramStages: ', supervisionsListByProgramStages);
 
                         const supervisionsList = supervisionsListByProgramStages.reduce((prev, curr) => {
                               if (curr?.length > 0) {
@@ -3163,8 +3150,6 @@ const Supervision = ({ me }) => {
                               }
                               return prev;
                         }, []);
-
-                        console.log('supervisionsList: ', supervisionsList);
 
                         let planificationPayload = {
                               id: uuid(),
@@ -6819,8 +6804,6 @@ const Supervision = ({ me }) => {
             for (let el of dataStoreRegistres) {
                   cumulateList = cumulateList.concat(el.children);
             }
-
-            console.log('cumulateList: ', cumulateList);
 
             const translatedList =
                   nonTranslateMappingConfigs.map(mapConf => {
