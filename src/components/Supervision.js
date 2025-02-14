@@ -117,7 +117,6 @@ dayjs.extend(customParseFormat);
 
 const Supervision = ({ me }) => {
       const [dataStoreSupervisionConfigs, setDataStoreSupervisionConfigs] = useState([]);
-      const [dataStoreSupervisions, setDataStoreSupervisions] = useState([]);
       const [dataStoreIndicatorConfigs, setDataStoreIndicatorConfigs] = useState([]);
 
       const [dataStoreIndicators, setDataStoreIndicators] = useState([]);
@@ -940,18 +939,6 @@ const Supervision = ({ me }) => {
             }
       };
 
-      const loadDataStoreSupervisions = async () => {
-            try {
-                  setLoadingDataStoreSupervisions(true);
-                  const response = await loadDataStore(process.env.REACT_APP_SUPERVISIONS_KEY, null, null, null);
-                  setDataStoreSupervisions(response);
-                  setLoadingDataStoreSupervisions(false);
-                  return response;
-            } catch (err) {
-                  setLoadingDataStoreSupervisions(false);
-            }
-      };
-
       const loadDataStoreIndicatorsMapping = async () => {
             try {
                   const response = await loadDataStore(process.env.REACT_APP_INDICATORS_MAPPING_KEY, null, null, null);
@@ -1047,15 +1034,6 @@ const Supervision = ({ me }) => {
             };
       };
 
-      const getTeamLead = (dataStoreList = [], eventId) =>
-            dataStoreList.reduce((prev, curr) => {
-                  const found_sup = curr.supervisions?.find(sup => eventId === sup.tei_event?.event);
-                  if (found_sup) {
-                        prev = found_sup.equipe?.teamLead || '';
-                  }
-                  return prev;
-            }, '');
-
       const filterAndGetPlanfications = () =>
             allSupervisionsFromTracker
                   .reduce((prev, current) => {
@@ -1081,7 +1059,6 @@ const Supervision = ({ me }) => {
                                           en => en.program === selectedSupervisionsConfigProgram?.program?.id
                                     )[0]?.events[0];
                                     const eventDate = found_event?.eventDate;
-                                    const eventId = found_event?.event;
                                     const trackedEntityInstance = current.trackedEntityInstance;
                                     const program = current.enrollments?.filter(
                                           en => en.program === selectedSupervisionsConfigProgram?.program?.id
@@ -1131,13 +1108,6 @@ const Supervision = ({ me }) => {
                                                                         ?.id
                                                       )?.value || ''
                                                 }`,
-                                                montant: calculateMontant(
-                                                      trackedEntityInstance,
-                                                      eventDate,
-                                                      current.orgUnit,
-                                                      program
-                                                ),
-                                                // teamLead: getTeamLead(dataStoreSupervisions, eventId),
 
                                                 period: eventDate,
                                                 programStageId: found_event?.programStage,
@@ -1221,10 +1191,7 @@ const Supervision = ({ me }) => {
                                                             )?.value || ''
                                                       }`,
                                                       period: en?.events[0]?.eventDate,
-                                                      teamLead: getTeamLead(
-                                                            dataStoreSupervisions,
-                                                            en?.events[0]?.event
-                                                      ),
+
                                                       superviseurs:
                                                             selectedSupervisionsConfigProgram?.fieldConfig?.supervisor?.dataElements
                                                                   ?.reduce((prevEl, curr) => {
@@ -1241,12 +1208,7 @@ const Supervision = ({ me }) => {
                                                                         return prevEl;
                                                                   }, [])
                                                                   ?.join(','),
-                                                      montant: calculateMontant(
-                                                            en.trackedEntityInstance,
-                                                            en?.events[0]?.eventDate,
-                                                            current.orgUnit,
-                                                            en.program
-                                                      ),
+
                                                       enrollment: en.enrollment,
                                                       program: en.program,
                                                       orgUnit: current.orgUnit,
@@ -1311,7 +1273,6 @@ const Supervision = ({ me }) => {
                                                             )?.value || ''
                                                       }`,
                                                       period: ev.eventDate,
-                                                      // teamLead: getTeamLead(dataStoreSupervisions, ev.event),
                                                       teamLead: ev.dataValues
                                                             ?.find(
                                                                   dv =>
@@ -1323,12 +1284,7 @@ const Supervision = ({ me }) => {
                                                                         )?.supervisorField?.[0]?.id
                                                             )
                                                             ?.value?.split(',')?.[0],
-                                                      montant: calculateMontant(
-                                                            currentEnrollment?.trackedEntityInstance,
-                                                            ev.eventDate,
-                                                            currentEnrollment?.orgUnit,
-                                                            currentEnrollment?.program
-                                                      ),
+
                                                       enrollment: currentEnrollment?.enrollment,
                                                       program: currentEnrollment?.program,
                                                       orgUnit: currentEnrollment?.orgUnit,
@@ -1691,6 +1647,7 @@ const Supervision = ({ me }) => {
                               eventPayload.dataValues?.map(async dv => {
                                     const newDvList = [];
                                     const foundInd = indicatorsList.find(ind => ind.value?.id === dv.dataElement);
+
                                     if (foundInd) {
                                           const foundAggrageMappingElement = dataStoreIndicatorsMapping?.find(
                                                 d =>
@@ -1747,6 +1704,7 @@ const Supervision = ({ me }) => {
 
                                                       const orgUnitId = eventPayload.orgUnit;
                                                       const dx = foundAggrageMappingElement.id;
+
                                                       const value = await getAnalyticValue(
                                                             periodObject?.analytic,
                                                             orgUnitId,
@@ -1814,6 +1772,7 @@ const Supervision = ({ me }) => {
                                                             orgUnitId,
                                                             dx
                                                       );
+                                                      console.log('valeur indicateur 3: ', value);
 
                                                       periodPayload.month3 = {
                                                             position: 3,
@@ -2204,6 +2163,8 @@ const Supervision = ({ me }) => {
 
                                                 await updatePeriodsConfigs(periodPayload);
                                           }
+                                    } else {
+                                          newDvList.push(dv);
                                     }
 
                                     return newDvList;
@@ -2242,7 +2203,7 @@ const Supervision = ({ me }) => {
                         null
                   )) || { periods: [], month1KeyWords: [], month2KeyWords: [], month3KeyWords: [] };
                   if (configPayload && periodPayload) {
-                        configPayload = { ...configPayload, periods: [...configPayload.periods, periodPayload] };
+                        configPayload = { ...configPayload, periods: [periodPayload, ...configPayload.periods] };
                   }
                   await saveDataToDataStore(process.env.REACT_APP_PERIODS_CONFIG_KEY, configPayload, null, null, null);
             } catch (err) {}
@@ -2483,6 +2444,8 @@ const Supervision = ({ me }) => {
                                                       const elementMONTH_14 = foundInd?.DHIS2MonthlyValue14;
                                                       const elementMONTH_15 = foundInd?.DHIS2MonthlyValue15;
 
+                                                      console.log('Element de données 3 : ', elementMONTH_3);
+
                                                       let periodPayload = {
                                                             eventDate: eventPayload.eventDate,
                                                             orgUnit: eventPayload.orgUnit,
@@ -2566,6 +2529,8 @@ const Supervision = ({ me }) => {
                                                                   orgUnitId,
                                                                   dx
                                                             );
+
+                                                            console.log('monthly value 3 : ', value);
 
                                                             periodPayload.month3 = {
                                                                   position: 3,
@@ -2953,8 +2918,11 @@ const Supervision = ({ me }) => {
                                                                   });
                                                             }
                                                       }
+
                                                       await updatePeriodsConfigs(periodPayload);
                                                 }
+                                          } else {
+                                                newDvList.push(dv);
                                           }
 
                                           return newDvList;
@@ -3077,7 +3045,7 @@ const Supervision = ({ me }) => {
             }
       };
 
-      const saveSupervisionAsEventStrategy = async (inputFieldsList, newDataStoreSupervisions) => {
+      const saveSupervisionAsEventStrategy = async inputFieldsList => {
             try {
                   if (inputFieldsList.length > 0) {
                         const supervisionsListByProgramStages = await Promise.all(
@@ -3151,16 +3119,16 @@ const Supervision = ({ me }) => {
                               return prev;
                         }, []);
 
-                        let planificationPayload = {
-                              id: uuid(),
-                              program: selectedProgram,
-                              dataSources: mappingConfigs,
-                              supervisions: supervisionsList
-                        };
+                        // let planificationPayload = {
+                        //       id: uuid(),
+                        //       program: selectedProgram,
+                        //       dataSources: mappingConfigs,
+                        //       supervisions: supervisionsList
+                        // };
 
-                        const newDataStoreSupervisionsPayload = [...newDataStoreSupervisions, planificationPayload];
+                        // const newDataStoreSupervisionsPayload = [...newDataStoreSupervisions, planificationPayload];
 
-                        await savePanificationToDataStore(newDataStoreSupervisionsPayload);
+                        // await savePanificationToDataStore(newDataStoreSupervisionsPayload);
                   }
             } catch (err) {
                   throw err;
@@ -3231,18 +3199,15 @@ const Supervision = ({ me }) => {
 
                   setLoadingSupervisionPlanification(true);
 
-                  const newDataStoreSupervisions = await loadDataStoreSupervisions();
-
                   if (
                         selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
                         selectedProgram.generationType === TYPE_GENERATION_AS_EVENT
                   ) {
-                        await saveSupervisionAsEventStrategy(inputFields, newDataStoreSupervisions);
+                        await saveSupervisionAsEventStrategy(inputFields);
                   }
 
                   loadDataStoreSupervisionConfigs(organisationUnits);
                   loadDataStorePerformanceFavoritsConfigs();
-                  loadDataStoreSupervisions();
 
                   setLoadingSupervisionPlanification(false);
                   setNotification({
@@ -3288,40 +3253,6 @@ const Supervision = ({ me }) => {
                         DESCENDANTS
                   );
             }
-      };
-
-      const calculateMontant = (trackedEntityInstance, period, organisationUnitId, programId) => {
-            let montant = 0;
-
-            const correctTEIs =
-                  dataStoreSupervisions.reduce((prev, curr) => {
-                        prev = prev.concat(curr.supervisions || []);
-                        prev = prev.filter(p =>
-                              p.period &&
-                              trackedEntityInstance === p.trackedEntityInstance &&
-                              dayjs(period).format('YYYY-MM-DD') === dayjs(p.period).format('YYYY-MM-DD') &&
-                              p.organisationUnit?.id === organisationUnitId &&
-                              p.program?.id === programId
-                                    ? true
-                                    : false
-                        );
-                        return prev;
-                  }, []) || [];
-
-            if (correctTEIs.length === 0) return `${montant} FCFA`;
-
-            const correctPaymentObject = dataStoreSupervisionConfigs
-                  .find(d => d.program?.id === programId)
-                  ?.paymentConfigs?.find(p => p.id === correctTEIs[0]?.payment);
-
-            if (!correctPaymentObject) return `${montant} FCFA`;
-
-            montant = parseFloat(
-                  correctPaymentObject.montantConstant -
-                        (correctPaymentObject.montantConstant * correctPaymentObject.fraisMobileMoney) / 100
-            ).toFixed(2);
-
-            return `${montant} FCFA`;
       };
 
       const RenderSupervisionList = () => (
@@ -5781,14 +5712,23 @@ const Supervision = ({ me }) => {
                   <></>
             );
 
-      const handleSelectBackgroundInformationFavorit = values => {
-            const currentFavs = values?.map(v => favoritBackgroundInformationList.find(b => b.id === v)) || [];
-            let newList = [];
+      // const handleSelectBackgroundInformationFavorit = values => {
+      //       const currentFavs = values?.map(v => favoritBackgroundInformationList.find(b => b.id === v)) || [];
+      //       let newList = [];
+      //       setSelectedBackgroundInformationFavorit(currentFavs);
+
+      //       for (let fav of currentFavs) {
+      //             newList = newList.concat(fav.configs || []);
+      //       }
+
+      //       setNonTranslateMappingConfigs(newList || []);
+      //       setMappingConfigs([]);
+      // };
+
+      const handleSelectBackgroundInformationFavorit = value => {
+            const currentFavs = favoritBackgroundInformationList.find(b => b.id === value);
             setSelectedBackgroundInformationFavorit(currentFavs);
-            for (let fav of currentFavs) {
-                  newList = newList.concat(fav.configs || []);
-            }
-            setNonTranslateMappingConfigs(newList || []);
+            setNonTranslateMappingConfigs(currentFavs.configs || []);
             setMappingConfigs([]);
       };
 
@@ -5820,10 +5760,10 @@ const Supervision = ({ me }) => {
                                                       style={{ width: '100%' }}
                                                       optionFilterProp="label"
                                                       loading={loadingBackgroundInformationFavoritsConfigs}
-                                                      value={selectedBackgroundInformationFavorit?.map(f => f.id)}
+                                                      value={selectedBackgroundInformationFavorit?.id}
                                                       onChange={handleSelectBackgroundInformationFavorit}
                                                       showSearch
-                                                      mode="multiple"
+                                                      // mode="multiple"
                                                 />
                                           </div>
                                     </Col>
@@ -6833,7 +6773,6 @@ const Supervision = ({ me }) => {
                   loadDataStoreRegistres();
                   loadOrganisationUnits();
                   loadOrganisationUnitGroups();
-                  loadDataStoreSupervisions();
                   loadDataStorePerformanceFavoritsConfigs();
                   loadDataStoreBackgroundInformationFavoritsConfigs();
                   loadDataStoreIndicatorsConfigs();

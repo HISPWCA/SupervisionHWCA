@@ -273,40 +273,6 @@ export const Dashboard = ({ me }) => {
             }
       };
 
-      const loadDataStoreSupervisionPlanifications = async () => {
-            try {
-                  setLoadingDataStoreSupervisionPlanifications(true);
-                  const response = await loadDataStore(process.env.REACT_APP_SUPERVISIONS_KEY, null, null, null);
-
-                  let supervisionList = [];
-                  const eventList = [];
-
-                  for (let planification of response) {
-                        for (let sup of planification.supervisions) {
-                              if (!supervisionList.map(s => s.id).includes(sup.id)) {
-                                    supervisionList.push(sup);
-                              }
-                        }
-                  }
-
-                  for (let sup of supervisionList) {
-                        const payload = {
-                              id: sup.id,
-                              title: 'Supervision',
-                              allDay: true,
-                              start: new Date(2015, 3, 0),
-                              end: new Date(2015, 3, 1)
-                        };
-
-                        eventList.push(payload);
-                  }
-
-                  setDataStoreSupervisionPlanifications(response);
-                  setLoadingDataStoreSupervisionPlanifications(false);
-            } catch (err) {
-                  setLoadingDataStoreSupervisionPlanifications(false);
-            }
-      };
 
       const loadUsers = async userOrgUnitId => {
             try {
