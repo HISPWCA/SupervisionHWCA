@@ -41,7 +41,6 @@ import {
       DESCENDANTS,
       DIRECTE,
       DQR,
-      ELEMENT_GROUP,
       FAVORIS,
       INDICATOR,
       MONTH,
@@ -52,8 +51,6 @@ import {
       NOTIFICATION_CRITICAL,
       NOTIFICATION_SUCCESS,
       ORGANISATION_UNIT,
-      PAYMENT_DONE,
-      PENDING_PAYMENT,
       PENDING_VALIDATION,
       QUARTER,
       RANDOM,
@@ -211,7 +208,6 @@ const Supervision = ({ me }) => {
       const [inputNbrOrgUnit, setInputNbrOrgUnit] = useState(0);
 
       const [loadingDataStoreSupervisionConfigs, setLoadingDataStoreSupervisionConfigs] = useState(false);
-      const [loadingDataStoreSupervisions, setLoadingDataStoreSupervisions] = useState(false);
       const [loadingDataStoreIndicatorConfigs, setLoadingDataStoreIndicatorConfigs] = useState(false);
       const [loadingOrganisationUnits, setLoadingOrganisationUnits] = useState(false);
       const [loadingOrganisationUnitGroupSets, setLoadingOrganisationUnitGroupSets] = useState(false);
@@ -1772,7 +1768,6 @@ const Supervision = ({ me }) => {
                                                             orgUnitId,
                                                             dx
                                                       );
-                                                      console.log('valeur indicateur 3: ', value);
 
                                                       periodPayload.month3 = {
                                                             position: 3,
@@ -2444,8 +2439,6 @@ const Supervision = ({ me }) => {
                                                       const elementMONTH_14 = foundInd?.DHIS2MonthlyValue14;
                                                       const elementMONTH_15 = foundInd?.DHIS2MonthlyValue15;
 
-                                                      console.log('Element de données 3 : ', elementMONTH_3);
-
                                                       let periodPayload = {
                                                             eventDate: eventPayload.eventDate,
                                                             orgUnit: eventPayload.orgUnit,
@@ -2529,8 +2522,6 @@ const Supervision = ({ me }) => {
                                                                   orgUnitId,
                                                                   dx
                                                             );
-
-                                                            console.log('monthly value 3 : ', value);
 
                                                             periodPayload.month3 = {
                                                                   position: 3,
