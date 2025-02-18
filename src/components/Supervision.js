@@ -5271,7 +5271,7 @@ const Supervision = ({ me }) => {
                                                       style={{ marginLeft: '5px', cursor: 'pointer' }}
                                                       onClick={() => setInputMeilleurPositif(!inputMeilleurPositif)}
                                                 >
-                                                      Meilleur Positif
+                                                      {translate('Meilleur_Positif')}
                                                 </span>
                                           </div>
                                     </Col>
