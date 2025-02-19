@@ -366,6 +366,15 @@
     "Status_Supervision": "Statut",
     "Edit_Indicator": "Editer l' Indicateur",
     "Pending Validation": "En attente",
-    "Recent_Verification_Period":"Période récente de vérification",
-    "Recent_Verification_Period_Help":"Choisir une date quelconque de la période la plus récente des périodes de vérification de données. ( par exemple : Si votre configuration prend 3 mois  de données, en choisissant 01 Mai 2024, le système va comprendre que vous voulez travailler avec les données d'Avril, Mars, Février 2024 )"
+    "Recent_Verification_Period":"Période la plus récente de vérification",
+    "Recent_Verification_Period_Help":"Choisir une date quelconque de la période la plus récente des périodes de vérification de données. ( par exemple : Si votre configuration prend 3 mois  de données, en choisissant 01 Mai 2024, le système va comprendre que vous voulez travailler avec les données d'Avril, Mars, Février 2024 )",
+
+
+    "Indicator_Updating": "Mise à jour des indicateurs",
+    "CrossCheck_Updating": "Mise à jour des recoupements",
+    "Registers_Updating": "Mise à jour des régistres",
+    "DocumentSource_Updating": "Mise à jour des source de documents",
+    "DataElement_Updating": "Mise à jour des élements de données "
+
+
 }

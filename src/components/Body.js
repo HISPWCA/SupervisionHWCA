@@ -33,6 +33,7 @@ import Cross_cuts from '../datastores/Cross_cuts.json';
 import Indicators from '../datastores/Indicators.json';
 import Registres from '../datastores/Registres.json';
 import MetadataInfos from '../datastores/metadataInfos.json';
+import { IoCheckmarkDoneCircle } from 'react-icons/io5';
 
 export const Body = () => {
       const [renderPage, setRenderPage] = useState(PAGE_DASHBOARD);
@@ -45,6 +46,8 @@ export const Body = () => {
 
       const [appUserGroup, setAppUserGroup] = useState(null);
       const [appCreateFavoritUserGroup, setAppCreateFavoritUserGroup] = useState(null);
+
+      const [updateMessages, setUpdateMessages] = useState([]);
 
       const updateMetaDataInformations = async () => {
             try {
@@ -73,133 +76,145 @@ export const Body = () => {
             }
       };
 
+      const updateCrossCheckDataStore = async () => {
+            try {
+                  const crosschecksList = await loadDataStore(process.env.REACT_APP_CROSS_CUT_KEY, null, null, []);
+                  if (crosschecksList?.length > 0) {
+                        await saveDataToDataStore(
+                              process.env.REACT_APP_CROSS_CUT_KEY,
+                              crosschecksList?.map(group => ({
+                                    ...group,
+                                    children:
+                                          group.children?.map(child => ({
+                                                ...child,
+                                                id: child.id || uuid(),
+                                                name_fr: child.name_fr || ''
+                                          })) || []
+                              }))
+                        );
+                        setUpdateMessages([...updateMessages, translate('CrossCheck_Updating')]);
+                  }
+            } catch (err) {
+                  console.log(err);
+            }
+      };
+      const updateIndicatorDataStore = async () => {
+            try {
+                  const indicatorsList = await loadDataStore(process.env.REACT_APP_INDICATORS_KEY, null, null, []);
+                  if (indicatorsList?.length > 0) {
+                        await saveDataToDataStore(
+                              process.env.REACT_APP_INDICATORS_KEY,
+                              indicatorsList?.map(group => ({
+                                    ...group,
+                                    children:
+                                          group.children?.map(child => ({
+                                                ...child,
+                                                id: child.id || uuid(),
+                                                name_fr: child.name_fr || ''
+                                          })) || []
+                              }))
+                        );
+
+                        setUpdateMessages([...updateMessages, translate('Indicator_Updating')]);
+                  }
+            } catch (err) {
+                  console.log(err);
+            }
+      };
+
+      const updateRegistersDataStore = async () => {
+            try {
+                  const registersList = await loadDataStore(process.env.REACT_APP_REGISTRES_KEY, null, null, []);
+                  if (registersList?.length > 0) {
+                        await saveDataToDataStore(
+                              process.env.REACT_APP_REGISTRES_KEY,
+                              registersList?.map(group => ({
+                                    ...group,
+                                    children:
+                                          group.children?.map(child => ({
+                                                ...child,
+                                                id: child.id || uuid(),
+                                                name_fr: child.name_fr || ''
+                                          })) || []
+                              }))
+                        );
+                        setUpdateMessages([...updateMessages, translate('Registers_Updating')]);
+                  }
+            } catch (err) {
+                  console.log(err);
+            }
+      };
+      const updateDECompletessDataStore = async () => {
+            try {
+                  const deCompletnessList = await loadDataStore(
+                        process.env.REACT_APP_DE_COMPLETNESS_KEY,
+                        null,
+                        null,
+                        []
+                  );
+                  if (deCompletnessList?.length > 0) {
+                        await saveDataToDataStore(
+                              process.env.REACT_APP_DE_COMPLETNESS_KEY,
+                              deCompletnessList?.map(group => ({
+                                    ...group,
+                                    children:
+                                          group.children?.map(child => ({
+                                                ...child,
+                                                id: child.id || uuid(),
+                                                name_fr: child.name_fr || ''
+                                          })) || []
+                              }))
+                        );
+
+                        setUpdateMessages([...updateMessages, translate('DataElement_Updating')]);
+                  }
+            } catch (err) {
+                  console.log(err);
+            }
+      };
+      const updateDSCompletnessDataStore = async () => {
+            try {
+                  const dsCompletnessList = await loadDataStore(
+                        process.env.REACT_APP_DS_COMPLETNESS_KEY,
+                        null,
+                        null,
+                        []
+                  );
+
+                  if (dsCompletnessList?.length > 0) {
+                        await saveDataToDataStore(
+                              process.env.REACT_APP_DS_COMPLETNESS_KEY,
+                              dsCompletnessList?.map(group => ({
+                                    ...group,
+                                    children:
+                                          group.children?.map(child => ({
+                                                ...child,
+                                                id: child.id || uuid(),
+                                                name_fr: child.name_fr || ''
+                                          })) || []
+                              }))
+                        );
+
+                        setUpdateMessages([...updateMessages, translate('DocumentSource_Updating')]);
+                  }
+            } catch (err) {
+                  console.log(err);
+            }
+      };
+
       const updateDatastoreSchemas = async () => {
             try {
                   const metaData = await loadDataStore(process.env.REACT_APP_META_INFOS_NAME, null, null, []);
                   if (!metaData?.dataStoreSchemaIsUpdated || metaData?.dataStoreSchemaIsUpdated === 'false') {
-                        const crosschecksList = await loadDataStore(
-                              process.env.REACT_APP_CROSS_CUT_KEY,
-                              null,
-                              null,
-                              []
-                        );
+                        await updateIndicatorDataStore();
+                        await updateCrossCheckDataStore();
+                        await updateDECompletessDataStore();
+                        await updateDSCompletnessDataStore();
+                        await updateRegistersDataStore();
 
-                        const indicatorsList = await loadDataStore(
-                              process.env.REACT_APP_INDICATORS_KEY,
-                              null,
-                              null,
-                              []
-                        );
-
-                        const deCompletnessList = await loadDataStore(
-                              process.env.REACT_APP_DE_COMPLETNESS_KEY,
-                              null,
-                              null,
-                              []
-                        );
-                        const dsCompletnessList = await loadDataStore(
-                              process.env.REACT_APP_DS_COMPLETNESS_KEY,
-                              null,
-                              null,
-                              []
-                        );
-                        const registersList = await loadDataStore(process.env.REACT_APP_REGISTRES_KEY, null, null, []);
-
-                        console.log('cross check list : ', crosschecksList);
-                        console.log('indicator list : ', indicatorsList);
-                        console.log('register List : ', registersList);
-                        console.log('de completness list : ', deCompletnessList);
-                        console.log('ds completness list : ', dsCompletnessList);
-
-                        //                          {
-                        //     "dataSet": null,
-                        //     "dhis2": {
-                        //       "id": "fm4wnvf7wly",
-                        //       "name": "001 Test",
-                        //       "type": "PROGRAM_INDICATOR"
-                        //     },
-                        //     "group": "HMIS",
-                        //     "indicator": "b915c4e3-b2a1-4566-b049-8d6459b5be0b",
-                        //     "indicatorRename": "001 Testk",
-                        //     "indicatorRename_fr": "001 Test",
-                        //     "useNameFromDHIS2": true
-                        //   }
-
-                        if (crosschecksList?.length > 0) {
-                              saveDataToDataStore(
-                                    process.env.REACT_APP_CROSS_CUT_KEY,
-                                    crosschecksList?.map(group => ({
-                                          ...group,
-                                          children:
-                                                group.children?.map(child => ({
-                                                      ...child,
-                                                      id: child.id || uuid(),
-                                                      name_fr: child.name_fr || ''
-                                                })) || []
-                                    }))
-                              );
-                        }
-
-                        if (indicatorsList?.length > 0) {
-                              saveDataToDataStore(
-                                    process.env.REACT_APP_INDICATORS_KEY,
-                                    indicatorsList?.map(group => ({
-                                          ...group,
-                                          children:
-                                                group.children?.map(child => ({
-                                                      ...child,
-                                                      id: child.id || uuid(),
-                                                      name_fr: child.name_fr || ''
-                                                })) || []
-                                    }))
-                              );
-                        }
-
-                        if (deCompletnessList?.length > 0) {
-                              saveDataToDataStore(
-                                    process.env.REACT_APP_DE_COMPLETNESS_KEY,
-                                    deCompletnessList?.map(group => ({
-                                          ...group,
-                                          children:
-                                                group.children?.map(child => ({
-                                                      ...child,
-                                                      id: child.id || uuid(),
-                                                      name_fr: child.name_fr || ''
-                                                })) || []
-                                    }))
-                              );
-                        }
-                        if (dsCompletnessList?.length > 0) {
-                              saveDataToDataStore(
-                                    process.env.REACT_APP_DS_COMPLETNESS_KEY,
-                                    dsCompletnessList?.map(group => ({
-                                          ...group,
-                                          children:
-                                                group.children?.map(child => ({
-                                                      ...child,
-                                                      id: child.id || uuid(),
-                                                      name_fr: child.name_fr || ''
-                                                })) || []
-                                    }))
-                              );
-                        }
-                        if (registersList?.length > 0) {
-                              saveDataToDataStore(
-                                    process.env.REACT_APP_REGISTRES_KEY,
-                                    registersList?.map(group => ({
-                                          ...group,
-                                          children:
-                                                group.children?.map(child => ({
-                                                      ...child,
-                                                      id: child.id || uuid(),
-                                                      name_fr: child.name_fr || ''
-                                                })) || []
-                                    }))
-                              );
-                        }
-
-                        saveDataToDataStore(process.env.REACT_APP_META_INFOS_NAME, {
+                        await saveDataToDataStore(process.env.REACT_APP_META_INFOS_NAME, {
                               ...metaData,
+                              metadata_version: process.env.REACT_APP_META_DATA_VERSION,
                               dataStoreSchemaIsUpdated: true
                         });
                   }
@@ -544,12 +559,13 @@ export const Body = () => {
       return (
             <>
                   <div className="app">
+                        {console.log('updateMessages', updateMessages)}
                         {loadingDataStoreInitialization && (
                               <div
                                     className="my-shadow"
                                     style={{
                                           display: 'flex',
-                                          alignItems: 'center',
+                                          // alignItems: 'center',
                                           maxWidth: '500px',
                                           padding: '10px',
                                           background: '#fff',
@@ -558,7 +574,20 @@ export const Body = () => {
                                     }}
                               >
                                     <CircularLoader small />
-                                    <span style={{ marginLeft: '20px' }}>{translate('Config_Initialization')}...</span>
+                                    <div style={{ marginLeft: '20px' }}>
+                                          <div> {translate('Config_Initialization')}...</div>
+                                          {updateMessages?.map(message => (
+                                                <div
+                                                      key={message}
+                                                      style={{ display: 'flex', gap: '5px', marginTop: '10px' }}
+                                                >
+                                                      <span>{message}</span>
+                                                      <span>
+                                                            <IoCheckmarkDoneCircle style={{ color: 'green' }} />
+                                                      </span>
+                                                </div>
+                                          ))}
+                                    </div>
                               </div>
                         )}
                         {isDataStoreInitialized && (
