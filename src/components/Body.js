@@ -49,30 +49,334 @@ export const Body = () => {
 
       const [updateMessages, setUpdateMessages] = useState([]);
 
-      const updateMetaDataInformations = async () => {
+      const updateBackgroundInformationsDataStore = async () => {
             try {
-                  const metaDataInfo = await loadDataStore(
-                        process.env.REACT_APP_META_INFOS_NAME,
+                  const backgroundInformationFavoriteList = await loadDataStore(
+                        process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY,
                         null,
                         null,
-                        MetadataInfos && {
-                              ...MetadataInfos,
-                              metadata_version: process.env.REACT_APP_META_DATA_VERSION
-                        }
+                        []
+                  );
+                  const indicatorsList = await loadDataStore(process.env.REACT_APP_INDICATORS_KEY, null, null, []);
+                  const crosschecksList = await loadDataStore(process.env.REACT_APP_CROSS_CUT_KEY, null, null, []);
+                  const registersList = await loadDataStore(process.env.REACT_APP_REGISTRES_KEY, null, null, []);
+                  const deCompletnessList = await loadDataStore(
+                        process.env.REACT_APP_DE_COMPLETNESS_KEY,
+                        null,
+                        null,
+                        []
+                  );
+                  const dsCompletnessList = await loadDataStore(
+                        process.env.REACT_APP_DS_COMPLETNESS_KEY,
+                        null,
+                        null,
+                        []
                   );
 
-                  if (
-                        metaDataInfo &&
-                        metaDataInfo.metadata_version &&
-                        metaDataInfo.metadata_version !== process.env.REACT_APP_META_DATA_VERSION
-                  ) {
-                        saveDataToDataStore(process.env.REACT_APP_META_INFOS_NAME, {
-                              ...MetadataInfos,
-                              metadata_version: process.env.REACT_APP_META_DATA_VERSION
-                        });
+                  if (backgroundInformationFavoriteList?.length > 0 && indicatorsList?.length > 0) {
+                        console.log('backgroundInformationFavoriteList :', backgroundInformationFavoriteList);
+                        await saveDataToDataStore(
+                              process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY,
+                              backgroundInformationFavoriteList?.map(favorite => ({
+                                    ...favorite,
+                                    formState: favorite.formState
+                                          ? {
+                                                  ...favorite.formState,
+                                                  consistencyOvertimes:
+                                                        favorite.formState?.consistencyOvertimes?.map(ind => ({
+                                                              ...ind,
+                                                              selectedSourceConsistency:
+                                                                    (ind.selectedSourceConsistency &&
+                                                                          indicatorsList
+                                                                                ?.find(
+                                                                                      group =>
+                                                                                            group.name ===
+                                                                                            favorite.formState
+                                                                                                  .selectedGlobalProgramArea
+                                                                                                  ?.name
+                                                                                )
+                                                                                ?.children?.find(
+                                                                                      child =>
+                                                                                            child.name ===
+                                                                                                  ind
+                                                                                                        .selectedSourceConsistency
+                                                                                                        ?.name ||
+                                                                                            child.name_fr ===
+                                                                                                  ind
+                                                                                                        .selectedSourceConsistency
+                                                                                                        ?.name
+                                                                                )) ||
+                                                                    ind.selectedSourceConsistency
+                                                        })) || [],
+                                                  indicators:
+                                                        favorite.formState?.indicators?.map(ind => ({
+                                                              ...ind,
+                                                              selectedSourceIndicator:
+                                                                    (ind.selectedSourceIndicator &&
+                                                                          indicatorsList
+                                                                                ?.find(
+                                                                                      group =>
+                                                                                            group.name ===
+                                                                                            favorite.formState
+                                                                                                  .selectedGlobalProgramArea
+                                                                                                  ?.name
+                                                                                )
+                                                                                ?.children?.find(
+                                                                                      child =>
+                                                                                            child.name ===
+                                                                                                  ind
+                                                                                                        .selectedSourceIndicator
+                                                                                                        ?.name ||
+                                                                                            child.name_fr ===
+                                                                                                  ind
+                                                                                                        .selectedSourceIndicator
+                                                                                                        ?.name
+                                                                                )) ||
+                                                                    ind.selectedSourceIndicator
+                                                        })) || [],
+
+                                                  recoupements:
+                                                        favorite.formState?.recoupements?.map(recoup => ({
+                                                              ...recoup,
+                                                              selectedSourcePrimary:
+                                                                    (recoup.selectedSourcePrimary &&
+                                                                          crosschecksList
+                                                                                ?.find(
+                                                                                      group =>
+                                                                                            group.name ===
+                                                                                            favorite.formState
+                                                                                                  .selectedGlobalProgramArea
+                                                                                                  ?.name
+                                                                                )
+                                                                                ?.children?.find(
+                                                                                      child =>
+                                                                                            child.name ===
+                                                                                                  recoup
+                                                                                                        .selectedSourcePrimary
+                                                                                                        ?.name ||
+                                                                                            child.name_fr ===
+                                                                                                  recoup
+                                                                                                        .selectedSourcePrimary
+                                                                                                        ?.name
+                                                                                )) ||
+                                                                    recoup.selectedSourcePrimary,
+
+                                                              selectedSourceSecondary:
+                                                                    (recoup.selectedSourceSecondary &&
+                                                                          crosschecksList
+                                                                                ?.find(
+                                                                                      group =>
+                                                                                            group.name ===
+                                                                                            favorite.formState
+                                                                                                  .selectedGlobalProgramArea
+                                                                                                  ?.name
+                                                                                )
+                                                                                ?.children?.find(
+                                                                                      child =>
+                                                                                            child.name ===
+                                                                                                  recoup
+                                                                                                        .selectedSourceSecondary
+                                                                                                        ?.name ||
+                                                                                            child.name_fr ===
+                                                                                                  recoup
+                                                                                                        .selectedSourceSecondary
+                                                                                                        ?.name
+                                                                                )) ||
+                                                                    recoup.selectedSourceSecondary
+                                                        })) || [],
+
+                                                  completeness: favorite.formState?.completeness
+                                                        ? {
+                                                                ...favorite.formState?.completeness,
+                                                                register: favorite.formState?.completeness?.register
+                                                                      ? registersList
+                                                                              ?.find(
+                                                                                    group =>
+                                                                                          group.name ===
+                                                                                          favorite.formState
+                                                                                                .selectedGlobalProgramArea
+                                                                                                ?.name
+                                                                              )
+                                                                              ?.children?.find(
+                                                                                    child =>
+                                                                                          child.name ===
+                                                                                                favorite.formState
+                                                                                                      ?.completeness
+                                                                                                      ?.register
+                                                                                                      ?.name ||
+                                                                                          child.name_fr ===
+                                                                                                favorite.formState
+                                                                                                      ?.completeness
+                                                                                                      ?.register?.name
+                                                                              ) ||
+                                                                        favorite.formState?.completeness?.register
+                                                                      : null,
+
+                                                                sourceDocuments:
+                                                                      favorite.formState?.completeness?.sourceDocuments?.map(
+                                                                            sourceDoc => ({
+                                                                                  ...sourceDoc,
+                                                                                  selectedSourceDS:
+                                                                                        sourceDoc.selectedSourceDS
+                                                                                              ? dsCompletnessList
+                                                                                                      ?.find(
+                                                                                                            group =>
+                                                                                                                  group.name ===
+                                                                                                                  favorite
+                                                                                                                        .formState
+                                                                                                                        .selectedGlobalProgramArea
+                                                                                                                        ?.name
+                                                                                                      )
+                                                                                                      ?.children?.find(
+                                                                                                            child =>
+                                                                                                                  child.name ===
+                                                                                                                        sourceDoc
+                                                                                                                              .selectedSourceDS
+                                                                                                                              ?.name ||
+                                                                                                                  child.name_fr ===
+                                                                                                                        sourceDoc
+                                                                                                                              .selectedSourceDS
+                                                                                                                              ?.name
+                                                                                                      ) ||
+                                                                                                sourceDoc.selectedSourceDS
+                                                                                              : null || null
+                                                                            })
+                                                                      ) || [],
+
+                                                                dataElements:
+                                                                      favorite.formState?.completeness?.dataElements?.map(
+                                                                            sourceDE => ({
+                                                                                  ...sourceDE,
+                                                                                  selectedSourceDE:
+                                                                                        sourceDE.selectedSourceDE
+                                                                                              ? deCompletnessList
+                                                                                                      ?.find(
+                                                                                                            group =>
+                                                                                                                  group.name ===
+                                                                                                                  favorite
+                                                                                                                        .formState
+                                                                                                                        .selectedGlobalProgramArea
+                                                                                                                        ?.name
+                                                                                                      )
+                                                                                                      ?.children?.find(
+                                                                                                            child =>
+                                                                                                                  child.name ===
+                                                                                                                        sourceDE
+                                                                                                                              .selectedSourceDE
+                                                                                                                              ?.name ||
+                                                                                                                  child.name_fr ===
+                                                                                                                        sourceDE
+                                                                                                                              .selectedSourceDE
+                                                                                                                              ?.name
+                                                                                                      ) ||
+                                                                                                sourceDE.selectedSourceDE
+                                                                                              : null || null
+                                                                            })
+                                                                      ) || []
+                                                          }
+                                                        : null
+                                            }
+                                          : null,
+                                    configs: favorite.configs
+                                          ? favorite.configs?.map(config => ({
+                                                  ...config,
+                                                  indicator: config.indicator
+                                                        ? {
+                                                                ...config.indicator,
+                                                                id:
+                                                                      [
+                                                                            ...(indicatorsList?.find(
+                                                                                  group =>
+                                                                                        group.name ===
+                                                                                        favorite.formState
+                                                                                              .selectedGlobalProgramArea
+                                                                                              ?.name
+                                                                            )?.children || []),
+                                                                            ...(crosschecksList?.find(
+                                                                                  group =>
+                                                                                        group.name ===
+                                                                                        favorite.formState
+                                                                                              .selectedGlobalProgramArea
+                                                                                              ?.name
+                                                                            )?.children || []),
+                                                                            ...(registersList?.find(
+                                                                                  group =>
+                                                                                        group.name ===
+                                                                                        favorite.formState
+                                                                                              .selectedGlobalProgramArea
+                                                                                              ?.name
+                                                                            )?.children || []),
+                                                                            ...(deCompletnessList?.find(
+                                                                                  group =>
+                                                                                        group.name ===
+                                                                                        favorite.formState
+                                                                                              .selectedGlobalProgramArea
+                                                                                              ?.name
+                                                                            )?.children || []),
+                                                                            ...(dsCompletnessList?.find(
+                                                                                  group =>
+                                                                                        group.name ===
+                                                                                        favorite.formState
+                                                                                              .selectedGlobalProgramArea
+                                                                                              ?.name
+                                                                            )?.children || [])
+                                                                      ]
+                                                                            ?.reduce(
+                                                                                  (prev, curr) => prev.concat(curr),
+                                                                                  []
+                                                                            )
+                                                                            ?.find(
+                                                                                  ind =>
+                                                                                        ind.name ===
+                                                                                              config.indicator?.id ||
+                                                                                        ind.name_fr ===
+                                                                                              config.indicator?.id
+                                                                            )?.id || config.indicator?.id
+                                                          }
+                                                        : config.indicator
+                                            }))
+                                          : []
+                              }))
+                        );
+                        setUpdateMessages(prev => [...prev, translate('Favoris_Mapping_Updating')]);
                   }
             } catch (err) {
-                  console.log('Error : ', err);
+                  console.log(err);
+            }
+      };
+
+      const updateIndicatorMappingDataStore = async () => {
+            try {
+                  const indicatorsMappingList = await loadDataStore(
+                        process.env.REACT_APP_INDICATORS_MAPPING_KEY,
+                        null,
+                        null,
+                        []
+                  );
+
+                  const indicatorsList = await loadDataStore(process.env.REACT_APP_INDICATORS_KEY, null, null, []);
+
+                  if (indicatorsMappingList?.length > 0 && indicatorsList?.length > 0) {
+                        await saveDataToDataStore(
+                              process.env.REACT_APP_INDICATORS_MAPPING_KEY,
+                              indicatorsMappingList?.map(indMapping => ({
+                                    ...indMapping,
+                                    indicatorRename_fr: indMapping.indicatorRename_fr || '',
+                                    indicator: indMapping.indicator
+                                          ? indicatorsList
+                                                  ?.find(group => group.name === indMapping.group)
+                                                  ?.children?.find(
+                                                        child =>
+                                                              child.name === indMapping.indicator ||
+                                                              child.name_fr === indMapping.indicator
+                                                  )?.id || indMapping.indicator
+                                          : null
+                              }))
+                        );
+                        setUpdateMessages(prev => [...prev, translate('Indicator_Mapping_Updating')]);
+                  }
+            } catch (err) {
+                  console.log(err);
             }
       };
 
@@ -92,12 +396,13 @@ export const Body = () => {
                                           })) || []
                               }))
                         );
-                        setUpdateMessages([...updateMessages, translate('CrossCheck_Updating')]);
+                        setUpdateMessages(prev => [...prev, translate('CrossCheck_Updating')]);
                   }
             } catch (err) {
                   console.log(err);
             }
       };
+
       const updateIndicatorDataStore = async () => {
             try {
                   const indicatorsList = await loadDataStore(process.env.REACT_APP_INDICATORS_KEY, null, null, []);
@@ -115,7 +420,7 @@ export const Body = () => {
                               }))
                         );
 
-                        setUpdateMessages([...updateMessages, translate('Indicator_Updating')]);
+                        setUpdateMessages(prev => [...prev, translate('Indicator_Updating')]);
                   }
             } catch (err) {
                   console.log(err);
@@ -138,12 +443,13 @@ export const Body = () => {
                                           })) || []
                               }))
                         );
-                        setUpdateMessages([...updateMessages, translate('Registers_Updating')]);
+                        setUpdateMessages(prev => [...prev, translate('Registers_Updating')]);
                   }
             } catch (err) {
                   console.log(err);
             }
       };
+
       const updateDECompletessDataStore = async () => {
             try {
                   const deCompletnessList = await loadDataStore(
@@ -166,12 +472,13 @@ export const Body = () => {
                               }))
                         );
 
-                        setUpdateMessages([...updateMessages, translate('DataElement_Updating')]);
+                        setUpdateMessages(prev => [...prev, translate('DataElement_Updating')]);
                   }
             } catch (err) {
                   console.log(err);
             }
       };
+
       const updateDSCompletnessDataStore = async () => {
             try {
                   const dsCompletnessList = await loadDataStore(
@@ -195,7 +502,7 @@ export const Body = () => {
                               }))
                         );
 
-                        setUpdateMessages([...updateMessages, translate('DocumentSource_Updating')]);
+                        setUpdateMessages(prev => [...prev, translate('DocumentSource_Updating')]);
                   }
             } catch (err) {
                   console.log(err);
@@ -211,6 +518,8 @@ export const Body = () => {
                         await updateDECompletessDataStore();
                         await updateDSCompletnessDataStore();
                         await updateRegistersDataStore();
+                        await updateIndicatorMappingDataStore();
+                        await updateBackgroundInformationsDataStore();
 
                         await saveDataToDataStore(process.env.REACT_APP_META_INFOS_NAME, {
                               ...metaData,
@@ -559,7 +868,6 @@ export const Body = () => {
       return (
             <>
                   <div className="app">
-                        {console.log('updateMessages', updateMessages)}
                         {loadingDataStoreInitialization && (
                               <div
                                     className="my-shadow"
@@ -570,7 +878,7 @@ export const Body = () => {
                                           padding: '10px',
                                           background: '#fff',
                                           borderRadius: '5px',
-                                          margin: '0px auto'
+                                          margin: '10px auto'
                                     }}
                               >
                                     <CircularLoader small />

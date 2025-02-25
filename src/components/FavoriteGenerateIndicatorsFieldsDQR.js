@@ -450,12 +450,17 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                         style={{
                                                                               width: '100%'
                                                                         }}
-                                                                        options={rec.selectedSourceProgramArea?.children?.map(
-                                                                              ind => ({
+                                                                        options={dataStoreCrosschecks
+                                                                              ?.find(
+                                                                                    c =>
+                                                                                          c.name ===
+                                                                                          rec.selectedSourceProgramArea
+                                                                                                ?.name
+                                                                              )
+                                                                              ?.children?.map(ind => ({
                                                                                     label: translateDataStoreLabel(ind),
                                                                                     value: ind.id
-                                                                              })
-                                                                        )}
+                                                                              }))}
                                                                         disabled={!rec.selectedSourceProgramArea}
                                                                         showSearch
                                                                         allowClear
