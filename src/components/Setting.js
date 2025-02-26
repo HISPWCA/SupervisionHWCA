@@ -53,14 +53,10 @@ import GenerateIndicatorsFieldsDQR from './GenerateIndicatorsFieldsDQR';
 import SettingIndicatorsMapping from './SettingIndicatorsMapping';
 import { TagsInput } from 'react-tag-input-component';
 import GenerateIndicatorsFieldsRDQA from './GenerateIndicatorsFieldsRDQA';
+import VisualizationOrMapsModal from './VisualizationOrMapsModal';
 
 const Setting = () => {
       const [currentItem, setCurrentItem] = useState(null);
-      const [notification, setNotification] = useState({
-            show: false,
-            message: null,
-            type: null
-      });
       const [renderPage, setRenderPage] = useState(PAGE_CONFIGURATION_TYPE_SUPERVISIONS);
       const [programs, setPrograms] = useState([]);
       const [indicatorGroups, setIndicatorGroups] = useState([]);
@@ -78,11 +74,56 @@ const Setting = () => {
       const [indicatorsFieldsConfigsForRDQA, setIndicatorsFieldsConfigsForRDQA] = useState([]);
       const [currentVisualizationConfig, setCurrentVisualizationConfig] = useState(null);
       const [dataStorePeriodConfigs, setDataStorePeriodConfigs] = useState(null);
-
       const [visualizations, setVisualizations] = useState([]);
       const [maps, setMaps] = useState([]);
       const [favorisItems, setFavorisItems] = useState([]);
       const [dataStoreGlobalSettings, setDataStoreGlobalSettings] = useState(null);
+      const [indicatorName, setIndicatorName] = useState('');
+      const [indicatorEtiquette, setIndicatorEtiquette] = useState('');
+      const [indicatorWeight, setIndicatorWeight] = useState(0);
+      const [indicatorBestPositive, setIndicatorBestPositive] = useState(true);
+      const [organisationUnitGroups, setOrganisationUnitGroups] = useState([]);
+      const [loadingOrganisationUnitGroups, setLoadingOrganisationUnitGroups] = useState(false);
+      const [programStageConfigurations, setProgramStageConfigurations] = useState([]);
+      const [currentProgramstageConfiguration, setCurrentProgramstageConfiguration] = useState(null);
+      const [currentProgramstageConfigurationForRDQA, setCurrentProgramstageConfigurationForRDQA] = useState(null);
+      const [selectedStatusSupervisionDataElement, setSelectedStatusSupervisionDataElement] = useState(null);
+      const [selectedIndicator, setSelectedIndicator] = useState(null);
+      const [selectedIndicatorGroup, setSelectedIndicatorGroup] = useState(null);
+      const [selectedIndicatorType, setSelectedIndicatorType] = useState(PROGRAM_INDICATOR);
+      const [selectedTEIProgram, setSelectedTEIProgram] = useState(null);
+      const [selectedProgram, setSelectedProgram] = useState(null);
+      const [selectedTypeSupervisionPage, setSelectedTypeSupervisionPage] = useState(PAGE_CONFIG_SUPERVISION);
+      const [selectedAnalyseType, setSelectedAnalyseType] = useState(TYPE_ANALYSE_DATA_ELEMENT);
+      const [selectedAnalyseIndicator, setSelectedAnalyseIndicator] = useState(null);
+      const [selectedAnalyseDataElement, setSelectedAnalyseDataElement] = useState(null);
+      const [selectedAttributesToDisplay, setSelectedAttributesToDisplay] = useState([]);
+      const [selectedPlanificationType, setSelectedPlanificationType] = useState(ORGANISATION_UNIT);
+      const [selectedProgramForVisualization, setSelectedProgramForVisualization] = useState(null);
+      const [selectedTypeForVisualization, setSelectedTypeForVisualization] = useState('VISUALIZATION');
+      const [selectedMaps, setSelectedMaps] = useState([]);
+      const [selectedVisualizations, setSelectedVisualizations] = useState([]);
+      const [inputLibellePayment, setInputLibellePayment] = useState('');
+      const [inputMontantConstantPayment, setInputMontantConstantPayment] = useState(0);
+      const [inputFraisMobileMoneyPayment, setInputFraisMobileMoneyPayment] = useState(0);
+      const [loadingPrograms, setLoadingPrograms] = useState(false);
+      const [loadingIndicatorGroups, setLoadingIndicatorGroups] = useState(false);
+      const [loadingSaveSupervionsConfig, setLoadingSaveSupervionsConfig] = useState(false);
+      const [loadingSaveIndicatorsConfig, setLoadingSaveIndicatorsConfig] = useState(false);
+      const [loadingIndicators, setLoadingIndicators] = useState(false);
+      const [loadingDataElements, setLoadingDataElements] = useState(false);
+      const [loadingAddAnalyseConfigs, setLoadingAddAnalyseConfigs] = useState(false);
+      const [loadingProgramStages, setLoadingProgramStages] = useState(false);
+      const [loadingSaveVisualizationInDatastore, setLoadingSaveVisualizationInDatastore] = useState(false);
+      const [loadingDataStoreVisualizations, setLoadingDataStoreVisualizations] = useState(false);
+      const [loadingVis, setLoadingVis] = useState(false);
+      const [updateAllFieldsWhenHaveOneStage, setUpdateAllFieldsWhenHaveOneStage] = useState(false);
+
+      const [displayVisualizationOrMapsModal, setDisplayVisualizationOrMapsModal] = useState(false);
+      const [visType, setVisType] = useState('');
+      const [inputSearchVis, setInputSearchVis] = useState('');
+      const [timoutID, setTimoutID] = useState(null);
+      const [visElementList, setVisElementList] = useState(null);
 
       const [numberOfIndicatorAndRecoupement, setNumberOfIndicatorAndRecoupement] = useState({
             DQR: {
@@ -98,53 +139,11 @@ const Setting = () => {
                   nbrRecoupement: 1
             }
       });
-
-      const [indicatorName, setIndicatorName] = useState('');
-      const [indicatorEtiquette, setIndicatorEtiquette] = useState('');
-      const [indicatorWeight, setIndicatorWeight] = useState(0);
-      const [indicatorBestPositive, setIndicatorBestPositive] = useState(true);
-
-      const [organisationUnitGroups, setOrganisationUnitGroups] = useState([]);
-      const [loadingOrganisationUnitGroups, setLoadingOrganisationUnitGroups] = useState(false);
-      const [programStageConfigurations, setProgramStageConfigurations] = useState([]);
-      const [currentProgramstageConfiguration, setCurrentProgramstageConfiguration] = useState(null);
-      const [currentProgramstageConfigurationForRDQA, setCurrentProgramstageConfigurationForRDQA] = useState(null);
-
-      const [selectedStatusSupervisionDataElement, setSelectedStatusSupervisionDataElement] = useState(null);
-      const [selectedIndicator, setSelectedIndicator] = useState(null);
-      const [selectedIndicatorGroup, setSelectedIndicatorGroup] = useState(null);
-      const [selectedIndicatorType, setSelectedIndicatorType] = useState(PROGRAM_INDICATOR);
-      const [selectedTEIProgram, setSelectedTEIProgram] = useState(null);
-      const [selectedProgram, setSelectedProgram] = useState(null);
-      const [selectedTypeSupervisionPage, setSelectedTypeSupervisionPage] = useState(PAGE_CONFIG_SUPERVISION);
-      const [selectedAnalyseType, setSelectedAnalyseType] = useState(TYPE_ANALYSE_DATA_ELEMENT);
-
-      const [selectedAnalyseIndicator, setSelectedAnalyseIndicator] = useState(null);
-      const [selectedAnalyseDataElement, setSelectedAnalyseDataElement] = useState(null);
-      const [selectedAttributesToDisplay, setSelectedAttributesToDisplay] = useState([]);
-      const [selectedPlanificationType, setSelectedPlanificationType] = useState(ORGANISATION_UNIT);
-      const [selectedProgramForVisualization, setSelectedProgramForVisualization] = useState(null);
-      const [selectedTypeForVisualization, setSelectedTypeForVisualization] = useState('VISUALIZATION');
-      const [selectedMaps, setSelectedMaps] = useState([]);
-      const [selectedVisualizations, setSelectedVisualizations] = useState([]);
-
-      const [inputLibellePayment, setInputLibellePayment] = useState('');
-      const [inputMontantConstantPayment, setInputMontantConstantPayment] = useState(0);
-      const [inputFraisMobileMoneyPayment, setInputFraisMobileMoneyPayment] = useState(0);
-
-      const [loadingPrograms, setLoadingPrograms] = useState(false);
-      const [loadingIndicatorGroups, setLoadingIndicatorGroups] = useState(false);
-      const [loadingSaveSupervionsConfig, setLoadingSaveSupervionsConfig] = useState(false);
-      const [loadingSaveIndicatorsConfig, setLoadingSaveIndicatorsConfig] = useState(false);
-      const [loadingIndicators, setLoadingIndicators] = useState(false);
-      const [loadingDataElements, setLoadingDataElements] = useState(false);
-      const [loadingAddAnalyseConfigs, setLoadingAddAnalyseConfigs] = useState(false);
-      const [loadingProgramStages, setLoadingProgramStages] = useState(false);
-      const [loadingSaveVisualizationInDatastore, setLoadingSaveVisualizationInDatastore] = useState(false);
-      const [loadingDataStoreVisualizations, setLoadingDataStoreVisualizations] = useState(false);
-
-      const [updateAllFieldsWhenHaveOneStage, setUpdateAllFieldsWhenHaveOneStage] = useState(false);
-
+      const [notification, setNotification] = useState({
+            show: false,
+            message: null,
+            type: null
+      });
       const [formState, setFormState] = useState({
             selectedConfigurationType: DQR,
             selectedSupervisionGenerationType: TYPE_GENERATION_AS_EVENT,
@@ -156,7 +155,7 @@ const Setting = () => {
             selectedStatusSupervisionDataElement: null,
             selectedSupervisionAutoGenerateID: null,
             selectedNbrIndicatorsToShow: null,
-            selectedPeriodVerification:null,
+            selectedPeriodVerification: null,
             indicators: [],
             recoupements: [],
             completeness: {
@@ -175,7 +174,6 @@ const Setting = () => {
             globalProgramArea: null,
             isFieldEditingMode: false
       });
-
       const [formStateForRDQA, setFormStateForRDQA] = useState({
             selectedProgramStageForConfiguration: null,
             selectedOrganisationUnitGroup: null,
@@ -183,7 +181,6 @@ const Setting = () => {
             selectedStatusSupervisionDataElement: null,
             selectedSupervisionAutoGenerateID: null
       });
-
       const [periodFormState, setPeriodFormState] = useState({
             month1KeyWords: [],
             month2KeyWords: [],
@@ -1008,7 +1005,8 @@ const Setting = () => {
                                                               formState?.selectedStatusSupervisionDataElement,
                                                         selectedNbrIndicatorsToShow:
                                                               formState?.selectedNbrIndicatorsToShow,
-                                                        selectedPeriodVerification: formState?.selectedPeriodVerification,
+                                                        selectedPeriodVerification:
+                                                              formState?.selectedPeriodVerification,
                                                         indicators: formState?.indicators,
                                                         recoupements: formState?.recoupements,
                                                         completeness: formState?.completeness,
@@ -2255,7 +2253,8 @@ const Setting = () => {
                                                                                           });
                                                                                     }}
                                                                                     value={
-                                                                                          formState?.selectedPeriodVerification
+                                                                                          formState
+                                                                                                ?.selectedPeriodVerification
                                                                                                 ?.id
                                                                                     }
                                                                                     optionFilterProp="label"
@@ -4037,7 +4036,7 @@ const Setting = () => {
                                                             allowClear
                                                       />
                                                 </div>
-                                                <div style={{ marginTop: '20px' }}>
+                                                {/* <div style={{ marginTop: '20px' }}>
                                                       <div style={{ marginTop: '5px' }}>
                                                             <Radio
                                                                   label={translate('VisualisationType')}
@@ -4060,8 +4059,8 @@ const Setting = () => {
                                                                   checked={selectedTypeForVisualization === 'MAP'}
                                                             />
                                                       </div>
-                                                </div>
-                                                {selectedProgramForVisualization && (
+                                                </div> */}
+                                                {/* {selectedProgramForVisualization && (
                                                       <div style={{ marginTop: '10px' }}>
                                                             {selectedTypeForVisualization === 'VISUALIZATION' && (
                                                                   <div>
@@ -4126,6 +4125,36 @@ const Setting = () => {
                                                                   </div>
                                                             )}
                                                       </div>
+                                                )} */}
+
+                                                {selectedProgramForVisualization && (
+                                                      <div
+                                                            style={{
+                                                                  display: 'flex',
+                                                                  gap: '10px',
+                                                                  alignItems: 'center',
+                                                                  marginTop: '20px'
+                                                            }}
+                                                      >
+                                                            <Button
+                                                                  primary
+                                                                  onClick={() => {
+                                                                        setVisType('VISUALIZATION');
+                                                                        setDisplayVisualizationOrMapsModal(true);
+                                                                  }}
+                                                            >
+                                                                  {translate('SelectVisualizations')}
+                                                            </Button>
+                                                            <Button
+                                                                  primary
+                                                                  onClick={() => {
+                                                                        setVisType('MAP');
+                                                                        setDisplayVisualizationOrMapsModal(true);
+                                                                  }}
+                                                            >
+                                                                  {translate('SelectMaps')}
+                                                            </Button>
+                                                      </div>
                                                 )}
 
                                                 {(selectedMaps.length > 0 || selectedVisualizations?.length > 0) && (
@@ -4141,7 +4170,7 @@ const Setting = () => {
                                           </div>
                                     </>
 
-                                    {selectedTypeForVisualization && favorisItems.length > 0 && (
+                                    {favorisItems.length > 0 && (
                                           <>
                                                 <div
                                                       className="my-shadow"
@@ -5179,6 +5208,14 @@ const Setting = () => {
             </>
       );
 
+      const handleChecked = (element, checked) => {
+            if (checked) {
+                  setFavorisItems([...favorisItems, element]);
+            } else {
+                  setFavorisItems(favorisItems?.filter(f => f.id !== element.id) || []);
+            }
+      };
+
       useEffect(() => {
             loadPrograms();
             loadMaps();
@@ -5234,6 +5271,21 @@ const Setting = () => {
             <>
                   {RenderTopContent()}
                   {RenderContent()}
+                  <VisualizationOrMapsModal
+                        setOpen={setDisplayVisualizationOrMapsModal}
+                        open={displayVisualizationOrMapsModal}
+                        visType={visType}
+                        inputSearchVis={inputSearchVis}
+                        setInputSearchVis={setInputSearchVis}
+                        setTimoutID={setTimoutID}
+                        timoutID={timoutID}
+                        setVisElementList={setVisElementList}
+                        visElementList={visElementList}
+                        loading={loadingVis}
+                        setLoading={setLoadingVis}
+                        handleChecked={handleChecked}
+                        favorisItems={favorisItems}
+                  />
                   <MyNotification notification={notification} setNotification={setNotification} />
             </>
       );

@@ -172,7 +172,7 @@
     "Dashboard": "Dashboard",
     "Display_Supervisors": "Display Supervisors",
     "Display_Supervisions": "Display Supervisions",
-    "Recherche": "Research",
+    "Recherche": "Search",
     "Groupe_Unite_Organisations": "Organisation unit groups",
     "Groupe_Unite_Organisation": "Organisation unit group",
     "Veuillez_Selectionner_Unite_Organisation": "Please select the organisation unit !",
@@ -254,7 +254,7 @@
     "Visualizations": "Visualizations & Maps",
     "VisualisationType": "Visualizataions",
     "MapType": "Maps",
-    "SelectVisualizations": "Select Visualizataions",
+    "SelectVisualizations": "Select Visualizations",
     "SelectMaps": "Select Maps",
     "Favoris": "Favorite",
     "Configuration_RDQA_Case": "Configuration type Old RDQA",
@@ -372,5 +372,6 @@
     "DocumentSource_Updating": "Document source updated ",
     "DataElement_Updating": "Data elements updated ",
     "Indicator_Mapping_Updating": "Indicator Mapping updated ",
-    "Favoris_Mapping_Updating": "Favorite Mapping updated "
+    "Favoris_Mapping_Updating": "Favorite Mapping updated ",
+    "Close":"Close"
 }

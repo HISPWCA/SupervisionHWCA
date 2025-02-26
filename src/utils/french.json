@@ -374,5 +374,6 @@
     "DocumentSource_Updating": "Mise à jour des source de documents",
     "DataElement_Updating": "Mise à jour des élements de données ",
     "Indicator_Mapping_Updating": "Mise à jour des mapping d'indicateurs  ",
-    "Favoris_Mapping_Updating": "Mise à jour des mapping des Favoris "
+    "Favoris_Mapping_Updating": "Mise à jour des mapping des Favoris ",
+    "Close": "Fermer"
 }
