@@ -4040,10 +4040,11 @@ const Setting = () => {
                                                       <div style={{ marginTop: '20px' }}>
                                                             <div>
                                                                   <Radio
-                                                                        label={translate('VisualisationType')}
-                                                                        onChange={({ value }) =>
-                                                                              setSelectedTypeForVisualization(value)
-                                                                        }
+                                                                        label={translate('SelectVisualizations')}
+                                                                        onChange={({ value }) => {
+                                                                              setSelectedTypeForVisualization(value);
+                                                                              setVisElementList([]);
+                                                                        }}
                                                                         value="VISUALIZATION"
                                                                         checked={
                                                                               selectedTypeForVisualization ===
@@ -4053,10 +4054,11 @@ const Setting = () => {
                                                             </div>
                                                             <div style={{ marginTop: '5px' }}>
                                                                   <Radio
-                                                                        label={translate('MapType')}
-                                                                        onChange={({ value }) =>
-                                                                              setSelectedTypeForVisualization(value)
-                                                                        }
+                                                                        label={translate('SelectMaps')}
+                                                                        onChange={({ value }) => {
+                                                                              setSelectedTypeForVisualization(value);
+                                                                              setVisElementList([]);
+                                                                        }}
                                                                         value="MAP"
                                                                         checked={selectedTypeForVisualization === 'MAP'}
                                                                   />
@@ -4065,7 +4067,7 @@ const Setting = () => {
                                                 )}
 
                                                 {selectedProgramForVisualization && (
-                                                      <div style={{ marginTop: '10px' }}>
+                                                      <div style={{ marginTop: '20px' }}>
                                                             <VisualizationOrMaps
                                                                   visType={selectedTypeForVisualization}
                                                                   inputSearchVis={inputSearchVis}

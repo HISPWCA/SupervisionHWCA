@@ -6,8 +6,7 @@ import { FiSave } from 'react-icons/fi';
 import axios from 'axios';
 
 const VisualizationOrMaps = ({
-      open,
-      setOpen,
+    
       visType,
       inputSearchVis,
       setInputSearchVis,
@@ -27,9 +26,9 @@ const VisualizationOrMaps = ({
                   }
 
                   if (value) {
-                        setLoading(true);
                         await new Promise(() => {
                               const tmpTimeoutID = setTimeout(async () => {
+                                    setLoading(true);
                                     let elements = [];
 
                                     if (visType === 'VISUALIZATION') {
@@ -50,11 +49,12 @@ const VisualizationOrMaps = ({
 
                                     setVisElementList(elements);
                                     setLoading(false);
-                              }, 500);
-
+                              }, 800);
+                              
                               setTimoutID(tmpTimeoutID);
                         });
                   }
+                  setLoading(false);
             } catch (err) {
                   setLoading(false);
             }
@@ -88,22 +88,28 @@ const VisualizationOrMaps = ({
             }
       ];
 
-      return open ? (
+      return (
             <div>
-                  <div>{visType === 'VISUALIZATION' ? translate('SelectVisualizations') : translate('SelectMaps')}</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                         <div style={{ flex: '0.9' }}>
-                              <Input style={{ width: '100%' }} value={inputSearchVis} onChange={handleOnSearch} />
+                              <Input
+                                    style={{ width: '100%' }}
+                                    placeholder={translate('Recherche')}
+                                    value={inputSearchVis}
+                                    onChange={handleOnSearch}
+                              />
                         </div>
-                        <Button
-                              small
-                              loading={loading}
-                              disabled={!inputSearchVis || loading}
-                              primary
-                              onClick={() => onSearch(inputSearchVis)}
-                        >
-                              {translate('Recherche')}
-                        </Button>
+                        <div style={{ flex: '0.1' }}>
+                              <Button
+                                    small
+                                    loading={loading}
+                                    disabled={!inputSearchVis || loading}
+                                    primary
+                                    onClick={() => onSearch(inputSearchVis)}
+                              >
+                                    {translate('Recherche')}
+                              </Button>
+                        </div>
                   </div>
                   <div style={{ marginTop: '10px' }}>
                         {loading && (
@@ -117,11 +123,15 @@ const VisualizationOrMaps = ({
                                     <div>{translate('Chargement')}...</div>
                               </div>
                         )}
-                        <Table pagination={{ pageSize:5}} bordered columns={columns} size="small" dataSource={visElementList} />
+                        <Table
+                              pagination={{ pageSize: 5 }}
+                              bordered
+                              columns={columns}
+                              size="small"
+                              dataSource={visElementList}
+                        />
                   </div>
             </div>
-      ) : (
-            <></>
       );
 };
 
