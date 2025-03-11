@@ -1,6 +1,6 @@
 {
   "name": "Supervision",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "description": "",
   "license": "BSD-3-Clause",
   "private": true,
@@ -51,7 +51,7 @@
     "name": "Supervision",
     "title": "Supervision",
     "description": "Supervision App  ",
-    "version": "2.2.3",
+    "version": "2.2.4",
     "developer": {
       "url": "https://hispwca.org",
       "name": "HISP West & Central Africa ( HWCA) "

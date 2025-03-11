@@ -53,7 +53,7 @@ import GenerateIndicatorsFieldsDQR from './GenerateIndicatorsFieldsDQR';
 import SettingIndicatorsMapping from './SettingIndicatorsMapping';
 import { TagsInput } from 'react-tag-input-component';
 import GenerateIndicatorsFieldsRDQA from './GenerateIndicatorsFieldsRDQA';
-import VisualizationOrMapsModal from './VisualizationOrMapsModal';
+import VisualizationOrMaps from './VisualizationOrMaps';
 
 const Setting = () => {
       const [currentItem, setCurrentItem] = useState(null);
@@ -4036,127 +4036,51 @@ const Setting = () => {
                                                             allowClear
                                                       />
                                                 </div>
-                                                {/* <div style={{ marginTop: '20px' }}>
-                                                      <div style={{ marginTop: '5px' }}>
-                                                            <Radio
-                                                                  label={translate('VisualisationType')}
-                                                                  onChange={({ value }) =>
-                                                                        setSelectedTypeForVisualization(value)
-                                                                  }
-                                                                  value="VISUALIZATION"
-                                                                  checked={
-                                                                        selectedTypeForVisualization === 'VISUALIZATION'
-                                                                  }
-                                                            />
-                                                      </div>
-                                                      <div style={{ marginTop: '5px' }}>
-                                                            <Radio
-                                                                  label={translate('MapType')}
-                                                                  onChange={({ value }) =>
-                                                                        setSelectedTypeForVisualization(value)
-                                                                  }
-                                                                  value="MAP"
-                                                                  checked={selectedTypeForVisualization === 'MAP'}
-                                                            />
-                                                      </div>
-                                                </div> */}
-                                                {/* {selectedProgramForVisualization && (
-                                                      <div style={{ marginTop: '10px' }}>
-                                                            {selectedTypeForVisualization === 'VISUALIZATION' && (
-                                                                  <div>
-                                                                        <div style={{ marginBottom: '5px' }}>
-                                                                              {translate('SelectVisualizations')}
-                                                                        </div>
-                                                                        <Select
-                                                                              options={visualizations?.map(vis => ({
-                                                                                    label: vis.displayName,
-                                                                                    value: vis.id
-                                                                              }))}
-                                                                              showSearch
-                                                                              placeholder={translate(
-                                                                                    'SelectVisualizations'
-                                                                              )}
-                                                                              style={{ width: '100%' }}
-                                                                              optionFilterProp="label"
-                                                                              onChange={value =>
-                                                                                    setSelectedVisualizations(
-                                                                                          value?.map(v =>
-                                                                                                visualizations.find(
-                                                                                                      m => m.id === v
-                                                                                                )
-                                                                                          )
-                                                                                    )
-                                                                              }
-                                                                              value={selectedVisualizations?.map(
-                                                                                    m => m.id
-                                                                              )}
-                                                                              mode="multiple"
-                                                                              allowClear
-                                                                        />
-                                                                  </div>
-                                                            )}
-                                                            {selectedTypeForVisualization === 'MAP' && (
-                                                                  <div>
-                                                                        <div style={{ marginBottom: '5px' }}>
-                                                                              {translate('SelectMaps')}
-                                                                        </div>
-                                                                        <Select
-                                                                              options={maps?.map(map => ({
-                                                                                    label: map.displayName,
-                                                                                    value: map.id
-                                                                              }))}
-                                                                              showSearch
-                                                                              placeholder={translate('SelectMaps')}
-                                                                              style={{ width: '100%' }}
-                                                                              optionFilterProp="label"
-                                                                              onChange={value =>
-                                                                                    setSelectedMaps(
-                                                                                          value?.map(v =>
-                                                                                                maps.find(
-                                                                                                      m => m.id === v
-                                                                                                )
-                                                                                          )
-                                                                                    )
-                                                                              }
-                                                                              value={selectedMaps?.map(m => m.id)}
-                                                                              mode="multiple"
-                                                                              allowClear
-                                                                        />
-                                                                  </div>
-                                                            )}
-                                                      </div>
-                                                )} */}
-
                                                 {selectedProgramForVisualization && (
-                                                      <div
-                                                            style={{
-                                                                  display: 'flex',
-                                                                  gap: '10px',
-                                                                  alignItems: 'center',
-                                                                  marginTop: '20px'
-                                                            }}
-                                                      >
-                                                            <Button
-                                                                  primary
-                                                                  onClick={() => {
-                                                                        setVisType('VISUALIZATION');
-                                                                        setDisplayVisualizationOrMapsModal(true);
-                                                                  }}
-                                                            >
-                                                                  {translate('SelectVisualizations')}
-                                                            </Button>
-                                                            <Button
-                                                                  primary
-                                                                  onClick={() => {
-                                                                        setVisType('MAP');
-                                                                        setDisplayVisualizationOrMapsModal(true);
-                                                                  }}
-                                                            >
-                                                                  {translate('SelectMaps')}
-                                                            </Button>
+                                                      <div style={{ marginTop: '20px' }}>
+                                                            <div>
+                                                                  <Radio
+                                                                        label={translate('VisualisationType')}
+                                                                        onChange={({ value }) =>
+                                                                              setSelectedTypeForVisualization(value)
+                                                                        }
+                                                                        value="VISUALIZATION"
+                                                                        checked={
+                                                                              selectedTypeForVisualization ===
+                                                                              'VISUALIZATION'
+                                                                        }
+                                                                  />
+                                                            </div>
+                                                            <div style={{ marginTop: '5px' }}>
+                                                                  <Radio
+                                                                        label={translate('MapType')}
+                                                                        onChange={({ value }) =>
+                                                                              setSelectedTypeForVisualization(value)
+                                                                        }
+                                                                        value="MAP"
+                                                                        checked={selectedTypeForVisualization === 'MAP'}
+                                                                  />
+                                                            </div>
                                                       </div>
                                                 )}
 
+                                                {selectedProgramForVisualization && (
+                                                      <div style={{ marginTop: '10px' }}>
+                                                            <VisualizationOrMaps
+                                                                  visType={selectedTypeForVisualization}
+                                                                  inputSearchVis={inputSearchVis}
+                                                                  setInputSearchVis={setInputSearchVis}
+                                                                  setTimoutID={setTimoutID}
+                                                                  timoutID={timoutID}
+                                                                  setVisElementList={setVisElementList}
+                                                                  visElementList={visElementList}
+                                                                  loading={loadingVis}
+                                                                  setLoading={setLoadingVis}
+                                                                  handleChecked={handleChecked}
+                                                                  favorisItems={favorisItems}
+                                                            />
+                                                      </div>
+                                                )}
                                                 {(selectedMaps.length > 0 || selectedVisualizations?.length > 0) && (
                                                       <div style={{ marginTop: '10px' }}>
                                                             <Button
@@ -5271,21 +5195,6 @@ const Setting = () => {
             <>
                   {RenderTopContent()}
                   {RenderContent()}
-                  <VisualizationOrMapsModal
-                        setOpen={setDisplayVisualizationOrMapsModal}
-                        open={displayVisualizationOrMapsModal}
-                        visType={visType}
-                        inputSearchVis={inputSearchVis}
-                        setInputSearchVis={setInputSearchVis}
-                        setTimoutID={setTimoutID}
-                        timoutID={timoutID}
-                        setVisElementList={setVisElementList}
-                        visElementList={visElementList}
-                        loading={loadingVis}
-                        setLoading={setLoadingVis}
-                        handleChecked={handleChecked}
-                        favorisItems={favorisItems}
-                  />
                   <MyNotification notification={notification} setNotification={setNotification} />
             </>
       );

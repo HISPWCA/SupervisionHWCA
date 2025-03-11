@@ -5,7 +5,7 @@ import { MAPS_ROUTE, VISUALIZATIONS_ROUTE } from '../utils/api.routes';
 import { FiSave } from 'react-icons/fi';
 import axios from 'axios';
 
-const VisualizationOrMapsModal = ({
+const VisualizationOrMaps = ({
       open,
       setOpen,
       visType,
@@ -88,69 +88,41 @@ const VisualizationOrMapsModal = ({
             }
       ];
 
-      const handleClose = () => {
-            setOpen(false);
-            setInputSearchVis('');
-            setVisElementList([]);
-            setTimoutID(null);
-      };
-
       return open ? (
-            <Modal onClose={handleClose}>
-                  <ModalTitle>
-                        <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
-                              {visType === 'VISUALIZATION'
-                                    ? translate('SelectVisualizations')
-                                    : translate('SelectMaps')}
+            <div>
+                  <div>{visType === 'VISUALIZATION' ? translate('SelectVisualizations') : translate('SelectMaps')}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                        <div style={{ flex: '0.9' }}>
+                              <Input style={{ width: '100%' }} value={inputSearchVis} onChange={handleOnSearch} />
                         </div>
-                  </ModalTitle>
-                  <ModalContent>
-                        <div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                                    <div style={{ flex: '0.9' }}>
-                                          <Input
-                                                style={{ width: '100%' }}
-                                                value={inputSearchVis}
-                                                onChange={handleOnSearch}
-                                          />
-                                    </div>
-                                    <Button
-                                          small
-                                          loading={loading}
-                                          disabled={!inputSearchVis || loading}
-                                          primary
-                                          onClick={() => onSearch(inputSearchVis)}
-                                    >
-                                          {translate('Recherche')}
-                                    </Button>
+                        <Button
+                              small
+                              loading={loading}
+                              disabled={!inputSearchVis || loading}
+                              primary
+                              onClick={() => onSearch(inputSearchVis)}
+                        >
+                              {translate('Recherche')}
+                        </Button>
+                  </div>
+                  <div style={{ marginTop: '10px' }}>
+                        {loading && (
+                              <div
+                                    style={{
+                                          display: 'flex',
+                                          gap: '10px'
+                                    }}
+                              >
+                                    <CircularLoader small />
+                                    <div>{translate('Chargement')}...</div>
                               </div>
-                              <div style={{ marginTop: '10px' }}>
-                                    {loading && (
-                                          <div
-                                                style={{
-                                                      display: 'flex',
-                                                      gap: '10px'
-                                                }}
-                                          >
-                                                <CircularLoader small />
-                                                <div>{translate('Chargement')}...</div>
-                                          </div>
-                                    )}
-                                    <Table bordered columns={columns} size="small" dataSource={visElementList} />
-                              </div>
-                        </div>
-                  </ModalContent>
-                  <ModalActions>
-                        <ButtonStrip end>
-                              <Button primary onClick={handleClose} icon={<FiSave style={{ fontSize: '18px' }} />}>
-                                    {translate('Close')}
-                              </Button>
-                        </ButtonStrip>
-                  </ModalActions>
-            </Modal>
+                        )}
+                        <Table pagination={{ pageSize:5}} bordered columns={columns} size="small" dataSource={visElementList} />
+                  </div>
+            </div>
       ) : (
             <></>
       );
 };
 
-export default VisualizationOrMapsModal;
+export default VisualizationOrMaps;
