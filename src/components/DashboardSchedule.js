@@ -31,7 +31,6 @@ import {
       AGENT,
       MES_PLANIFICATIONS
 } from '../utils/constants';
-import MapView from './MapView';
 import { goToNewPage, loadDataStore } from '../utils/functions';
 import { IoMdOpen } from 'react-icons/io';
 import { BLACK, BLUE, GRAY_DARK, GREEN, ORANGE, RED, WHITE } from '../utils/couleurs';
