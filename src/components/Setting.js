@@ -4044,6 +4044,7 @@ const Setting = () => {
                                                                         onChange={({ value }) => {
                                                                               setSelectedTypeForVisualization(value);
                                                                               setVisElementList([]);
+                                                                              setInputSearchVis('')
                                                                         }}
                                                                         value="VISUALIZATION"
                                                                         checked={
@@ -4058,6 +4059,7 @@ const Setting = () => {
                                                                         onChange={({ value }) => {
                                                                               setSelectedTypeForVisualization(value);
                                                                               setVisElementList([]);
+                                                                              setInputSearchVis('');
                                                                         }}
                                                                         value="MAP"
                                                                         checked={selectedTypeForVisualization === 'MAP'}
@@ -4111,10 +4113,11 @@ const Setting = () => {
                                                       <Table
                                                             bordered
                                                             size="small"
-                                                            pagination={false}
+                                                            pagination={{ pageSize: 5 }}
                                                             dataSource={favorisItems?.map(f => ({
                                                                   ...f,
-                                                                  action: f.id
+                                                                  action: f.id,
+                                                                  type: f.type || "MAP"
                                                             }))}
                                                             columns={[
                                                                   {
@@ -4233,6 +4236,7 @@ const Setting = () => {
                                                 {translate('Visualization_Configurations')}
                                           </div>
                                           <Table
+                                                pagination={{ pageSize: 5 }}
                                                 dataSource={dataStoreVisualizations?.map(fav => ({
                                                       ...fav,
                                                       programName: fav?.program?.displayName,

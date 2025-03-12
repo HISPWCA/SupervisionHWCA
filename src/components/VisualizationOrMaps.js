@@ -1,12 +1,10 @@
-import { Button, ButtonStrip, Modal, ModalActions, ModalContent, ModalTitle, CircularLoader } from '@dhis2/ui';
+import { Button, CircularLoader } from '@dhis2/ui';
 import translate from '../utils/translator';
 import { Checkbox, Input, Table } from 'antd';
 import { MAPS_ROUTE, VISUALIZATIONS_ROUTE } from '../utils/api.routes';
-import { FiSave } from 'react-icons/fi';
 import axios from 'axios';
 
 const VisualizationOrMaps = ({
-    
       visType,
       inputSearchVis,
       setInputSearchVis,
@@ -50,7 +48,7 @@ const VisualizationOrMaps = ({
                                     setVisElementList(elements);
                                     setLoading(false);
                               }, 800);
-                              
+
                               setTimoutID(tmpTimeoutID);
                         });
                   }
