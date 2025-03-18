@@ -1,20 +1,18 @@
 import { MAP } from '../utils/constants';
 
-const MyFrame = (
-  {
-    base_url,
-    id,
-    orgUnitIDs,
-    periods,
-    style = {},
-    type = MAP,
-    targetLineValue,
-    targetLineTitle,
-    baseLineValue,
-    baseLineTitle
-  }
-) => {
-  const htmlStringForChart = `
+const MyFrame = ({
+      base_url,
+      id,
+      orgUnitIDs,
+      periods,
+      style = {},
+      type = MAP,
+      targetLineValue,
+      targetLineTitle,
+      baseLineValue,
+      baseLineTitle
+}) => {
+      const htmlStringForChart = `
 
         <!DOCTYPE html>
 <html lang="en">
@@ -186,12 +184,61 @@ const MyFrame = (
                 headers: headersOptions,
               });
               responseData = responseVisualization?.data;
+              const visualizationTitle = responseData.displayName
+
+              if(visualizationTitle){
+                  const span = document.createElement('span');
+                  span.style.backgroundColor = '#C3E9E2';
+                  span.style.color = '#000';
+                  span.style.fontWeight = 'bold';
+                  span.style.padding = '2px 5px';
+                  span.style.border = '1px solid green';
+
+                  if (visualizationTitle) {
+                        span.innerText = visualizationTitle;
+
+                        const titleContent = document.getElementById('TITLE');
+                        if (titleContent) {
+                              titleContent.style.display = 'flex';
+                              titleContent.style.width = '100%';
+                              titleContent.style.alignItems = 'center';
+                              titleContent.style.justifyContent = 'center';
+
+                              titleContent.appendChild(span);
+                        }
+                  }
+              }
             } catch (err) {
               // au cas contraire , c'est plutôt un map
               const responseMap = await axios.get(routeMap, {
                 headers: headersOptions,
               });
               responseData = responseMap?.data;
+
+               const mapTitle = responseMap.displayName
+
+              if(mapTitle){
+                  const span = document.createElement('span');
+                  span.style.backgroundColor = '#C3E9E2';
+                  span.style.color = '#000';
+                  span.style.fontWeight = 'bold';
+                  span.style.padding = '2px 5px';
+                  span.style.border = '1px solid green';
+
+                  if (mapTitle) {
+                        span.innerText = mapTitle;
+
+                        const titleContent = document.getElementById('TITLE');
+                        if (titleContent) {
+                              titleContent.style.display = 'flex';
+                              titleContent.style.width = '100%';
+                              titleContent.style.alignItems = 'center';
+                              titleContent.style.justifyContent = 'center';
+
+                              titleContent.appendChild(span);
+                        }
+                  }
+              }
             }
 
             return responseData;
@@ -546,6 +593,7 @@ const MyFrame = (
 </head>
 
       <body>
+      <div id="TITLE"></div>
         <div id="${id}">Chart</div>
         <div id="my-legend"></div>
       </body>
@@ -553,7 +601,7 @@ const MyFrame = (
 </html>       
         `;
 
-  const htmlStringForMAP = `
+      const htmlStringForMAP = `
 
         <!DOCTYPE html>
 <html lang="en">
@@ -723,12 +771,66 @@ const MyFrame = (
                 headers: headersOptions,
               });
               responseData = responseVisualization?.data;
+
+
+               const visualizationTitle = responseData.displayName
+
+              if(visualizationTitle){
+                  const span = document.createElement('span');
+                  span.style.backgroundColor = '#C3E9E2';
+                  span.style.color = '#000';
+                  span.style.fontWeight = 'bold';
+                  span.style.padding = '2px 5px';
+                  span.style.border = '1px solid green';
+
+                  if (visualizationTitle) {
+                        span.innerText = visualizationTitle;
+
+                        const titleContent = document.getElementById('TITLE');
+                        if (titleContent) {
+                              titleContent.style.display = 'flex';
+                              titleContent.style.width = '100%';
+                              titleContent.style.alignItems = 'center';
+                              titleContent.style.justifyContent = 'center';
+
+                              titleContent.appendChild(span);
+                        }
+                  }
+              }
+
             } catch (err) {
               // au cas contraire , c'est plutôt un map
               const responseMap = await axios.get(routeMap, {
                 headers: headersOptions,
               });
               responseData = responseMap?.data;
+
+              const mapTitle = responseMap.displayName
+
+              if(mapTitle){
+                  const span = document.createElement('span');
+                  span.style.backgroundColor = '#C3E9E2';
+                  span.style.color = '#000';
+                  span.style.fontWeight = 'bold';
+                  span.style.padding = '2px 5px';
+                  span.style.border = '1px solid green';
+
+                  if (mapTitle) {
+                        span.innerText = mapTitle;
+
+                        const titleContent = document.getElementById('TITLE');
+                        if (titleContent) {
+                              titleContent.style.display = 'flex';
+                              titleContent.style.width = '100%';
+                              titleContent.style.alignItems = 'center';
+                              titleContent.style.justifyContent = 'center';
+
+                              titleContent.appendChild(span);
+                        }
+                  }
+              }
+
+
             }
 
             return responseData;
@@ -1065,6 +1167,7 @@ const MyFrame = (
 </head>
 
 <body>
+        <div id="TITLE"></div>
         <div class="map" id="${id}">Chart</div>
  
 </body>
@@ -1073,16 +1176,17 @@ const MyFrame = (
        
         `;
 
-  return (
-    <div>
-      <iframe
-        id={`${id}-iframe`}
-        frameborder="0"
-        srcDoc={type === MAP ? htmlStringForMAP : htmlStringForChart}
-        style={{ height: '100%', width: '100%', ...style }}
-      ></iframe>
-    </div>
-  );
+      return (
+            <div>
+                  {console.log(id)}
+                  <iframe
+                        id={`${id}-iframe`}
+                        frameborder="0"
+                        srcDoc={type === MAP ? htmlStringForMAP : htmlStringForChart}
+                        style={{ height: '100%', width: '100%', ...style }}
+                  ></iframe>
+            </div>
+      );
 };
 
 export default MyFrame;

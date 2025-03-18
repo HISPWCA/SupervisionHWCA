@@ -4044,7 +4044,7 @@ const Setting = () => {
                                                                         onChange={({ value }) => {
                                                                               setSelectedTypeForVisualization(value);
                                                                               setVisElementList([]);
-                                                                              setInputSearchVis('')
+                                                                              setInputSearchVis('');
                                                                         }}
                                                                         value="VISUALIZATION"
                                                                         checked={
@@ -4117,7 +4117,7 @@ const Setting = () => {
                                                             dataSource={favorisItems?.map(f => ({
                                                                   ...f,
                                                                   action: f.id,
-                                                                  type: f.type || "MAP"
+                                                                  type: f.type || 'MAP'
                                                             }))}
                                                             columns={[
                                                                   {
@@ -5090,14 +5090,18 @@ const Setting = () => {
                                     >
                                           {translate('Visualizations')}
                                     </div>
-                                    <div
-                                          className={`setting-menu-item ${
-                                                selectedTypeSupervisionPage === PAGE_CONFIG_ANALYSE ? 'active' : ''
-                                          }`}
-                                          onClick={() => handleClickConfigMenu(PAGE_CONFIG_ANALYSE)}
-                                    >
-                                          {translate('Analyses')}
-                                    </div>
+                                    {0 > 1 && (
+                                          <div
+                                                className={`setting-menu-item ${
+                                                      selectedTypeSupervisionPage === PAGE_CONFIG_ANALYSE
+                                                            ? 'active'
+                                                            : ''
+                                                }`}
+                                                onClick={() => handleClickConfigMenu(PAGE_CONFIG_ANALYSE)}
+                                          >
+                                                {translate('Analyses')}
+                                          </div>
+                                    )}
                               </div>
                         </Col>
                         <Col md={20} sm={24}>

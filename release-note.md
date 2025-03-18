@@ -1,5 +1,8 @@
-## Version: 2.2.4 ##
+## Version: 2.2.5
 
-### Functionality ###
+### Functionality
 
-- Update from visualization & Map configuration part in setting
+- Removed analyses Menu from setting part
+- Added Visualization Title for each visualization items from Dashboard side
+- Improved legend Text by wrapping them when too long
+- Used ( use dhis2 name ) from mapping part on dashboard when generating visualization items. Is this option is checked, then we can use the new name
