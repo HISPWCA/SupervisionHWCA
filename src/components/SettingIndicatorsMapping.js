@@ -397,14 +397,49 @@ const SettingIndicatorsMapping = () => {
                                                                               }}
                                                                         >
                                                                               <Row gutter={[5, 5]}>
-                                                                                    <Col md={3}>
-                                                                                          <div>
-                                                                                                {translateDataStoreLabel(
-                                                                                                      indicator
-                                                                                                )}
+                                                                                    <Col md={4}>
+                                                                                          <div
+                                                                                                style={{
+                                                                                                      display: 'flex',
+                                                                                                      alignItems:
+                                                                                                            'center',
+                                                                                                      gap: '1px'
+                                                                                                }}
+                                                                                          >
+                                                                                                <span>
+                                                                                                      {translateDataStoreLabel(
+                                                                                                            indicator
+                                                                                                      )}
+                                                                                                </span>
+                                                                                                {indicator.parent &&
+                                                                                                      indicator.isStock && (
+                                                                                                            <span
+                                                                                                                  style={{
+                                                                                                                        backgroundColor:
+                                                                                                                              '#C3E9E2',
+                                                                                                                        padding: '5px',
+
+                                                                                                                        fontWeight:
+                                                                                                                              'bold',
+                                                                                                                        borderRadius:
+                                                                                                                              '10px',
+                                                                                                                        fontSize: '12px'
+                                                                                                                  }}
+                                                                                                            >
+                                                                                                                  (
+                                                                                                                  {translateDataStoreLabel(
+                                                                                                                        group.children?.find(
+                                                                                                                              i =>
+                                                                                                                                    i.id ===
+                                                                                                                                    indicator.parent
+                                                                                                                        )
+                                                                                                                  )}
+                                                                                                                  )
+                                                                                                            </span>
+                                                                                                      )}
                                                                                           </div>
                                                                                     </Col>
-                                                                                    <Col md={8}>
+                                                                                    <Col md={7}>
                                                                                           <div
                                                                                                 style={{
                                                                                                       display: 'flex',

@@ -85,6 +85,8 @@ const Favorites = ({ me }) => {
             selectedBackgroundInformationFavorit: null,
             inputFavorisNameForBackgroundInforation: '',
             selectedGlobalProgramArea: null,
+            selectedStockIndicator: null,
+            selectedStockSourceMargin: null,
             nbrIndicatorsToShow: 0,
             indicators: [],
             recoupements: [],
@@ -117,6 +119,8 @@ const Favorites = ({ me }) => {
                               ...formState,
                               selectedNbrIndicatorsToShow: currStage.selectedNbrIndicatorsToShow,
                               selectedGlobalProgramArea: existingFormState?.selectedGlobalProgramArea,
+                              selectedStockIndicator: existingFormState?.selectedStockIndicator,
+                              selectedStockSourceMargin: existingFormState?.selectedStockSourceMargin,
                               globalProgramArea: currStage.globalProgramArea,
                               nbrIndicatorsToShow: existingFormState?.nbrIndicatorsToShow
                                     ? existingFormState?.nbrIndicatorsToShow
@@ -314,6 +318,8 @@ const Favorites = ({ me }) => {
                   selectedProgramStage: null,
                   inputFavorisNameForBackgroundInforation: '',
                   selectedGlobalProgramArea: null,
+                  selectedStockIndicator: null,
+                  selectedStockSourceMargin: null,
                   nbrIndicatorsToShow: 0,
                   indicators: [],
                   recoupements: [],
@@ -423,7 +429,7 @@ const Favorites = ({ me }) => {
             };
 
             // Indicator
-            for (let indicator of formState?.indicators.slice(0, formState?.nbrIndicatorsToShow)) {
+            for (let indicator of formState?.indicators?.slice(0, formState?.nbrIndicatorsToShow)) {
                   let payloadIndicator = {
                         dataElement: indicator?.value,
                         indicator: indicator?.selectedSourceIndicator && {
@@ -450,7 +456,7 @@ const Favorites = ({ me }) => {
             }
 
             // Recoupements
-            for (let recoupement of formState?.recoupements) {
+            for (let recoupement of formState?.recoupements?.slice(0, formState?.recoupements?.length - 1)) {
                   let payloadPrimary = {
                         dataElement: recoupement?.primaryValue,
                         indicator: recoupement?.selectedSourcePrimary && {
@@ -483,6 +489,37 @@ const Favorites = ({ me }) => {
                   if (payloadPrimary.dataElement?.id && payloadPrimary.indicator?.id) newList.push(payloadPrimary);
                   if (payloadSecondary.dataElement?.id && payloadSecondary.indicator?.id)
                         newList.push(payloadSecondary);
+                  if (payloadMargin.dataElement?.id && payloadMargin.indicator?.id) newList.push(payloadMargin);
+            }
+
+            const stockRecoupement = formState?.recoupements[formState?.recoupements?.length - 1];
+
+            console.log('stockRecoupement : ', stockRecoupement);
+            console.log('formState?.recoupements : ', formState?.recoupements.length);
+            if (stockRecoupement) {
+                  let payloadIndicator = {
+                        dataElement: stockRecoupement?.primaryValue,
+                        indicator: formState?.selectedStockIndicator && {
+                              id: formState?.selectedStockIndicator?.id,
+                              displayName: formState?.selectedStockIndicator?.name
+                        },
+                        programStage,
+                        program
+                  };
+
+                  let payloadMargin = {
+                        dataElement: stockRecoupement?.margin,
+                        indicator: formState?.selectedStockSourceMargin && {
+                              id: formState?.selectedStockSourceMargin,
+                              displayName: formState?.selectedStockSourceMargin
+                        },
+                        programStage,
+                        program
+                  };
+
+                  if (payloadIndicator.dataElement?.id && payloadIndicator.indicator?.id)
+                        newList.push(payloadIndicator);
+
                   if (payloadMargin.dataElement?.id && payloadMargin.indicator?.id) newList.push(payloadMargin);
             }
 
@@ -1208,7 +1245,6 @@ const Favorites = ({ me }) => {
                                                       dataStoreIndicators={
                                                             filteredIndicatorsFromIndicatorsMapping() || []
                                                       }
-                                                      // dataStoreIndicators={dataStoreIndicators}
                                                       dataStoreCrosschecks={dataStoreCrosschecks}
                                                       dataStoreDECompletness={dataStoreDECompletness}
                                                       dataStoreDSCompletness={dataStoreDSCompletness}

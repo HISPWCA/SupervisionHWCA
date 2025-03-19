@@ -269,6 +269,12 @@ const Setting = () => {
                   newRecoupements.push({
                         id: uuid(),
                         position: i,
+                        isStock: dqrConfig.nbrRecoupement === i ? true : false,
+                        initialStock: fieldList?.recoupements?.find(rec => rec.position === i)?.initialStock || null,
+                        distributedStock:
+                              fieldList?.recoupements?.find(rec => rec.position === i)?.distributedStock || null,
+                        receivedStock: fieldList?.recoupements?.find(rec => rec.position === i)?.receivedStock || null,
+                        restedStock: fieldList?.recoupements?.find(rec => rec.position === i)?.restedStock || null,
                         primaryValue: fieldList?.recoupements?.find(rec => rec.position === i)?.primaryValue || null,
                         secondaryValue:
                               fieldList?.recoupements?.find(rec => rec.position === i)?.secondaryValue || null,

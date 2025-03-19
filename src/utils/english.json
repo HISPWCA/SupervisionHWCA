@@ -373,5 +373,12 @@
     "DataElement_Updating": "Data elements updated ",
     "Indicator_Mapping_Updating": "Indicator Mapping updated ",
     "Favoris_Mapping_Updating": "Favorite Mapping updated ",
-    "Close":"Close"
+    "Close": "Close",
+    "Cross_Check_Stock_Configuration": "Stock configuration for cross check ",
+    "Initial_Stock": "Opening balance",
+    "Distributed_Stock": "Quantity used",
+    "Received_Stock": "Quantity received",
+    "Rested_Stock": "End balance",
+    "Stock": "Stocks",
+    "Is_Stock": "Is Stock ?"
 }

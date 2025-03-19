@@ -4,11 +4,13 @@ import { v4 as uuid } from 'uuid';
 
 import { useState, useEffect } from 'react';
 import { FiSave } from 'react-icons/fi';
-import { Input, Popconfirm, Select } from 'antd';
+import { Input, Popconfirm, Select, Checkbox } from 'antd';
 import { IoMdAddCircle } from 'react-icons/io';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { saveDataToDataStore } from '../utils/functions';
 import { NOTIFICATION_CRITICAL, NOTIFICATION_SUCCESS } from '../utils/constants';
+import { MdSystemUpdateAlt } from 'react-icons/md';
+import { FaRegEdit } from 'react-icons/fa';
 
 const SettingIndicatorsMappingNew = ({
       open,
@@ -23,11 +25,14 @@ const SettingIndicatorsMappingNew = ({
       const [newIndicatorList, setNewIndicatorList] = useState([]);
       const [selectedIndicatorType, setSelectedIndicatorType] = useState('');
       const [inputIndicatorType, setInputIndicatorType] = useState('');
+      const [isStock, setIsStock] = useState(false);
       const [inputIndicator, setInputIndicator] = useState('');
       const [inputIndicatorFr, setInputIndicatorFr] = useState('');
       const [type, setType] = useState('NEW');
       const [loadingSave, setLoadingSave] = useState(false);
       const [loadingDelete, setLoadingDelete] = useState(false);
+
+      const [currentItem, setCurrentItem] = useState(null);
 
       const cleanAllState = () => {
             setSelectedIndicatorType('');
@@ -73,6 +78,7 @@ const SettingIndicatorsMappingNew = ({
                   loadDataStoreIndicatorsMapping();
                   cleanAllState();
                   setLoadingSave(false);
+                  setCurrentItem(null);
             } catch (err) {
                   setLoadingSave(false);
                   setNotification({
@@ -93,6 +99,7 @@ const SettingIndicatorsMappingNew = ({
                         setInputIndicator('');
                         setInputIndicatorFr('');
                         setInputIndicatorType('');
+                        setCurrentItem('');
                   }
             }
       };
@@ -109,26 +116,72 @@ const SettingIndicatorsMappingNew = ({
             setInputIndicatorFr('');
             setInputIndicator('');
             setSelectedIndicatorType('');
+            setCurrentItem('');
       };
 
       const handleAddIndicator = () => {
-            if (
-                  inputIndicator &&
-                  inputIndicatorFr &&
-                  !newIndicatorList
-                        .map(i => i.name?.trim()?.toLowerCase())
-                        .includes(inputIndicator?.trim()?.toLowerCase()) &&
-                  !newIndicatorList
-                        .map(i => i.name?.trim()?.toLowerCase())
-                        .includes(inputIndicatorFr?.trim()?.toLowerCase())
-            ) {
-                  setNewIndicatorList([
-                        ...newIndicatorList,
-                        { id: uuid(), name_fr: inputIndicatorFr?.trim(), name: inputIndicator?.trim() }
-                  ]);
-                  setInputIndicator('');
-                  setInputIndicatorFr('');
+            let payload = {};
+
+            if (currentItem) {
+                  payload = {
+                        ...currentItem,
+                        name_fr: inputIndicatorFr?.trim(),
+                        name: inputIndicator?.trim(),
+                        isStock
+                  };
+            } else {
+                  payload = {
+                        id: uuid(),
+                        name_fr: inputIndicatorFr?.trim(),
+                        name: inputIndicator?.trim(),
+                        isStock
+                  };
             }
+
+            let stockElements = [];
+            if (isStock && !currentItem) {
+                  stockElements = [
+                        {
+                              id: uuid(),
+                              isStock,
+                              name_fr: translate('Initial_Stock'),
+                              name: translate('Initial_Stock'),
+                              parent: payload.id
+                        },
+                        {
+                              id: uuid(),
+                              isStock,
+                              name_fr: translate('Distributed_Stock'),
+                              name: translate('Distributed_Stock'),
+                              parent: payload.id
+                        },
+                        {
+                              id: uuid(),
+                              isStock,
+                              name_fr: translate('Received_Stock'),
+                              name: translate('Received_Stock'),
+                              parent: payload.id
+                        },
+                        {
+                              id: uuid(),
+                              isStock,
+                              name_fr: translate('Rested_Stock'),
+                              name: translate('Rested_Stock'),
+                              parent: payload.id
+                        }
+                  ];
+            }
+
+            if (currentItem) {
+                  setNewIndicatorList(newIndicatorList.map(i => (i.id === currentItem.id ? { ...i, ...payload } : i)));
+            } else {
+                  setNewIndicatorList([...newIndicatorList, payload, ...stockElements]);
+            }
+
+            setIsStock(false);
+            setInputIndicator('');
+            setInputIndicatorFr('');
+            setCurrentItem('');
       };
 
       const handleDeleteEverything = async () => {
@@ -165,6 +218,7 @@ const SettingIndicatorsMappingNew = ({
 
             if (id) {
                   setNewIndicatorList(newIndicatorList.filter(i => id !== i.id));
+                  setCurrentItem(null);
             }
       };
 
@@ -276,36 +330,76 @@ const SettingIndicatorsMappingNew = ({
                                                             <Button
                                                                   primary
                                                                   disabled={
-                                                                        inputIndicator &&
-                                                                        !newIndicatorList
-                                                                              .map(i => i.name?.trim()?.toLowerCase())
-                                                                              .includes(
-                                                                                    inputIndicator
-                                                                                          ?.trim()
-                                                                                          ?.toLowerCase()
-                                                                              ) &&
-                                                                        !newIndicatorList
-                                                                              .map(i => i.name?.trim()?.toLowerCase())
-                                                                              .includes(
-                                                                                    inputIndicatorFr
-                                                                                          ?.trim()
-                                                                                          ?.toLowerCase()
-                                                                              )
+                                                                        currentItem
+                                                                              ? false
+                                                                              : inputIndicator &&
+                                                                                !newIndicatorList
+                                                                                      .map(i =>
+                                                                                            i.name
+                                                                                                  ?.trim()
+                                                                                                  ?.toLowerCase()
+                                                                                      )
+                                                                                      .includes(
+                                                                                            inputIndicator
+                                                                                                  ?.trim()
+                                                                                                  ?.toLowerCase()
+                                                                                      ) &&
+                                                                                !newIndicatorList
+                                                                                      .map(i =>
+                                                                                            i.name
+                                                                                                  ?.trim()
+                                                                                                  ?.toLowerCase()
+                                                                                      )
+                                                                                      .includes(
+                                                                                            inputIndicatorFr
+                                                                                                  ?.trim()
+                                                                                                  ?.toLowerCase()
+                                                                                      )
                                                                               ? false
                                                                               : true
                                                                   }
                                                                   onClick={handleAddIndicator}
                                                                   icon={
-                                                                        <IoMdAddCircle
-                                                                              style={{
-                                                                                    fontSize: '18px',
-                                                                                    color: 'white'
-                                                                              }}
-                                                                        />
+                                                                        currentItem ? (
+                                                                              <MdSystemUpdateAlt
+                                                                                    style={{
+                                                                                          fontSize: '18px',
+                                                                                          color: 'white'
+                                                                                    }}
+                                                                              />
+                                                                        ) : (
+                                                                              <IoMdAddCircle
+                                                                                    style={{
+                                                                                          fontSize: '18px',
+                                                                                          color: 'white'
+                                                                                    }}
+                                                                              />
+                                                                        )
                                                                   }
                                                             ></Button>
                                                       </div>
                                                 </div>
+                                          )}
+
+                                          {(selectedIndicatorType || inputIndicatorType) && (
+                                                <>
+                                                      <div
+                                                            style={{
+                                                                  display: 'flex',
+                                                                  marginTop: '10px',
+                                                                  cursor: 'pointer',
+                                                                  gap: '10px',
+                                                                  alignItems: 'center'
+                                                            }}
+                                                            onClick={() => setIsStock(!isStock)}
+                                                      >
+                                                            <Checkbox
+                                                                  checked={isStock}
+                                                                  onChange={() => setIsStock(!isStock)}
+                                                            />
+                                                            <span>{translate('Is_Stock')}</span>
+                                                      </div>
+                                                </>
                                           )}
                                     </div>
                                     {selectedIndicatorType || inputIndicatorType ? (
@@ -371,10 +465,59 @@ const SettingIndicatorsMappingNew = ({
                                                                                                       '1px solid #00000060'
                                                                                           }}
                                                                                     >
-                                                                                          <div style={{ color:'#00000099'}}>
-                                                                                                {`${ind.name} / ${ind.name_fr}`}
+                                                                                          <div
+                                                                                                style={{
+                                                                                                      color: '#00000099'
+                                                                                                }}
+                                                                                          >
+                                                                                                {`${ind.name} / ${
+                                                                                                      ind.name_fr
+                                                                                                } ${
+                                                                                                      ind.parent &&
+                                                                                                      ind.isStock
+                                                                                                            ? '(' +
+                                                                                                              newIndicatorList?.find(
+                                                                                                                    i =>
+                                                                                                                          i.id ===
+                                                                                                                          ind.parent
+                                                                                                              )?.name +
+                                                                                                              ')'
+                                                                                                            : ''
+                                                                                                }`}
                                                                                           </div>
-                                                                                          <div>
+                                                                                          <div
+                                                                                                style={{
+                                                                                                      display: 'flex',
+                                                                                                      alignItems:
+                                                                                                            'center',
+                                                                                                      gap: '5px'
+                                                                                                }}
+                                                                                          >
+                                                                                                <FaRegEdit
+                                                                                                      title={translate(
+                                                                                                            'Edit_Indicator'
+                                                                                                      )}
+                                                                                                      style={{
+                                                                                                            fontSize: '22px',
+                                                                                                            color: 'blue',
+                                                                                                            cursor: 'pointer'
+                                                                                                      }}
+                                                                                                      onClick={() => {
+                                                                                                            setCurrentItem(
+                                                                                                                  ind
+                                                                                                            );
+                                                                                                            setIsStock(
+                                                                                                                  ind.isStock ||
+                                                                                                                        false
+                                                                                                            );
+                                                                                                            setInputIndicator(
+                                                                                                                  ind.name
+                                                                                                            );
+                                                                                                            setInputIndicatorFr(
+                                                                                                                  ind.name_fr
+                                                                                                            );
+                                                                                                      }}
+                                                                                                />
                                                                                                 <Popconfirm
                                                                                                       title={translate(
                                                                                                             'Delete'

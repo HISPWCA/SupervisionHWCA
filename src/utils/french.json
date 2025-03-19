@@ -375,5 +375,12 @@
     "DataElement_Updating": "Mise à jour des élements de données ",
     "Indicator_Mapping_Updating": "Mise à jour des mapping d'indicateurs  ",
     "Favoris_Mapping_Updating": "Mise à jour des mapping des Favoris ",
-    "Close": "Fermer"
+    "Close": "Fermer",
+    "Cross_Check_Stock_Configuration": "Configuration de stock pour le recoupement",
+    "Initial_Stock": "Stock initial",
+    "Distributed_Stock": "Stock distribué",
+    "Received_Stock": "Stock reçues",
+    "Rested_Stock": "Stock restant",
+    "Stock": "Stocks",
+    "Is_Stock": "C'est un Stock ?"
 }
