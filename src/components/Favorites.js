@@ -521,6 +521,8 @@ const Favorites = ({ me }) => {
                         newList.push(payloadIndicator);
 
                   if (payloadMargin.dataElement?.id && payloadMargin.indicator?.id) newList.push(payloadMargin);
+
+                  console.log('newList : ', newList);
             }
 
             // consistencyOvertime

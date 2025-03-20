@@ -673,7 +673,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                           ?.find(
                                                                                                 d =>
                                                                                                       d.name ===
-                                                                                                      formState?.selectedGlobalProgramArea
+                                                                                                      formState?.selectedGlobalProgramArea?.name
                                                                                           )
                                                                                           ?.children?.find(
                                                                                                 d => d.id === value

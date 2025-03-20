@@ -146,11 +146,13 @@ const SettingIndicatorsMappingNew = ({
                               isStock,
                               name_fr: translate('Initial_Stock'),
                               name: translate('Initial_Stock'),
+                              initialStock: true,
                               parent: payload.id
                         },
                         {
                               id: uuid(),
                               isStock,
+                              distributedStock: true,
                               name_fr: translate('Distributed_Stock'),
                               name: translate('Distributed_Stock'),
                               parent: payload.id
@@ -158,6 +160,7 @@ const SettingIndicatorsMappingNew = ({
                         {
                               id: uuid(),
                               isStock,
+                              receivedStock: true,
                               name_fr: translate('Received_Stock'),
                               name: translate('Received_Stock'),
                               parent: payload.id
@@ -165,6 +168,7 @@ const SettingIndicatorsMappingNew = ({
                         {
                               id: uuid(),
                               isStock,
+                              restedStock: true,
                               name_fr: translate('Rested_Stock'),
                               name: translate('Rested_Stock'),
                               parent: payload.id

@@ -411,12 +411,40 @@ const SettingIndicatorsMapping = () => {
                                                                                                             indicator
                                                                                                       )}
                                                                                                 </span>
-                                                                                                {indicator.parent &&
+
+                                                                                                {!indicator.parent &&
                                                                                                       indicator.isStock && (
                                                                                                             <span
                                                                                                                   style={{
                                                                                                                         backgroundColor:
                                                                                                                               '#C3E9E2',
+                                                                                                                        padding: '5px',
+
+                                                                                                                        fontWeight:
+                                                                                                                              'bold',
+                                                                                                                        borderRadius:
+                                                                                                                              '10px',
+                                                                                                                        fontSize: '12px'
+                                                                                                                  }}
+                                                                                                            >
+                                                                                                                  (
+                                                                                                                  {translateDataStoreLabel(
+                                                                                                                        group.children?.find(
+                                                                                                                              i =>
+                                                                                                                                    i.id ===
+                                                                                                                                    indicator.parent
+                                                                                                                        )
+                                                                                                                  )}
+                                                                                                                  )
+                                                                                                            </span>
+                                                                                                      )}
+
+                                                                                                {indicator.parent &&
+                                                                                                      indicator.isStock && (
+                                                                                                            <span
+                                                                                                                  style={{
+                                                                                                                        backgroundColor:
+                                                                                                                              '#C3E9E260',
                                                                                                                         padding: '5px',
 
                                                                                                                         fontWeight:

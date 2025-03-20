@@ -1638,11 +1638,20 @@ const Supervision = ({ me }) => {
                   let newDataValueAsListofArray = [];
                   if (payload.programStageConfig?.indicators?.length > 0 && payload.periodVerification) {
                         const indicatorsList = payload.programStageConfig?.indicators;
+                        const lastCrossCheckWhichIsStockData =
+                              payload.programStageConfig?.recoupements[
+                                    payload.programStageConfig?.recoupements.length - 1
+                              ];
+
+                        console.log('lastCrossCheckWhichIsStockData:', lastCrossCheckWhichIsStockData);
 
                         newDataValueAsListofArray = await Promise.all(
                               eventPayload.dataValues?.map(async dv => {
                                     const newDvList = [];
                                     const foundInd = indicatorsList.find(ind => ind.value?.id === dv.dataElement);
+                                    const foundRecoup =
+                                          lastCrossCheckWhichIsStockData?.primaryValue?.id === dv.dataElement &&
+                                          lastCrossCheckWhichIsStockData;
 
                                     if (foundInd) {
                                           const foundAggrageMappingElement = dataStoreIndicatorsMapping?.find(
@@ -2158,10 +2167,100 @@ const Supervision = ({ me }) => {
 
                                                 await updatePeriodsConfigs(periodPayload);
                                           }
-                                    } else {
-                                          newDvList.push(dv);
                                     }
 
+                                    if (foundRecoup) {
+                                          const foundAggrageMappingElementParentRecoup =
+                                                dataStoreIndicatorsMapping?.find(
+                                                      d =>
+                                                            d.indicator ===
+                                                            mappingConfigs
+                                                                  .filter(
+                                                                        ev =>
+                                                                              ev.programStage?.id ===
+                                                                              payload.programStage?.id
+                                                                  )
+                                                                  .find(ev => ev.indicator?.displayName === dv.value)
+                                                                  ?.indicator?.id
+                                                );
+
+                                          if (foundAggrageMappingElementParentRecoup) {
+                                                const concerningStockIndicatorChildren =
+                                                      dataStoreIndicators
+                                                            ?.find(
+                                                                  group =>
+                                                                        group.name ===
+                                                                        foundAggrageMappingElementParentRecoup.group
+                                                            )
+                                                            ?.children?.filter(
+                                                                  child =>
+                                                                        child.isStock &&
+                                                                        child.parent ===
+                                                                              foundAggrageMappingElementParentRecoup.indicator
+                                                            ) || [];
+
+                                                console.log(
+                                                      'concerningStockIndicatorChildren:',
+                                                      concerningStockIndicatorChildren
+                                                );
+
+                                                // check if is mapped
+                                                for (let child of concerningStockIndicatorChildren) {
+                                                      const foundChildMapping = dataStoreIndicatorsMapping?.find(
+                                                            d => d.indicator === child.id
+                                                      )?.dhis2;
+
+                                                      const periodType = dataStoreIndicatorsMapping?.find(
+                                                            d => d.indicator === child.id
+                                                      )?.periodType;
+
+                                                      if (foundChildMapping) {
+                                                            // const value = 800;
+
+                                                            const periodObject = getRightPeriodFormat(
+                                                                  3,
+                                                                  periodType,
+                                                                  payload.periodVerification
+                                                            );
+
+                                                            const orgUnitId = eventPayload.orgUnit;
+
+                                                            const value = await getAnalyticValue(
+                                                                  periodObject.analytic,
+                                                                  orgUnitId,
+                                                                  foundChildMapping.id
+                                                            );
+
+                                                            const dx = child.initialStock
+                                                                  ? foundRecoup?.initialStock?.id
+                                                                  : child?.distributedStock
+                                                                  ? foundRecoup?.distributedStock?.id
+                                                                  : child?.receivedStock
+                                                                  ? foundRecoup?.receivedStock?.id
+                                                                  : child?.restedStock
+                                                                  ? foundRecoup?.restedStock?.id
+                                                                  : null;
+
+                                                            console.log('------------------------');
+                                                            console.log('periodObject: ', periodObject);
+                                                            console.log('periodType: ', periodType);
+                                                            console.log('orgUnitId: ', orgUnitId);
+                                                            console.log('value: ', value);
+                                                            console.log('dx: ', dx);
+                                                            console.log('child: ', child);
+
+                                                            if (value && dx) {
+                                                                  newDvList.push({
+                                                                        dataElement: dx,
+                                                                        value: value
+                                                                  });
+                                                            }
+                                                      }
+                                                }
+                                          }
+                                    }
+
+                                    newDvList.push(dv);
                                     return newDvList;
                               }) || []
                         );
@@ -2206,6 +2305,7 @@ const Supervision = ({ me }) => {
 
       const generateEventsAsNewSupervision = async payload => {
             try {
+                  console.log('payload.programStageConfig:', payload.programStageConfig);
                   const existingTEI_List_response = await axios.get(
                         `${TRACKED_ENTITY_INSTANCES_ROUTE}?ou=${payload.orgUnit}&order=created:DESC&program=${selectedProgram?.program?.id}&fields=*&ouMode=SELECTED`
                   );
@@ -2390,11 +2490,23 @@ const Supervision = ({ me }) => {
                         let newDataValueAsListofArray = [];
                         if (payload.programStageConfig?.indicators?.length > 0 && payload.periodVerification) {
                               const indicatorsList = payload.programStageConfig?.indicators;
+                              const lastCrossCheckWhichIsStockData =
+                                    payload.programStageConfig?.recoupements[
+                                          payload.programStageConfig?.recoupements?.length - 1
+                                    ];
+
+                              console.log('lastCrossCheckWhichIsStockData:', lastCrossCheckWhichIsStockData);
 
                               newDataValueAsListofArray = await Promise.all(
                                     eventPayload.dataValues?.map(async dv => {
                                           const newDvList = [];
-                                          const foundInd = indicatorsList.find(ind => ind.value?.id === dv.dataElement);
+                                          const foundInd = indicatorsList?.find(
+                                                ind => ind.value?.id === dv.dataElement
+                                          );
+                                          const foundRecoup =
+                                                lastCrossCheckWhichIsStockData?.primaryValue?.id === dv.dataElement &&
+                                                lastCrossCheckWhichIsStockData;
+
                                           if (foundInd) {
                                                 const foundAggrageMappingElement = dataStoreIndicatorsMapping?.find(
                                                       d =>
@@ -2405,7 +2517,7 @@ const Supervision = ({ me }) => {
                                                                               ev.programStage?.id ===
                                                                               payload.programStage?.id
                                                                   )
-                                                                  .find(ev => ev.indicator?.displayName === dv.value)
+                                                                  ?.find(ev => ev.indicator?.displayName === dv.value)
                                                                   ?.indicator?.id
                                                 )?.dhis2;
 
@@ -2912,9 +3024,105 @@ const Supervision = ({ me }) => {
 
                                                       await updatePeriodsConfigs(periodPayload);
                                                 }
-                                          } else {
-                                                newDvList.push(dv);
                                           }
+
+                                          if (foundRecoup) {
+                                                const foundAggrageMappingElementParentRecoup =
+                                                      dataStoreIndicatorsMapping?.find(
+                                                            d =>
+                                                                  d.indicator ===
+                                                                  mappingConfigs
+                                                                        .filter(
+                                                                              ev =>
+                                                                                    ev.programStage?.id ===
+                                                                                    payload.programStage?.id
+                                                                        )
+                                                                        .find(
+                                                                              ev =>
+                                                                                    ev.indicator?.displayName ===
+                                                                                    dv.value
+                                                                        )?.indicator?.id
+                                                      );
+
+                                                if (foundAggrageMappingElementParentRecoup) {
+                                                      const concerningStockIndicatorChildren =
+                                                            dataStoreIndicators
+                                                                  ?.find(
+                                                                        group =>
+                                                                              group.name ===
+                                                                              foundAggrageMappingElementParentRecoup.group
+                                                                  )
+                                                                  ?.children?.filter(
+                                                                        child =>
+                                                                              child.isStock &&
+                                                                              child.parent ===
+                                                                                    foundAggrageMappingElementParentRecoup.indicator
+                                                                  ) || [];
+
+                                                      console.log(
+                                                            'concerningStockIndicatorChildren:',
+                                                            concerningStockIndicatorChildren
+                                                      );
+
+                                                      // check if is mapped
+                                                      for (let child of concerningStockIndicatorChildren) {
+                                                            const foundChildMapping = dataStoreIndicatorsMapping?.find(
+                                                                  d => d.indicator === child.id
+                                                            )?.dhis2;
+
+                                                            const periodType = dataStoreIndicatorsMapping?.find(
+                                                                  d => d.indicator === child.id
+                                                            )?.periodType;
+
+                                                            if (foundChildMapping) {
+                                                                  // const value = 800;
+
+                                                                  const periodObject = getRightPeriodFormat(
+                                                                        3,
+                                                                        periodType,
+                                                                        payload.periodVerification
+                                                                  );
+
+                                                                  const orgUnitId = eventPayload.orgUnit;
+
+                                                                  const value = await getAnalyticValue(
+                                                                        periodObject.analytic,
+                                                                        orgUnitId,
+                                                                        foundChildMapping.id
+                                                                  );
+
+                                                                  const dx = child.initialStock
+                                                                        ? foundRecoup?.initialStock?.id
+                                                                        : child?.distributedStock
+                                                                        ? foundRecoup?.distributedStock?.id
+                                                                        : child?.receivedStock
+                                                                        ? foundRecoup?.receivedStock?.id
+                                                                        : child?.restedStock
+                                                                        ? foundRecoup?.restedStock?.id
+                                                                        : null;
+
+                                                                  console.log('------------------------');
+                                                                  console.log('periodObject: ', periodObject);
+                                                                  console.log('periodType: ', periodType);
+                                                                  console.log('orgUnitId: ', orgUnitId);
+                                                                  console.log('value: ', value);
+                                                                  console.log('dx: ', dx);
+                                                                  console.log('child: ', child);
+
+                                                                  if (value && dx) {
+                                                                        newDvList.push({
+                                                                              dataElement: dx,
+                                                                              value: value
+                                                                        });
+                                                                  }
+                                                            }
+                                                      }
+                                                }
+                                          }
+
+                                          // if (!foundInd && !foundRecoup) {
+                                          //       newDvList.push(dv);
+                                          // }
 
                                           return newDvList;
                                     }) || []
@@ -2925,6 +3133,8 @@ const Supervision = ({ me }) => {
                               (prev, curr) => (curr?.length > 0 ? prev.concat(curr) : prev),
                               []
                         );
+
+                        console.log('newDataValueList: ', newDataValueList);
 
                         eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValueList];
 
@@ -3103,12 +3313,12 @@ const Supervision = ({ me }) => {
                               }) || []
                         );
 
-                        const supervisionsList = supervisionsListByProgramStages.reduce((prev, curr) => {
-                              if (curr?.length > 0) {
-                                    prev = prev.concat(curr);
-                              }
-                              return prev;
-                        }, []);
+                        // const supervisionsList = supervisionsListByProgramStages.reduce((prev, curr) => {
+                        //       if (curr?.length > 0) {
+                        //             prev = prev.concat(curr);
+                        //       }
+                        //       return prev;
+                        // }, []);
 
                         // let planificationPayload = {
                         //       id: uuid(),
