@@ -392,7 +392,9 @@ const SettingIndicatorsMapping = () => {
                                                                               key={indicator.id}
                                                                               style={{
                                                                                     marginTop: '5px',
-                                                                                    borderBottom: '1px solid #ccc',
+                                                                                    borderBottom: indicator.isStock
+                                                                                          ? ''
+                                                                                          : '1px solid #ccc',
                                                                                     paddingBottom: '5px'
                                                                               }}
                                                                         >
@@ -406,38 +408,24 @@ const SettingIndicatorsMapping = () => {
                                                                                                       gap: '1px'
                                                                                                 }}
                                                                                           >
-                                                                                                <span>
+                                                                                                <span
+                                                                                                      style={{
+                                                                                                            fontWeight:
+                                                                                                                  indicator.isStock &&
+                                                                                                                  !indicator.parent
+                                                                                                                        ? 'bold'
+                                                                                                                        : 'normal',
+                                                                                                            textDecoration:
+                                                                                                                  indicator.isStock &&
+                                                                                                                  !indicator.parent
+                                                                                                                        ? 'underline'
+                                                                                                                        : 'none'
+                                                                                                      }}
+                                                                                                >
                                                                                                       {translateDataStoreLabel(
                                                                                                             indicator
                                                                                                       )}
                                                                                                 </span>
-
-                                                                                                {!indicator.parent &&
-                                                                                                      indicator.isStock && (
-                                                                                                            <span
-                                                                                                                  style={{
-                                                                                                                        backgroundColor:
-                                                                                                                              '#C3E9E2',
-                                                                                                                        padding: '5px',
-
-                                                                                                                        fontWeight:
-                                                                                                                              'bold',
-                                                                                                                        borderRadius:
-                                                                                                                              '10px',
-                                                                                                                        fontSize: '12px'
-                                                                                                                  }}
-                                                                                                            >
-                                                                                                                  (
-                                                                                                                  {translateDataStoreLabel(
-                                                                                                                        group.children?.find(
-                                                                                                                              i =>
-                                                                                                                                    i.id ===
-                                                                                                                                    indicator.parent
-                                                                                                                        )
-                                                                                                                  )}
-                                                                                                                  )
-                                                                                                            </span>
-                                                                                                      )}
 
                                                                                                 {indicator.parent &&
                                                                                                       indicator.isStock && (
@@ -467,50 +455,22 @@ const SettingIndicatorsMapping = () => {
                                                                                                       )}
                                                                                           </div>
                                                                                     </Col>
-                                                                                    <Col md={7}>
-                                                                                          <div
-                                                                                                style={{
-                                                                                                      display: 'flex',
-                                                                                                      alignItems:
-                                                                                                            'center',
-                                                                                                      gap: '10px'
-                                                                                                }}
-                                                                                          >
-                                                                                                <Input
-                                                                                                      width="100%"
-                                                                                                      disabled
-                                                                                                      value={
-                                                                                                            formState?.indicators?.find(
-                                                                                                                  it =>
-                                                                                                                        it.group ===
-                                                                                                                              group.name &&
-                                                                                                                        it.indicator ===
-                                                                                                                              indicator.id
-                                                                                                            )?.dhis2
-                                                                                                                  ?.name
-                                                                                                      }
-                                                                                                />
-
-                                                                                                {formState?.indicators?.find(
-                                                                                                      it =>
-                                                                                                            it.group ===
-                                                                                                                  group.name &&
-                                                                                                            it.indicator ===
-                                                                                                                  indicator.id
-                                                                                                )?.periodType && (
-                                                                                                      <span
-                                                                                                            style={{
-                                                                                                                  background:
-                                                                                                                        'orange',
-                                                                                                                  fontWeight:
-                                                                                                                        'bold',
-                                                                                                                  padding: '2px',
-                                                                                                                  borderRadius:
-                                                                                                                        '10px',
-                                                                                                                  color: 'white'
-                                                                                                            }}
-                                                                                                      >
-                                                                                                            {
+                                                                                    {(!indicator.isStock ||
+                                                                                          (indicator.isStock &&
+                                                                                                indicator.parent)) && (
+                                                                                          <Col md={7}>
+                                                                                                <div
+                                                                                                      style={{
+                                                                                                            display: 'flex',
+                                                                                                            alignItems:
+                                                                                                                  'center',
+                                                                                                            gap: '10px'
+                                                                                                      }}
+                                                                                                >
+                                                                                                      <Input
+                                                                                                            width="100%"
+                                                                                                            disabled
+                                                                                                            value={
                                                                                                                   formState?.indicators?.find(
                                                                                                                         it =>
                                                                                                                               it.group ===
@@ -518,200 +478,252 @@ const SettingIndicatorsMapping = () => {
                                                                                                                               it.indicator ===
                                                                                                                                     indicator.id
                                                                                                                   )
-                                                                                                                        ?.periodType
+                                                                                                                        ?.dhis2
+                                                                                                                        ?.name
                                                                                                             }
-                                                                                                      </span>
-                                                                                                )}
-                                                                                          </div>
-                                                                                    </Col>
-                                                                                    <Col md={1}>
-                                                                                          <Button
-                                                                                                primary
-                                                                                                small
-                                                                                                onClick={() => {
-                                                                                                      const currentIndicator =
-                                                                                                            formState?.indicators?.find(
-                                                                                                                  it =>
-                                                                                                                        it.group ===
-                                                                                                                              group.name &&
-                                                                                                                        it.indicator ===
-                                                                                                                              indicator.id
+                                                                                                      />
+
+                                                                                                      {formState?.indicators?.find(
+                                                                                                            it =>
+                                                                                                                  it.group ===
+                                                                                                                        group.name &&
+                                                                                                                  it.indicator ===
+                                                                                                                        indicator.id
+                                                                                                      )?.periodType && (
+                                                                                                            <span
+                                                                                                                  style={{
+                                                                                                                        background:
+                                                                                                                              'orange',
+                                                                                                                        fontWeight:
+                                                                                                                              'bold',
+                                                                                                                        padding: '2px',
+                                                                                                                        borderRadius:
+                                                                                                                              '10px',
+                                                                                                                        color: 'white'
+                                                                                                                  }}
+                                                                                                            >
+                                                                                                                  {
+                                                                                                                        formState?.indicators?.find(
+                                                                                                                              it =>
+                                                                                                                                    it.group ===
+                                                                                                                                          group.name &&
+                                                                                                                                    it.indicator ===
+                                                                                                                                          indicator.id
+                                                                                                                        )
+                                                                                                                              ?.periodType
+                                                                                                                  }
+                                                                                                            </span>
+                                                                                                      )}
+                                                                                                </div>
+                                                                                          </Col>
+                                                                                    )}
+                                                                                    {(!indicator.isStock ||
+                                                                                          (indicator.isStock &&
+                                                                                                indicator.parent)) && (
+                                                                                          <Col md={1}>
+                                                                                                <Button
+                                                                                                      primary
+                                                                                                      small
+                                                                                                      onClick={() => {
+                                                                                                            const currentIndicator =
+                                                                                                                  formState?.indicators?.find(
+                                                                                                                        it =>
+                                                                                                                              it.group ===
+                                                                                                                                    group.name &&
+                                                                                                                              it.indicator ===
+                                                                                                                                    indicator.id
+                                                                                                                  );
+
+                                                                                                            setFormState(
+                                                                                                                  {
+                                                                                                                        ...formState,
+                                                                                                                        visibleAnalyticComponentModal: true,
+                                                                                                                        selectedMetaDatas:
+                                                                                                                              currentIndicator?.dhis2
+                                                                                                                                    ? [
+                                                                                                                                            currentIndicator?.dhis2
+                                                                                                                                      ]
+                                                                                                                                    : [],
+                                                                                                                        currentIndicator:
+                                                                                                                              {
+                                                                                                                                    group: group.name,
+                                                                                                                                    indicator:
+                                                                                                                                          indicator.id
+                                                                                                                              }
+                                                                                                                  }
                                                                                                             );
 
-                                                                                                      setFormState({
-                                                                                                            ...formState,
-                                                                                                            visibleAnalyticComponentModal: true,
-                                                                                                            selectedMetaDatas:
-                                                                                                                  currentIndicator?.dhis2
-                                                                                                                        ? [
-                                                                                                                                currentIndicator?.dhis2
-                                                                                                                          ]
-                                                                                                                        : [],
-                                                                                                            currentIndicator:
-                                                                                                                  {
-                                                                                                                        group: group.name,
-                                                                                                                        indicator:
-                                                                                                                              indicator.id
-                                                                                                                  }
-                                                                                                      });
+                                                                                                            setSelectedDataSet(
+                                                                                                                  currentIndicator.dataSet
+                                                                                                            );
+                                                                                                      }}
+                                                                                                      icon={
+                                                                                                            <TbSelect
+                                                                                                                  style={{
+                                                                                                                        fontSize: '18px'
+                                                                                                                  }}
+                                                                                                            />
+                                                                                                      }
+                                                                                                ></Button>
+                                                                                          </Col>
+                                                                                    )}
+                                                                                    {(!indicator.isStock ||
+                                                                                          (indicator.isStock &&
+                                                                                                indicator.parent)) && (
+                                                                                          <Col md={4}>
+                                                                                                <div className="flex gap-2">
+                                                                                                      <Checkbox
+                                                                                                            disabled={
+                                                                                                                  !formState?.indicators?.find(
+                                                                                                                        it =>
+                                                                                                                              it.group ===
+                                                                                                                                    group.name &&
+                                                                                                                              it.indicator ===
+                                                                                                                                    indicator.id
+                                                                                                                  )
+                                                                                                                        ?.dhis2
+                                                                                                            }
+                                                                                                            checked={
+                                                                                                                  formState?.indicators?.find(
+                                                                                                                        it =>
+                                                                                                                              it.group ===
+                                                                                                                                    group.name &&
+                                                                                                                              it.indicator ===
+                                                                                                                                    indicator.id
+                                                                                                                  )
+                                                                                                                        ?.useNameFromDHIS2
+                                                                                                            }
+                                                                                                            onChange={_ =>
+                                                                                                                  setFormState(
+                                                                                                                        {
+                                                                                                                              ...formState,
+                                                                                                                              indicators:
+                                                                                                                                    formState?.indicators?.map(
+                                                                                                                                          it => {
+                                                                                                                                                if (
+                                                                                                                                                      it.group ===
+                                                                                                                                                            group.name &&
+                                                                                                                                                      it.indicator ===
+                                                                                                                                                            indicator.id
+                                                                                                                                                ) {
+                                                                                                                                                      return {
+                                                                                                                                                            ...it,
+                                                                                                                                                            useNameFromDHIS2:
+                                                                                                                                                                  !it.useNameFromDHIS2,
+                                                                                                                                                            indicatorRename:
+                                                                                                                                                                  getCurrentLangue() ===
+                                                                                                                                                                  'en'
+                                                                                                                                                                        ? !it.useNameFromDHIS2
+                                                                                                                                                                              ? it
+                                                                                                                                                                                      .dhis2
+                                                                                                                                                                                      ?.name
+                                                                                                                                                                              : null
+                                                                                                                                                                        : null,
 
-                                                                                                      setSelectedDataSet(
-                                                                                                            currentIndicator.dataSet
-                                                                                                      );
-                                                                                                }}
-                                                                                                icon={
-                                                                                                      <TbSelect
-                                                                                                            style={{
-                                                                                                                  fontSize: '18px'
-                                                                                                            }}
+                                                                                                                                                            indicatorRename_fr:
+                                                                                                                                                                  getCurrentLangue() ===
+                                                                                                                                                                  'fr'
+                                                                                                                                                                        ? !it.useNameFromDHIS2
+                                                                                                                                                                              ? it
+                                                                                                                                                                                      .dhis2
+                                                                                                                                                                                      ?.name
+                                                                                                                                                                              : null
+                                                                                                                                                                        : null
+                                                                                                                                                      };
+                                                                                                                                                }
+
+                                                                                                                                                return it;
+                                                                                                                                          }
+                                                                                                                                    )
+                                                                                                                        }
+                                                                                                                  )
+                                                                                                            }
+                                                                                                      >
+                                                                                                            {translate(
+                                                                                                                  'Use_Indicator_Name_From_Dhis2'
+                                                                                                            )}
+                                                                                                      </Checkbox>
+                                                                                                </div>
+                                                                                          </Col>
+                                                                                    )}
+
+                                                                                    {(!indicator.isStock ||
+                                                                                          (indicator.isStock &&
+                                                                                                indicator.parent)) && (
+                                                                                          <Col md={8}>
+                                                                                                <div className="mt-2">
+                                                                                                      {console.log(
+                                                                                                            'form state: ',
+                                                                                                            formState?.indicators
+                                                                                                      )}
+                                                                                                      <Input
+                                                                                                            disabled={
+                                                                                                                  !formState?.indicators?.find(
+                                                                                                                        it =>
+                                                                                                                              it.group ===
+                                                                                                                                    group.name &&
+                                                                                                                              it.indicator ===
+                                                                                                                                    indicator.id
+                                                                                                                  )
+                                                                                                                        ?.useNameFromDHIS2
+                                                                                                            }
+                                                                                                            value={
+                                                                                                                  getCurrentLangue() ===
+                                                                                                                  'en'
+                                                                                                                        ? formState?.indicators?.find(
+                                                                                                                                it =>
+                                                                                                                                      it.group ===
+                                                                                                                                            group.name &&
+                                                                                                                                      it.indicator ===
+                                                                                                                                            indicator.id
+                                                                                                                          )
+                                                                                                                                ?.indicatorRename
+                                                                                                                        : formState?.indicators?.find(
+                                                                                                                                it =>
+                                                                                                                                      it.group ===
+                                                                                                                                            group.name &&
+                                                                                                                                      it.indicator ===
+                                                                                                                                            indicator.id
+                                                                                                                          )
+                                                                                                                                ?.indicatorRename_fr
+                                                                                                            }
+                                                                                                            onChange={event =>
+                                                                                                                  setFormState(
+                                                                                                                        {
+                                                                                                                              ...formState,
+                                                                                                                              indicators:
+                                                                                                                                    formState?.indicators?.map(
+                                                                                                                                          it => {
+                                                                                                                                                if (
+                                                                                                                                                      it.group ===
+                                                                                                                                                            group.name &&
+                                                                                                                                                      it.indicator ===
+                                                                                                                                                            indicator.id
+                                                                                                                                                ) {
+                                                                                                                                                      return {
+                                                                                                                                                            ...it,
+
+                                                                                                                                                            indicatorRename:
+                                                                                                                                                                  event
+                                                                                                                                                                        .target
+                                                                                                                                                                        .value
+                                                                                                                                                      };
+                                                                                                                                                }
+
+                                                                                                                                                return it;
+                                                                                                                                          }
+                                                                                                                                    )
+                                                                                                                        }
+                                                                                                                  )
+                                                                                                            }
+                                                                                                            className="w-full"
+                                                                                                            placeholder={translate(
+                                                                                                                  'Indicator_Name'
+                                                                                                            )}
                                                                                                       />
-                                                                                                }
-                                                                                          ></Button>
-                                                                                    </Col>
-                                                                                    <Col md={4}>
-                                                                                          <div className="flex gap-2">
-                                                                                                <Checkbox
-                                                                                                      disabled={
-                                                                                                            !formState?.indicators?.find(
-                                                                                                                  it =>
-                                                                                                                        it.group ===
-                                                                                                                              group.name &&
-                                                                                                                        it.indicator ===
-                                                                                                                              indicator.id
-                                                                                                            )?.dhis2
-                                                                                                      }
-                                                                                                      checked={
-                                                                                                            formState?.indicators?.find(
-                                                                                                                  it =>
-                                                                                                                        it.group ===
-                                                                                                                              group.name &&
-                                                                                                                        it.indicator ===
-                                                                                                                              indicator.id
-                                                                                                            )
-                                                                                                                  ?.useNameFromDHIS2
-                                                                                                      }
-                                                                                                      onChange={_ =>
-                                                                                                            setFormState(
-                                                                                                                  {
-                                                                                                                        ...formState,
-                                                                                                                        indicators:
-                                                                                                                              formState?.indicators?.map(
-                                                                                                                                    it => {
-                                                                                                                                          if (
-                                                                                                                                                it.group ===
-                                                                                                                                                      group.name &&
-                                                                                                                                                it.indicator ===
-                                                                                                                                                      indicator.id
-                                                                                                                                          ) {
-                                                                                                                                                return {
-                                                                                                                                                      ...it,
-                                                                                                                                                      useNameFromDHIS2:
-                                                                                                                                                            !it.useNameFromDHIS2,
-                                                                                                                                                      indicatorRename:
-                                                                                                                                                            getCurrentLangue() ===
-                                                                                                                                                            'en'
-                                                                                                                                                                  ? !it.useNameFromDHIS2
-                                                                                                                                                                        ? it
-                                                                                                                                                                                .dhis2
-                                                                                                                                                                                ?.name
-                                                                                                                                                                        : null
-                                                                                                                                                                  : null,
-
-                                                                                                                                                      indicatorRename_fr:
-                                                                                                                                                            getCurrentLangue() ===
-                                                                                                                                                            'fr'
-                                                                                                                                                                  ? !it.useNameFromDHIS2
-                                                                                                                                                                        ? it
-                                                                                                                                                                                .dhis2
-                                                                                                                                                                                ?.name
-                                                                                                                                                                        : null
-                                                                                                                                                                  : null
-                                                                                                                                                };
-                                                                                                                                          }
-
-                                                                                                                                          return it;
-                                                                                                                                    }
-                                                                                                                              )
-                                                                                                                  }
-                                                                                                            )
-                                                                                                      }
-                                                                                                >
-                                                                                                      {translate(
-                                                                                                            'Use_Indicator_Name_From_Dhis2'
-                                                                                                      )}
-                                                                                                </Checkbox>
-                                                                                          </div>
-                                                                                    </Col>
-
-                                                                                    <Col md={8}>
-                                                                                          <div className="mt-2">
-                                                                                                <Input
-                                                                                                      disabled={
-                                                                                                            !formState?.indicators?.find(
-                                                                                                                  it =>
-                                                                                                                        it.group ===
-                                                                                                                              group.name &&
-                                                                                                                        it.indicator ===
-                                                                                                                              indicator.id
-                                                                                                            )
-                                                                                                                  ?.useNameFromDHIS2
-                                                                                                      }
-                                                                                                      value={
-                                                                                                            getCurrentLangue() ===
-                                                                                                            'en'
-                                                                                                                  ? formState?.indicators?.find(
-                                                                                                                          it =>
-                                                                                                                                it.group ===
-                                                                                                                                      group.name &&
-                                                                                                                                it.indicator ===
-                                                                                                                                      indicator.id
-                                                                                                                    )
-                                                                                                                          ?.indicatorRename
-                                                                                                                  : formState?.indicators?.find(
-                                                                                                                          it =>
-                                                                                                                                it.group ===
-                                                                                                                                      group.name &&
-                                                                                                                                it.indicator ===
-                                                                                                                                      indicator.id
-                                                                                                                    )
-                                                                                                                          ?.indicatorRename_fr
-                                                                                                      }
-                                                                                                      onChange={event =>
-                                                                                                            setFormState(
-                                                                                                                  {
-                                                                                                                        ...formState,
-                                                                                                                        indicators:
-                                                                                                                              formState?.indicators?.map(
-                                                                                                                                    it => {
-                                                                                                                                          if (
-                                                                                                                                                it.group ===
-                                                                                                                                                      group.name &&
-                                                                                                                                                it.indicator ===
-                                                                                                                                                      indicator.id
-                                                                                                                                          ) {
-                                                                                                                                                return {
-                                                                                                                                                      ...it,
-
-                                                                                                                                                      indicatorRename:
-                                                                                                                                                            event
-                                                                                                                                                                  .target
-                                                                                                                                                                  .value
-                                                                                                                                                };
-                                                                                                                                          }
-
-                                                                                                                                          return it;
-                                                                                                                                    }
-                                                                                                                              )
-                                                                                                                  }
-                                                                                                            )
-                                                                                                      }
-                                                                                                      className="w-full"
-                                                                                                      placeholder={translate(
-                                                                                                            'Indicator_Name'
-                                                                                                      )}
-                                                                                                />
-                                                                                          </div>
-                                                                                    </Col>
+                                                                                                </div>
+                                                                                          </Col>
+                                                                                    )}
                                                                               </Row>
                                                                         </div>
                                                                   ))}

@@ -682,10 +682,6 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                   }}
                                                             />
 
-                                                            {console.log(
-                                                                  'formState?.selectedStockIndicator : ',
-                                                                  formState?.selectedStockIndicator
-                                                            )}
                                                       </div>
                                                 </td>
                                                 <td

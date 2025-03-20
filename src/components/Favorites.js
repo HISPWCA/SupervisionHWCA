@@ -1202,7 +1202,7 @@ const Favorites = ({ me }) => {
                                 name: curr.name,
                                 children: curr.children?.filter(d =>
                                       dataStoreIndicatorsMapping?.find(
-                                            mapping =>
+                                            mapping => d.isStock ? true :
                                                   mapping.group === curr.name &&
                                                   mapping.indicator === d.id &&
                                                   mapping.dhis2?.id
