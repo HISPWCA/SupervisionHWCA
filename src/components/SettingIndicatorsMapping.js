@@ -652,10 +652,6 @@ const SettingIndicatorsMapping = () => {
                                                                                                 indicator.parent)) && (
                                                                                           <Col md={8}>
                                                                                                 <div className="mt-2">
-                                                                                                      {console.log(
-                                                                                                            'form state: ',
-                                                                                                            formState?.indicators
-                                                                                                      )}
                                                                                                       <Input
                                                                                                             disabled={
                                                                                                                   !formState?.indicators?.find(
@@ -677,7 +673,8 @@ const SettingIndicatorsMapping = () => {
                                                                                                                                       it.indicator ===
                                                                                                                                             indicator.id
                                                                                                                           )
-                                                                                                                                ?.indicatorRename
+                                                                                                                                ?.indicatorRename ||
+                                                                                                                          ''
                                                                                                                         : formState?.indicators?.find(
                                                                                                                                 it =>
                                                                                                                                       it.group ===
@@ -685,9 +682,10 @@ const SettingIndicatorsMapping = () => {
                                                                                                                                       it.indicator ===
                                                                                                                                             indicator.id
                                                                                                                           )
-                                                                                                                                ?.indicatorRename_fr
+                                                                                                                                ?.indicatorRename_fr ||
+                                                                                                                          ''
                                                                                                             }
-                                                                                                            onChange={event =>
+                                                                                                            onChange={event => {
                                                                                                                   setFormState(
                                                                                                                         {
                                                                                                                               ...formState,
@@ -700,13 +698,26 @@ const SettingIndicatorsMapping = () => {
                                                                                                                                                       it.indicator ===
                                                                                                                                                             indicator.id
                                                                                                                                                 ) {
+                                                                                                                                                      console.log(
+                                                                                                                                                            'it: ',
+                                                                                                                                                            it
+                                                                                                                                                      );
                                                                                                                                                       return {
                                                                                                                                                             ...it,
-
+                                                                                                                                                            indicatorRename_fr:
+                                                                                                                                                                  getCurrentLangue() ===
+                                                                                                                                                                  'en'
+                                                                                                                                                                        ? it.indicatorRename_fr
+                                                                                                                                                                        : event
+                                                                                                                                                                                .target
+                                                                                                                                                                                .value,
                                                                                                                                                             indicatorRename:
-                                                                                                                                                                  event
-                                                                                                                                                                        .target
-                                                                                                                                                                        .value
+                                                                                                                                                                  getCurrentLangue() ===
+                                                                                                                                                                  'en'
+                                                                                                                                                                        ? event
+                                                                                                                                                                                .target
+                                                                                                                                                                                .value
+                                                                                                                                                                        : it.indicatorRename
                                                                                                                                                       };
                                                                                                                                                 }
 
@@ -714,8 +725,8 @@ const SettingIndicatorsMapping = () => {
                                                                                                                                           }
                                                                                                                                     )
                                                                                                                         }
-                                                                                                                  )
-                                                                                                            }
+                                                                                                                  );
+                                                                                                            }}
                                                                                                             className="w-full"
                                                                                                             placeholder={translate(
                                                                                                                   'Indicator_Name'
