@@ -4103,7 +4103,14 @@ const Supervision = ({ me }) => {
 
       const handleVisibleTeamLead = () => {
             setVisibleTeamLeadContent(true);
-            const users = [...selectedEquipeSuperviseurs, ...selectedEquipeAutreSuperviseurs];
+            const users = [...selectedEquipeSuperviseurs, ...selectedEquipeAutreSuperviseurs].map(user =>
+                  user.id && user.id.length > 0
+                        ? {
+                                label: user.displayName,
+                                value: user.displayName
+                          }
+                        : { label: user, value: user }
+            );
             if (users.length === 1) {
                   setSelectedTeamLead(users[0]);
             }
