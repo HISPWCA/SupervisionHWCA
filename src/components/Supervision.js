@@ -4112,7 +4112,7 @@ const Supervision = ({ me }) => {
                         : { label: user, value: user }
             );
             if (users.length === 1) {
-                  setSelectedTeamLead(users[0]);
+                  setSelectedTeamLead(users[0].value);
             }
       };
 
