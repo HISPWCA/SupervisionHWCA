@@ -1,8 +1,13 @@
-## Version: 2.2.5
+## Version: 2.2.6
 
-### Functionality
+### Functionalities
 
-- Removed analyses Menu from setting part
-- Added Visualization Title for each visualization items from Dashboard side
-- Improved legend Text by wrapping them when too long
-- Used ( use dhis2 name ) from mapping part on dashboard when generating visualization items. Is this option is checked, then we can use the new name
+- Adding Support for Stock informations:
+    * Changing cross check C to Stock informations
+- Creating indicator and configuring it from setting mapping part
+- Generating automatically stock informations ( opening balance , end balance , received stock , distributed stock ) for creating indicator 
+- Changing cross check C from setting program configuration par into stock informations
+- Configuration data element for cross check C stock informations. 
+- Changing and update favorite creation part to support stock informations 
+- Update Planification part to be able to send stock informations to the DHIS2 
+- Getting and sending open balance , end balance , received stock , distributed stock analytics information into dhis2
