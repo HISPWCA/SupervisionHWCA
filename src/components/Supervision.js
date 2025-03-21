@@ -3903,8 +3903,12 @@ const Supervision = ({ me }) => {
                   inputEquipeAutreSuperviseur &&
                   !selectedEquipeAutreSuperviseurs?.includes(inputEquipeAutreSuperviseur?.trim())
             ) {
-                  setSelectedEquipeAutreSuperviseurs([...selectedEquipeAutreSuperviseurs, inputEquipeAutreSuperviseur]);
+                  const users = [...selectedEquipeAutreSuperviseurs, inputEquipeAutreSuperviseur];
+                  setSelectedEquipeAutreSuperviseurs(users);
                   setInputEquipeAutreSuperviseur('');
+                  if (users.length === 1) {
+                        setSelectedTeamLead(users[0]);
+                  }
             }
       };
 
