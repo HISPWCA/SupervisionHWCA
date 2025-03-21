@@ -1178,7 +1178,6 @@ const MyFrame = ({
 
       return (
             <div>
-                  {console.log(id)}
                   <iframe
                         id={`${id}-iframe`}
                         frameborder="0"

@@ -698,10 +698,6 @@ const SettingIndicatorsMapping = () => {
                                                                                                                                                       it.indicator ===
                                                                                                                                                             indicator.id
                                                                                                                                                 ) {
-                                                                                                                                                      console.log(
-                                                                                                                                                            'it: ',
-                                                                                                                                                            it
-                                                                                                                                                      );
                                                                                                                                                       return {
                                                                                                                                                             ...it,
                                                                                                                                                             indicatorRename_fr:

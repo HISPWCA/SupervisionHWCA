@@ -74,7 +74,6 @@ export const Body = () => {
                   );
 
                   if (backgroundInformationFavoriteList?.length > 0 && indicatorsList?.length > 0) {
-                        console.log('backgroundInformationFavoriteList :', backgroundInformationFavoriteList);
                         await saveDataToDataStore(
                               process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY,
                               backgroundInformationFavoriteList?.map(favorite => ({

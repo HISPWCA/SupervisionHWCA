@@ -493,9 +493,6 @@ const Favorites = ({ me }) => {
             }
 
             const stockRecoupement = formState?.recoupements[formState?.recoupements?.length - 1];
-
-            console.log('stockRecoupement : ', stockRecoupement);
-            console.log('formState?.recoupements : ', formState?.recoupements.length);
             if (stockRecoupement) {
                   let payloadIndicator = {
                         dataElement: stockRecoupement?.primaryValue,
@@ -521,8 +518,6 @@ const Favorites = ({ me }) => {
                         newList.push(payloadIndicator);
 
                   if (payloadMargin.dataElement?.id && payloadMargin.indicator?.id) newList.push(payloadMargin);
-
-                  console.log('newList : ', newList);
             }
 
             // consistencyOvertime
@@ -1201,11 +1196,12 @@ const Favorites = ({ me }) => {
                           prev.push({
                                 name: curr.name,
                                 children: curr.children?.filter(d =>
-                                      dataStoreIndicatorsMapping?.find(
-                                            mapping => d.isStock ? true :
-                                                  mapping.group === curr.name &&
-                                                  mapping.indicator === d.id &&
-                                                  mapping.dhis2?.id
+                                      dataStoreIndicatorsMapping?.find(mapping =>
+                                            d.isStock
+                                                  ? true
+                                                  : mapping.group === curr.name &&
+                                                    mapping.indicator === d.id &&
+                                                    mapping.dhis2?.id
                                       )
                                 )
                           });

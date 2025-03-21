@@ -1643,8 +1643,6 @@ const Supervision = ({ me }) => {
                                     payload.programStageConfig?.recoupements.length - 1
                               ];
 
-                        console.log('lastCrossCheckWhichIsStockData:', lastCrossCheckWhichIsStockData);
-
                         newDataValueAsListofArray = await Promise.all(
                               eventPayload.dataValues?.map(async dv => {
                                     const newDvList = [];
@@ -2199,11 +2197,6 @@ const Supervision = ({ me }) => {
                                                                               foundAggrageMappingElementParentRecoup.indicator
                                                             ) || [];
 
-                                                console.log(
-                                                      'concerningStockIndicatorChildren:',
-                                                      concerningStockIndicatorChildren
-                                                );
-
                                                 // check if is mapped
                                                 for (let child of concerningStockIndicatorChildren) {
                                                       const foundChildMapping = dataStoreIndicatorsMapping?.find(
@@ -2240,14 +2233,6 @@ const Supervision = ({ me }) => {
                                                                   : child?.restedStock
                                                                   ? foundRecoup?.restedStock?.id
                                                                   : null;
-
-                                                            console.log('------------------------');
-                                                            console.log('periodObject: ', periodObject);
-                                                            console.log('periodType: ', periodType);
-                                                            console.log('orgUnitId: ', orgUnitId);
-                                                            console.log('value: ', value);
-                                                            console.log('dx: ', dx);
-                                                            console.log('child: ', child);
 
                                                             if (value && dx) {
                                                                   newDvList.push({
@@ -2305,7 +2290,6 @@ const Supervision = ({ me }) => {
 
       const generateEventsAsNewSupervision = async payload => {
             try {
-                  console.log('payload.programStageConfig:', payload.programStageConfig);
                   const existingTEI_List_response = await axios.get(
                         `${TRACKED_ENTITY_INSTANCES_ROUTE}?ou=${payload.orgUnit}&order=created:DESC&program=${selectedProgram?.program?.id}&fields=*&ouMode=SELECTED`
                   );
@@ -2494,8 +2478,6 @@ const Supervision = ({ me }) => {
                                     payload.programStageConfig?.recoupements[
                                           payload.programStageConfig?.recoupements?.length - 1
                                     ];
-
-                              console.log('lastCrossCheckWhichIsStockData:', lastCrossCheckWhichIsStockData);
 
                               newDataValueAsListofArray = await Promise.all(
                                     eventPayload.dataValues?.map(async dv => {
@@ -3059,11 +3041,6 @@ const Supervision = ({ me }) => {
                                                                                     foundAggrageMappingElementParentRecoup.indicator
                                                                   ) || [];
 
-                                                      console.log(
-                                                            'concerningStockIndicatorChildren:',
-                                                            concerningStockIndicatorChildren
-                                                      );
-
                                                       // check if is mapped
                                                       for (let child of concerningStockIndicatorChildren) {
                                                             const foundChildMapping = dataStoreIndicatorsMapping?.find(
@@ -3100,14 +3077,6 @@ const Supervision = ({ me }) => {
                                                                         : child?.restedStock
                                                                         ? foundRecoup?.restedStock?.id
                                                                         : null;
-
-                                                                  console.log('------------------------');
-                                                                  console.log('periodObject: ', periodObject);
-                                                                  console.log('periodType: ', periodType);
-                                                                  console.log('orgUnitId: ', orgUnitId);
-                                                                  console.log('value: ', value);
-                                                                  console.log('dx: ', dx);
-                                                                  console.log('child: ', child);
 
                                                                   if (value && dx) {
                                                                         newDvList.push({
@@ -3906,9 +3875,6 @@ const Supervision = ({ me }) => {
                   const users = [...selectedEquipeAutreSuperviseurs, inputEquipeAutreSuperviseur];
                   setSelectedEquipeAutreSuperviseurs(users);
                   setInputEquipeAutreSuperviseur('');
-                  if (users.length === 1) {
-                        setSelectedTeamLead(users[0]);
-                  }
             }
       };
 
@@ -4123,7 +4089,7 @@ const Supervision = ({ me }) => {
                                                 <Button
                                                       primary
                                                       disabled={inputEquipeName?.trim()?.length > 0 ? false : true}
-                                                      onClick={() => setVisibleTeamLeadContent(true)}
+                                                      onClick={handleVisibleTeamLead}
                                                       icon={<FiSave style={{ fontSize: '18px' }} />}
                                                 >
                                                       {translate('Enregistrer')}
@@ -4134,6 +4100,14 @@ const Supervision = ({ me }) => {
                         </Modal>
                   </>
             );
+
+      const handleVisibleTeamLead = () => {
+            setVisibleTeamLeadContent(true);
+            const users = [...selectedEquipeSuperviseurs, ...selectedEquipeAutreSuperviseurs];
+            if (users.length === 1) {
+                  setSelectedTeamLead(users[0]);
+            }
+      };
 
       const handleCloseAddFavoritForPerformance = () => {
             setVisibleAddFavoritPerformanceModal(false);
