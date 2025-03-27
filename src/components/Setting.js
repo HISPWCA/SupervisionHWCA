@@ -1296,7 +1296,7 @@ const Setting = () => {
 
                   cleanAllProgramConfigurationStates();
 
-                  setLoadingSaveSupervionsConfig(false);
+                  loadDataStoreGlobalSettings();
                   setNotification({
                         show: true,
                         type: NOTIFICATION_SUCCESS,
@@ -1304,7 +1304,7 @@ const Setting = () => {
                               ? translate('Mise_A_Jour_Effectuer')
                               : translate('Configuration_Added_For_Program_stage')
                   });
-                  loadDataStoreGlobalSettings();
+                  setLoadingSaveSupervionsConfig(false);
             } catch (err) {
                   setNotification({
                         show: true,
@@ -2496,7 +2496,6 @@ const Setting = () => {
                                                                                           value: p
                                                                                     }))}
                                                                                     showSearch
-                                                                                    allowClear
                                                                                     optionFilterProp="label"
                                                                                     value={
                                                                                           formState?.indicators[0]
