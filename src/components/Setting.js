@@ -2509,9 +2509,11 @@ const Setting = () => {
                                                                                                             i => ({
                                                                                                                   ...i,
                                                                                                                   viewMonthlyValue:
-                                                                                                                        parseInt(
-                                                                                                                              value
-                                                                                                                        )
+                                                                                                                        value
+                                                                                                                              ? parseInt(
+                                                                                                                                      value
+                                                                                                                                )
+                                                                                                                              : 0
                                                                                                             })
                                                                                                       ) || []
                                                                                           });
