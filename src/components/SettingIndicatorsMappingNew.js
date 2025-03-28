@@ -26,6 +26,7 @@ const SettingIndicatorsMappingNew = ({
       const [selectedIndicatorType, setSelectedIndicatorType] = useState('');
       const [inputIndicatorType, setInputIndicatorType] = useState('');
       const [isStock, setIsStock] = useState(false);
+      const [isNotInDHIS2, setIsNotInDHIS2] = useState(false);
       const [inputIndicator, setInputIndicator] = useState('');
       const [inputIndicatorFr, setInputIndicatorFr] = useState('');
       const [type, setType] = useState('NEW');
@@ -36,6 +37,8 @@ const SettingIndicatorsMappingNew = ({
 
       const cleanAllState = () => {
             setSelectedIndicatorType('');
+            setIsNotInDHIS2(false);
+            setIsStock(false);
             setType('NEW');
             setInputIndicator('');
             setInputIndicatorFr('');
@@ -127,14 +130,16 @@ const SettingIndicatorsMappingNew = ({
                         ...currentItem,
                         name_fr: inputIndicatorFr?.trim(),
                         name: inputIndicator?.trim(),
-                        isStock
+                        isStock,
+                        isNotInDHIS2
                   };
             } else {
                   payload = {
                         id: uuid(),
                         name_fr: inputIndicatorFr?.trim(),
                         name: inputIndicator?.trim(),
-                        isStock
+                        isStock,
+                        isNotInDHIS2
                   };
             }
 
@@ -144,6 +149,7 @@ const SettingIndicatorsMappingNew = ({
                         {
                               id: uuid(),
                               isStock,
+                              isNotInDHIS2,
                               name_fr: translate('Initial_Stock'),
                               name: translate('Initial_Stock'),
                               initialStock: true,
@@ -152,6 +158,7 @@ const SettingIndicatorsMappingNew = ({
                         {
                               id: uuid(),
                               isStock,
+                              isNotInDHIS2,
                               distributedStock: true,
                               name_fr: translate('Distributed_Stock'),
                               name: translate('Distributed_Stock'),
@@ -160,6 +167,7 @@ const SettingIndicatorsMappingNew = ({
                         {
                               id: uuid(),
                               isStock,
+                              isNotInDHIS2,
                               receivedStock: true,
                               name_fr: translate('Received_Stock'),
                               name: translate('Received_Stock'),
@@ -168,6 +176,7 @@ const SettingIndicatorsMappingNew = ({
                         {
                               id: uuid(),
                               isStock,
+                              isNotInDHIS2,
                               restedStock: true,
                               name_fr: translate('Rested_Stock'),
                               name: translate('Rested_Stock'),
@@ -183,6 +192,7 @@ const SettingIndicatorsMappingNew = ({
             }
 
             setIsStock(false);
+            setIsNotInDHIS2(false);
             setInputIndicator('');
             setInputIndicatorFr('');
             setCurrentItem('');
@@ -307,7 +317,7 @@ const SettingIndicatorsMappingNew = ({
                                           {(selectedIndicatorType || inputIndicatorType) && (
                                                 <div style={{ display: 'flex', gap: '5px', alignItems: 'end' }}>
                                                       <div style={{ marginTop: '10px', width: '50%' }}>
-                                                            <div>{translate('Indicateur')} ( English )</div>
+                                                            <div>{translate('Indicateur')}</div>
                                                             <div style={{ marginTop: '5px' }}>
                                                                   <Input
                                                                         placeholder={translate('Name')}
@@ -318,7 +328,7 @@ const SettingIndicatorsMappingNew = ({
                                                                   />
                                                             </div>
                                                       </div>
-                                                      <div style={{ marginTop: '10px', width: '50%' }}>
+                                                      {/* <div style={{ marginTop: '10px', width: '50%' }}>
                                                             <div>{translate('Indicateur')} ( Français )</div>
                                                             <div style={{ marginTop: '5px' }}>
                                                                   <Input
@@ -329,9 +339,10 @@ const SettingIndicatorsMappingNew = ({
                                                                         }
                                                                   />
                                                             </div>
-                                                      </div>
+                                                      </div> */}
                                                       <div>
                                                             <Button
+                                                                  small
                                                                   primary
                                                                   disabled={
                                                                         currentItem
@@ -345,17 +356,6 @@ const SettingIndicatorsMappingNew = ({
                                                                                       )
                                                                                       .includes(
                                                                                             inputIndicator
-                                                                                                  ?.trim()
-                                                                                                  ?.toLowerCase()
-                                                                                      ) &&
-                                                                                !newIndicatorList
-                                                                                      .map(i =>
-                                                                                            i.name
-                                                                                                  ?.trim()
-                                                                                                  ?.toLowerCase()
-                                                                                      )
-                                                                                      .includes(
-                                                                                            inputIndicatorFr
                                                                                                   ?.trim()
                                                                                                   ?.toLowerCase()
                                                                                       )
@@ -380,7 +380,11 @@ const SettingIndicatorsMappingNew = ({
                                                                               />
                                                                         )
                                                                   }
-                                                            ></Button>
+                                                            >
+                                                                  {currentItem
+                                                                        ? translate('Update')
+                                                                        : translate('Ajouter')}
+                                                            </Button>
                                                       </div>
                                                 </div>
                                           )}
@@ -402,6 +406,23 @@ const SettingIndicatorsMappingNew = ({
                                                                   onChange={() => setIsStock(!isStock)}
                                                             />
                                                             <span>{translate('Is_Stock')}</span>
+                                                      </div>
+
+                                                      <div
+                                                            style={{
+                                                                  display: 'flex',
+                                                                  marginTop: '10px',
+                                                                  cursor: 'pointer',
+                                                                  gap: '10px',
+                                                                  alignItems: 'center'
+                                                            }}
+                                                            onClick={() => setIsNotInDHIS2(!isNotInDHIS2)}
+                                                      >
+                                                            <Checkbox
+                                                                  checked={isNotInDHIS2}
+                                                                  onChange={() => setIsNotInDHIS2(!isNotInDHIS2)}
+                                                            />
+                                                            <span>{translate('Does_not_exist_in_dhis2')}</span>
                                                       </div>
                                                 </>
                                           )}
@@ -474,9 +495,7 @@ const SettingIndicatorsMappingNew = ({
                                                                                                       color: '#00000099'
                                                                                                 }}
                                                                                           >
-                                                                                                {`${ind.name} / ${
-                                                                                                      ind.name_fr
-                                                                                                } ${
+                                                                                                {`${ind.name} ${
                                                                                                       ind.parent &&
                                                                                                       ind.isStock
                                                                                                             ? '(' +
@@ -512,6 +531,10 @@ const SettingIndicatorsMappingNew = ({
                                                                                                             );
                                                                                                             setIsStock(
                                                                                                                   ind.isStock ||
+                                                                                                                        false
+                                                                                                            );
+                                                                                                            setIsNotInDHIS2(
+                                                                                                                  ind.isNotInDHIS2 ||
                                                                                                                         false
                                                                                                             );
                                                                                                             setInputIndicator(

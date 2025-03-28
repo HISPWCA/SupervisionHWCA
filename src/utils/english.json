@@ -380,5 +380,7 @@
     "Received_Stock": "Quantity received",
     "Rested_Stock": "End balance",
     "Stock": "Stocks",
-    "Is_Stock": "Is Stock ?"
+    "Is_Stock": "Is Stock ?",
+    "Does_not_exist_in_dhis2":"Doesn't exist in DHIS2 ?",
+    "Update": "Update"
 }

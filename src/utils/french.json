@@ -382,5 +382,7 @@
     "Received_Stock": "Stock reçues",
     "Rested_Stock": "Stock restant",
     "Stock": "Stocks",
-    "Is_Stock": "C'est un Stock ?"
+    "Is_Stock": "C'est un Stock ?",
+    "Does_not_exist_in_dhis2": "N'existe pas dans le DHIS2 ?",
+    "Update":"Mèttre à jour"
 }

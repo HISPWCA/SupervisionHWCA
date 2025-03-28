@@ -517,56 +517,63 @@ const SettingIndicatorsMapping = () => {
                                                                                                 </div>
                                                                                           </Col>
                                                                                     )}
-                                                                                    {(!indicator.isStock ||
-                                                                                          (indicator.isStock &&
-                                                                                                indicator.parent)) && (
-                                                                                          <Col md={1}>
-                                                                                                <Button
-                                                                                                      primary
-                                                                                                      small
-                                                                                                      onClick={() => {
-                                                                                                            const currentIndicator =
-                                                                                                                  formState?.indicators?.find(
-                                                                                                                        it =>
-                                                                                                                              it.group ===
-                                                                                                                                    group.name &&
-                                                                                                                              it.indicator ===
-                                                                                                                                    indicator.id
+
+                                                                                    {indicator?.isNotInDHIS2 ===
+                                                                                    true ? (
+                                                                                          <Col md={1}></Col>
+                                                                                    ) : (
+                                                                                          (!indicator.isStock ||
+                                                                                                (indicator.isStock &&
+                                                                                                      indicator.parent)) && (
+                                                                                                <Col md={1}>
+                                                                                                      <Button
+                                                                                                            primary
+                                                                                                            small
+                                                                                                            onClick={() => {
+                                                                                                                  const currentIndicator =
+                                                                                                                        formState?.indicators?.find(
+                                                                                                                              it =>
+                                                                                                                                    it.group ===
+                                                                                                                                          group.name &&
+                                                                                                                                    it.indicator ===
+                                                                                                                                          indicator.id
+                                                                                                                        );
+
+                                                                                                                  setFormState(
+                                                                                                                        {
+                                                                                                                              ...formState,
+                                                                                                                              visibleAnalyticComponentModal: true,
+                                                                                                                              selectedMetaDatas:
+                                                                                                                                    currentIndicator?.dhis2
+                                                                                                                                          ? [
+                                                                                                                                                  currentIndicator?.dhis2
+                                                                                                                                            ]
+                                                                                                                                          : [],
+                                                                                                                              currentIndicator:
+                                                                                                                                    {
+                                                                                                                                          group: group.name,
+                                                                                                                                          indicator:
+                                                                                                                                                indicator.id
+                                                                                                                                    }
+                                                                                                                        }
                                                                                                                   );
 
-                                                                                                            setFormState(
-                                                                                                                  {
-                                                                                                                        ...formState,
-                                                                                                                        visibleAnalyticComponentModal: true,
-                                                                                                                        selectedMetaDatas:
-                                                                                                                              currentIndicator?.dhis2
-                                                                                                                                    ? [
-                                                                                                                                            currentIndicator?.dhis2
-                                                                                                                                      ]
-                                                                                                                                    : [],
-                                                                                                                        currentIndicator:
-                                                                                                                              {
-                                                                                                                                    group: group.name,
-                                                                                                                                    indicator:
-                                                                                                                                          indicator.id
-                                                                                                                              }
-                                                                                                                  }
-                                                                                                            );
-
-                                                                                                            setSelectedDataSet(
-                                                                                                                  currentIndicator.dataSet
-                                                                                                            );
-                                                                                                      }}
-                                                                                                      icon={
-                                                                                                            <TbSelect
-                                                                                                                  style={{
-                                                                                                                        fontSize: '18px'
-                                                                                                                  }}
-                                                                                                            />
-                                                                                                      }
-                                                                                                ></Button>
-                                                                                          </Col>
+                                                                                                                  setSelectedDataSet(
+                                                                                                                        currentIndicator.dataSet
+                                                                                                                  );
+                                                                                                            }}
+                                                                                                            icon={
+                                                                                                                  <TbSelect
+                                                                                                                        style={{
+                                                                                                                              fontSize: '18px'
+                                                                                                                        }}
+                                                                                                                  />
+                                                                                                            }
+                                                                                                      ></Button>
+                                                                                                </Col>
+                                                                                          )
                                                                                     )}
+
                                                                                     {(!indicator.isStock ||
                                                                                           (indicator.isStock &&
                                                                                                 indicator.parent)) && (
