@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Card, Col, DatePicker, Popconfirm, Row, Select, Table, Tooltip } from 'antd';
+import { Card, Col, DatePicker, Row, Select, Table, Tooltip } from 'antd';
 import { Calendar, dayjsLocalizer } from 'react-big-calendar';
 import ReactEchart from 'echarts-for-react';
 import axios from 'axios';
@@ -64,7 +64,6 @@ export const Dashboard = ({ me }) => {
       const [organisationUnits, setOrganisationUnits] = useState([]);
       const [users, setUsers] = useState([]);
       const [dataStoreSupervisionsConfigs, setDataStoreSupervisionsConfigs] = useState([]);
-      const [_, setDataStoreSupervisionPlanifications] = useState([]);
       const [teiList, setTeiList] = useState([]);
       const [noticeBox, setNoticeBox] = useState({
             show: false,
@@ -82,118 +81,16 @@ export const Dashboard = ({ me }) => {
       const [statusPaymentOptions, setStatusPaymentOptions] = useState([]);
 
       const [selectedOrganisationUnit, setSelectedOrganisationUnit] = useState(null);
-      const [selectedPlanification, setSelectedPlanification] = useState(MES_PLANIFICATIONS);
+      const [selectedPlanification, setSelectedPlanification] = useState(PLANIFICATION_PAR_TOUS);
       const [selectedPeriod, setSelectedPeriod] = useState(dayjs(new Date()));
-      const [selectedPlanificationUser, setSelectedPlanificationUser] = useState(null);
-      const [selectedSupervisors, setSelectedSupervisors] = useState([]);
       const [selectedProgram, setSelectedProgram] = useState(null);
 
       const [loadingOrganisationUnits, setLoadingOrganisationUnits] = useState(false);
       const [loadingUsers, setLoadingUsers] = useState(false);
-      const [loadingDataStoreSupervisionPlanifications, setLoadingDataStoreSupervisionPlanifications] = useState(false);
       const [loadingDataStoreSupervisionsConfigs, setLoadingDataStoreSupervisionsConfigs] = useState(false);
       const [loadingTeiList, setLoadingTeiList] = useState(false);
 
       const colors = ['#5470C6', '#EE6666'];
-
-      const analyleLineOptions = {
-            color: colors,
-            tooltip: {
-                  trigger: 'none',
-                  axisPointer: {
-                        type: 'cross'
-                  }
-            },
-            legend: {},
-            grid: {
-                  top: 70,
-                  bottom: 50
-            },
-            xAxis: [
-                  {
-                        type: 'category',
-                        axisTick: {
-                              alignWithLabel: true
-                        },
-                        axisLine: {
-                              onZero: false,
-                              lineStyle: {
-                                    color: colors[1]
-                              }
-                        },
-                        axisPointer: {
-                              label: {
-                                    formatter: function (params) {
-                                          return (
-                                                'Precipitation  ' +
-                                                params.value +
-                                                (params.seriesData.length ? '：' + params.seriesData[0].data : '')
-                                          );
-                                    }
-                              }
-                        },
-                        // prettier-ignore
-                        data: ['2016-1', '2016-2', '2016-3', '2016-4', '2016-5', '2016-6', '2016-7', '2016-8', '2016-9', '2016-10', '2016-11', '2016-12']
-                  },
-                  {
-                        type: 'category',
-                        axisTick: {
-                              alignWithLabel: true
-                        },
-                        axisLine: {
-                              onZero: false,
-                              lineStyle: {
-                                    color: colors[0]
-                              }
-                        },
-                        axisPointer: {
-                              label: {
-                                    formatter: function (params) {
-                                          return (
-                                                'Precipitation  ' +
-                                                params.value +
-                                                (params.seriesData.length ? '：' + params.seriesData[0].data : '')
-                                          );
-                                    }
-                              }
-                        },
-                        // prettier-ignore
-                        data: ['2015-1', '2015-2', '2015-3', '2015-4', '2015-5', '2015-6', '2015-7', '2015-8', '2015-9', '2015-10', '2015-11', '2015-12']
-                  }
-            ],
-            yAxis: [
-                  {
-                        type: 'value'
-                  }
-            ],
-            series: [
-                  {
-                        name: 'Precipitation(2015)',
-                        type: 'line',
-                        xAxisIndex: 1,
-                        smooth: true,
-                        emphasis: {
-                              focus: 'series'
-                        },
-                        data: [2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3]
-                  },
-                  {
-                        name: 'Precipitation(2016)',
-                        type: 'line',
-                        smooth: true,
-                        emphasis: {
-                              focus: 'series'
-                        },
-                        data: [3.9, 5.9, 11.1, 18.7, 48.3, 69.2, 231.6, 46.6, 55.4, 18.4, 10.3, 0.7]
-                  }
-            ]
-      };
-
-      const coordinates = [
-            { latitude: '7.653044', longitude: '1.047232' },
-            { latitude: '7.616294', longitude: '1.126936' },
-            { latitude: '7.582263', longitude: '1.508966' }
-      ];
 
       const loadOrganisationUnits = async () => {
             try {
@@ -208,7 +105,7 @@ export const Dashboard = ({ me }) => {
                         const currentProgram = progs[0];
                         const currentOrgUnit = orgUnits.find(ou => ou.id === me?.organisationUnits?.[0]?.id);
                         const currentPeriod = dayjs();
-                        const currentPlanification = MES_PLANIFICATIONS;
+                        const currentPlanification = PLANIFICATION_PAR_TOUS;
 
                         if (currentProgram) {
                               setSelectedProgram(currentProgram);
@@ -272,7 +169,6 @@ export const Dashboard = ({ me }) => {
             }
       };
 
-
       const loadUsers = async userOrgUnitId => {
             try {
                   if (userOrgUnitId) {
@@ -296,10 +192,6 @@ export const Dashboard = ({ me }) => {
       const handleSelectedPeriod = event => {
             setSelectedPeriod(dayjs(event));
       };
-
-      const handleSelectSupervisor = values => setSelectedSupervisors(values.map(sup => users.find(u => u.id === sup)));
-
-      const handleSelectPlanificationUser = value => setSelectedPlanificationUser(users.find(u => u.id === value));
 
       const filterAndGetPlanfications = () =>
             teiList
@@ -640,60 +532,6 @@ export const Dashboard = ({ me }) => {
             ]
       });
 
-      const getPieChartDatasForPayment = () => ({
-            title: {
-                  text: translate('Paiement'),
-                  left: 'center'
-            },
-
-            tooltip: {
-                  trigger: 'item'
-            },
-
-            legend: {
-                  orient: 'vertical',
-                  bottom: '10',
-                  left: 'left'
-            },
-
-            color: statusPaymentOptions.map(option => getStatusNameAndColorForPayment(option.code).color.background),
-
-            series: [
-                  {
-                        type: 'pie',
-                        radius: '65%',
-                        center: ['50%', '50%'],
-                        selectedMode: 'single',
-                        label: { show: false },
-                        data: statusPaymentOptions.map(option => {
-                              const statusPayload = filterAndGetPlanfications().reduce((prev, curr) => {
-                                    if (curr.statusPayment && prev[`${curr.statusPayment}`]) {
-                                          prev[`${curr.statusPayment}`] = {
-                                                name: getStatusNameAndColorForPayment(curr.statusPayment)?.name,
-                                                value: prev[`${curr.statusPayment}`].value + 1
-                                          };
-                                    } else {
-                                          prev[`${curr.statusPayment}`] = {
-                                                name: getStatusNameAndColorForPayment(curr.statusPayment)?.name,
-                                                value: 1
-                                          };
-                                    }
-
-                                    return prev;
-                              }, {});
-                              return statusPayload[option.code] || { name: option.displayName, value: 0 };
-                        }),
-                        emphasis: {
-                              itemStyle: {
-                                    shadowBlur: 30,
-                                    shadowOffsetX: 0,
-                                    shadowColor: `${BLACK}50`
-                              }
-                        }
-                  }
-            ]
-      });
-
       const calculatePourcentageOfSupervision = value => {
             const list = [
                   { id: null, displayName: translate(SCHEDULED.name), code: SCHEDULED.value },
@@ -773,7 +611,6 @@ export const Dashboard = ({ me }) => {
 
       const getCalendarEvents = () =>
             filterAndGetPlanfications().map(planification => ({
-                  // id: planification.trackedEntityInstance,
                   id: uuid(),
                   allDay: true,
                   title: (
@@ -786,11 +623,14 @@ export const Dashboard = ({ me }) => {
                                           ?.background,
                                     color: getStatusNameAndColor(planification.statusSupervision)?.color?.text,
                                     margin: '0px',
-                                    padding: '3px'
+                                    padding: '3px',
+                                    display: 'flex',
+                                    gap: '5px',
+                                    alignItems: 'center'
                               }}
                         >
-                              {' '}
-                              {planification.libelle}
+                              <span>{planification.libelle}</span>
+                              <span style={{ fontSize: '10px' }}>( {selectedProgram?.program?.displayName} )</span>
                         </div>
                   ),
                   start: dayjs(planification.period).format('YYYY-MM-DD HH:mm:ss'),
@@ -1490,10 +1330,12 @@ export const Dashboard = ({ me }) => {
             <>
                   <div style={{ padding: '10px', width: '100%' }}>
                         {RenderFilters()}
+
                         <Row gutter={[8, 8]}>
                               {RenderCalendar()}
                               {RenderCharts()}
                         </Row>
+
                         {RenderNoticeBox()}
                         <MyNotification notification={notification} setNotification={setNotification} />
                   </div>
