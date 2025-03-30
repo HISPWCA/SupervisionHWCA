@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Card, Col, DatePicker, Row, Select, Table, Tooltip } from 'antd';
+import { Card, Col, DatePicker, Popover, Row, Select, Table, Tooltip } from 'antd';
 import { Calendar, dayjsLocalizer } from 'react-big-calendar';
 import ReactEchart from 'echarts-for-react';
 import axios from 'axios';
@@ -614,24 +614,51 @@ export const Dashboard = ({ me }) => {
                   id: uuid(),
                   allDay: true,
                   title: (
-                        <div
-                              style={{
-                                    fontWeight: 'bold',
-                                    fontSize: '12px',
-                                    borderRadius: '5px',
-                                    backgroundColor: getStatusNameAndColor(planification.statusSupervision)?.color
-                                          ?.background,
-                                    color: getStatusNameAndColor(planification.statusSupervision)?.color?.text,
-                                    margin: '0px',
-                                    padding: '3px',
-                                    display: 'flex',
-                                    gap: '5px',
-                                    alignItems: 'center'
-                              }}
-                        >
-                              <span>{planification.libelle}</span>
-                              <span style={{ fontSize: '10px' }}>( {selectedProgram?.program?.displayName} )</span>
-                        </div>
+                        <>
+                              <Popover
+                                    content={
+                                          <div
+                                                style={{
+                                                      fontWeight: 'bold',
+                                                      color: getStatusNameAndColor(planification.statusSupervision)
+                                                            ?.color?.text
+                                                }}
+                                          >{`${planification.libelle}  (  ${selectedProgram?.program?.displayName} )`}</div>
+                                    }
+                                    color={getStatusNameAndColor(planification.statusSupervision)?.color?.background}
+                              >
+                                    <div
+                                          style={{
+                                                fontWeight: 'bold',
+                                                fontSize: '12px',
+                                                borderRadius: '5px',
+                                                backgroundColor: getStatusNameAndColor(planification.statusSupervision)
+                                                      ?.color?.background,
+                                                color: getStatusNameAndColor(planification.statusSupervision)?.color
+                                                      ?.text,
+                                                margin: '0px',
+                                                padding: '1px',
+                                                display: 'flex',
+                                                gap: '1px',
+                                                alignItems: 'center'
+                                          }}
+                                          className="text-truncate-one"
+                                    >
+                                          <span>{planification.libelle}</span>
+                                          <span
+                                                style={{
+                                                      background: '#fff',
+                                                      color: '#000',
+                                                      padding: '1px',
+                                                      borderRadius: '15px',
+                                                      fontSize: '10px'
+                                                }}
+                                          >
+                                                ( {selectedProgram?.program?.displayName} )
+                                          </span>
+                                    </div>
+                              </Popover>
+                        </>
                   ),
                   start: dayjs(planification.period).format('YYYY-MM-DD HH:mm:ss'),
                   end: dayjs(planification.period).format('YYYY-MM-DD HH:mm:ss')
@@ -654,7 +681,8 @@ export const Dashboard = ({ me }) => {
                                     events={getCalendarEvents()}
                                     startAccessor="start"
                                     endAccessor="end"
-                                    style={{ height: '445px' }}
+                                    style={{ height: '500px' }}
+                                    popup={true}
                                     date={dayjs(calendarDate).format('YYYY-MM-DD')}
                                     onNavigate={(newDate, view, action) => {
                                           setCalendarDate(dayjs(newDate));
@@ -668,7 +696,7 @@ export const Dashboard = ({ me }) => {
                                                 );
                                           }
                                     }}
-                                    selectable
+                                    // selectable
                               />
                         </div>
                   </div>
@@ -1145,7 +1173,12 @@ export const Dashboard = ({ me }) => {
                                     <Table
                                           size="small"
                                           columns={columns()}
-                                          dataSource={getFiveLastPlanifications()}
+                                          dataSource={
+                                                getFiveLastPlanifications()?.map(i => ({
+                                                      ...i,
+                                                      nom: `${i.nom} ( ${selectedProgram?.program?.displayName} )`
+                                                })) || []
+                                          }
                                           pagination={false}
                                           style={{ height: '100%' }}
                                     />
