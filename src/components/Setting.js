@@ -920,7 +920,9 @@ const Setting = () => {
                   consistencyOvertimes: [],
                   indicators: [],
                   isFieldEditingMode: false,
-                  recoupements: []
+                  recoupements: [],
+                  selectedSupervisionAutoGenerateID: null,
+                  selectedNbrIndicatorsToShow: null
             });
             setCurrentProgramstageConfiguration(null);
             setProgramStageConfigurations([]);
@@ -1600,13 +1602,6 @@ const Setting = () => {
             });
       };
 
-      const handleSelectOrganisationUnitGroupProgramStage = value => {
-            setFormState({
-                  ...formState,
-                  selectedOrganisationUnitGroup: organisationUnitGroups.find(orgUnitGroup => orgUnitGroup.id === value)
-            });
-      };
-
       const handleSelectOrganisationUnitGroupProgramStageForRDQA = value => {
             setFormStateForRDQA({
                   ...formStateForRDQA,
@@ -1773,7 +1768,7 @@ const Setting = () => {
                   setCurrentProgramstageConfiguration(null);
                   setCurrentProgramstageConfigurationForRDQA(null);
 
-                  if (prog?.configurationType === DQR) {
+                  if (prog?.configurationType === DQR || prog?.configurationType === NORMAL_PROGRAM) {
                         setFormState({
                               ...formState,
                               selectedTEIProgram: programs.find(p => p.id === prog.program?.id),
@@ -1809,7 +1804,9 @@ const Setting = () => {
                   }
 
                   setProgramStageConfigurations(prog.programStageConfigurations || []);
-                  initialiserNumberOfIndicatorAndRecoupement(dataStoreGlobalSettings);
+                  if (prog?.configurationType !== NORMAL_PROGRAM) {
+                        initialiserNumberOfIndicatorAndRecoupement(dataStoreGlobalSettings);
+                  }
             } catch (err) {
                   setNotification({
                         show: true,
@@ -1824,7 +1821,10 @@ const Setting = () => {
                   const foundProgramStage = programStages.find(p => p.id === value.programStage?.id);
                   if (!foundProgramStage) throw new Error('No program stage found ');
 
-                  if (formState?.selectedConfigurationType === DQR) {
+                  if (
+                        formState?.selectedConfigurationType === DQR ||
+                        formState?.selectedConfigurationType === NORMAL_PROGRAM
+                  ) {
                         setFormState({
                               ...formState,
                               selectedProgramStageForConfiguration: foundProgramStage,
