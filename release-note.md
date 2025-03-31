@@ -2,5 +2,7 @@
 
 ### Functionalities
 
-- Hiden program from supervision Schedule page and allow displaying of all supervision from all program.
-- Adding program name on each planification on calendar.
+- Adding support of Simple Supervision Program
+- Adding new Option to type of program in order to support Simple supervions Program
+- Hide Favorites while planification for a supervision in case of Simple supervision program type 
+- Hide recente supervision verification period in case of Simple supervision program type

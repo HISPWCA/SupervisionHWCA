@@ -1731,6 +1731,20 @@ const Setting = () => {
                                                       checked={formState?.selectedConfigurationType === DQR}
                                                 />
                                           </div>
+                                          <div style={{ marginTop: '5px' }}>
+                                                <Radio
+                                                      disabled={formState?.isFieldEditingMode}
+                                                      label={translate('Configuration_DQR_Case')}
+                                                      onChange={({ value }) =>
+                                                            setFormState({
+                                                                  ...formState,
+                                                                  selectedConfigurationType: value
+                                                            })
+                                                      }
+                                                      value={DQR}
+                                                      checked={formState?.selectedConfigurationType === DQR}
+                                                />
+                                          </div>
                                     </div>
                               </div>
                         )}
