@@ -155,7 +155,6 @@
     "Agregee": "Aggregate",
     "Indicateur_Programme": "Program Indicator",
     "Type_De_Supervision": "Type of supervision",
-    "Configuration_Des_Indicateurs": "Indicator configuration",
     "Parametre_Supervision": "Supervision settings",
     "Analyses": "Analysis",
     "Type_Element": "Element type",
@@ -381,6 +380,7 @@
     "Rested_Stock": "End balance",
     "Stock": "Stocks",
     "Is_Stock": "Is Stock ?",
-    "Does_not_exist_in_dhis2":"Doesn't exist in DHIS2 ?",
-    "Update": "Update"
+    "Does_not_exist_in_dhis2": "Doesn't exist in DHIS2 ?",
+    "Update": "Update",
+    "Configuration_Normal_Case": "Configuration type Normal Supervision Program"
 }

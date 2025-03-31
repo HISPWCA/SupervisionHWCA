@@ -22,7 +22,8 @@ import {
       PAGE_INDICATORS_MAPPING,
       RDQA,
       ERDQ,
-      PERIOD_LIST
+      PERIOD_LIST,
+      NORMAL_PROGRAM
 } from '../utils/constants';
 import { Card, Checkbox, Col, Divider, Input, InputNumber, Popconfirm, Row, Select, Table } from 'antd';
 import {
@@ -119,8 +120,6 @@ const Setting = () => {
       const [loadingVis, setLoadingVis] = useState(false);
       const [updateAllFieldsWhenHaveOneStage, setUpdateAllFieldsWhenHaveOneStage] = useState(false);
 
-      const [displayVisualizationOrMapsModal, setDisplayVisualizationOrMapsModal] = useState(false);
-      const [visType, setVisType] = useState('');
       const [inputSearchVis, setInputSearchVis] = useState('');
       const [timoutID, setTimoutID] = useState(null);
       const [visElementList, setVisElementList] = useState(null);
@@ -934,7 +933,11 @@ const Setting = () => {
 
                   if (!formState?.selectedTEIProgram) throw new Error(translate('Veuillez_Selectionner_Un_Programme'));
 
-                  if (formState?.selectedConfigurationType === DQR && !formState?.selectedProgramStageForConfiguration)
+                  if (
+                        (formState?.selectedConfigurationType === DQR ||
+                              formState?.selectedConfigurationType === NORMAL_PROGRAM) &&
+                        !formState?.selectedProgramStageForConfiguration
+                  )
                         throw new Error(translate('Please_Select_Program_Stage'));
 
                   if (
@@ -947,7 +950,8 @@ const Setting = () => {
                         throw new Error(translate('Please_Select_Organisation_Unit_Group'));
 
                   if (
-                        formState?.selectedConfigurationType === DQR &&
+                        (formState?.selectedConfigurationType === DQR ||
+                              formState?.selectedConfigurationType === NORMAL_PROGRAM) &&
                         formState?.selectedSupervisorDataElements?.length === 0
                   )
                         throw new Error(translate('Please_Select_Supervisor_Fields'));
@@ -970,7 +974,8 @@ const Setting = () => {
                   );
 
                   if (
-                        formState?.selectedConfigurationType === DQR &&
+                        (formState?.selectedConfigurationType === DQR ||
+                              formState?.selectedConfigurationType === NORMAL_PROGRAM) &&
                         !formState?.isFieldEditingMode &&
                         existingConfig &&
                         existingConfig.programStageConfigurations
@@ -994,7 +999,10 @@ const Setting = () => {
                   let newProgramStageConfigurations = [];
 
                   // Case of DQR
-                  if (formState?.selectedConfigurationType === DQR) {
+                  if (
+                        formState?.selectedConfigurationType === DQR ||
+                        formState?.selectedConfigurationType === NORMAL_PROGRAM
+                  ) {
                         newProgramStageConfigurations = existingConfig
                               ? formState?.isFieldEditingMode && currentProgramstageConfiguration
                                     ? programStageConfigurations.map(p => {
@@ -1146,7 +1154,8 @@ const Setting = () => {
                         planificationType: formState.selectedPlanificationType,
                         configurationType: formState.selectedConfigurationType,
                         selectedSupervisionAutoGenerateID:
-                              formState?.selectedConfigurationType === DQR
+                              formState?.selectedConfigurationType === DQR ||
+                              formState?.selectedConfigurationType === NORMAL_PROGRAM
                                     ? formState.selectedSupervisionAutoGenerateID
                                     : formStateForRDQA.selectedSupervisionAutoGenerateID,
                         program: {
@@ -1163,7 +1172,10 @@ const Setting = () => {
                         }))
                   };
 
-                  if (formState?.selectedConfigurationType === DQR) {
+                  if (
+                        formState?.selectedConfigurationType === DQR ||
+                        formState?.selectedConfigurationType === NORMAL_PROGRAM
+                  ) {
                         if (
                               formState.selectedProgramStageForConfiguration &&
                               formState.selectedSupervisorDataElements?.length > 0
@@ -1246,7 +1258,10 @@ const Setting = () => {
                         null
                   );
 
-                  if (formState?.selectedConfigurationType === DQR) {
+                  if (
+                        formState?.selectedConfigurationType === DQR ||
+                        formState?.selectedConfigurationType === NORMAL_PROGRAM
+                  ) {
                         const newPeriodConfigPayload = {
                               ...dataStorePeriodConfigs,
                               month1KeyWords: periodFormState.month1KeyWords,
@@ -1734,15 +1749,15 @@ const Setting = () => {
                                           <div style={{ marginTop: '5px' }}>
                                                 <Radio
                                                       disabled={formState?.isFieldEditingMode}
-                                                      label={translate('Configuration_DQR_Case')}
+                                                      label={translate('Configuration_Normal_Case')}
                                                       onChange={({ value }) =>
                                                             setFormState({
                                                                   ...formState,
                                                                   selectedConfigurationType: value
                                                             })
                                                       }
-                                                      value={DQR}
-                                                      checked={formState?.selectedConfigurationType === DQR}
+                                                      value={NORMAL_PROGRAM}
+                                                      checked={formState?.selectedConfigurationType === NORMAL_PROGRAM}
                                                 />
                                           </div>
                                     </div>
@@ -2039,289 +2054,247 @@ const Setting = () => {
                                                                         </td>
                                                                   </tr>
 
-                                                                  <tr>
-                                                                        <td
-                                                                              style={{
-                                                                                    border: '1px solid #00000070',
-                                                                                    padding: '2px 5px',
-                                                                                    verticalAlign: 'top',
-                                                                                    width: '50%'
-                                                                              }}
-                                                                        >
-                                                                              {translate('How_Many_Indicators')}
-                                                                        </td>
-                                                                        <td
-                                                                              style={{
-                                                                                    border: '1px solid #00000070',
-                                                                                    padding: '2px 5px',
-                                                                                    verticalAlign: 'top'
-                                                                              }}
-                                                                        >
-                                                                              <Select
-                                                                                    options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
-                                                                                          progStageDE => ({
-                                                                                                label: progStageDE
-                                                                                                      .dataElement
-                                                                                                      ?.displayName,
-                                                                                                value: progStageDE
-                                                                                                      .dataElement?.id
-                                                                                          })
-                                                                                    )}
-                                                                                    placeholder={translate(
-                                                                                          'How_Many_Indicators'
-                                                                                    )}
-                                                                                    style={{ width: '100%' }}
-                                                                                    onChange={value => {
-                                                                                          setFormState({
-                                                                                                ...formState,
-                                                                                                selectedNbrIndicatorsToShow:
-                                                                                                      formState?.selectedProgramStageForConfiguration?.programStageDataElements
-                                                                                                            ?.map(
-                                                                                                                  p =>
-                                                                                                                        p.dataElement
-                                                                                                            )
-                                                                                                            .find(
-                                                                                                                  dataElement =>
-                                                                                                                        dataElement.id ===
-                                                                                                                        value
-                                                                                                            )
-                                                                                          });
+                                                                  {formState?.selectedConfigurationType !==
+                                                                        NORMAL_PROGRAM && (
+                                                                        <tr>
+                                                                              <td
+                                                                                    style={{
+                                                                                          border: '1px solid #00000070',
+                                                                                          padding: '2px 5px',
+                                                                                          verticalAlign: 'top',
+                                                                                          width: '50%'
                                                                                     }}
-                                                                                    value={
-                                                                                          formState
-                                                                                                ?.selectedNbrIndicatorsToShow
-                                                                                                ?.id
-                                                                                    }
-                                                                                    optionFilterProp="label"
-                                                                                    showSearch
-                                                                                    allowClear
-                                                                              />
-                                                                        </td>
-                                                                  </tr>
-                                                                  <tr>
-                                                                        <td
-                                                                              style={{
-                                                                                    border: '1px solid #00000070',
-                                                                                    padding: '2px 5px',
-                                                                                    verticalAlign: 'top',
-                                                                                    width: '50%'
-                                                                              }}
-                                                                        >
-                                                                              {translate('How_Many_Document_Source')}
-                                                                        </td>
-                                                                        <td
-                                                                              style={{
-                                                                                    border: '1px solid #00000070',
-                                                                                    padding: '2px 5px',
-                                                                                    verticalAlign: 'top'
-                                                                              }}
-                                                                        >
-                                                                              <Select
-                                                                                    options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
-                                                                                          progStageDE => ({
-                                                                                                label: progStageDE
-                                                                                                      .dataElement
-                                                                                                      ?.displayName,
-                                                                                                value: progStageDE
-                                                                                                      .dataElement?.id
-                                                                                          })
-                                                                                    )}
-                                                                                    placeholder={translate(
+                                                                              >
+                                                                                    {translate('How_Many_Indicators')}
+                                                                              </td>
+                                                                              <td
+                                                                                    style={{
+                                                                                          border: '1px solid #00000070',
+                                                                                          padding: '2px 5px',
+                                                                                          verticalAlign: 'top'
+                                                                                    }}
+                                                                              >
+                                                                                    <Select
+                                                                                          options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                                                progStageDE => ({
+                                                                                                      label: progStageDE
+                                                                                                            .dataElement
+                                                                                                            ?.displayName,
+                                                                                                      value: progStageDE
+                                                                                                            .dataElement
+                                                                                                            ?.id
+                                                                                                })
+                                                                                          )}
+                                                                                          placeholder={translate(
+                                                                                                'How_Many_Indicators'
+                                                                                          )}
+                                                                                          style={{ width: '100%' }}
+                                                                                          onChange={value => {
+                                                                                                setFormState({
+                                                                                                      ...formState,
+                                                                                                      selectedNbrIndicatorsToShow:
+                                                                                                            formState?.selectedProgramStageForConfiguration?.programStageDataElements
+                                                                                                                  ?.map(
+                                                                                                                        p =>
+                                                                                                                              p.dataElement
+                                                                                                                  )
+                                                                                                                  .find(
+                                                                                                                        dataElement =>
+                                                                                                                              dataElement.id ===
+                                                                                                                              value
+                                                                                                                  )
+                                                                                                });
+                                                                                          }}
+                                                                                          value={
+                                                                                                formState
+                                                                                                      ?.selectedNbrIndicatorsToShow
+                                                                                                      ?.id
+                                                                                          }
+                                                                                          optionFilterProp="label"
+                                                                                          showSearch
+                                                                                          allowClear
+                                                                                    />
+                                                                              </td>
+                                                                        </tr>
+                                                                  )}
+
+                                                                  {formState?.selectedConfigurationType !==
+                                                                        NORMAL_PROGRAM && (
+                                                                        <tr>
+                                                                              <td
+                                                                                    style={{
+                                                                                          border: '1px solid #00000070',
+                                                                                          padding: '2px 5px',
+                                                                                          verticalAlign: 'top',
+                                                                                          width: '50%'
+                                                                                    }}
+                                                                              >
+                                                                                    {translate(
                                                                                           'How_Many_Document_Source'
                                                                                     )}
-                                                                                    style={{ width: '100%' }}
-                                                                                    onChange={value => {
-                                                                                          setFormState({
-                                                                                                ...formState,
-                                                                                                completeness: {
-                                                                                                      ...formState?.completeness,
-                                                                                                      selectedNbrDocumentsSourceToShow:
-                                                                                                            formState?.selectedProgramStageForConfiguration?.programStageDataElements
-                                                                                                                  ?.map(
-                                                                                                                        p =>
-                                                                                                                              p.dataElement
-                                                                                                                  )
-                                                                                                                  .find(
-                                                                                                                        dataElement =>
-                                                                                                                              dataElement.id ===
-                                                                                                                              value
-                                                                                                                  )
-                                                                                                }
-                                                                                          });
+                                                                              </td>
+                                                                              <td
+                                                                                    style={{
+                                                                                          border: '1px solid #00000070',
+                                                                                          padding: '2px 5px',
+                                                                                          verticalAlign: 'top'
                                                                                     }}
-                                                                                    value={
-                                                                                          formState?.completeness
-                                                                                                ?.selectedNbrDocumentsSourceToShow
-                                                                                                ?.id
-                                                                                    }
-                                                                                    optionFilterProp="label"
-                                                                                    showSearch
-                                                                                    allowClear
-                                                                              />
-                                                                        </td>
-                                                                  </tr>
+                                                                              >
+                                                                                    <Select
+                                                                                          options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                                                progStageDE => ({
+                                                                                                      label: progStageDE
+                                                                                                            .dataElement
+                                                                                                            ?.displayName,
+                                                                                                      value: progStageDE
+                                                                                                            .dataElement
+                                                                                                            ?.id
+                                                                                                })
+                                                                                          )}
+                                                                                          placeholder={translate(
+                                                                                                'How_Many_Document_Source'
+                                                                                          )}
+                                                                                          style={{ width: '100%' }}
+                                                                                          onChange={value => {
+                                                                                                setFormState({
+                                                                                                      ...formState,
+                                                                                                      completeness: {
+                                                                                                            ...formState?.completeness,
+                                                                                                            selectedNbrDocumentsSourceToShow:
+                                                                                                                  formState?.selectedProgramStageForConfiguration?.programStageDataElements
+                                                                                                                        ?.map(
+                                                                                                                              p =>
+                                                                                                                                    p.dataElement
+                                                                                                                        )
+                                                                                                                        .find(
+                                                                                                                              dataElement =>
+                                                                                                                                    dataElement.id ===
+                                                                                                                                    value
+                                                                                                                        )
+                                                                                                      }
+                                                                                                });
+                                                                                          }}
+                                                                                          value={
+                                                                                                formState?.completeness
+                                                                                                      ?.selectedNbrDocumentsSourceToShow
+                                                                                                      ?.id
+                                                                                          }
+                                                                                          optionFilterProp="label"
+                                                                                          showSearch
+                                                                                          allowClear
+                                                                                    />
+                                                                              </td>
+                                                                        </tr>
+                                                                  )}
 
-                                                                  <tr>
-                                                                        <td
-                                                                              style={{
-                                                                                    border: '1px solid #00000070',
-                                                                                    padding: '2px 5px',
-                                                                                    verticalAlign: 'top',
-                                                                                    width: '50%'
-                                                                              }}
-                                                                        >
-                                                                              {translate('How_Many_Data_Element')}
-                                                                        </td>
-                                                                        <td
-                                                                              style={{
-                                                                                    border: '1px solid #00000070',
-                                                                                    padding: '2px 5px',
-                                                                                    verticalAlign: 'top'
-                                                                              }}
-                                                                        >
-                                                                              <Select
-                                                                                    options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
-                                                                                          progStageDE => ({
-                                                                                                label: progStageDE
-                                                                                                      .dataElement
-                                                                                                      ?.displayName,
-                                                                                                value: progStageDE
-                                                                                                      .dataElement?.id
-                                                                                          })
-                                                                                    )}
-                                                                                    placeholder={translate(
-                                                                                          'How_Many_Data_Element'
-                                                                                    )}
-                                                                                    style={{ width: '100%' }}
-                                                                                    onChange={value => {
-                                                                                          setFormState({
-                                                                                                ...formState,
-                                                                                                completeness: {
-                                                                                                      ...formState?.completeness,
-                                                                                                      selectedNbrDataElementsToShow:
-                                                                                                            formState?.selectedProgramStageForConfiguration?.programStageDataElements
-                                                                                                                  ?.map(
-                                                                                                                        p =>
-                                                                                                                              p.dataElement
-                                                                                                                  )
-                                                                                                                  .find(
-                                                                                                                        dataElement =>
-                                                                                                                              dataElement.id ===
-                                                                                                                              value
-                                                                                                                  )
-                                                                                                }
-                                                                                          });
+                                                                  {formState?.selectedConfigurationType !==
+                                                                        NORMAL_PROGRAM && (
+                                                                        <tr>
+                                                                              <td
+                                                                                    style={{
+                                                                                          border: '1px solid #00000070',
+                                                                                          padding: '2px 5px',
+                                                                                          verticalAlign: 'top',
+                                                                                          width: '50%'
                                                                                     }}
-                                                                                    value={
-                                                                                          formState?.completeness
-                                                                                                .selectedNbrDataElementsToShow
-                                                                                                ?.id
-                                                                                    }
-                                                                                    optionFilterProp="label"
-                                                                                    showSearch
-                                                                                    allowClear
-                                                                              />
-                                                                        </td>
-                                                                  </tr>
+                                                                              >
+                                                                                    {translate('How_Many_Data_Element')}
+                                                                              </td>
+                                                                              <td
+                                                                                    style={{
+                                                                                          border: '1px solid #00000070',
+                                                                                          padding: '2px 5px',
+                                                                                          verticalAlign: 'top'
+                                                                                    }}
+                                                                              >
+                                                                                    <Select
+                                                                                          options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                                                progStageDE => ({
+                                                                                                      label: progStageDE
+                                                                                                            .dataElement
+                                                                                                            ?.displayName,
+                                                                                                      value: progStageDE
+                                                                                                            .dataElement
+                                                                                                            ?.id
+                                                                                                })
+                                                                                          )}
+                                                                                          placeholder={translate(
+                                                                                                'How_Many_Data_Element'
+                                                                                          )}
+                                                                                          style={{ width: '100%' }}
+                                                                                          onChange={value => {
+                                                                                                setFormState({
+                                                                                                      ...formState,
+                                                                                                      completeness: {
+                                                                                                            ...formState?.completeness,
+                                                                                                            selectedNbrDataElementsToShow:
+                                                                                                                  formState?.selectedProgramStageForConfiguration?.programStageDataElements
+                                                                                                                        ?.map(
+                                                                                                                              p =>
+                                                                                                                                    p.dataElement
+                                                                                                                        )
+                                                                                                                        .find(
+                                                                                                                              dataElement =>
+                                                                                                                                    dataElement.id ===
+                                                                                                                                    value
+                                                                                                                        )
+                                                                                                      }
+                                                                                                });
+                                                                                          }}
+                                                                                          value={
+                                                                                                formState?.completeness
+                                                                                                      .selectedNbrDataElementsToShow
+                                                                                                      ?.id
+                                                                                          }
+                                                                                          optionFilterProp="label"
+                                                                                          showSearch
+                                                                                          allowClear
+                                                                                    />
+                                                                              </td>
+                                                                        </tr>
+                                                                  )}
 
-                                                                  <tr>
-                                                                        <td
-                                                                              style={{
-                                                                                    border: '1px solid #00000070',
-                                                                                    padding: '2px 5px',
-                                                                                    verticalAlign: 'top',
-                                                                                    width: '50%'
-                                                                              }}
-                                                                        >
-                                                                              {translate('Recent_Verification_Period')}
-                                                                        </td>
-                                                                        <td
-                                                                              style={{
-                                                                                    border: '1px solid #00000070',
-                                                                                    padding: '2px 5px',
-                                                                                    verticalAlign: 'top'
-                                                                              }}
-                                                                        >
-                                                                              <Select
-                                                                                    options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
-                                                                                          progStageDE => ({
-                                                                                                label: progStageDE
-                                                                                                      .dataElement
-                                                                                                      ?.displayName,
-                                                                                                value: progStageDE
-                                                                                                      .dataElement?.id
-                                                                                          })
-                                                                                    )}
-                                                                                    placeholder={translate(
+                                                                  {formState?.selectedConfigurationType !==
+                                                                        NORMAL_PROGRAM && (
+                                                                        <tr>
+                                                                              <td
+                                                                                    style={{
+                                                                                          border: '1px solid #00000070',
+                                                                                          padding: '2px 5px',
+                                                                                          verticalAlign: 'top',
+                                                                                          width: '50%'
+                                                                                    }}
+                                                                              >
+                                                                                    {translate(
                                                                                           'Recent_Verification_Period'
                                                                                     )}
-                                                                                    style={{ width: '100%' }}
-                                                                                    onChange={value => {
-                                                                                          setFormState({
-                                                                                                ...formState,
-                                                                                                selectedPeriodVerification:
-                                                                                                      formState?.selectedProgramStageForConfiguration?.programStageDataElements
-                                                                                                            ?.map(
-                                                                                                                  p =>
-                                                                                                                        p.dataElement
-                                                                                                            )
-                                                                                                            .find(
-                                                                                                                  dataElement =>
-                                                                                                                        dataElement.id ===
-                                                                                                                        value
-                                                                                                            )
-                                                                                          });
+                                                                              </td>
+                                                                              <td
+                                                                                    style={{
+                                                                                          border: '1px solid #00000070',
+                                                                                          padding: '2px 5px',
+                                                                                          verticalAlign: 'top'
                                                                                     }}
-                                                                                    value={
-                                                                                          formState
-                                                                                                ?.selectedPeriodVerification
-                                                                                                ?.id
-                                                                                    }
-                                                                                    optionFilterProp="label"
-                                                                                    showSearch
-                                                                                    allowClear
-                                                                              />
-                                                                        </td>
-                                                                  </tr>
-
-                                                                  <tr>
-                                                                        <td
-                                                                              style={{
-                                                                                    border: '1px solid #00000070',
-                                                                                    padding: '2px 5px',
-                                                                                    verticalAlign: 'top',
-                                                                                    width: '50%'
-                                                                              }}
-                                                                        >
-                                                                              {translate('Register_Name')}
-                                                                        </td>
-                                                                        <td
-                                                                              style={{
-                                                                                    border: '1px solid #00000070',
-                                                                                    padding: '2px 5px',
-                                                                                    verticalAlign: 'top'
-                                                                              }}
-                                                                        >
-                                                                              <Select
-                                                                                    options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
-                                                                                          progStageDE => ({
-                                                                                                label: progStageDE
-                                                                                                      .dataElement
-                                                                                                      ?.displayName,
-                                                                                                value: progStageDE
-                                                                                                      .dataElement?.id
-                                                                                          })
-                                                                                    )}
-                                                                                    placeholder={translate(
-                                                                                          'Register_Name'
-                                                                                    )}
-                                                                                    style={{ width: '100%' }}
-                                                                                    onChange={value => {
-                                                                                          setFormState({
-                                                                                                ...formState,
-                                                                                                completeness: {
-                                                                                                      ...formState?.completeness,
-                                                                                                      selectedRegister:
+                                                                              >
+                                                                                    <Select
+                                                                                          options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                                                progStageDE => ({
+                                                                                                      label: progStageDE
+                                                                                                            .dataElement
+                                                                                                            ?.displayName,
+                                                                                                      value: progStageDE
+                                                                                                            .dataElement
+                                                                                                            ?.id
+                                                                                                })
+                                                                                          )}
+                                                                                          placeholder={translate(
+                                                                                                'Recent_Verification_Period'
+                                                                                          )}
+                                                                                          style={{ width: '100%' }}
+                                                                                          onChange={value => {
+                                                                                                setFormState({
+                                                                                                      ...formState,
+                                                                                                      selectedPeriodVerification:
                                                                                                             formState?.selectedProgramStageForConfiguration?.programStageDataElements
                                                                                                                   ?.map(
                                                                                                                         p =>
@@ -2332,211 +2305,300 @@ const Setting = () => {
                                                                                                                               dataElement.id ===
                                                                                                                               value
                                                                                                                   )
-                                                                                                }
-                                                                                          });
-                                                                                    }}
-                                                                                    value={
-                                                                                          formState?.completeness
-                                                                                                .selectedRegister?.id
-                                                                                    }
-                                                                                    optionFilterProp="label"
-                                                                                    showSearch
-                                                                                    allowClear
-                                                                              />
-                                                                        </td>
-                                                                  </tr>
+                                                                                                });
+                                                                                          }}
+                                                                                          value={
+                                                                                                formState
+                                                                                                      ?.selectedPeriodVerification
+                                                                                                      ?.id
+                                                                                          }
+                                                                                          optionFilterProp="label"
+                                                                                          showSearch
+                                                                                          allowClear
+                                                                                    />
+                                                                              </td>
+                                                                        </tr>
+                                                                  )}
 
-                                                                  <tr>
-                                                                        <td
-                                                                              style={{
-                                                                                    border: '1px solid #00000070',
-                                                                                    padding: '2px 5px',
-                                                                                    verticalAlign: 'top',
-                                                                                    width: '50%'
-                                                                              }}
-                                                                        >
-                                                                              {translate('Register_Key_Words')}
-                                                                        </td>
-                                                                        <td
-                                                                              style={{
-                                                                                    border: '1px solid #00000070',
-                                                                                    padding: '2px 5px',
-                                                                                    verticalAlign: 'top'
-                                                                              }}
-                                                                        >
-                                                                              <TagsInput
-                                                                                    style={{ width: '100%' }}
-                                                                                    value={
-                                                                                          formState?.completeness
-                                                                                                ?.registerKeyWords || []
-                                                                                    }
-                                                                                    onChange={word =>
-                                                                                          setFormState({
-                                                                                                ...formState,
-                                                                                                completeness: {
-                                                                                                      ...formState?.completeness,
-                                                                                                      registerKeyWords:
+                                                                  {formState?.selectedConfigurationType !==
+                                                                        NORMAL_PROGRAM && (
+                                                                        <tr>
+                                                                              <td
+                                                                                    style={{
+                                                                                          border: '1px solid #00000070',
+                                                                                          padding: '2px 5px',
+                                                                                          verticalAlign: 'top',
+                                                                                          width: '50%'
+                                                                                    }}
+                                                                              >
+                                                                                    {translate('Register_Name')}
+                                                                              </td>
+                                                                              <td
+                                                                                    style={{
+                                                                                          border: '1px solid #00000070',
+                                                                                          padding: '2px 5px',
+                                                                                          verticalAlign: 'top'
+                                                                                    }}
+                                                                              >
+                                                                                    <Select
+                                                                                          options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                                                progStageDE => ({
+                                                                                                      label: progStageDE
+                                                                                                            .dataElement
+                                                                                                            ?.displayName,
+                                                                                                      value: progStageDE
+                                                                                                            .dataElement
+                                                                                                            ?.id
+                                                                                                })
+                                                                                          )}
+                                                                                          placeholder={translate(
+                                                                                                'Register_Name'
+                                                                                          )}
+                                                                                          style={{ width: '100%' }}
+                                                                                          onChange={value => {
+                                                                                                setFormState({
+                                                                                                      ...formState,
+                                                                                                      completeness: {
+                                                                                                            ...formState?.completeness,
+                                                                                                            selectedRegister:
+                                                                                                                  formState?.selectedProgramStageForConfiguration?.programStageDataElements
+                                                                                                                        ?.map(
+                                                                                                                              p =>
+                                                                                                                                    p.dataElement
+                                                                                                                        )
+                                                                                                                        .find(
+                                                                                                                              dataElement =>
+                                                                                                                                    dataElement.id ===
+                                                                                                                                    value
+                                                                                                                        )
+                                                                                                      }
+                                                                                                });
+                                                                                          }}
+                                                                                          value={
+                                                                                                formState?.completeness
+                                                                                                      .selectedRegister
+                                                                                                      ?.id
+                                                                                          }
+                                                                                          optionFilterProp="label"
+                                                                                          showSearch
+                                                                                          allowClear
+                                                                                    />
+                                                                              </td>
+                                                                        </tr>
+                                                                  )}
+
+                                                                  {formState?.selectedConfigurationType !==
+                                                                        NORMAL_PROGRAM && (
+                                                                        <tr>
+                                                                              <td
+                                                                                    style={{
+                                                                                          border: '1px solid #00000070',
+                                                                                          padding: '2px 5px',
+                                                                                          verticalAlign: 'top',
+                                                                                          width: '50%'
+                                                                                    }}
+                                                                              >
+                                                                                    {translate('Register_Key_Words')}
+                                                                              </td>
+                                                                              <td
+                                                                                    style={{
+                                                                                          border: '1px solid #00000070',
+                                                                                          padding: '2px 5px',
+                                                                                          verticalAlign: 'top'
+                                                                                    }}
+                                                                              >
+                                                                                    <TagsInput
+                                                                                          style={{ width: '100%' }}
+                                                                                          value={
+                                                                                                formState?.completeness
+                                                                                                      ?.registerKeyWords ||
+                                                                                                []
+                                                                                          }
+                                                                                          onChange={word =>
+                                                                                                setFormState({
+                                                                                                      ...formState,
+                                                                                                      completeness: {
+                                                                                                            ...formState?.completeness,
+                                                                                                            registerKeyWords:
+                                                                                                                  word ||
+                                                                                                                  []
+                                                                                                      }
+                                                                                                })
+                                                                                          }
+                                                                                    />
+                                                                              </td>
+                                                                        </tr>
+                                                                  )}
+
+                                                                  {formState?.selectedConfigurationType !==
+                                                                        NORMAL_PROGRAM && (
+                                                                        <tr>
+                                                                              <td
+                                                                                    style={{
+                                                                                          border: '1px solid #00000070',
+                                                                                          padding: '2px 5px',
+                                                                                          verticalAlign: 'top',
+                                                                                          width: '50%'
+                                                                                    }}
+                                                                              >
+                                                                                    {translate('Global_Program_Area')}
+                                                                              </td>
+                                                                              <td
+                                                                                    style={{
+                                                                                          border: '1px solid #00000070',
+                                                                                          padding: '2px 5px',
+                                                                                          verticalAlign: 'top'
+                                                                                    }}
+                                                                              >
+                                                                                    <Select
+                                                                                          options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                                                progStageDE => ({
+                                                                                                      label: progStageDE
+                                                                                                            .dataElement
+                                                                                                            ?.displayName,
+                                                                                                      value: progStageDE
+                                                                                                            .dataElement
+                                                                                                            ?.id
+                                                                                                })
+                                                                                          )}
+                                                                                          placeholder={translate(
+                                                                                                'Global_Program_Area'
+                                                                                          )}
+                                                                                          style={{ width: '100%' }}
+                                                                                          onChange={value => {
+                                                                                                setFormState({
+                                                                                                      ...formState,
+                                                                                                      globalProgramArea:
+                                                                                                            formState?.selectedProgramStageForConfiguration?.programStageDataElements
+                                                                                                                  ?.map(
+                                                                                                                        p =>
+                                                                                                                              p.dataElement
+                                                                                                                  )
+                                                                                                                  .find(
+                                                                                                                        dataElement =>
+                                                                                                                              dataElement.id ===
+                                                                                                                              value
+                                                                                                                  )
+                                                                                                });
+                                                                                          }}
+                                                                                          value={
+                                                                                                formState
+                                                                                                      ?.globalProgramArea
+                                                                                                      ?.id
+                                                                                          }
+                                                                                          optionFilterProp="label"
+                                                                                          showSearch
+                                                                                          allowClear
+                                                                                    />
+                                                                              </td>
+                                                                        </tr>
+                                                                  )}
+                                                                  {formState?.selectedConfigurationType !==
+                                                                        NORMAL_PROGRAM && (
+                                                                        <tr>
+                                                                              <td
+                                                                                    style={{
+                                                                                          border: '1px solid #00000070',
+                                                                                          padding: '2px 5px',
+                                                                                          verticalAlign: 'top',
+                                                                                          width: '50%'
+                                                                                    }}
+                                                                              >
+                                                                                    {translate(
+                                                                                          'Keys_Word_Global_Program_Area'
+                                                                                    )}
+                                                                              </td>
+                                                                              <td
+                                                                                    style={{
+                                                                                          border: '1px solid #00000070',
+                                                                                          padding: '2px 5px',
+                                                                                          verticalAlign: 'top'
+                                                                                    }}
+                                                                              >
+                                                                                    <TagsInput
+                                                                                          style={{ width: '100%' }}
+                                                                                          value={
+                                                                                                formState?.globalProgramAreaKeyWords ||
+                                                                                                []
+                                                                                          }
+                                                                                          onChange={word =>
+                                                                                                setFormState({
+                                                                                                      ...formState,
+                                                                                                      globalProgramAreaKeyWords:
                                                                                                             word || []
-                                                                                                }
-                                                                                          })
-                                                                                    }
-                                                                              />
-                                                                        </td>
-                                                                  </tr>
+                                                                                                })
+                                                                                          }
+                                                                                    />
+                                                                              </td>
+                                                                        </tr>
+                                                                  )}
 
-                                                                  <tr>
-                                                                        <td
-                                                                              style={{
-                                                                                    border: '1px solid #00000070',
-                                                                                    padding: '2px 5px',
-                                                                                    verticalAlign: 'top',
-                                                                                    width: '50%'
-                                                                              }}
-                                                                        >
-                                                                              {translate('Global_Program_Area')}
-                                                                        </td>
-                                                                        <td
-                                                                              style={{
-                                                                                    border: '1px solid #00000070',
-                                                                                    padding: '2px 5px',
-                                                                                    verticalAlign: 'top'
-                                                                              }}
-                                                                        >
-                                                                              <Select
-                                                                                    options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
-                                                                                          progStageDE => ({
-                                                                                                label: progStageDE
-                                                                                                      .dataElement
-                                                                                                      ?.displayName,
-                                                                                                value: progStageDE
-                                                                                                      .dataElement?.id
-                                                                                          })
-                                                                                    )}
-                                                                                    placeholder={translate(
-                                                                                          'Global_Program_Area'
-                                                                                    )}
-                                                                                    style={{ width: '100%' }}
-                                                                                    onChange={value => {
-                                                                                          setFormState({
-                                                                                                ...formState,
-                                                                                                globalProgramArea:
-                                                                                                      formState?.selectedProgramStageForConfiguration?.programStageDataElements
-                                                                                                            ?.map(
-                                                                                                                  p =>
-                                                                                                                        p.dataElement
-                                                                                                            )
-                                                                                                            .find(
-                                                                                                                  dataElement =>
-                                                                                                                        dataElement.id ===
-                                                                                                                        value
-                                                                                                            )
-                                                                                          });
+                                                                  {formState?.selectedConfigurationType !==
+                                                                        NORMAL_PROGRAM && (
+                                                                        <tr>
+                                                                              <td
+                                                                                    style={{
+                                                                                          border: '1px solid #00000070',
+                                                                                          padding: '2px 5px',
+                                                                                          verticalAlign: 'top',
+                                                                                          width: '50%'
                                                                                     }}
-                                                                                    value={
-                                                                                          formState?.globalProgramArea
-                                                                                                ?.id
-                                                                                    }
-                                                                                    optionFilterProp="label"
-                                                                                    showSearch
-                                                                                    allowClear
-                                                                              />
-                                                                        </td>
-                                                                  </tr>
-
-                                                                  <tr>
-                                                                        <td
-                                                                              style={{
-                                                                                    border: '1px solid #00000070',
-                                                                                    padding: '2px 5px',
-                                                                                    verticalAlign: 'top',
-                                                                                    width: '50%'
-                                                                              }}
-                                                                        >
-                                                                              {translate(
-                                                                                    'Keys_Word_Global_Program_Area'
-                                                                              )}
-                                                                        </td>
-                                                                        <td
-                                                                              style={{
-                                                                                    border: '1px solid #00000070',
-                                                                                    padding: '2px 5px',
-                                                                                    verticalAlign: 'top'
-                                                                              }}
-                                                                        >
-                                                                              <TagsInput
-                                                                                    style={{ width: '100%' }}
-                                                                                    value={
-                                                                                          formState?.globalProgramAreaKeyWords ||
-                                                                                          []
-                                                                                    }
-                                                                                    onChange={word =>
-                                                                                          setFormState({
-                                                                                                ...formState,
-                                                                                                globalProgramAreaKeyWords:
-                                                                                                      word || []
-                                                                                          })
-                                                                                    }
-                                                                              />
-                                                                        </td>
-                                                                  </tr>
-
-                                                                  <tr>
-                                                                        <td
-                                                                              style={{
-                                                                                    border: '1px solid #00000070',
-                                                                                    padding: '2px 5px',
-                                                                                    verticalAlign: 'top',
-                                                                                    width: '50%'
-                                                                              }}
-                                                                        >
-                                                                              {translate('Number_Of_DHIS2_Period')}
-                                                                        </td>
-                                                                        <td
-                                                                              style={{
-                                                                                    border: '1px solid #00000070',
-                                                                                    padding: '2px 5px',
-                                                                                    verticalAlign: 'top'
-                                                                              }}
-                                                                        >
-                                                                              <Select
-                                                                                    placeholder={translate(
+                                                                              >
+                                                                                    {translate(
                                                                                           'Number_Of_DHIS2_Period'
                                                                                     )}
+                                                                              </td>
+                                                                              <td
                                                                                     style={{
-                                                                                          width: '307px'
+                                                                                          border: '1px solid #00000070',
+                                                                                          padding: '2px 5px',
+                                                                                          verticalAlign: 'top'
                                                                                     }}
-                                                                                    options={PERIOD_LIST?.map(p => ({
-                                                                                          label: p,
-                                                                                          value: p
-                                                                                    }))}
-                                                                                    showSearch
-                                                                                    optionFilterProp="label"
-                                                                                    value={
-                                                                                          formState?.indicators[0]
-                                                                                                ?.viewMonthlyValue
-                                                                                    }
-                                                                                    onChange={value => {
-                                                                                          setFormState({
-                                                                                                ...formState,
-                                                                                                indicators:
-                                                                                                      formState?.indicators?.map(
-                                                                                                            i => ({
-                                                                                                                  ...i,
-                                                                                                                  viewMonthlyValue:
-                                                                                                                        value
-                                                                                                                              ? parseInt(
-                                                                                                                                      value
-                                                                                                                                )
-                                                                                                                              : 0
-                                                                                                            })
-                                                                                                      ) || []
-                                                                                          });
-                                                                                    }}
-                                                                              />
-                                                                        </td>
-                                                                  </tr>
+                                                                              >
+                                                                                    <Select
+                                                                                          placeholder={translate(
+                                                                                                'Number_Of_DHIS2_Period'
+                                                                                          )}
+                                                                                          style={{
+                                                                                                width: '307px'
+                                                                                          }}
+                                                                                          options={PERIOD_LIST?.map(
+                                                                                                p => ({
+                                                                                                      label: p,
+                                                                                                      value: p
+                                                                                                })
+                                                                                          )}
+                                                                                          showSearch
+                                                                                          optionFilterProp="label"
+                                                                                          value={
+                                                                                                formState?.indicators[0]
+                                                                                                      ?.viewMonthlyValue
+                                                                                          }
+                                                                                          onChange={value => {
+                                                                                                setFormState({
+                                                                                                      ...formState,
+                                                                                                      indicators:
+                                                                                                            formState?.indicators?.map(
+                                                                                                                  i => ({
+                                                                                                                        ...i,
+                                                                                                                        viewMonthlyValue:
+                                                                                                                              value
+                                                                                                                                    ? parseInt(
+                                                                                                                                            value
+                                                                                                                                      )
+                                                                                                                                    : 0
+                                                                                                                  })
+                                                                                                            ) || []
+                                                                                                });
+                                                                                          }}
+                                                                                    />
+                                                                              </td>
+                                                                        </tr>
+                                                                  )}
 
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
+                                                                        formState?.selectedConfigurationType !==
+                                                                              NORMAL_PROGRAM &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
                                                                         ) >= 1 && (
@@ -2581,7 +2643,10 @@ const Setting = () => {
                                                                                     </td>
                                                                               </tr>
                                                                         )}
+
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
+                                                                        formState?.selectedConfigurationType !==
+                                                                              NORMAL_PROGRAM &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
                                                                         ) >= 2 && (
@@ -2628,6 +2693,8 @@ const Setting = () => {
                                                                         )}
 
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
+                                                                        formState?.selectedConfigurationType !==
+                                                                              NORMAL_PROGRAM &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
                                                                         ) >= 3 && (
@@ -2674,6 +2741,8 @@ const Setting = () => {
                                                                         )}
 
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
+                                                                        formState?.selectedConfigurationType !==
+                                                                              NORMAL_PROGRAM &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
                                                                         ) >= 4 && (
@@ -2720,6 +2789,8 @@ const Setting = () => {
                                                                         )}
 
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
+                                                                        formState?.selectedConfigurationType !==
+                                                                              NORMAL_PROGRAM &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
                                                                         ) >= 5 && (
@@ -2766,6 +2837,8 @@ const Setting = () => {
                                                                         )}
 
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
+                                                                        formState?.selectedConfigurationType !==
+                                                                              NORMAL_PROGRAM &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
                                                                         ) >= 6 && (
@@ -2812,6 +2885,8 @@ const Setting = () => {
                                                                         )}
 
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
+                                                                        formState?.selectedConfigurationType !==
+                                                                              NORMAL_PROGRAM &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
                                                                         ) >= 7 && (
@@ -2858,6 +2933,8 @@ const Setting = () => {
                                                                         )}
 
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
+                                                                        formState?.selectedConfigurationType !==
+                                                                              NORMAL_PROGRAM &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
                                                                         ) >= 8 && (
@@ -2904,6 +2981,8 @@ const Setting = () => {
                                                                         )}
 
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
+                                                                        formState?.selectedConfigurationType !==
+                                                                              NORMAL_PROGRAM &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
                                                                         ) >= 9 && (
@@ -2950,6 +3029,8 @@ const Setting = () => {
                                                                         )}
 
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
+                                                                        formState?.selectedConfigurationType !==
+                                                                              NORMAL_PROGRAM &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
                                                                         ) >= 10 && (
@@ -2996,6 +3077,8 @@ const Setting = () => {
                                                                         )}
 
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
+                                                                        formState?.selectedConfigurationType !==
+                                                                              NORMAL_PROGRAM &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
                                                                         ) >= 11 && (
@@ -3042,6 +3125,8 @@ const Setting = () => {
                                                                         )}
 
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
+                                                                        formState?.selectedConfigurationType !==
+                                                                              NORMAL_PROGRAM &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
                                                                         ) >= 12 && (
@@ -3088,6 +3173,8 @@ const Setting = () => {
                                                                         )}
 
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
+                                                                        formState?.selectedConfigurationType !==
+                                                                              NORMAL_PROGRAM &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
                                                                         ) >= 13 && (
@@ -3134,6 +3221,8 @@ const Setting = () => {
                                                                         )}
 
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
+                                                                        formState?.selectedConfigurationType !==
+                                                                              NORMAL_PROGRAM &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
                                                                         ) >= 14 && (
@@ -3180,6 +3269,8 @@ const Setting = () => {
                                                                         )}
 
                                                                   {formState?.indicators[0]?.viewMonthlyValue &&
+                                                                        formState?.selectedConfigurationType !==
+                                                                              NORMAL_PROGRAM &&
                                                                         parseInt(
                                                                               formState?.indicators[0]?.viewMonthlyValue
                                                                         ) >= 15 && (
@@ -3496,7 +3587,8 @@ const Setting = () => {
 
                   <Button
                         disabled={
-                              formState?.selectedConfigurationType === DQR
+                              formState?.selectedConfigurationType === DQR ||
+                              formState?.selectedConfigurationType === NORMAL_PROGRAM
                                     ? formState?.selectedProgramStageForConfiguration
                                           ? false
                                           : true
@@ -3509,9 +3601,12 @@ const Setting = () => {
                         loading={loadingSaveSupervionsConfig}
                         icon={<FiSave style={{ fontSize: '18px', color: '#FFF' }} />}
                   >
-                        {formState?.selectedConfigurationType === DQR && currentProgramstageConfiguration
+                        {(formState?.selectedConfigurationType === DQR ||
+                              formState?.selectedConfigurationType === NORMAL_PROGRAM) &&
+                        currentProgramstageConfiguration
                               ? translate('Mise_A_Jour_Configuration')
-                              : formState?.selectedConfigurationType === DQR &&
+                              : (formState?.selectedConfigurationType === DQR ||
+                                      formState?.selectedConfigurationType === NORMAL_PROGRAM) &&
                                 '+ '.concat(translate('AddConfiguration'))}
                         {formState?.selectedConfigurationType === RDQA && currentProgramstageConfigurationForRDQA
                               ? translate('Mise_A_Jour_Configuration')
@@ -3882,6 +3977,8 @@ const Setting = () => {
                                                             {RenderNbrOfIndicatorAndRecoupement()}
                                                             {RenderIndicatorAndRecoupementConfigFields()}
                                                       </>
+                                                ) : formState?.selectedConfigurationType === NORMAL_PROGRAM ? (
+                                                      <>{RenderProgramStageConfiguration()}</>
                                                 ) : (
                                                       <>
                                                             {RenderProgramStageConfigurationForRDQA()}

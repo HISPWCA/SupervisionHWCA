@@ -45,6 +45,7 @@ import {
       INDICATOR,
       MONTH,
       NA,
+      NORMAL_PROGRAM,
       NOTICE_BOX_DEFAULT,
       NOTICE_BOX_ERROR,
       NOTICE_BOX_WARNING,
@@ -2330,7 +2331,8 @@ const Supervision = ({ me }) => {
                                     : dayjs().format('YYYY-MM-DD');
 
                               eventPayload.dataValues =
-                                    selectedProgram?.configurationType === DQR
+                                    selectedProgram?.configurationType === DQR ||
+                                    selectedProgram?.configurationType === NORMAL_PROGRAM
                                           ? mappingConfigs
                                                   .filter(ev => ev.programStage?.id === payload.programStage?.id)
                                                   .map(ev => ({
@@ -3234,7 +3236,10 @@ const Supervision = ({ me }) => {
                                                             .includes(progStageConfig?.organisationUnitGroup?.id)) ||
                                                 false;
 
-                                          if (selectedProgram?.configurationType === DQR) {
+                                          if (
+                                                selectedProgram?.configurationType === DQR ||
+                                                selectedProgram?.configurationType === NORMAL_PROGRAM
+                                          ) {
                                                 is_ok = true;
                                           }
 
@@ -4978,7 +4983,8 @@ const Supervision = ({ me }) => {
                                                                   />
                                                             </div>
                                                       </Col>{' '}
-                                                      <Col sm={24} md={24}>
+                                                     
+                                                    { selectedProgram.configurationType !== NORMAL_PROGRAM &&  <Col sm={24} md={24}>
                                                             <div>
                                                                   <div
                                                                         style={{
@@ -5041,7 +5047,9 @@ const Supervision = ({ me }) => {
                                                                         }
                                                                   />
                                                             </div>
-                                                      </Col>
+                                                      </Col>}
+
+
                                                       <Col sm={24} md={24}>
                                                             <div>
                                                                   <div style={{ marginBottom: '5px' }}>
@@ -6739,7 +6747,9 @@ const Supervision = ({ me }) => {
                                     <Col sm={24} md={8}>
                                           {RenderSupervisionTypeContent()}
                                           {selectedSupervisionType && RenderSelectedSupervisionTypeList()}
-                                          {selectedProgram && RenderDataElementConfigContent()}
+                                          {selectedProgram &&
+                                                selectedProgram.configurationType !== NORMAL_PROGRAM &&
+                                                RenderDataElementConfigContent()}
                                     </Col>
                                     <Col sm={24} md={16}>
                                           {selectedProgram &&

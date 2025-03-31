@@ -155,7 +155,6 @@
     "Agregee": "Agrégée",
     "Indicateur_Programme": "Indicateur de programme",
     "Type_De_Supervision": "Type de supervisions",
-    "Configuration_Des_Indicateurs": "Configuration des indicateurs",
     "Parametre_Supervision": "Paramètre des supervisions",
     "Analyses": "Analyses",
     "Type_Element": "Type d'élément",
@@ -384,5 +383,6 @@
     "Stock": "Stocks",
     "Is_Stock": "C'est un Stock ?",
     "Does_not_exist_in_dhis2": "N'existe pas dans le DHIS2 ?",
-    "Update":"Mèttre à jour"
+    "Update":"Mèttre à jour",
+    "Configuration_Normal_Case": "Configuration type  Programme Supervision Normale"
 }

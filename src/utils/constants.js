@@ -1,5 +1,6 @@
 export const ERDQ = 'ERDQ';
 export const DQR = 'DQR';
+export const NORMAL_PROGRAM = 'NORMAL_PROGRAM';
 export const RDQA = 'RDQA';
 
 export const PAGE_DASHBOARD = 'PAGE_DASHBOARD';

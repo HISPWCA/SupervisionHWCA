@@ -1259,7 +1259,8 @@ const Favorites = ({ me }) => {
                                                       indicatorFieldsForRDQA={indicatorFieldsForRDQA}
                                                       setIndicatorFieldsForRDQA={setIndicatorFieldsForRDQA}
                                                 />
-                                          )}
+                                          )
+                                    }     
                               </Col>
                         </Row>
                   </div>
