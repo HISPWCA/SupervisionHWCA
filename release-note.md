@@ -1,8 +1,5 @@
-## Version: 2.2.8
+## Version: 2.3.0
 
 ### Functionalities
 
-- Adding support of Simple Supervision Program
-- Adding new Option to type of program in order to support Simple supervions Program
-- Hide Favorites while planification for a supervision in case of Simple supervision program type 
-- Hide recente supervision verification period in case of Simple supervision program type
+- Taking into account planification on unsigned program on a organisation unit. for instance, While we select organisation unit for planification, and it does not assigned to a program , we display a message and remove it from planification organisation unit before proceed the planification 
