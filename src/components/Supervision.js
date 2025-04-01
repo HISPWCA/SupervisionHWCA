@@ -266,7 +266,7 @@ const Supervision = ({ me }) => {
                   const newDataValues = rowEvent.dataValues
                         ?.map(dv => dv.dataElement)
                         .includes(correctProgramStageFromDataStore.statusSupervisionField?.id)
-                        ? rowEvent.dataValues.map(dvEl => {
+                        ? rowEvent.dataValues?.map(dvEl => {
                                 if (correctProgramStageFromDataStore.statusSupervisionField?.id === dvEl) {
                                       return {
                                             ...dvEl,
@@ -717,17 +717,6 @@ const Supervision = ({ me }) => {
                                 Cell: ({ cell, row }) => {
                                       return (
                                             <div style={{ textAlign: 'center' }}>
-                                                  {/* <Popconfirm
-                                                        title={translate('Open_Event_With')}
-                                                        okText={translate('Open_With_New_Tracker')}
-                                                        cancelText={translate('Open_With_Old_Tracker')}
-                                                        onCancel={() =>
-                                                             
-                                                        }
-                                                        onConfirm={() =>
-                                                            
-                                                        }
-                                                  > */}
                                                   <Tooltip title={translate('Ouvrir_Dans_Le_Tracker')}>
                                                         <IoMdOpen
                                                               onClick={() =>
@@ -747,7 +736,6 @@ const Supervision = ({ me }) => {
                                                               }}
                                                         />
                                                   </Tooltip>
-                                                  {/* </Popconfirm> */}
                                             </div>
                                       );
                                 }
@@ -4915,7 +4903,7 @@ const Supervision = ({ me }) => {
       const RenderOrganisationUnitForm = (colMd = 12) => (
             <div>
                   <Row gutter={[10, 10]}>
-                        {selectedOrganisationUnits.map((org, index) => (
+                        {selectedOrganisationUnits?.map((org, index) => (
                               <Col md={colMd} sm={24} key={index}>
                                     <Card bodyStyle={{ padding: '0px' }} className="my-shadow" size="small">
                                           <div
@@ -4956,7 +4944,36 @@ const Supervision = ({ me }) => {
                                                       </Popconfirm>
                                                 </span>
                                           </div>
-                                          <div style={{ padding: '10px' }}>
+                                          <div style={{ padding: '10px', position: 'relative' }}>
+                                                {console.log('org : ', org)}
+                                                {console.log('selectedProgram: ', selectedProgram)}
+                                                <div
+                                                      style={{
+                                                            display: 'flex',
+                                                            justifyItems: 'center',
+                                                            alignItems: 'center',
+                                                            width: '100%',
+                                                            height: '100%',
+                                                            zIndex: '1000px',
+                                                            background: '#FFFFFF60',
+                                                            cursor: 'not-allowed',
+                                                            position: 'absolute',
+                                                            top: '0px',
+                                                            left: '0px'
+                                                      }}
+                                                >
+                                                      <div
+                                                            style={{
+                                                                  fontWeight: 'bold',
+                                                                  fontSize: '16px',
+                                                                  background: '#FF006E30',
+                                                                  color: '#FF006E',
+                                                                  padding: '5px 10px'
+                                                            }}
+                                                      >
+                                                            {translate('Program_Not_Assign_To_OU')}
+                                                      </div>
+                                                </div>
                                                 <Row gutter={[10, 10]}>
                                                       <Col sm={24} md={24}>
                                                             <div>
@@ -4983,73 +5000,76 @@ const Supervision = ({ me }) => {
                                                                   />
                                                             </div>
                                                       </Col>{' '}
-                                                     
-                                                    { selectedProgram.configurationType !== NORMAL_PROGRAM &&  <Col sm={24} md={24}>
-                                                            <div>
-                                                                  <div
-                                                                        style={{
-                                                                              marginBottom: '5px',
-                                                                              display: 'flex',
-                                                                              alignItems: 'center',
-                                                                              gap: '5px'
-                                                                        }}
-                                                                  >
-                                                                        {
-                                                                              <span>
-                                                                                    {translate(
-                                                                                          'Recent_Verification_Period'
-                                                                                    )}{' '}
-                                                                                    (
-                                                                                    <span style={{ color: RED }}>
-                                                                                          {' '}
-                                                                                          *{' '}
-                                                                                    </span>
-                                                                                    )
-                                                                              </span>
-                                                                        }
-
-                                                                        <Popover
-                                                                              content={
-                                                                                    <div
-                                                                                          style={{
-                                                                                                maxWidth: '300px',
-                                                                                                border: '1px solid blue',
-                                                                                                padding: '10px',
-                                                                                                borderRadius: '10px'
-                                                                                          }}
-                                                                                    >
-                                                                                          {translate(
-                                                                                                'Recent_Verification_Period_Help'
-                                                                                          )}
-                                                                                    </div>
-                                                                              }
+                                                      {selectedProgram.configurationType !== NORMAL_PROGRAM && (
+                                                            <Col sm={24} md={24}>
+                                                                  <div>
+                                                                        <div
+                                                                              style={{
+                                                                                    marginBottom: '5px',
+                                                                                    display: 'flex',
+                                                                                    alignItems: 'center',
+                                                                                    gap: '5px'
+                                                                              }}
                                                                         >
-                                                                              <span style={{ cursor: 'pointer' }}>
-                                                                                    <FcInfo
-                                                                                          style={{
-                                                                                                fontSize: '18px'
-                                                                                          }}
-                                                                                    />
-                                                                              </span>
-                                                                        </Popover>
+                                                                              {
+                                                                                    <span>
+                                                                                          {translate(
+                                                                                                'Recent_Verification_Period'
+                                                                                          )}{' '}
+                                                                                          (
+                                                                                          <span style={{ color: RED }}>
+                                                                                                {' '}
+                                                                                                *{' '}
+                                                                                          </span>
+                                                                                          )
+                                                                                    </span>
+                                                                              }
+
+                                                                              <Popover
+                                                                                    content={
+                                                                                          <div
+                                                                                                style={{
+                                                                                                      maxWidth: '300px',
+                                                                                                      border: '1px solid blue',
+                                                                                                      padding: '10px',
+                                                                                                      borderRadius:
+                                                                                                            '10px'
+                                                                                                }}
+                                                                                          >
+                                                                                                {translate(
+                                                                                                      'Recent_Verification_Period_Help'
+                                                                                                )}
+                                                                                          </div>
+                                                                                    }
+                                                                              >
+                                                                                    <span style={{ cursor: 'pointer' }}>
+                                                                                          <FcInfo
+                                                                                                style={{
+                                                                                                      fontSize: '18px'
+                                                                                                }}
+                                                                                          />
+                                                                                    </span>
+                                                                              </Popover>
+                                                                        </div>
+                                                                        <DatePicker
+                                                                              style={{ width: '100%' }}
+                                                                              placeholder={translate(
+                                                                                    'Recent_Verification_Period'
+                                                                              )}
+                                                                              value={
+                                                                                    inputFields[index]
+                                                                                          ?.periodVerification
+                                                                              }
+                                                                              onChange={period =>
+                                                                                    handleInputPeriodVerification(
+                                                                                          period,
+                                                                                          index
+                                                                                    )
+                                                                              }
+                                                                        />
                                                                   </div>
-                                                                  <DatePicker
-                                                                        style={{ width: '100%' }}
-                                                                        placeholder={translate(
-                                                                              'Recent_Verification_Period'
-                                                                        )}
-                                                                        value={inputFields[index]?.periodVerification}
-                                                                        onChange={period =>
-                                                                              handleInputPeriodVerification(
-                                                                                    period,
-                                                                                    index
-                                                                              )
-                                                                        }
-                                                                  />
-                                                            </div>
-                                                      </Col>}
-
-
+                                                            </Col>
+                                                      )}
                                                       <Col sm={24} md={24}>
                                                             <div>
                                                                   <div style={{ marginBottom: '5px' }}>
