@@ -16,9 +16,16 @@ export const USERS_ROUTE = API_BASE_ROUTE.concat(
 );
 export const SYSTEM_INFOS_ROUTE = API_BASE_ROUTE.concat('/system/info.json');
 export const DATA_STORE_ROUTE = API_BASE_ROUTE.concat('/dataStore');
+
 export const PROGRAMS_ROUTE = API_BASE_ROUTE.concat(
       '/programs.json?paging=false&fields=id,name,displayName,programIndicators[id,displayName],programTrackedEntityAttributes[trackedEntityAttribute[id,displayName]]'
 );
+
+export const PROGRAMS_OUS_ROUTE = API_BASE_ROUTE.concat(
+      '/programs.json?paging=false&fields=id,name,displayName,organisationUnits[id,displayName,name]&filter=programType:eq:WITH_REGISTRATION'
+);
+
+
 export const PROGRAMS_STAGE_ROUTE = API_BASE_ROUTE.concat(
       '/programStages.json?paging=false&fields=id,name,displayName'
 );

@@ -75,6 +75,7 @@ import {
       ORGANISATION_UNITS_ROUTE,
       ORGANISATION_UNIT_GROUPS_ROUTE,
       ORGANISATION_UNIT_GROUP_SETS_ROUTE,
+      PROGRAMS_OUS_ROUTE,
       PROGRAMS_STAGE_ROUTE,
       PROGS_ROUTE,
       SERVER_URL,
@@ -142,6 +143,7 @@ const Supervision = ({ me }) => {
       });
 
       const [organisationUnits, setOrganisationUnits] = useState([]);
+      const [programs, setPrograms] = useState([]);
       const [users, setUsers] = useState([]);
       const [organisationUnitGroupSets, setOrganisationUnitGroupSets] = useState([]);
       const [programStages, setProgramStages] = useState([]);
@@ -252,6 +254,15 @@ const Supervision = ({ me }) => {
 
       const disabledDate = current => {
             return current && dayjs(new Date()).subtract(1, 'day').isBefore(current) ? false : true;
+      };
+
+      const isAssigned = orgId => {
+            if (selectedProgram?.program?.id && orgId) {
+                  const prog_ous = programs?.find(p => p.id === selectedProgram?.program?.id)?.organisationUnits || [];
+                  return prog_ous?.map(o => o.id)?.includes(orgId) || false;
+            }
+
+            return false;
       };
 
       const handleCancelEvent = async rowEvent => {
@@ -761,6 +772,12 @@ const Supervision = ({ me }) => {
             } catch (err) {
                   setLoadingOrganisationUnits(false);
             }
+      };
+      const loadPrograms = async () => {
+            try {
+                  const response = await axios.get(PROGRAMS_OUS_ROUTE);
+                  setPrograms(response.data?.programs);
+            } catch (err) {}
       };
 
       const loadDataElementGroups = async () => {
@@ -1381,7 +1398,7 @@ const Supervision = ({ me }) => {
       const handleDeleteOtherSupervisor = (item, index) => {
             if (item) {
                   setInputFields(
-                        inputFields.map((inp, inputIndex) => {
+                        inputFields?.map((inp, inputIndex) => {
                               if (inputIndex === index) {
                                     return {
                                           ...inp,
@@ -1390,7 +1407,7 @@ const Supervision = ({ me }) => {
                                     };
                               }
                               return inp;
-                        })
+                        }) || []
                   );
             }
       };
@@ -3207,53 +3224,37 @@ const Supervision = ({ me }) => {
 
       const saveSupervisionAsEventStrategy = async inputFieldsList => {
             try {
-                  if (inputFieldsList.length > 0) {
+                  if (inputFieldsList?.filter(i => isAssigned(i.organisationUnit?.id))?.length > 0) {
                         const supervisionsListByProgramStages = await Promise.all(
-                              inputFieldsList?.map(async item => {
-                                    let listByProgramStage = [];
-                                    for (let progStageConfig of selectedProgram?.programStageConfigurations) {
-                                          const found_organisationUnit = organisationUnits.find(
-                                                ou => ou.id === item.organisationUnit?.id
-                                          );
+                              inputFieldsList
+                                    ?.filter(i => isAssigned(i.organisationUnit?.id))
+                                    ?.map(async item => {
+                                          let listByProgramStage = [];
+                                          for (let progStageConfig of selectedProgram?.programStageConfigurations) {
+                                                const found_organisationUnit = organisationUnits.find(
+                                                      ou => ou.id === item.organisationUnit?.id
+                                                );
 
-                                          let is_ok =
-                                                (found_organisationUnit &&
-                                                      progStageConfig?.programStage &&
-                                                      found_organisationUnit.organisationUnitGroups
-                                                            ?.map(ouG => ouG.id)
-                                                            .includes(progStageConfig?.organisationUnitGroup?.id)) ||
-                                                false;
+                                                let is_ok =
+                                                      (found_organisationUnit &&
+                                                            progStageConfig?.programStage &&
+                                                            found_organisationUnit.organisationUnitGroups
+                                                                  ?.map(ouG => ouG.id)
+                                                                  .includes(
+                                                                        progStageConfig?.organisationUnitGroup?.id
+                                                                  )) ||
+                                                      false;
 
-                                          if (
-                                                selectedProgram?.configurationType === DQR ||
-                                                selectedProgram?.configurationType === NORMAL_PROGRAM
-                                          ) {
-                                                is_ok = true;
-                                          }
+                                                if (
+                                                      selectedProgram?.configurationType === DQR ||
+                                                      selectedProgram?.configurationType === NORMAL_PROGRAM
+                                                ) {
+                                                      is_ok = true;
+                                                }
 
-                                          if (is_ok) {
-                                                const payload = {
-                                                      ...item,
-                                                      orgUnit: item.organisationUnit?.id,
-                                                      period: item.period && dayjs(item.period).format('YYYY-MM-DD'),
-                                                      periodVerification:
-                                                            item.periodVerification &&
-                                                            dayjs(item.periodVerification).format('YYYY-MM-DD'),
-                                                      program: item.program?.id,
-                                                      fieldConfig: item.fieldConfig,
-                                                      programStage: progStageConfig.programStage,
-                                                      programStageConfig: progStageConfig
-                                                };
-
-                                                let createdTEIObject = null;
-                                                createdTEIObject = await generateEventsAsNewSupervision(payload);
-
-                                                if (createdTEIObject) {
-                                                      listByProgramStage.push({
+                                                if (is_ok) {
+                                                      const payload = {
                                                             ...item,
-                                                            id: uuid(),
-                                                            planificationType: selectedPlanificationType,
-                                                            indicators: selectedIndicators,
                                                             orgUnit: item.organisationUnit?.id,
                                                             period:
                                                                   item.period &&
@@ -3261,18 +3262,42 @@ const Supervision = ({ me }) => {
                                                             periodVerification:
                                                                   item.periodVerification &&
                                                                   dayjs(item.periodVerification).format('YYYY-MM-DD'),
-                                                            program: item.program,
-                                                            programStage: progStageConfig.programStage.id,
-                                                            programStageConfig: progStageConfig,
+                                                            program: item.program?.id,
                                                             fieldConfig: item.fieldConfig,
-                                                            tei: createdTEIObject
-                                                      });
+                                                            programStage: progStageConfig.programStage,
+                                                            programStageConfig: progStageConfig
+                                                      };
+
+                                                      let createdTEIObject = null;
+                                                      createdTEIObject = await generateEventsAsNewSupervision(payload);
+
+                                                      if (createdTEIObject) {
+                                                            listByProgramStage.push({
+                                                                  ...item,
+                                                                  id: uuid(),
+                                                                  planificationType: selectedPlanificationType,
+                                                                  indicators: selectedIndicators,
+                                                                  orgUnit: item.organisationUnit?.id,
+                                                                  period:
+                                                                        item.period &&
+                                                                        dayjs(item.period).format('YYYY-MM-DD'),
+                                                                  periodVerification:
+                                                                        item.periodVerification &&
+                                                                        dayjs(item.periodVerification).format(
+                                                                              'YYYY-MM-DD'
+                                                                        ),
+                                                                  program: item.program,
+                                                                  programStage: progStageConfig.programStage.id,
+                                                                  programStageConfig: progStageConfig,
+                                                                  fieldConfig: item.fieldConfig,
+                                                                  tei: createdTEIObject
+                                                            });
+                                                      }
                                                 }
                                           }
-                                    }
 
-                                    return listByProgramStage;
-                              }) || []
+                                          return listByProgramStage;
+                                    }) || []
                         );
 
                         // const supervisionsList = supervisionsListByProgramStages.reduce((prev, curr) => {
@@ -3334,17 +3359,21 @@ const Supervision = ({ me }) => {
       };
 
       const validateForms = async inputFields => {
-            inputFields.forEach(element => {
-                  if (!element.period) throw new Error(translate('Veuillez_Remplire_Champ_Obligatoire'));
+            
+            inputFields
+                  ?.filter(i => isAssigned(i.organisationUnit?.id))
+                  ?.forEach(element => {
+                        if (!element.period) throw new Error(translate('Veuillez_Remplire_Champ_Obligatoire'));
 
-                  if (selectedProgram?.fieldConfig?.supervisor?.dataElements?.length > 0) {
-                        if (
-                              (!element.supervisors || element.supervisors?.length === 0) &&
-                              (!element.otherSupervisors || element.otherSupervisors?.length === 0)
-                        )
-                              throw new Error(translate('Veuillez_Remplire_Champ_Obligatoire'));
-                  }
-            });
+                        if (selectedProgram?.fieldConfig?.supervisor?.dataElements?.length > 0) {
+                              if (
+                                    (!element.supervisors || element.supervisors?.length === 0) &&
+                                    (!element.otherSupervisors || element.otherSupervisors?.length === 0)
+                              )
+                                    throw new Error(translate('Veuillez_Remplire_Champ_Obligatoire'));
+                        }
+                  });
+
       };
 
       const getAnalyticValue = async (period, orgUnit, dx) => {
@@ -4945,35 +4974,40 @@ const Supervision = ({ me }) => {
                                                 </span>
                                           </div>
                                           <div style={{ padding: '10px', position: 'relative' }}>
-                                                {console.log('org : ', org)}
-                                                {console.log('selectedProgram: ', selectedProgram)}
-                                                <div
-                                                      style={{
-                                                            display: 'flex',
-                                                            justifyItems: 'center',
-                                                            alignItems: 'center',
-                                                            width: '100%',
-                                                            height: '100%',
-                                                            zIndex: '1000px',
-                                                            background: '#FFFFFF60',
-                                                            cursor: 'not-allowed',
-                                                            position: 'absolute',
-                                                            top: '0px',
-                                                            left: '0px'
-                                                      }}
-                                                >
+
+                                                {!isAssigned(org?.id) && (
                                                       <div
                                                             style={{
-                                                                  fontWeight: 'bold',
-                                                                  fontSize: '16px',
-                                                                  background: '#FF006E30',
-                                                                  color: '#FF006E',
-                                                                  padding: '5px 10px'
+                                                                  display: 'flex',
+                                                                  justifyItems: 'center',
+                                                                  alignItems: 'center',
+                                                                  width: '100%',
+                                                                  height: '100%',
+                                                                  zIndex: 1000,
+                                                                  background: '#00000020',
+                                                                  cursor: 'not-allowed',
+                                                                  position: 'absolute',
+                                                                  top: '0px',
+                                                                  left: '0px'
                                                             }}
                                                       >
-                                                            {translate('Program_Not_Assign_To_OU')}
+                                                            <div
+                                                                  style={{
+                                                                        fontWeight: 'bold',
+                                                                        fontSize: '16px',
+                                                                        background: '#FFFFFF',
+                                                                        color: '#FF006E',
+                                                                        border: '1px solid #FF006E',
+                                                                        padding: '10px',
+                                                                        margin: '0px auto',
+                                                                        width: '80%'
+                                                                  }}
+                                                            >
+                                                                  {translate('Program_Not_Assign_To_OU')}
+                                                            </div>
                                                       </div>
-                                                </div>
+                                                )}
+
                                                 <Row gutter={[10, 10]}>
                                                       <Col sm={24} md={24}>
                                                             <div>
@@ -5990,7 +6024,7 @@ const Supervision = ({ me }) => {
       const handleSelectCheckbox = orgUnit => {
             if (selectedOrganisationUnits.map(ou => ou.id).includes(orgUnit.id)) {
                   setSelectedOrganisationUnits(selectedOrganisationUnits.filter(ou => ou.id !== orgUnit.id));
-                  setInputFields(inputFields.filter(o => o.organisationUnit?.id !== orgUnit.id));
+                  setInputFields(inputFields?.filter(o => o.organisationUnit?.id !== orgUnit.id) || []);
             } else {
                   setSelectedOrganisationUnits([
                         ...selectedOrganisationUnits,
@@ -6268,7 +6302,7 @@ const Supervision = ({ me }) => {
                   setSelectedAgents(
                         selectedAgents.filter(ag => ag.trackedEntityInstance !== value.trackedEntityInstance)
                   );
-                  setInputFields(inputFields.filter(o => o.trackedEntityInstance !== value.trackedEntityInstance));
+                  setInputFields(inputFields?.filter(o => o.trackedEntityInstance !== value.trackedEntityInstance) || []);
             } else {
                   setSelectedAgents([
                         ...selectedAgents,
@@ -6282,7 +6316,7 @@ const Supervision = ({ me }) => {
                   setSelectedAgents(
                         selectedAgents.filter(ag => ag.trackedEntityInstance !== value.trackedEntityInstance)
                   );
-                  setInputFields(inputFields.filter(o => o.trackedEntityInstance !== value.trackedEntityInstance));
+                  setInputFields(inputFields?.filter(o => o.trackedEntityInstance !== value.trackedEntityInstance) || []);
             } else {
                   setSelectedAgents([
                         ...selectedAgents,
@@ -6903,7 +6937,7 @@ const Supervision = ({ me }) => {
       const initInputOrganisation = ouList => {
             const newList = [];
             for (let org of ouList) {
-                  if (inputFields.map(inp => inp.organisationUnit?.id).includes(org.id)) {
+                  if (inputFields?.map(inp => inp.organisationUnit?.id)?.includes(org.id)) {
                         newList.push(inputFields.find(inp => inp.organisationUnit.id === org.id));
                   } else {
                         newList.push({
@@ -6987,6 +7021,7 @@ const Supervision = ({ me }) => {
                   loadDataStoreDECompletness();
                   loadDataStoreDSCompletness();
                   loadDataStoreRegistres();
+                  loadPrograms();
                   loadOrganisationUnits();
                   loadOrganisationUnitGroups();
                   loadDataStorePerformanceFavoritsConfigs();

@@ -385,5 +385,5 @@
     "Does_not_exist_in_dhis2": "N'existe pas dans le DHIS2 ?",
     "Update":"Mèttre à jour",
     "Configuration_Normal_Case": "Configuration type  Programme Supervision Normale",
-    "Program_Not_Assign_To_OU": "Le Programme n'est pas assigné à cette unité d'organisation. Elle sera ignorée lors de la planification"
+    "Program_Not_Assign_To_OU": "Le Programme n'est pas assigné à cette unité d'organisation. Il sera ignorée lors de la planification"
 }

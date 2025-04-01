@@ -804,9 +804,67 @@ const Setting = () => {
                               message: translate('Suppression_Effectuee'),
                               type: NOTIFICATION_SUCCESS
                         });
-                        handleCancelSupConfig();
-                        cleanAllProgramConfigurationStates();
+
+                        setFormState({
+                              selectedConfigurationType: DQR,
+                              selectedSupervisionGenerationType: TYPE_GENERATION_AS_EVENT,
+                              selectedPlanificationType: ORGANISATION_UNIT,
+                              selectedProgramStageForConfiguration: null,
+                              selectedOrganisationUnitGroup: null,
+                              selectedTEIProgram: null,
+                              selectedSupervisorDataElements: [],
+                              selectedStatusSupervisionDataElement: null,
+                              selectedSupervisionAutoGenerateID: null,
+                              selectedNbrIndicatorsToShow: null,
+                              selectedPeriodVerification: null,
+                              globalProgramArea: null,
+                              globalProgramAreaKeyWords: [],
+                              indicators: [],
+                              recoupements: [],
+                              completeness: {
+                                    registerKeyWords: [],
+                                    selectedNbrDataElementsToShow: null,
+                                    selectedNbrDocumentsSourceToShow: null,
+                                    selectedRegister: null,
+                                    dataElements: [],
+                                    sourceDocuments: [],
+                                    margin: null,
+                                    programAreaDOC: null,
+                                    programAreaDE: null
+                              },
+                              consistencyOvertimes: [],
+                              isFieldEditingMode: false
+                        });
+
+                        setFormStateForRDQA({
+                              selectedProgramStageForConfiguration: null,
+                              selectedOrganisationUnitGroup: null,
+                              selectedSupervisorDataElements: [],
+                              selectedStatusSupervisionDataElement: null,
+                              selectedSupervisionAutoGenerateID: null
+                        });
+
+                        setPeriodFormState({
+                              month1KeyWords: [],
+                              month2KeyWords: [],
+                              month3KeyWords: [],
+                              month4KeyWords: [],
+                              month5KeyWords: [],
+                              month6KeyWords: [],
+                              month7KeyWords: [],
+                              month8KeyWords: [],
+                              month9KeyWords: [],
+                              month10KeyWords: [],
+                              month11KeyWords: [],
+                              month12KeyWords: [],
+                              month13KeyWords: [],
+                              month14KeyWords: [],
+                              month15KeyWords: []
+                        });
+
                         setCurrentProgramstageConfiguration(null);
+                        setCurrentProgramstageConfigurationForRDQA(null);
+                        setProgramStageConfigurations([]);
                   }
             } catch (err) {
                   setNotification({
@@ -908,25 +966,64 @@ const Setting = () => {
 
       const handleCancelSupConfig = () => {
             setFormState({
-                  ...formState,
+                  selectedConfigurationType: DQR,
+                  selectedSupervisionGenerationType: TYPE_GENERATION_AS_EVENT,
+                  selectedPlanificationType: ORGANISATION_UNIT,
                   selectedProgramStageForConfiguration: null,
+                  selectedOrganisationUnitGroup: null,
                   selectedTEIProgram: null,
                   selectedSupervisorDataElements: [],
                   selectedStatusSupervisionDataElement: null,
-                  selectedOrganisationUnitGroup: null,
+                  selectedSupervisionAutoGenerateID: null,
+                  selectedNbrIndicatorsToShow: null,
+                  selectedPeriodVerification: null,
                   globalProgramArea: null,
                   globalProgramAreaKeyWords: [],
-                  completeness: null,
-                  consistencyOvertimes: [],
                   indicators: [],
-                  isFieldEditingMode: false,
                   recoupements: [],
-                  selectedSupervisionAutoGenerateID: null,
-                  selectedNbrIndicatorsToShow: null
+                  completeness: {
+                        registerKeyWords: [],
+                        selectedNbrDataElementsToShow: null,
+                        selectedNbrDocumentsSourceToShow: null,
+                        selectedRegister: null,
+                        dataElements: [],
+                        sourceDocuments: [],
+                        margin: null,
+                        programAreaDOC: null,
+                        programAreaDE: null
+                  },
+                  consistencyOvertimes: [],
+                  isFieldEditingMode: false
+            });
+
+            setFormStateForRDQA({
+                  selectedProgramStageForConfiguration: null,
+                  selectedOrganisationUnitGroup: null,
+                  selectedSupervisorDataElements: [],
+                  selectedStatusSupervisionDataElement: null,
+                  selectedSupervisionAutoGenerateID: null
+            });
+
+            setPeriodFormState({
+                  month1KeyWords: [],
+                  month2KeyWords: [],
+                  month3KeyWords: [],
+                  month4KeyWords: [],
+                  month5KeyWords: [],
+                  month6KeyWords: [],
+                  month7KeyWords: [],
+                  month8KeyWords: [],
+                  month9KeyWords: [],
+                  month10KeyWords: [],
+                  month11KeyWords: [],
+                  month12KeyWords: [],
+                  month13KeyWords: [],
+                  month14KeyWords: [],
+                  month15KeyWords: []
             });
             setCurrentProgramstageConfiguration(null);
+            setCurrentProgramstageConfigurationForRDQA(null);
             setProgramStageConfigurations([]);
-            cleanAllProgramConfigurationStates();
       };
 
       const handleSaveSupConfig = async () => {
