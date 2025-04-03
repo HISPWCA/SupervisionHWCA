@@ -64,7 +64,13 @@ import {
       WEEK,
       YEAR
 } from '../utils/constants';
-import { goToNewPage, loadDataStore, saveDataToDataStore } from '../utils/functions';
+import {
+      goToNewPage,
+      loadDataStore,
+      loadDataStoreDEBUG,
+      saveDataToDataStore,
+      saveDataToDataStoreDEBUG
+} from '../utils/functions';
 import { MyNoticeBox } from './MyNoticeBox';
 import {
       ANALYTICS_ROUTE,
@@ -1722,8 +1728,7 @@ const Supervision = ({ me }) => {
 
                                                       periodPayload.month1 = {
                                                             position: 1,
-                                                            dataElement: elementMONTH_1,
-                                                            value,
+                                                            dataElement: { id: elementMONTH_1.id },
                                                             period: periodObject?.normal,
                                                             periodString: periodObject?.normal
                                                       };
@@ -1753,8 +1758,7 @@ const Supervision = ({ me }) => {
 
                                                       periodPayload.month2 = {
                                                             position: 2,
-                                                            dataElement: elementMONTH_2,
-                                                            value,
+                                                            dataElement: { id: elementMONTH_2.id },
                                                             period: periodObject?.normal,
                                                             periodString: periodObject?.normal
                                                       };
@@ -1784,8 +1788,7 @@ const Supervision = ({ me }) => {
 
                                                       periodPayload.month3 = {
                                                             position: 3,
-                                                            dataElement: elementMONTH_3,
-                                                            value,
+                                                            dataElement: { id: elementMONTH_3.id },
                                                             period: periodObject?.normal,
                                                             periodString: periodObject?.normal
                                                       };
@@ -1815,8 +1818,7 @@ const Supervision = ({ me }) => {
 
                                                       periodPayload.month4 = {
                                                             position: 4,
-                                                            dataElement: elementMONTH_4,
-                                                            value,
+                                                            dataElement: { id: elementMONTH_4.id },
                                                             period: periodObject?.normal,
                                                             periodString: periodObject?.normal
                                                       };
@@ -2170,6 +2172,7 @@ const Supervision = ({ me }) => {
                                                 }
 
                                                 await updatePeriodsConfigs(periodPayload);
+                                                await updatePeriodsConfigsDEBUG(periodPayload);
                                           }
                                     }
 
@@ -2291,6 +2294,32 @@ const Supervision = ({ me }) => {
                         configPayload = { ...configPayload, periods: [periodPayload, ...configPayload.periods] };
                   }
                   await saveDataToDataStore(process.env.REACT_APP_PERIODS_CONFIG_KEY, configPayload, null, null, null);
+            } catch (err) {}
+      };
+
+      const updatePeriodsConfigsDEBUG = async periodPayload => {
+            try {
+                  let configPayload = (await loadDataStoreDEBUG(
+                        process.env.REACT_APP_PERIODS_CONFIG_KEY,
+                        null,
+                        null,
+                        null
+                  )) || { periods: [], month1KeyWords: [], month2KeyWords: [], month3KeyWords: [] };
+                  
+                  if (configPayload && periodPayload) {
+                        configPayload = { ...configPayload, periods: [periodPayload, ...configPayload.periods] };
+                  }
+                  
+                  await saveDataToDataStoreDEBUG(
+                        process.env.REACT_APP_PERIODS_CONFIG_KEY,
+                        configPayload,
+                        null,
+                        null,
+                        null
+                  );
+
+                  console.log("update period configuraiton: ", periodPayload)
+
             } catch (err) {}
       };
 
@@ -2564,8 +2593,7 @@ const Supervision = ({ me }) => {
 
                                                             periodPayload.month1 = {
                                                                   position: 1,
-                                                                  dataElement: elementMONTH_1,
-                                                                  value,
+                                                                  dataElement: { id: elementMONTH_1.id },
                                                                   period: periodObject?.normal,
                                                                   periodString: periodObject?.normal
                                                             };
@@ -2595,8 +2623,7 @@ const Supervision = ({ me }) => {
 
                                                             periodPayload.month2 = {
                                                                   position: 2,
-                                                                  dataElement: elementMONTH_2,
-                                                                  value,
+                                                                  dataElement: { id: elementMONTH_2.id },
                                                                   period: periodObject?.normal,
                                                                   periodString: periodObject?.normal
                                                             };
@@ -2626,8 +2653,7 @@ const Supervision = ({ me }) => {
 
                                                             periodPayload.month3 = {
                                                                   position: 3,
-                                                                  dataElement: elementMONTH_3,
-                                                                  value,
+                                                                  dataElement: { id: elementMONTH_3.id },
                                                                   period: periodObject?.normal,
                                                                   periodString: periodObject?.normal
                                                             };
@@ -2657,8 +2683,7 @@ const Supervision = ({ me }) => {
 
                                                             periodPayload.month4 = {
                                                                   position: 4,
-                                                                  dataElement: elementMONTH_4,
-                                                                  value,
+                                                                  dataElement: { id: elementMONTH_4.id },
                                                                   period: periodObject?.normal,
                                                                   periodString: periodObject?.normal
                                                             };
@@ -2688,8 +2713,7 @@ const Supervision = ({ me }) => {
 
                                                             periodPayload.month5 = {
                                                                   position: 5,
-                                                                  dataElement: elementMONTH_5,
-                                                                  value,
+                                                                  dataElement: { id: elementMONTH_5.id },
                                                                   period: periodObject?.normal,
                                                                   periodString: periodObject?.normal
                                                             };
@@ -2718,8 +2742,7 @@ const Supervision = ({ me }) => {
 
                                                             periodPayload.month6 = {
                                                                   position: 6,
-                                                                  dataElement: elementMONTH_6,
-                                                                  value,
+                                                                  dataElement: { id: elementMONTH_6.id },
                                                                   period: periodObject?.normal,
                                                                   periodString: periodObject?.normal
                                                             };
@@ -2749,8 +2772,7 @@ const Supervision = ({ me }) => {
 
                                                             periodPayload.month7 = {
                                                                   position: 7,
-                                                                  dataElement: elementMONTH_7,
-                                                                  value,
+                                                                  dataElement: { id: elementMONTH_7.id },
                                                                   period: periodObject?.normal,
                                                                   periodString: periodObject?.normal
                                                             };
@@ -2780,8 +2802,7 @@ const Supervision = ({ me }) => {
 
                                                             periodPayload.month8 = {
                                                                   position: 8,
-                                                                  dataElement: elementMONTH_8,
-                                                                  value,
+                                                                  dataElement: { id: elementMONTH_8.id },
                                                                   period: periodObject?.normal,
                                                                   periodString: periodObject?.normal
                                                             };
@@ -2811,8 +2832,7 @@ const Supervision = ({ me }) => {
 
                                                             periodPayload.month9 = {
                                                                   position: 9,
-                                                                  dataElement: elementMONTH_9,
-                                                                  value,
+                                                                  dataElement: { id: elementMONTH_9.id },
                                                                   period: periodObject?.normal,
                                                                   periodString: periodObject?.normal
                                                             };
@@ -2842,8 +2862,7 @@ const Supervision = ({ me }) => {
 
                                                             periodPayload.month10 = {
                                                                   position: 10,
-                                                                  dataElement: elementMONTH_10,
-                                                                  value,
+                                                                  dataElement: { id: elementMONTH_10.id },
                                                                   period: periodObject?.normal,
                                                                   periodString: periodObject?.normal
                                                             };
@@ -2873,8 +2892,7 @@ const Supervision = ({ me }) => {
 
                                                             periodPayload.month11 = {
                                                                   position: 11,
-                                                                  dataElement: elementMONTH_11,
-                                                                  value,
+                                                                  dataElement: { id: elementMONTH_11.id },
                                                                   period: periodObject?.normal,
                                                                   periodString: periodObject?.normal
                                                             };
@@ -2904,8 +2922,7 @@ const Supervision = ({ me }) => {
 
                                                             periodPayload.month12 = {
                                                                   position: 12,
-                                                                  dataElement: elementMONTH_12,
-                                                                  value,
+                                                                  dataElement: { id: elementMONTH_12.id },
                                                                   period: periodObject?.normal,
                                                                   periodString: periodObject?.normal
                                                             };
@@ -2935,8 +2952,7 @@ const Supervision = ({ me }) => {
 
                                                             periodPayload.month13 = {
                                                                   position: 13,
-                                                                  dataElement: elementMONTH_13,
-                                                                  value,
+                                                                  dataElement: { id: elementMONTH_13.id },
                                                                   period: periodObject?.normal,
                                                                   periodString: periodObject?.normal
                                                             };
@@ -2966,8 +2982,7 @@ const Supervision = ({ me }) => {
 
                                                             periodPayload.month14 = {
                                                                   position: 14,
-                                                                  dataElement: elementMONTH_14,
-                                                                  value,
+                                                                  dataElement: { id: elementMONTH_14.id },
                                                                   period: periodObject?.normal,
                                                                   periodString: periodObject?.normal
                                                             };
@@ -2997,8 +3012,7 @@ const Supervision = ({ me }) => {
 
                                                             periodPayload.month15 = {
                                                                   position: 15,
-                                                                  dataElement: elementMONTH_15,
-                                                                  value,
+                                                                  dataElement: { id: elementMONTH_15.id },
                                                                   period: periodObject?.normal,
                                                                   periodString: periodObject?.normal
                                                             };
@@ -3012,6 +3026,7 @@ const Supervision = ({ me }) => {
                                                       }
 
                                                       await updatePeriodsConfigs(periodPayload);
+                                                      await updatePeriodsConfigsDEBUG(periodPayload);
                                                 }
                                           }
 
@@ -3359,7 +3374,6 @@ const Supervision = ({ me }) => {
       };
 
       const validateForms = async inputFields => {
-            
             inputFields
                   ?.filter(i => isAssigned(i.organisationUnit?.id))
                   ?.forEach(element => {
@@ -3373,7 +3387,6 @@ const Supervision = ({ me }) => {
                                     throw new Error(translate('Veuillez_Remplire_Champ_Obligatoire'));
                         }
                   });
-
       };
 
       const getAnalyticValue = async (period, orgUnit, dx) => {
@@ -4974,7 +4987,6 @@ const Supervision = ({ me }) => {
                                                 </span>
                                           </div>
                                           <div style={{ padding: '10px', position: 'relative' }}>
-
                                                 {!isAssigned(org?.id) && (
                                                       <div
                                                             style={{
@@ -6302,7 +6314,9 @@ const Supervision = ({ me }) => {
                   setSelectedAgents(
                         selectedAgents.filter(ag => ag.trackedEntityInstance !== value.trackedEntityInstance)
                   );
-                  setInputFields(inputFields?.filter(o => o.trackedEntityInstance !== value.trackedEntityInstance) || []);
+                  setInputFields(
+                        inputFields?.filter(o => o.trackedEntityInstance !== value.trackedEntityInstance) || []
+                  );
             } else {
                   setSelectedAgents([
                         ...selectedAgents,
@@ -6316,7 +6330,9 @@ const Supervision = ({ me }) => {
                   setSelectedAgents(
                         selectedAgents.filter(ag => ag.trackedEntityInstance !== value.trackedEntityInstance)
                   );
-                  setInputFields(inputFields?.filter(o => o.trackedEntityInstance !== value.trackedEntityInstance) || []);
+                  setInputFields(
+                        inputFields?.filter(o => o.trackedEntityInstance !== value.trackedEntityInstance) || []
+                  );
             } else {
                   setSelectedAgents([
                         ...selectedAgents,
