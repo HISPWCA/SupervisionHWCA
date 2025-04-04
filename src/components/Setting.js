@@ -46,7 +46,7 @@ import { FiEdit } from 'react-icons/fi';
 import { MdOutlineCancel } from 'react-icons/md';
 import { GiCancel } from 'react-icons/gi';
 
-import { loadDataStore, saveDataToDataStore } from '../utils/functions';
+import { loadDataStore, saveDataToDataStore, saveDataToDataStoreDEBUG } from '../utils/functions';
 import { BLUE } from '../utils/couleurs';
 import MyNotification from './MyNotification';
 import translate from '../utils/translator';
@@ -646,6 +646,13 @@ const Setting = () => {
                                     null,
                                     null
                               );
+                              await saveDataToDataStoreDEBUG(
+                                    process.env.REACT_APP_INDICATORS_CONFIG_KEY,
+                                    newList,
+                                    null,
+                                    null,
+                                    null
+                              );
                         }
 
                         setMappingConfigs(newList);
@@ -792,6 +799,13 @@ const Setting = () => {
                   if (item) {
                         const newList = mappingConfigSupervisions.filter(mapConf => mapConf.id !== item.id);
                         await saveDataToDataStore(
+                              process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY,
+                              newList,
+                              null,
+                              null,
+                              null
+                        );
+                        await saveDataToDataStoreDEBUG(
                               process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY,
                               newList,
                               null,
