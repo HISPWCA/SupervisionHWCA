@@ -2,4 +2,4 @@
 
 ### Functionalities
 
-- Taking into account possibility to use Supervision status based on data element configurated in tracker  and the native event status
+- Improving datastore api call during  app initialization. ( it's now more quick )
