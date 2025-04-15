@@ -1678,9 +1678,9 @@ const Supervision = ({ me }) => {
                                                             ?.indicator?.id
                                           );
                                           const foundAggrageMappingElement = newObject?.dhis2;
-                                          const periodType = newObject?.periodType;
+                                          const periodType = newObject?.periodType || 'Monthly';
 
-                                          if (periodType) {
+                                          if (periodType && foundAggrageMappingElement) {
                                                 newIndicatorsPeriodTypes.push({
                                                       position: foundInd.position,
                                                       periodType
@@ -2541,9 +2541,9 @@ const Supervision = ({ me }) => {
                                                                   ?.indicator?.id
                                                 );
                                                 const foundAggrageMappingElement = newObject?.dhis2;
-                                                const periodType = newObject?.periodType;
+                                                const periodType = newObject?.periodType || 'Monthly';
 
-                                                if (periodType) {
+                                                if (periodType && foundAggrageMappingElement) {
                                                       newIndicatorsPeriodTypes.push({
                                                             position: foundInd.position,
                                                             periodType

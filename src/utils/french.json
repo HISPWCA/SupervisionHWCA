@@ -366,7 +366,7 @@
     "Edit_Indicator": "Editer l' Indicateur",
     "Pending Validation": "En attente",
     "Recent_Verification_Period": "Période la plus récente de vérification",
-    "Recent_Verification_Period_Help": "Choisir une date quelconque de la période la plus récente des périodes de vérification de données. ( par exemple : Si votre configuration prend 3 mois  de données, en choisissant 01 Mai 2024, le système va comprendre que vous voulez travailler avec les données d'Avril, Mars, Février 2024 )",
+    "Recent_Verification_Period_Help": "Choisir une date quelconque de la période la plus récente des périodes de vérification de données. ( par exemple : Si votre configuration prend 3 mois  de données, en choisissant 01 Mai 2024, le système va compter à partir de 01 Mai 2024 )",
     "Indicator_Updating": "Mise à jour des indicateurs",
     "CrossCheck_Updating": "Mise à jour des recoupements",
     "Registers_Updating": "Mise à jour des régistres",
@@ -383,7 +383,7 @@
     "Stock": "Stocks",
     "Is_Stock": "C'est un Stock ?",
     "Does_not_exist_in_dhis2": "N'existe pas dans le DHIS2 ?",
-    "Update":"Mèttre à jour",
+    "Update":"Mettre à jour",
     "Configuration_Normal_Case": "Configuration type  Programme Supervision Normale",
     "Program_Not_Assign_To_OU": "Le Programme n'est pas assigné à cette unité d'organisation. Elle sera ignorée lors de la planification",
     "Indicators_Period_Type": "Type de période des indicators"
