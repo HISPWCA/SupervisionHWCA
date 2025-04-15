@@ -383,5 +383,6 @@
     "Does_not_exist_in_dhis2": "Doesn't exist in DHIS2 ?",
     "Update": "Update",
     "Configuration_Normal_Case": "Configuration type Normal Supervision Program",
-    "Program_Not_Assign_To_OU":"The Program is not assign to this organisation unit.It will be ignored during the planification"
+    "Program_Not_Assign_To_OU":"The Program is not assign to this organisation unit.It will be ignored during the planification",
+    "Indicators_Period_Type":"Indicators period type"
 }

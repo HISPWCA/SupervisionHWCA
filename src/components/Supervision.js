@@ -64,11 +64,7 @@ import {
       WEEK,
       YEAR
 } from '../utils/constants';
-import {
-      goToNewPage,
-      loadDataStore,
-      saveDataToDataStore,
-} from '../utils/functions';
+import { goToNewPage, loadDataStore, saveDataToDataStore } from '../utils/functions';
 import { MyNoticeBox } from './MyNoticeBox';
 import {
       ANALYTICS_ROUTE,
@@ -2295,8 +2291,6 @@ const Supervision = ({ me }) => {
       //       } catch (err) {}
       // };
 
-  
-
       const generateEventsAsNewSupervision = async payload => {
             try {
                   const existingTEI_List_response = await axios.get(
@@ -2484,6 +2478,9 @@ const Supervision = ({ me }) => {
                         let newDataValueAsListofArray = [];
                         if (payload.programStageConfig?.indicators?.length > 0 && payload.periodVerification) {
                               const indicatorsList = payload.programStageConfig?.indicators;
+
+                              const selectedIndicatorsPeriodType =
+                                    payload.programStageConfig?.selectedIndicatorsPeriodType;
                               const lastCrossCheckWhichIsStockData =
                                     payload.programStageConfig?.recoupements[
                                           payload.programStageConfig?.recoupements?.length - 1
@@ -3085,10 +3082,6 @@ const Supervision = ({ me }) => {
                                                 }
                                           }
 
-                                          // if (!foundInd && !foundRecoup) {
-                                          //       newDvList.push(dv);
-                                          // }
-
                                           return newDvList;
                                     }) || []
                               );
@@ -3097,9 +3090,7 @@ const Supervision = ({ me }) => {
                         const newDataValueList = newDataValueAsListofArray.reduce(
                               (prev, curr) => (curr?.length > 0 ? prev.concat(curr) : prev),
                               []
-                        );
-
-                        console.log('newDataValueList: ', newDataValueList);
+                        ) 
 
                         eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValueList];
 
@@ -3129,77 +3120,6 @@ const Supervision = ({ me }) => {
             setSelectedOrganisationUnitGroups(
                   values.map(val => organisationUnitGroups.find(orgGp => orgGp.id === val))
             );
-
-      const savePanificationToDataStore = async payloadList => {
-            try {
-                  if (payloadList) {
-                        const newPayload = payloadList.map(payload => ({
-                              id: payload.id,
-                              program: payload.program,
-                              dataSources: payload.dataSources,
-                              supervisions:
-                                    payload.supervisions?.map(sup => ({
-                                          id: sup.id,
-                                          organisationUnit: sup.organisationUnit,
-                                          program: sup.program,
-                                          payment: sup.payment,
-                                          period: sup.period,
-                                          equipe: {
-                                                ...sup.equipe,
-                                                superviseurs:
-                                                      sup.equipe?.superviseurs?.map(equipSup => ({
-                                                            id: equipSup.id,
-                                                            name: equipSup.name
-                                                      })) || []
-                                          },
-                                          tei_event: sup.tei?.enrollments
-                                                ? sup.tei.enrollments.reduce((prev, curr) => {
-                                                        if (
-                                                              curr.orgUnit === sup.tei.orgUnit &&
-                                                              curr.program === sup.program?.id
-                                                        ) {
-                                                              const corresponding_event = curr.events?.find(
-                                                                    ev =>
-                                                                          dayjs(ev.eventDate).format('YYYY-MM-DD') ===
-                                                                                dayjs(sup.period).format(
-                                                                                      'YYYY-MM-DD'
-                                                                                ) ||
-                                                                          dayjs(ev.dueDate).format('YYYY-MM-DD') ===
-                                                                                dayjs(sup.period).format('YYYY-MM-DD')
-                                                              );
-
-                                                              if (corresponding_event) {
-                                                                    prev = {
-                                                                          ...prev,
-                                                                          event: corresponding_event.event,
-                                                                          orgUnit: corresponding_event.orgUnit,
-                                                                          enrollment: corresponding_event.enrollment,
-                                                                          program: corresponding_event.program,
-                                                                          programStage:
-                                                                                corresponding_event.programStage,
-                                                                          trackedEntityInstance:
-                                                                                corresponding_event.trackedEntityInstance,
-                                                                          orgUnitName: corresponding_event.orgUnitName,
-                                                                          created: corresponding_event.created,
-                                                                          dueDate: corresponding_event.dueDate,
-                                                                          eventDate: corresponding_event.eventDate,
-                                                                          storedBy: corresponding_event.storedBy,
-                                                                          status: corresponding_event.status
-                                                                    };
-                                                              }
-                                                        }
-                                                        return prev;
-                                                  }, {})
-                                                : sup.tei_event
-                                    })) || []
-                        }));
-
-                        await saveDataToDataStore(process.env.REACT_APP_SUPERVISIONS_KEY, newPayload);
-                  }
-            } catch (err) {
-                  throw err;
-            }
-      };
 
       const savePerformanceFavoritsToDataStore = async payloads => {
             try {
@@ -3288,24 +3208,6 @@ const Supervision = ({ me }) => {
                                           return listByProgramStage;
                                     }) || []
                         );
-
-                        // const supervisionsList = supervisionsListByProgramStages.reduce((prev, curr) => {
-                        //       if (curr?.length > 0) {
-                        //             prev = prev.concat(curr);
-                        //       }
-                        //       return prev;
-                        // }, []);
-
-                        // let planificationPayload = {
-                        //       id: uuid(),
-                        //       program: selectedProgram,
-                        //       dataSources: mappingConfigs,
-                        //       supervisions: supervisionsList
-                        // };
-
-                        // const newDataStoreSupervisionsPayload = [...newDataStoreSupervisions, planificationPayload];
-
-                        // await savePanificationToDataStore(newDataStoreSupervisionsPayload);
                   }
             } catch (err) {
                   throw err;

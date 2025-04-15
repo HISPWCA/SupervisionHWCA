@@ -155,6 +155,7 @@ const Setting = () => {
             selectedSupervisionAutoGenerateID: null,
             selectedNbrIndicatorsToShow: null,
             selectedPeriodVerification: null,
+            selectedIndicatorsPeriodType: null,
             indicators: [],
             recoupements: [],
             completeness: {
@@ -353,6 +354,7 @@ const Setting = () => {
                   selectedSupervisionAutoGenerateID: null,
                   selectedNbrIndicatorsToShow: null,
                   selectedPeriodVerification: null,
+                  selectedIndicatorsPeriodType: null,
                   globalProgramArea: null,
                   globalProgramAreaKeyWords: [],
                   indicators: [],
@@ -818,6 +820,7 @@ const Setting = () => {
                               selectedSupervisionAutoGenerateID: null,
                               selectedNbrIndicatorsToShow: null,
                               selectedPeriodVerification: null,
+                              selectedIndicatorsPeriodType: null,
                               globalProgramArea: null,
                               globalProgramAreaKeyWords: [],
                               indicators: [],
@@ -978,6 +981,7 @@ const Setting = () => {
                   selectedSupervisionAutoGenerateID: null,
                   selectedNbrIndicatorsToShow: null,
                   selectedPeriodVerification: null,
+                  selectedIndicatorsPeriodType: null,
                   globalProgramArea: null,
                   globalProgramAreaKeyWords: [],
                   indicators: [],
@@ -1121,6 +1125,8 @@ const Setting = () => {
                                                               formState?.selectedNbrIndicatorsToShow,
                                                         selectedPeriodVerification:
                                                               formState?.selectedPeriodVerification,
+                                                        selectedIndicatorsPeriodType:
+                                                              formState?.selectedIndicatorsPeriodType,
                                                         indicators: formState?.indicators,
                                                         recoupements: formState?.recoupements,
                                                         completeness: formState?.completeness,
@@ -1144,6 +1150,7 @@ const Setting = () => {
                                                         formState?.selectedStatusSupervisionDataElement,
                                                   selectedNbrIndicatorsToShow: formState.selectedNbrIndicatorsToShow,
                                                   selectedPeriodVerification: formState.selectedPeriodVerification,
+                                                  selectedIndicatorsPeriodType: formState.selectedIndicatorsPeriodType,
                                                   indicators: formState.indicators,
                                                   recoupements: formState.recoupements,
                                                   completeness: formState.completeness,
@@ -1160,6 +1167,7 @@ const Setting = () => {
                                             supervisorField: formState?.selectedSupervisorDataElements,
                                             selectedNbrIndicatorsToShow: formState.selectedNbrIndicatorsToShow,
                                             selectedPeriodVerification: formState.selectedPeriodVerification,
+                                            selectedIndicatorsPeriodType: formState.selectedIndicatorsPeriodType,
                                             statusSupervisionField: formState?.selectedStatusSupervisionDataElement,
                                             indicators: formState.indicators,
                                             recoupements: formState.recoupements,
@@ -1684,6 +1692,7 @@ const Setting = () => {
                   selectedStatusSupervisionDataElement: null,
                   selectedNbrIndicatorsToShow: null,
                   selectedPeriodVerification: null,
+                  selectedIndicatorsPeriodType: null,
                   selectedSupervisorDataElements: [],
                   globalProgramArea: formState?.globalProgramArea,
                   globalProgramAreaKeyWords: formState?.globalProgramAreaKeyWords || [],
@@ -1702,6 +1711,7 @@ const Setting = () => {
                   selectedStatusSupervisionDataElement: null,
                   selectedNbrIndicatorsToShow: null,
                   selectedPeriodVerification: null,
+                  selectedIndicatorsPeriodType: null,
                   selectedSupervisorDataElements: [],
                   selectedProgramStageForConfiguration: programStages.find(pstage => pstage.id === value)
             });
@@ -1940,6 +1950,7 @@ const Setting = () => {
                               selectedStatusSupervisionDataElement: value.statusSupervisionField,
                               selectedNbrIndicatorsToShow: value.selectedNbrIndicatorsToShow,
                               selectedPeriodVerification: value.selectedPeriodVerification,
+                              selectedIndicatorsPeriodType: value.selectedIndicatorsPeriodType,
                               globalProgramArea: value?.globalProgramArea,
                               globalProgramAreaKeyWords: value?.globalProgramAreaKeyWords || [],
                               completeness: {
@@ -2415,6 +2426,72 @@ const Setting = () => {
                                                                                           value={
                                                                                                 formState
                                                                                                       ?.selectedPeriodVerification
+                                                                                                      ?.id
+                                                                                          }
+                                                                                          optionFilterProp="label"
+                                                                                          showSearch
+                                                                                          allowClear
+                                                                                    />
+                                                                              </td>
+                                                                        </tr>
+                                                                  )}
+
+                                                                  {formState?.selectedConfigurationType !==
+                                                                        NORMAL_PROGRAM && (
+                                                                        <tr>
+                                                                              <td
+                                                                                    style={{
+                                                                                          border: '1px solid #00000070',
+                                                                                          padding: '2px 5px',
+                                                                                          verticalAlign: 'top',
+                                                                                          width: '50%'
+                                                                                    }}
+                                                                              >
+                                                                                    {translate(
+                                                                                          'Indicators_Period_Type'
+                                                                                    )}
+                                                                              </td>
+                                                                              <td
+                                                                                    style={{
+                                                                                          border: '1px solid #00000070',
+                                                                                          padding: '2px 5px',
+                                                                                          verticalAlign: 'top'
+                                                                                    }}
+                                                                              >
+                                                                                    <Select
+                                                                                          options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                                                progStageDE => ({
+                                                                                                      label: progStageDE
+                                                                                                            .dataElement
+                                                                                                            ?.displayName,
+                                                                                                      value: progStageDE
+                                                                                                            .dataElement
+                                                                                                            ?.id
+                                                                                                })
+                                                                                          )}
+                                                                                          placeholder={translate(
+                                                                                                'Indicators_Period_Type'
+                                                                                          )}
+                                                                                          style={{ width: '100%' }}
+                                                                                          onChange={value => {
+                                                                                                setFormState({
+                                                                                                      ...formState,
+                                                                                                      selectedIndicatorsPeriodType:
+                                                                                                            formState?.selectedProgramStageForConfiguration?.programStageDataElements
+                                                                                                                  ?.map(
+                                                                                                                        p =>
+                                                                                                                              p.dataElement
+                                                                                                                  )
+                                                                                                                  .find(
+                                                                                                                        dataElement =>
+                                                                                                                              dataElement.id ===
+                                                                                                                              value
+                                                                                                                  )
+                                                                                                });
+                                                                                          }}
+                                                                                          value={
+                                                                                                formState
+                                                                                                      ?.selectedIndicatorsPeriodType
                                                                                                       ?.id
                                                                                           }
                                                                                           optionFilterProp="label"
