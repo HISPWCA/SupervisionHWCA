@@ -1639,9 +1639,18 @@ const Supervision = ({ me }) => {
                         }
                   }
 
-                  // Period implémentation
+                  const selectedPeriodVerification = payload.programStageConfig?.selectedPeriodVerification;
+                  if (selectedPeriodVerification && payload.periodVerification) {
+                        const newPayl = {
+                              value: payload.periodVerification,
+                              dataElement: selectedPeriodVerification.id
+                        };
+                        eventPayload.dataValues = [...eventPayload.dataValues, newPayl];
+                  }
 
+                  // Period implémentation
                   let newDataValueAsListofArray = [];
+                  const newIndicatorsPeriodTypes = [];
                   if (payload.programStageConfig?.indicators?.length > 0 && payload.periodVerification) {
                         const indicatorsList = payload.programStageConfig?.indicators;
                         const lastCrossCheckWhichIsStockData =
@@ -1658,27 +1667,25 @@ const Supervision = ({ me }) => {
                                           lastCrossCheckWhichIsStockData;
 
                                     if (foundInd) {
-                                          const foundAggrageMappingElement = dataStoreIndicatorsMapping?.find(
+                                          const newObject = dataStoreIndicatorsMapping?.find(
                                                 d =>
                                                       d.indicator ===
                                                       mappingConfigs
                                                             .filter(
                                                                   ev => ev.programStage?.id === payload.programStage?.id
                                                             )
-                                                            .find(ev => ev.indicator?.displayName === dv.value)
+                                                            ?.find(ev => ev.indicator?.displayName === dv.value)
                                                             ?.indicator?.id
-                                          )?.dhis2;
+                                          );
+                                          const foundAggrageMappingElement = newObject?.dhis2;
+                                          const periodType = newObject?.periodType;
 
-                                          const periodType = dataStoreIndicatorsMapping?.find(
-                                                d =>
-                                                      d.indicator ===
-                                                      mappingConfigs
-                                                            .filter(
-                                                                  ev => ev.programStage?.id === payload.programStage?.id
-                                                            )
-                                                            .find(ev => ev.indicator?.displayName === dv.value)
-                                                            ?.indicator?.id
-                                          )?.periodType;
+                                          if (periodType) {
+                                                newIndicatorsPeriodTypes.push({
+                                                      position: foundInd.position,
+                                                      periodType
+                                                });
+                                          }
 
                                           if (foundAggrageMappingElement) {
                                                 const elementMONTH_1 = foundInd?.DHIS2MonthlyValue1;
@@ -2254,6 +2261,21 @@ const Supervision = ({ me }) => {
                         );
                   }
 
+                  const selectedIndicatorsPeriodType = payload.programStageConfig?.selectedIndicatorsPeriodType;
+                  if (newIndicatorsPeriodTypes?.length > 0 && selectedIndicatorsPeriodType) {
+                        const typePayload = {
+                              value: newIndicatorsPeriodTypes
+                                    .sort((a, b) => a.position - b.position)
+                                    .filter(e => e.periodType)
+                                    .map(e => e.periodType)
+                                    .join(' '),
+                              dataElement: selectedIndicatorsPeriodType.id
+                        };
+
+                        console.log('payload: ', typePayload);
+                        eventPayload.dataValues = [...eventPayload.dataValues, typePayload];
+                  }
+
                   const newDataValueList = newDataValueAsListofArray.reduce(
                         (prev, curr) => (curr?.length > 0 ? prev.concat(curr) : prev),
                         []
@@ -2475,12 +2497,21 @@ const Supervision = ({ me }) => {
                               }
                         }
 
+                        const selectedPeriodVerification = payload.programStageConfig?.selectedPeriodVerification;
+                        if (selectedPeriodVerification && payload.periodVerification) {
+                              const newPayl = {
+                                    value: payload.periodVerification,
+                                    dataElement: selectedPeriodVerification.id
+                              };
+                              eventPayload.dataValues = [...eventPayload.dataValues, newPayl];
+                        }
+
                         let newDataValueAsListofArray = [];
+                        const newIndicatorsPeriodTypes = [];
+
                         if (payload.programStageConfig?.indicators?.length > 0 && payload.periodVerification) {
                               const indicatorsList = payload.programStageConfig?.indicators;
 
-                              const selectedIndicatorsPeriodType =
-                                    payload.programStageConfig?.selectedIndicatorsPeriodType;
                               const lastCrossCheckWhichIsStockData =
                                     payload.programStageConfig?.recoupements[
                                           payload.programStageConfig?.recoupements?.length - 1
@@ -2497,7 +2528,7 @@ const Supervision = ({ me }) => {
                                                 lastCrossCheckWhichIsStockData;
 
                                           if (foundInd) {
-                                                const foundAggrageMappingElement = dataStoreIndicatorsMapping?.find(
+                                                const newObject = dataStoreIndicatorsMapping?.find(
                                                       d =>
                                                             d.indicator ===
                                                             mappingConfigs
@@ -2508,20 +2539,16 @@ const Supervision = ({ me }) => {
                                                                   )
                                                                   ?.find(ev => ev.indicator?.displayName === dv.value)
                                                                   ?.indicator?.id
-                                                )?.dhis2;
+                                                );
+                                                const foundAggrageMappingElement = newObject?.dhis2;
+                                                const periodType = newObject?.periodType;
 
-                                                const periodType = dataStoreIndicatorsMapping?.find(
-                                                      d =>
-                                                            d.indicator ===
-                                                            mappingConfigs
-                                                                  .filter(
-                                                                        ev =>
-                                                                              ev.programStage?.id ===
-                                                                              payload.programStage?.id
-                                                                  )
-                                                                  .find(ev => ev.indicator?.displayName === dv.value)
-                                                                  ?.indicator?.id
-                                                )?.periodType;
+                                                if (periodType) {
+                                                      newIndicatorsPeriodTypes.push({
+                                                            position: foundInd.position,
+                                                            periodType
+                                                      });
+                                                }
 
                                                 if (foundAggrageMappingElement) {
                                                       const elementMONTH_1 = foundInd?.DHIS2MonthlyValue1;
@@ -3087,10 +3114,25 @@ const Supervision = ({ me }) => {
                               );
                         }
 
+                        const selectedIndicatorsPeriodType = payload.programStageConfig?.selectedIndicatorsPeriodType;
+                        if (newIndicatorsPeriodTypes?.length > 0 && selectedIndicatorsPeriodType) {
+                              const typePayload = {
+                                    value: newIndicatorsPeriodTypes
+                                          .sort((a, b) => a.position - b.position)
+                                          .filter(e => e.periodType)
+                                          .map(e => e.periodType)
+                                          .join(' '),
+                                    dataElement: selectedIndicatorsPeriodType.id
+                              };
+
+                              console.log('payload: ', typePayload);
+                              eventPayload.dataValues = [...eventPayload.dataValues, typePayload];
+                        }
+
                         const newDataValueList = newDataValueAsListofArray.reduce(
                               (prev, curr) => (curr?.length > 0 ? prev.concat(curr) : prev),
                               []
-                        ) 
+                        );
 
                         eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValueList];
 
@@ -3098,6 +3140,7 @@ const Supervision = ({ me }) => {
                               newEventsList.push(eventPayload);
                         }
 
+                        console.log('newEventsList ', newEventsList);
                         await createEvents({ events: newEventsList });
 
                         const currentTEI = await axios.get(
@@ -5204,7 +5247,8 @@ const Supervision = ({ me }) => {
             return currentPeriod;
       };
 
-      const getRightPeriodFormat = (index, periodType, period) => {
+      const getRightPeriodFormat = (indexI, periodType, period) => {
+            const index = indexI - 1;
             let result = {
                   normal: dayjs(period).subtract(+index, 'month').format('YYYY/MM'),
                   analytic: dayjs(period).subtract(+index, 'month').format('YYYYMM')

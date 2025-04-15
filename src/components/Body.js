@@ -570,7 +570,6 @@ export const Body = () => {
                               }
                         ),
                         loadDataStore(process.env.REACT_APP_PERIODS_CONFIG_KEY, null, null, {
-                              periods: [],
                               month1KeyWords: [],
                               month2KeyWords: [],
                               month3KeyWords: [],
