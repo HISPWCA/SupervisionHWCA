@@ -6936,8 +6936,13 @@ const Supervision = ({ me }) => {
             const translatedList =
                   nonTranslateMappingConfigs.map(mapConf => {
                         const foundElement = cumulateList.find(c => c.id === mapConf.indicator.id);
-                        const foundDE = cumulateList.find(c => c.id === mapConf.dataElement.id);
+                        const foundDE = DEs.find(de => de.id === mapConf.dataElement.id);
 
+                        const foundDatastoreMappingObject = dataStoreIndicatorsMapping?.find(
+                              d => d.indicator === mapConf.indicator.id
+                        );
+
+                  
                         return {
                               ...mapConf,
                               dataElement: mapConf.dataElement && {
@@ -6947,7 +6952,11 @@ const Supervision = ({ me }) => {
                               indicator: mapConf.indicator && {
                                     ...mapConf.indicator,
                                     displayName: foundElement
-                                          ? translateDataStoreLabel(foundElement)
+                                          ? foundDatastoreMappingObject?.useNameFromDHIS2 === true &&
+                                            (foundDatastoreMappingObject.indicatorRename ||
+                                                  foundDatastoreMappingObject.indicatorRename_fr)
+                                                ? translateDataStoreLabel(foundDatastoreMappingObject)
+                                                : translateDataStoreLabel(foundElement)
                                           : mapConf.indicator.displayName
                               }
                         };

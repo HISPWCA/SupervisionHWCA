@@ -14,6 +14,7 @@ const translate = entry => {
 };
 
 export const translateDataStoreLabel = elementObject => {
+      console.log('elementObject.useNameFromDHIS2 ', elementObject?.useNameFromDHIS2);
       if (!elementObject) return '';
       switch (localStorage.getItem('userLang')) {
             case 'fr':
@@ -27,7 +28,9 @@ export const translateDataStoreLabel = elementObject => {
                         : elementObject['name'] || elementObject['name_fr'];
 
             default:
-                  return elementObject['name'];
+                  return elementObject.useNameFromDHIS2 === true
+                        ? elementObject['indicatorRename'] || elementObject['indicatorRename_fr']
+                        : elementObject['name'];
       }
 };
 
