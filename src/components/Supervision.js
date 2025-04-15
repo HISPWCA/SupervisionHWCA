@@ -828,7 +828,6 @@ const Supervision = ({ me }) => {
                               setSelectedSupervisionConfigProgram(currentProgram);
                               setSelectedPeriodSupervisionConfig(dayjs());
                               setSelectedOrgUnitSupervisionFromTracker(currentOrgUnit);
-                              loadProgramStages(currentProgram.program.id);
                               await loadTeisPlanifications(currentProgram.program.id, currentOrgUnit?.id, DESCENDANTS);
                         }
                   }
@@ -6931,12 +6930,20 @@ const Supervision = ({ me }) => {
                   cumulateList = cumulateList.concat(el.children);
             }
 
+            const DEs = programStages[0]?.programStageDataElements?.map(de => de.dataElement) || [];
+            console.log('DEs : ', DEs);
+
             const translatedList =
                   nonTranslateMappingConfigs.map(mapConf => {
                         const foundElement = cumulateList.find(c => c.id === mapConf.indicator.id);
+                        const foundDE = cumulateList.find(c => c.id === mapConf.dataElement.id);
 
                         return {
                               ...mapConf,
+                              dataElement: mapConf.dataElement && {
+                                    ...mapConf.dataElement,
+                                    displayName: foundDE ? foundDE.displayName : mapConf.dataElement.displayName
+                              },
                               indicator: mapConf.indicator && {
                                     ...mapConf.indicator,
                                     displayName: foundElement

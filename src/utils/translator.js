@@ -17,10 +17,14 @@ export const translateDataStoreLabel = elementObject => {
       if (!elementObject) return '';
       switch (localStorage.getItem('userLang')) {
             case 'fr':
-                  return elementObject['name_fr'] || elementObject['name'];
+                  return elementObject.useNameFromDHIS2 === true
+                        ? elementObject['indicatorRename_fr'] || elementObject['indicatorRename']
+                        : elementObject['name_fr'] || elementObject['name'];
 
             case 'en':
-                  return elementObject['name'] || elementObject['name_fr'];
+                  return elementObject.useNameFromDHIS2 === true
+                        ? elementObject['indicatorRename'] || elementObject['indicatorRename_fr']
+                        : elementObject['name'] || elementObject['name_fr'];
 
             default:
                   return elementObject['name'];

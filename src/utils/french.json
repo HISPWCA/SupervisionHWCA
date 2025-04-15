@@ -306,7 +306,7 @@
     "Next": "Suiv",
     "Global_Program_Area": "Domaine de programme global",
     "Keys_Word_Global_Program_Area": "Mots clés du Domaine de programme global",
-    "Use_Indicator_Name_From_Dhis2": "Utiliser nom du DHIS2",
+    "Use_Indicator_Name_From_Dhis2": "Utiliser ou customiser le nom du DHIS2",
     "Indicator_Keys_Word": "Mots clés indicateur",
     "Indicator_keys_Word_Help": "Ajouter tous les mots clés des indicateurs en appuyant sur la touche entrée, ces informations seront utilisées au niveau du tableau de bord et du côté android pour le changement des noms des éléments",
     "Cross_Check_Keys_Word": "Mots clés des recoupements( Dashboard ) ",
