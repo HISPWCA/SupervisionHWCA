@@ -67,9 +67,7 @@ import {
 import {
       goToNewPage,
       loadDataStore,
-      loadDataStoreDEBUG,
       saveDataToDataStore,
-      saveDataToDataStoreDEBUG
 } from '../utils/functions';
 import { MyNoticeBox } from './MyNoticeBox';
 import {
@@ -2282,43 +2280,22 @@ const Supervision = ({ me }) => {
             }
       };
 
-      const updatePeriodsConfigs = async periodPayload => {
-            try {
-                  let configPayload = (await loadDataStore(
-                        process.env.REACT_APP_PERIODS_CONFIG_KEY,
-                        null,
-                        null,
-                        null
-                  )) || { periods: [], month1KeyWords: [], month2KeyWords: [], month3KeyWords: [] };
-                  if (configPayload && periodPayload) {
-                        configPayload = { ...configPayload, periods: [periodPayload, ...configPayload.periods] };
-                  }
-                  await saveDataToDataStore(process.env.REACT_APP_PERIODS_CONFIG_KEY, configPayload, null, null, null);
-            } catch (err) {}
-      };
+      // const updatePeriodsConfigs = async periodPayload => {
+      //       try {
+      //             let configPayload = (await loadDataStore(
+      //                   process.env.REACT_APP_PERIODS_CONFIG_KEY,
+      //                   null,
+      //                   null,
+      //                   null
+      //             )) || { periods: [], month1KeyWords: [], month2KeyWords: [], month3KeyWords: [] };
+      //             if (configPayload && periodPayload) {
+      //                   configPayload = { ...configPayload, periods: [periodPayload, ...configPayload.periods] };
+      //             }
+      //             await saveDataToDataStore(process.env.REACT_APP_PERIODS_CONFIG_KEY, configPayload, null, null, null);
+      //       } catch (err) {}
+      // };
 
-      const updatePeriodsConfigsDEBUG = async periodPayload => {
-            try {
-                  let configPayload = (await loadDataStoreDEBUG(
-                        process.env.REACT_APP_PERIODS_CONFIG_KEY,
-                        null,
-                        null,
-                        null
-                  )) || { periods: [], month1KeyWords: [], month2KeyWords: [], month3KeyWords: [] };
-
-                  if (configPayload && periodPayload) {
-                        configPayload = { ...configPayload, periods: [periodPayload, ...configPayload.periods] };
-                  }
-
-                  await saveDataToDataStoreDEBUG(
-                        process.env.REACT_APP_PERIODS_CONFIG_KEY,
-                        configPayload,
-                        null,
-                        null,
-                        null
-                  );
-            } catch (err) {}
-      };
+  
 
       const generateEventsAsNewSupervision = async payload => {
             try {

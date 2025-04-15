@@ -46,7 +46,7 @@ import { FiEdit } from 'react-icons/fi';
 import { MdOutlineCancel } from 'react-icons/md';
 import { GiCancel } from 'react-icons/gi';
 
-import { loadDataStore, saveDataToDataStore, saveDataToDataStoreDEBUG } from '../utils/functions';
+import { loadDataStore, saveDataToDataStore } from '../utils/functions';
 import { BLUE } from '../utils/couleurs';
 import MyNotification from './MyNotification';
 import translate from '../utils/translator';
@@ -646,13 +646,7 @@ const Setting = () => {
                                     null,
                                     null
                               );
-                              await saveDataToDataStoreDEBUG(
-                                    process.env.REACT_APP_INDICATORS_CONFIG_KEY,
-                                    newList,
-                                    null,
-                                    null,
-                                    null
-                              );
+                             
                         }
 
                         setMappingConfigs(newList);
@@ -805,13 +799,6 @@ const Setting = () => {
                               null,
                               null
                         );
-                        await saveDataToDataStoreDEBUG(
-                              process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY,
-                              newList,
-                              null,
-                              null,
-                              null
-                        );
                         setMappingConfigSupervisions(newList);
                         setNotification({
                               show: true,
@@ -896,13 +883,7 @@ const Setting = () => {
                               dataFav => dataFav.program?.id !== item.program?.id
                         );
                         await saveDataToDataStore(process.env.REACT_APP_VISUALIZATION_KEY, newList, null, null, null);
-                        await saveDataToDataStoreDEBUG(
-                              process.env.REACT_APP_VISUALIZATION_KEY,
-                              newList,
-                              null,
-                              null,
-                              null
-                        );
+                    
                         loadDataStoreVisualizations();
                         setNotification({
                               show: true,
@@ -1376,13 +1357,7 @@ const Setting = () => {
                         null,
                         null
                   );  
-                   await saveDataToDataStoreDEBUG(
-                         process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY,
-                         newList,
-                         setLoadingSaveSupervionsConfig,
-                         null,
-                         null
-                   );
+            
 
                   if (
                         formState?.selectedConfigurationType === DQR ||
@@ -1402,13 +1377,7 @@ const Setting = () => {
                               null,
                               null
                         );
-                         await saveDataToDataStoreDEBUG(
-                               process.env.REACT_APP_PERIODS_CONFIG_KEY,
-                               newPeriodConfigPayload,
-                               null,
-                               null,
-                               null
-                         );
+                  
                   }
 
                   let glabalConfigPayload = {
@@ -1430,13 +1399,7 @@ const Setting = () => {
                         null,
                         null
                   );  
-                   await saveDataToDataStoreDEBUG(
-                         process.env.REACT_APP_GLOBAL_SETTING_KEY,
-                         glabalConfigPayload,
-                         null,
-                         null,
-                         null
-                   );
+              
 
                   const responsePeriodConfigs = await loadDataStore(
                         process.env.REACT_APP_PERIODS_CONFIG_KEY,
@@ -1529,13 +1492,7 @@ const Setting = () => {
                               null
                         );
 
-                        await saveDataToDataStoreDEBUG(
-                              process.env.REACT_APP_INDICATORS_CONFIG_KEY,
-                              newList,
-                              setLoadingSaveIndicatorsConfig,
-                              null,
-                              null
-                        );
+                    
                         setMappingConfigs(newList);
                         setNotification({
                               show: true,
@@ -1582,13 +1539,7 @@ const Setting = () => {
                   if (value) {
                         const newList = analyseConfigs.filter(analyseConf => analyseConf.id !== value.id);
                         await saveDataToDataStore(process.env.REACT_APP_ANALYSES_CONFIG_KEY, newList, null, null, null);
-                        await saveDataToDataStoreDEBUG(
-                              process.env.REACT_APP_ANALYSES_CONFIG_KEY,
-                              newList,
-                              null,
-                              null,
-                              null
-                        );
+                      
                         setAnalyseConfigs(newList);
                         setNotification({
                               show: true,
@@ -1661,13 +1612,7 @@ const Setting = () => {
 
                         const newList = [...analyseConfigs, payload];
                         await saveDataToDataStore(process.env.REACT_APP_ANALYSES_CONFIG_KEY, newList, null, null, null);
-                        await saveDataToDataStoreDEBUG(
-                              process.env.REACT_APP_ANALYSES_CONFIG_KEY,
-                              newList,
-                              null,
-                              null,
-                              null
-                        );
+                       
 
                         setAnalyseConfigs(newList);
                         setSelectedAnalyseDataElement(null);
@@ -3508,13 +3453,7 @@ const Setting = () => {
                         null,
                         null
                   );
-                  await saveDataToDataStoreDEBUG(
-                        process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY,
-                        newList,
-                        setLoadingSaveSupervionsConfig,
-                        null,
-                        null
-                  );
+      
 
                   setProgramStageConfigurations(filteredProgramStages);
                   setMappingConfigSupervisions(newList);
@@ -3695,13 +3634,7 @@ const Setting = () => {
                               null,
                               null
                         );   
-                        await saveDataToDataStoreDEBUG(
-                              process.env.REACT_APP_VISUALIZATION_KEY,
-                              newList,
-                              setLoadingSaveVisualizationInDatastore,
-                              null,
-                              null
-                        );
+                     
 
                         await loadDataStoreVisualizations();
                         setNotification({
