@@ -2171,8 +2171,8 @@ const Supervision = ({ me }) => {
                                                       }
                                                 }
 
-                                                await updatePeriodsConfigs(periodPayload);
-                                                await updatePeriodsConfigsDEBUG(periodPayload);
+                                                // await updatePeriodsConfigs(periodPayload);
+                                                // await updatePeriodsConfigsDEBUG(periodPayload);
                                           }
                                     }
 
@@ -2305,11 +2305,11 @@ const Supervision = ({ me }) => {
                         null,
                         null
                   )) || { periods: [], month1KeyWords: [], month2KeyWords: [], month3KeyWords: [] };
-                  
+
                   if (configPayload && periodPayload) {
                         configPayload = { ...configPayload, periods: [periodPayload, ...configPayload.periods] };
                   }
-                  
+
                   await saveDataToDataStoreDEBUG(
                         process.env.REACT_APP_PERIODS_CONFIG_KEY,
                         configPayload,
@@ -2317,9 +2317,6 @@ const Supervision = ({ me }) => {
                         null,
                         null
                   );
-
-                  console.log("update period configuraiton: ", periodPayload)
-
             } catch (err) {}
       };
 
@@ -3025,8 +3022,8 @@ const Supervision = ({ me }) => {
                                                             }
                                                       }
 
-                                                      await updatePeriodsConfigs(periodPayload);
-                                                      await updatePeriodsConfigsDEBUG(periodPayload);
+                                                      // await updatePeriodsConfigs(periodPayload);
+                                                      // await updatePeriodsConfigsDEBUG(periodPayload);
                                                 }
                                           }
 
