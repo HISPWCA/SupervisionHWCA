@@ -295,7 +295,7 @@
     "Other_Fields": "Autre champs",
     "System_Auto_Generate_Attribute_ID": "Attribut Supervision autogénérer ID",
     "NbrIndicatorsToShow": "Nombre d'indicateur a afficher",
-    "Indicators_Mapping": "Mapping des indicateurs",
+    "Indicators_Mapping": "Mapping/Gestion des indicateurs",
     "Indicator_Group": "Type d'indicateur ",
     "Indicator_From_Dhis2": "Indicateur du DHIS2",
     "DHIS2_monthly_value": "DHIS2 Valeur de la période",
@@ -383,8 +383,13 @@
     "Stock": "Stocks",
     "Is_Stock": "C'est un Stock ?",
     "Does_not_exist_in_dhis2": "N'existe pas dans le DHIS2 ?",
-    "Update":"Mettre à jour",
+    "Update": "Mettre à jour",
     "Configuration_Normal_Case": "Configuration type  Programme Supervision Normale",
     "Program_Not_Assign_To_OU": "Le Programme n'est pas assigné à cette unité d'organisation. Elle sera ignorée lors de la planification",
-    "Indicators_Period_Type": "Type de période des indicators"
+    "Indicators_Period_Type": "Type de période des indicators",
+    "Registers_Management": "Gestion des Régistres",
+    "Cross_Chek_Management": "Gestion des recoupements",
+    "Source_Document_Management": "Gestion des sources de documents",
+    "Data element Management": "Gestion des élements de données",
+    "Save_Configs":"Enrégistrer les configurations"
 }

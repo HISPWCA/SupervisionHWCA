@@ -23,7 +23,8 @@ import {
       RDQA,
       ERDQ,
       PERIOD_LIST,
-      NORMAL_PROGRAM
+      NORMAL_PROGRAM,
+      PAGE_REGISTERS_MANAGEMENT
 } from '../utils/constants';
 import { Card, Checkbox, Col, Divider, Input, InputNumber, Popconfirm, Row, Select, Table } from 'antd';
 import {
@@ -34,7 +35,6 @@ import {
       ORGANISATION_UNIT_GROUPS_ROUTE,
       PROGRAMS_ROUTE,
       PROGRAMS_STAGE_ROUTE,
-      PROGRAM_INDICATOR_GROUPS,
       VISUALIZATIONS_ROUTE
 } from '../utils/api.routes';
 import axios from 'axios';
@@ -55,6 +55,7 @@ import SettingIndicatorsMapping from './SettingIndicatorsMapping';
 import { TagsInput } from 'react-tag-input-component';
 import GenerateIndicatorsFieldsRDQA from './GenerateIndicatorsFieldsRDQA';
 import VisualizationOrMaps from './VisualizationOrMaps';
+import SettingRegistersManagement from './SettingRegistersManagement';
 
 const Setting = () => {
       const [currentItem, setCurrentItem] = useState(null);
@@ -535,19 +536,6 @@ const Setting = () => {
             }
       };
 
-      // const loadProgramIndicatorGroups = async () => {
-      //       try {
-      //             setLoadingIndicatorGroups(true);
-
-      //             const response = await axios.get(`${PROGRAM_INDICATOR_GROUPS}`);
-
-      //             setIndicatorGroups(response.data.programIndicatorGroups);
-      //             setLoadingIndicatorGroups(false);
-      //       } catch (err) {
-      //             setLoadingIndicatorGroups(false);
-      //       }
-      // };
-
       const loadProgramStages = async programID => {
             try {
                   setLoadingProgramStages(true);
@@ -648,7 +636,6 @@ const Setting = () => {
                                     null,
                                     null
                               );
-                             
                         }
 
                         setMappingConfigs(newList);
@@ -886,7 +873,7 @@ const Setting = () => {
                               dataFav => dataFav.program?.id !== item.program?.id
                         );
                         await saveDataToDataStore(process.env.REACT_APP_VISUALIZATION_KEY, newList, null, null, null);
-                    
+
                         loadDataStoreVisualizations();
                         setNotification({
                               show: true,
@@ -1364,8 +1351,7 @@ const Setting = () => {
                         setLoadingSaveSupervionsConfig,
                         null,
                         null
-                  );  
-            
+                  );
 
                   if (
                         formState?.selectedConfigurationType === DQR ||
@@ -1385,7 +1371,6 @@ const Setting = () => {
                               null,
                               null
                         );
-                  
                   }
 
                   let glabalConfigPayload = {
@@ -1406,8 +1391,7 @@ const Setting = () => {
                         null,
                         null,
                         null
-                  );  
-              
+                  );
 
                   const responsePeriodConfigs = await loadDataStore(
                         process.env.REACT_APP_PERIODS_CONFIG_KEY,
@@ -1500,7 +1484,6 @@ const Setting = () => {
                               null
                         );
 
-                    
                         setMappingConfigs(newList);
                         setNotification({
                               show: true,
@@ -1547,7 +1530,7 @@ const Setting = () => {
                   if (value) {
                         const newList = analyseConfigs.filter(analyseConf => analyseConf.id !== value.id);
                         await saveDataToDataStore(process.env.REACT_APP_ANALYSES_CONFIG_KEY, newList, null, null, null);
-                      
+
                         setAnalyseConfigs(newList);
                         setNotification({
                               show: true,
@@ -1620,7 +1603,6 @@ const Setting = () => {
 
                         const newList = [...analyseConfigs, payload];
                         await saveDataToDataStore(process.env.REACT_APP_ANALYSES_CONFIG_KEY, newList, null, null, null);
-                       
 
                         setAnalyseConfigs(newList);
                         setSelectedAnalyseDataElement(null);
@@ -3530,7 +3512,6 @@ const Setting = () => {
                         null,
                         null
                   );
-      
 
                   setProgramStageConfigurations(filteredProgramStages);
                   setMappingConfigSupervisions(newList);
@@ -3710,8 +3691,7 @@ const Setting = () => {
                               setLoadingSaveVisualizationInDatastore,
                               null,
                               null
-                        );   
-                     
+                        );
 
                         await loadDataStoreVisualizations();
                         setNotification({
@@ -5361,6 +5341,12 @@ const Setting = () => {
             </div>
       );
 
+      const RenderPageRegistersManagement = () => (
+            <div>
+                  <SettingRegistersManagement />
+            </div>
+      );
+
       const RenderTypeSupervisionContent = () => (
             <div>
                   <Row gutter={[8, 8]}>
@@ -5381,6 +5367,16 @@ const Setting = () => {
                                           onClick={() => handleClickConfigMenu(PAGE_INDICATORS_MAPPING)}
                                     >
                                           {translate('Indicators_Mapping')}
+                                    </div>
+                                    <div
+                                          className={`setting-menu-item ${
+                                                selectedTypeSupervisionPage === PAGE_REGISTERS_MANAGEMENT
+                                                      ? 'active'
+                                                      : ''
+                                          }`}
+                                          onClick={() => handleClickConfigMenu(PAGE_REGISTERS_MANAGEMENT)}
+                                    >
+                                          {translate('Registers_Management')}
                                     </div>
                                     <div
                                           className={`setting-menu-item ${
@@ -5413,6 +5409,8 @@ const Setting = () => {
                               {selectedTypeSupervisionPage === PAGE_CONFIG_VISUALIZATION &&
                                     RenderPageVisualizationsConfig()}
                               {selectedTypeSupervisionPage === PAGE_CONFIG_ANALYSE && RenderPageAnalyseConfig()}
+                              {selectedTypeSupervisionPage === PAGE_REGISTERS_MANAGEMENT &&
+                                    RenderPageRegistersManagement()}
                         </Col>
                   </Row>
             </div>

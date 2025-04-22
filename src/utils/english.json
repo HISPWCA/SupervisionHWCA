@@ -295,7 +295,7 @@
     "Other_Fields": "Other fields",
     "System_Auto_Generate_Attribute_ID": "Supervision Attribute auto generate ID",
     "NbrIndicatorsToShow": "Number of indicators to show",
-    "Indicators_Mapping": "Indicators Mapping",
+    "Indicators_Mapping": "Indicators Mapping/Management",
     "Indicator_Group": "Indicator type",
     "Indicator_From_Dhis2": "Indicator From DHIS2",
     "DHIS2_monthly_value": "DHIS2 period value",
@@ -384,5 +384,10 @@
     "Update": "Update",
     "Configuration_Normal_Case": "Configuration type Normal Supervision Program",
     "Program_Not_Assign_To_OU":"The Program is not assign to this organisation unit.It will be ignored during the planification",
-    "Indicators_Period_Type":"Indicators period type"
+    "Indicators_Period_Type":"Indicators period type",
+    "Registers_Management":"Registers Management",
+    "Cross_Chek_Management":"Cross Check Management",
+    "Source_Document_Management":"Source  Document Management",
+    "Data element Management":"Data element Management",
+        "Save_Configs": "Save configs"
 }
