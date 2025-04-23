@@ -9,7 +9,7 @@ import translate, { translateDataStoreLabel } from '../utils/translator';
 import { IoMdAddCircleOutline } from 'react-icons/io';
 import { FaRegEdit } from 'react-icons/fa';
 
-const SettingCrossChecksManagement = () => {
+const SettingSourceDocumentCompletenessManagement = () => {
     const [openModal, setOpenModal] = useState(false);
     const [dataStoreElements, setDataStoreElements] = useState([]);
     const [loadingProcess, setLoadingProcess] = useState(false);
@@ -31,7 +31,7 @@ const SettingCrossChecksManagement = () => {
         try {
             setLoadingProcess(true);
             const newList = formState?.indicators;
-            await saveDataToDataStore(process.env.REACT_APP_REGISTRES_KEY, newList, null, null, null);
+            await saveDataToDataStore(process.env.REACT_APP_DS_COMPLETNESS_KEY, newList, null, null, null);
             setNotification({
                 show: true,
                 message: translate('Operation_Success'),
@@ -51,7 +51,7 @@ const SettingCrossChecksManagement = () => {
     const loadDataStoreElements = async () => {
         try {
             setLoadingElements(true);
-            const response = await loadDataStore(process.env.REACT_APP_REGISTRES_KEY, null, null, []);
+            const response = await loadDataStore(process.env.REACT_APP_DS_COMPLETNESS_KEY, null, null, []);
             setDataStoreElements(response);
             setLoadingElements(false);
         } catch (err) {
@@ -77,7 +77,7 @@ const SettingCrossChecksManagement = () => {
                         alignItems: 'center'
                     }}
                 >
-                    <div style={{ fontWeight: 'bold' }}>{translate('Registers_Management')}</div>
+                    <div style={{ fontWeight: 'bold' }}>{translate('Source_Document_Management')}</div>
                     <div
                         style={{
                             display: 'flex',
@@ -194,7 +194,7 @@ const SettingCrossChecksManagement = () => {
                                                     key={element.id}
                                                     style={{
                                                         marginTop: '5px',
-                                                        borderBottom: index +1 === group.children.length ? '' : '1px solid #ccc',
+                                                        borderBottom: index + 1 === group.children.length ? '' : '1px solid #ccc',
                                                         paddingBottom: '5px'
                                                     }}
                                                 >
@@ -254,10 +254,10 @@ const SettingCrossChecksManagement = () => {
                 <SettingAddFormModal
                     dataStoreElements={dataStoreElements}
                     refreshElements={loadDataStoreElements}
-                    elementName='Register'
+                    elementName="Source_Document"
                     setOpen={setOpenModal}
                     open={openModal}
-                    dataStoreKey={process.env.REACT_APP_REGISTRES_KEY}
+                    dataStoreKey={process.env.REACT_APP_DS_COMPLETNESS_KEY}
                     currentSelectedGroup={currentSelectedGroup}
                     setCurrentSelectedGroup={setCurrentSelectedGroup}
                 />
@@ -266,4 +266,4 @@ const SettingCrossChecksManagement = () => {
     );
 };
 
-export default SettingCrossChecksManagement;
+export default SettingSourceDocumentCompletenessManagement;
