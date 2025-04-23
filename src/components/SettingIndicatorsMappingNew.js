@@ -12,323 +12,284 @@ import { NOTIFICATION_CRITICAL, NOTIFICATION_SUCCESS } from '../utils/constants'
 import { MdSystemUpdateAlt } from 'react-icons/md';
 import { FaRegEdit } from 'react-icons/fa';
 
-const SettingIndicatorsMappingNew = ({
-      open,
-      setOpen,
-      loadDataStoreIndicators,
-      loadDataStoreIndicatorsMapping,
-      setNotification,
-      dataStoreIndicators,
-      currentDataStoreMapping,
-      setCurrentDataStoreMapping
-}) => {
-      const [newIndicatorList, setNewIndicatorList] = useState([]);
-      const [selectedIndicatorType, setSelectedIndicatorType] = useState('');
-      const [inputIndicatorType, setInputIndicatorType] = useState('');
-      const [isStock, setIsStock] = useState(false);
-      const [isNotInDHIS2, setIsNotInDHIS2] = useState(false);
-      const [inputIndicator, setInputIndicator] = useState('');
-      const [inputIndicatorFr, setInputIndicatorFr] = useState('');
-      const [type, setType] = useState('NEW');
-      const [loadingSave, setLoadingSave] = useState(false);
-      const [loadingDelete, setLoadingDelete] = useState(false);
+const SettingIndicatorsMappingNew = ({ open, setOpen, loadDataStoreIndicators, loadDataStoreIndicatorsMapping, setNotification, dataStoreIndicators, currentDataStoreMapping, setCurrentDataStoreMapping }) => {
+    const [newIndicatorList, setNewIndicatorList] = useState([]);
+    const [selectedIndicatorType, setSelectedIndicatorType] = useState('');
+    const [inputIndicatorType, setInputIndicatorType] = useState('');
+    const [isStock, setIsStock] = useState(false);
+    const [isNotInDHIS2, setIsNotInDHIS2] = useState(false);
+    const [inputIndicator, setInputIndicator] = useState('');
+    const [inputIndicatorFr, setInputIndicatorFr] = useState('');
+    const [type, setType] = useState('NEW');
+    const [loadingSave, setLoadingSave] = useState(false);
+    const [loadingDelete, setLoadingDelete] = useState(false);
 
-      const [currentItem, setCurrentItem] = useState(null);
+    const [currentItem, setCurrentItem] = useState(null);
 
-      const cleanAllState = () => {
-            setSelectedIndicatorType('');
-            setIsNotInDHIS2(false);
-            setIsStock(false);
-            setType('NEW');
-            setInputIndicator('');
-            setInputIndicatorFr('');
-            setInputIndicatorType('');
-            setNewIndicatorList([]);
-            setOpen(false);
-      };
+    const cleanAllState = () => {
+        setSelectedIndicatorType('');
+        setIsNotInDHIS2(false);
+        setIsStock(false);
+        setType('NEW');
+        setInputIndicator('');
+        setInputIndicatorFr('');
+        setInputIndicatorType('');
+        setNewIndicatorList([]);
+        setOpen(false);
+    };
 
-      const handleCloseModal = () => {
+    const handleCloseModal = () => {
+        cleanAllState();
+    };
+
+    const handleSave = async () => {
+        try {
+            setLoadingSave(true);
+            let payloads = dataStoreIndicators;
+            if (type === 'SELECT') {
+                payloads = dataStoreIndicators.map(i => {
+                    if (i.name === selectedIndicatorType) {
+                        return { ...i, children: newIndicatorList || [] };
+                    }
+                    return i;
+                });
+            }
+
+            if (type === 'NEW') {
+                payloads = [...dataStoreIndicators, { name: inputIndicatorType?.trim(), children: newIndicatorList || [] }];
+            }
+            await saveDataToDataStore(process.env.REACT_APP_INDICATORS_KEY, payloads);
+            setNotification({
+                show: true,
+                message: translate('Operation_Success'),
+                type: NOTIFICATION_SUCCESS
+            });
+            setCurrentDataStoreMapping(null);
+            loadDataStoreIndicators();
+            loadDataStoreIndicatorsMapping();
             cleanAllState();
-      };
+            setLoadingSave(false);
+            setCurrentItem(null);
+        } catch (err) {
+            setLoadingSave(false);
+            setNotification({
+                show: true,
+                message: err.response?.data?.message || err.message,
+                type: NOTIFICATION_CRITICAL
+            });
+        }
+    };
 
-      const handleSave = async () => {
-            try {
-                  setLoadingSave(true);
-                  let payloads = dataStoreIndicators;
-                  if (type === 'SELECT') {
-                        payloads = dataStoreIndicators.map(i => {
-                              if (i.name === selectedIndicatorType) {
-                                    return { ...i, children: newIndicatorList || [] };
-                              }
-                              return i;
-                        });
-                  }
+    const handleSelectIndicatortype = value => {
+        if (value) {
+            const found_indicator_type = dataStoreIndicators?.find(i => i.name === value);
 
-                  if (type === 'NEW') {
-                        payloads = [
-                              ...dataStoreIndicators,
-                              { name: inputIndicatorType?.trim(), children: newIndicatorList || [] }
-                        ];
-                  }
-                  await saveDataToDataStore(process.env.REACT_APP_INDICATORS_KEY, payloads);
-                  setNotification({
-                        show: true,
-                        message: translate('Operation_Success'),
-                        type: NOTIFICATION_SUCCESS
-                  });
-                  setCurrentDataStoreMapping(null);
-                  loadDataStoreIndicators();
-                  loadDataStoreIndicatorsMapping();
-                  cleanAllState();
-                  setLoadingSave(false);
-                  setCurrentItem(null);
-            } catch (err) {
-                  setLoadingSave(false);
-                  setNotification({
-                        show: true,
-                        message: err.response?.data?.message || err.message,
-                        type: NOTIFICATION_CRITICAL
-                  });
+            if (found_indicator_type) {
+                setSelectedIndicatorType(value);
+                setNewIndicatorList(found_indicator_type.children || []);
+                setInputIndicator('');
+                setInputIndicatorFr('');
+                setInputIndicatorType('');
+                setCurrentItem('');
             }
-      };
+        }
+    };
 
-      const handleSelectIndicatortype = value => {
-            if (value) {
-                  const found_indicator_type = dataStoreIndicators?.find(i => i.name === value);
+    const handleInputIndicatorType = e => {
+        setInputIndicatorType(e.target.value);
+        setSelectedIndicatorType('');
+    };
 
-                  if (found_indicator_type) {
-                        setSelectedIndicatorType(value);
-                        setNewIndicatorList(found_indicator_type.children || []);
-                        setInputIndicator('');
-                        setInputIndicatorFr('');
-                        setInputIndicatorType('');
-                        setCurrentItem('');
-                  }
-            }
-      };
+    const handleSelectType = ({ value }) => {
+        setType(value);
+        setNewIndicatorList([]);
+        setInputIndicatorType('');
+        setInputIndicatorFr('');
+        setInputIndicator('');
+        setSelectedIndicatorType('');
+        setCurrentItem('');
+    };
 
-      const handleInputIndicatorType = e => {
-            setInputIndicatorType(e.target.value);
-            setSelectedIndicatorType('');
-      };
+    const handleAddIndicator = () => {
+        let payload = {};
 
-      const handleSelectType = ({ value }) => {
-            setType(value);
-            setNewIndicatorList([]);
-            setInputIndicatorType('');
-            setInputIndicatorFr('');
-            setInputIndicator('');
-            setSelectedIndicatorType('');
-            setCurrentItem('');
-      };
+        if (currentItem) {
+            payload = {
+                ...currentItem,
+                name_fr: inputIndicatorFr?.trim(),
+                name: inputIndicator?.trim(),
+                isStock,
+                isNotInDHIS2
+            };
+        } else {
+            payload = {
+                id: uuid(),
+                name_fr: inputIndicatorFr?.trim(),
+                name: inputIndicator?.trim(),
+                isStock,
+                isNotInDHIS2
+            };
+        }
 
-      const handleAddIndicator = () => {
-            let payload = {};
+        let stockElements = [];
+        if (isStock && !currentItem) {
+            stockElements = [
+                {
+                    id: uuid(),
+                    isStock,
+                    isNotInDHIS2,
+                    name_fr: translate('Initial_Stock'),
+                    name: translate('Initial_Stock'),
+                    initialStock: true,
+                    parent: payload.id
+                },
+                {
+                    id: uuid(),
+                    isStock,
+                    isNotInDHIS2,
+                    distributedStock: true,
+                    name_fr: translate('Distributed_Stock'),
+                    name: translate('Distributed_Stock'),
+                    parent: payload.id
+                },
+                {
+                    id: uuid(),
+                    isStock,
+                    isNotInDHIS2,
+                    receivedStock: true,
+                    name_fr: translate('Received_Stock'),
+                    name: translate('Received_Stock'),
+                    parent: payload.id
+                },
+                {
+                    id: uuid(),
+                    isStock,
+                    isNotInDHIS2,
+                    restedStock: true,
+                    name_fr: translate('Rested_Stock'),
+                    name: translate('Rested_Stock'),
+                    parent: payload.id
+                }
+            ];
+        }
 
-            if (currentItem) {
-                  payload = {
-                        ...currentItem,
-                        name_fr: inputIndicatorFr?.trim(),
-                        name: inputIndicator?.trim(),
-                        isStock,
-                        isNotInDHIS2
-                  };
-            } else {
-                  payload = {
-                        id: uuid(),
-                        name_fr: inputIndicatorFr?.trim(),
-                        name: inputIndicator?.trim(),
-                        isStock,
-                        isNotInDHIS2
-                  };
-            }
+        if (currentItem) {
+            setNewIndicatorList(newIndicatorList.map(i => (i.id === currentItem.id ? { ...i, ...payload } : i)));
+        } else {
+            setNewIndicatorList([...newIndicatorList, payload, ...stockElements]);
+        }
 
-            let stockElements = [];
-            if (isStock && !currentItem) {
-                  stockElements = [
-                        {
-                              id: uuid(),
-                              isStock,
-                              isNotInDHIS2,
-                              name_fr: translate('Initial_Stock'),
-                              name: translate('Initial_Stock'),
-                              initialStock: true,
-                              parent: payload.id
-                        },
-                        {
-                              id: uuid(),
-                              isStock,
-                              isNotInDHIS2,
-                              distributedStock: true,
-                              name_fr: translate('Distributed_Stock'),
-                              name: translate('Distributed_Stock'),
-                              parent: payload.id
-                        },
-                        {
-                              id: uuid(),
-                              isStock,
-                              isNotInDHIS2,
-                              receivedStock: true,
-                              name_fr: translate('Received_Stock'),
-                              name: translate('Received_Stock'),
-                              parent: payload.id
-                        },
-                        {
-                              id: uuid(),
-                              isStock,
-                              isNotInDHIS2,
-                              restedStock: true,
-                              name_fr: translate('Rested_Stock'),
-                              name: translate('Rested_Stock'),
-                              parent: payload.id
-                        }
-                  ];
-            }
+        setIsStock(false);
+        setIsNotInDHIS2(false);
+        setInputIndicator('');
+        setInputIndicatorFr('');
+        setCurrentItem('');
+    };
 
-            if (currentItem) {
-                  setNewIndicatorList(newIndicatorList.map(i => (i.id === currentItem.id ? { ...i, ...payload } : i)));
-            } else {
-                  setNewIndicatorList([...newIndicatorList, payload, ...stockElements]);
-            }
+    const handleDeleteEverything = async () => {
+        try {
+            setLoadingDelete(true);
+            let payloads = dataStoreIndicators?.filter(i => i.name !== currentDataStoreMapping?.name) || [];
 
-            setIsStock(false);
-            setIsNotInDHIS2(false);
-            setInputIndicator('');
-            setInputIndicatorFr('');
-            setCurrentItem('');
-      };
+            await saveDataToDataStore(process.env.REACT_APP_INDICATORS_KEY, payloads);
+            setNotification({
+                show: true,
+                message: translate('Operation_Success'),
+                type: NOTIFICATION_SUCCESS
+            });
+            setCurrentDataStoreMapping(null);
+            loadDataStoreIndicators();
+            loadDataStoreIndicatorsMapping();
+            cleanAllState();
+            setLoadingDelete(false);
+        } catch (err) {
+            setLoadingDelete(false);
+            setNotification({
+                show: true,
+                message: err.response?.data?.message || err.message,
+                type: NOTIFICATION_CRITICAL
+            });
+        }
+    };
 
-      const handleDeleteEverything = async () => {
-            try {
-                  setLoadingDelete(true);
-                  let payloads = dataStoreIndicators?.filter(i => i.name !== currentDataStoreMapping?.name) || [];
+    const handleDeleteIndicator = id => {
+        if (!id) return console.log("L'id de l'indicateur est null. ça veut dire que le format est incorrect. Veuillez metre à jour le format puis rééssayer.");
 
-                  await saveDataToDataStore(process.env.REACT_APP_INDICATORS_KEY, payloads);
-                  setNotification({
-                        show: true,
-                        message: translate('Operation_Success'),
-                        type: NOTIFICATION_SUCCESS
-                  });
-                  setCurrentDataStoreMapping(null);
-                  loadDataStoreIndicators();
-                  loadDataStoreIndicatorsMapping();
-                  cleanAllState();
-                  setLoadingDelete(false);
-            } catch (err) {
-                  setLoadingDelete(false);
-                  setNotification({
-                        show: true,
-                        message: err.response?.data?.message || err.message,
-                        type: NOTIFICATION_CRITICAL
-                  });
-            }
-      };
+        if (id) {
+            setNewIndicatorList(newIndicatorList.filter(i => id !== i.id));
+            setCurrentItem(null);
+        }
+    };
 
-      const handleDeleteIndicator = id => {
-            if (!id)
-                  return console.log(
-                        "L'id de l'indicateur est null. ça veut dire que le format est incorrect. Veuillez metre à jour le format puis rééssayer."
-                  );
+    useEffect(() => {
+        if (currentDataStoreMapping) {
+            setSelectedIndicatorType(currentDataStoreMapping?.name);
+            setNewIndicatorList(currentDataStoreMapping?.children || []);
+            setType('SELECT');
+        }
+    }, [currentDataStoreMapping]);
 
-            if (id) {
-                  setNewIndicatorList(newIndicatorList.filter(i => id !== i.id));
-                  setCurrentItem(null);
-            }
-      };
+    return (
+        <>
+            {open && (
+                <Modal onClose={handleCloseModal}>
+                    <ModalTitle>
+                        <div style={{ fontWeight: 'bold', fontSize: '16px' }}>{translate('New_Indicator')}</div>
+                    </ModalTitle>
+                    <ModalContent>
+                        <div
+                            style={{
+                                padding: '10px',
+                                border: '1px solid #00000060',
+                                borderRadius: '10px'
+                            }}
+                        >
+                            <div>
+                                <div>
+                                    <Radio label={translate('Select_Group')} className="cursor-pointer" onChange={handleSelectType} value="SELECT" checked={type === 'SELECT' ? true : false} />
+                                </div>
+                                <div>
+                                    <Radio label={translate('Create_New_Group')} className="cursor-pointer" onChange={handleSelectType} value="NEW" checked={type === 'NEW' ? true : false} />
+                                </div>
+                            </div>
 
-      useEffect(() => {
-            if (currentDataStoreMapping) {
-                  setSelectedIndicatorType(currentDataStoreMapping?.name);
-                  setNewIndicatorList(currentDataStoreMapping?.children || []);
-                  setType('SELECT');
-            }
-      }, [currentDataStoreMapping]);
-
-      return (
-            <>
-                  {open && (
-                        <Modal onClose={handleCloseModal}>
-                              <ModalTitle>
-                                    <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
-                                          {translate('New_Indicator')}
+                            <div style={{ marginTop: '20px' }}>
+                                {type === 'SELECT' && (
+                                    <div>
+                                        <div>{translate('Group')}</div>
+                                        <div style={{ marginTop: '5px' }}>
+                                            <Select
+                                                options={dataStoreIndicators.map(i => ({
+                                                    label: i.name,
+                                                    value: i.name
+                                                }))}
+                                                placeholder={translate('Group')}
+                                                onChange={handleSelectIndicatortype}
+                                                value={selectedIndicatorType}
+                                                style={{ width: '100%' }}
+                                            />
+                                        </div>
                                     </div>
-                              </ModalTitle>
-                              <ModalContent>
-                                    <div
-                                          style={{
-                                                padding: '10px',
-                                                border: '1px solid #00000060',
-                                                borderRadius: '10px'
-                                          }}
-                                    >
-                                          <div>
-                                                <div>
-                                                      <Radio
-                                                            label={translate('Select_Indicator_Type')}
-                                                            className="cursor-pointer"
-                                                            onChange={handleSelectType}
-                                                            value="SELECT"
-                                                            checked={type === 'SELECT' ? true : false}
-                                                      />
-                                                </div>
-                                                <div>
-                                                      <Radio
-                                                            label={translate('Create_New_Indicator_Type')}
-                                                            className="cursor-pointer"
-                                                            onChange={handleSelectType}
-                                                            value="NEW"
-                                                            checked={type === 'NEW' ? true : false}
-                                                      />
-                                                </div>
-                                          </div>
+                                )}
+                                {type === 'NEW' && (
+                                    <div>
+                                        <div>{translate('Group')}</div>
+                                        <div style={{ marginTop: '5px' }}>
+                                            <Input placeholder={translate('Name')} value={inputIndicatorType} onChange={handleInputIndicatorType} />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
 
-                                          <div style={{ marginTop: '20px' }}>
-                                                {type === 'SELECT' && (
-                                                      <div>
-                                                            <div>{translate('Indicator_Group')}</div>
-                                                            <div style={{ marginTop: '5px' }}>
-                                                                  <Select
-                                                                        options={dataStoreIndicators.map(i => ({
-                                                                              label: i.name,
-                                                                              value: i.name
-                                                                        }))}
-                                                                        placeholder={translate('Indicator_Group')}
-                                                                        onChange={handleSelectIndicatortype}
-                                                                        value={selectedIndicatorType}
-                                                                        style={{ width: '100%' }}
-                                                                  />
-                                                            </div>
-                                                      </div>
-                                                )}
-                                                {type === 'NEW' && (
-                                                      <div>
-                                                            <div>{translate('Indicator_Group')}</div>
-                                                            <div style={{ marginTop: '5px' }}>
-                                                                  <Input
-                                                                        placeholder={translate('Name')}
-                                                                        value={inputIndicatorType}
-                                                                        onChange={handleInputIndicatorType}
-                                                                  />
-                                                            </div>
-                                                      </div>
-                                                )}
-                                          </div>
-
-                                          {(selectedIndicatorType || inputIndicatorType) && (
-                                                <div style={{ display: 'flex', gap: '5px', alignItems: 'end' }}>
-                                                      <div style={{ marginTop: '10px', width: '50%' }}>
-                                                            <div>{translate('Indicateur')}</div>
-                                                            <div style={{ marginTop: '5px' }}>
-                                                                  <Input
-                                                                        placeholder={translate('Name')}
-                                                                        value={inputIndicator}
-                                                                        onChange={e =>
-                                                                              setInputIndicator(e.target.value)
-                                                                        }
-                                                                  />
-                                                            </div>
-                                                      </div>
-                                                      {/* <div style={{ marginTop: '10px', width: '50%' }}>
+                            {(selectedIndicatorType || inputIndicatorType) && (
+                                <div style={{ display: 'flex', gap: '5px', alignItems: 'end' }}>
+                                    <div style={{ marginTop: '10px', width: '50%' }}>
+                                        <div>{translate('Indicateur')}</div>
+                                        <div style={{ marginTop: '5px' }}>
+                                            <Input placeholder={translate('Name')} value={inputIndicator} onChange={e => setInputIndicator(e.target.value)} />
+                                        </div>
+                                    </div>
+                                    {/* <div style={{ marginTop: '10px', width: '50%' }}>
                                                             <div>{translate('Indicateur')} ( Français )</div>
                                                             <div style={{ marginTop: '5px' }}>
                                                                   <Input
@@ -340,291 +301,212 @@ const SettingIndicatorsMappingNew = ({
                                                                   />
                                                             </div>
                                                       </div> */}
-                                                      <div>
-                                                            <Button
-                                                                  small
-                                                                  primary
-                                                                  disabled={
-                                                                        currentItem
-                                                                              ? false
-                                                                              : inputIndicator &&
-                                                                                !newIndicatorList
-                                                                                      .map(i =>
-                                                                                            i.name
-                                                                                                  ?.trim()
-                                                                                                  ?.toLowerCase()
-                                                                                      )
-                                                                                      .includes(
-                                                                                            inputIndicator
-                                                                                                  ?.trim()
-                                                                                                  ?.toLowerCase()
-                                                                                      )
-                                                                              ? false
-                                                                              : true
-                                                                  }
-                                                                  onClick={handleAddIndicator}
-                                                                  icon={
-                                                                        currentItem ? (
-                                                                              <MdSystemUpdateAlt
-                                                                                    style={{
-                                                                                          fontSize: '18px',
-                                                                                          color: 'white'
-                                                                                    }}
-                                                                              />
-                                                                        ) : (
-                                                                              <IoMdAddCircle
-                                                                                    style={{
-                                                                                          fontSize: '18px',
-                                                                                          color: 'white'
-                                                                                    }}
-                                                                              />
-                                                                        )
-                                                                  }
-                                                            >
-                                                                  {currentItem
-                                                                        ? translate('Update')
-                                                                        : translate('Ajouter')}
-                                                            </Button>
-                                                      </div>
-                                                </div>
-                                          )}
-
-                                          {(selectedIndicatorType || inputIndicatorType) && (
-                                                <>
-                                                      <div
-                                                            style={{
-                                                                  display: 'flex',
-                                                                  marginTop: '10px',
-                                                                  cursor: 'pointer',
-                                                                  gap: '10px',
-                                                                  alignItems: 'center'
-                                                            }}
-                                                            onClick={() => setIsStock(!isStock)}
-                                                      >
-                                                            <Checkbox
-                                                                  checked={isStock}
-                                                                  onChange={() => setIsStock(!isStock)}
-                                                            />
-                                                            <span>{translate('Is_Stock')}</span>
-                                                      </div>
-
-                                                      <div
-                                                            style={{
-                                                                  display: 'flex',
-                                                                  marginTop: '10px',
-                                                                  cursor: 'pointer',
-                                                                  gap: '10px',
-                                                                  alignItems: 'center'
-                                                            }}
-                                                            onClick={() => setIsNotInDHIS2(!isNotInDHIS2)}
-                                                      >
-                                                            <Checkbox
-                                                                  checked={isNotInDHIS2}
-                                                                  onChange={() => setIsNotInDHIS2(!isNotInDHIS2)}
-                                                            />
-                                                            <span>{translate('Does_not_exist_in_dhis2')}</span>
-                                                      </div>
-                                                </>
-                                          )}
+                                    <div>
+                                        <Button
+                                            small
+                                            primary
+                                            disabled={currentItem ? false : inputIndicator && !newIndicatorList.map(i => i.name?.trim()?.toLowerCase()).includes(inputIndicator?.trim()?.toLowerCase()) ? false : true}
+                                            onClick={handleAddIndicator}
+                                            icon={
+                                                currentItem ? (
+                                                    <MdSystemUpdateAlt
+                                                        style={{
+                                                            fontSize: '18px',
+                                                            color: 'white'
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <IoMdAddCircle
+                                                        style={{
+                                                            fontSize: '18px',
+                                                            color: 'white'
+                                                        }}
+                                                    />
+                                                )
+                                            }
+                                        >
+                                            {currentItem ? translate('Update') : translate('Ajouter')}
+                                        </Button>
                                     </div>
-                                    {selectedIndicatorType || inputIndicatorType ? (
-                                          <>
-                                                <div style={{ fontWeight: 'bold', marginTop: '20px' }}>
-                                                      {translate('Indicateurs')}
-                                                </div>
-                                                <table
-                                                      style={{
-                                                            width: '100%',
-                                                            borderCollapse: 'collapse',
-                                                            marginTop: '10px',
-                                                            fontSize: '14px'
-                                                      }}
-                                                >
-                                                      <thead>
-                                                            <tr style={{ background: '#C3E9E2' }}>
-                                                                  <th
-                                                                        style={{
-                                                                              padding: '5px',
-                                                                              border: '1px solid #00000060',
-                                                                              width: '30%',
-                                                                              textAlign: 'center'
-                                                                        }}
-                                                                  >
-                                                                        {translate('Indicator_Group')}
-                                                                  </th>
-                                                                  <th
-                                                                        style={{
-                                                                              padding: '5px',
-                                                                              border: '1px solid #00000060'
-                                                                        }}
-                                                                  >
-                                                                        {translate('Indicateurs')}
-                                                                  </th>
-                                                            </tr>
-                                                      </thead>
-                                                      <tbody>
-                                                            <tr>
-                                                                  <td
-                                                                        style={{
-                                                                              padding: '5px',
-                                                                              border: '1px solid #00000060',
-                                                                              textAlign: 'center'
-                                                                        }}
-                                                                  >
-                                                                        {type === 'SELECT'
-                                                                              ? selectedIndicatorType
-                                                                              : inputIndicatorType}
-                                                                  </td>
-                                                                  <td style={{ border: '1px solid #00000060' }}>
-                                                                        <div>
-                                                                              {newIndicatorList?.map((ind, index) => (
-                                                                                    <div
-                                                                                          key={index}
-                                                                                          style={{
-                                                                                                padding: '5px',
-                                                                                                display: 'flex',
-                                                                                                alignItems: 'center',
-                                                                                                justifyContent:
-                                                                                                      'space-between',
-                                                                                                borderTop:
-                                                                                                      '1px solid #00000060'
-                                                                                          }}
-                                                                                    >
-                                                                                          <div
-                                                                                                style={{
-                                                                                                      color: '#00000099'
-                                                                                                }}
-                                                                                          >
-                                                                                                {`${ind.name} ${
-                                                                                                      ind.parent &&
-                                                                                                      ind.isStock
-                                                                                                            ? '(' +
-                                                                                                              newIndicatorList?.find(
-                                                                                                                    i =>
-                                                                                                                          i.id ===
-                                                                                                                          ind.parent
-                                                                                                              )?.name +
-                                                                                                              ')'
-                                                                                                            : ''
-                                                                                                }`}
-                                                                                          </div>
-                                                                                          <div
-                                                                                                style={{
-                                                                                                      display: 'flex',
-                                                                                                      alignItems:
-                                                                                                            'center',
-                                                                                                      gap: '5px'
-                                                                                                }}
-                                                                                          >
-                                                                                                <FaRegEdit
-                                                                                                      title={translate(
-                                                                                                            'Edit_Indicator'
-                                                                                                      )}
-                                                                                                      style={{
-                                                                                                            fontSize: '22px',
-                                                                                                            color: 'blue',
-                                                                                                            cursor: 'pointer'
-                                                                                                      }}
-                                                                                                      onClick={() => {
-                                                                                                            setCurrentItem(
-                                                                                                                  ind
-                                                                                                            );
-                                                                                                            setIsStock(
-                                                                                                                  ind.isStock ||
-                                                                                                                        false
-                                                                                                            );
-                                                                                                            setIsNotInDHIS2(
-                                                                                                                  ind.isNotInDHIS2 ||
-                                                                                                                        false
-                                                                                                            );
-                                                                                                            setInputIndicator(
-                                                                                                                  ind.name
-                                                                                                            );
-                                                                                                            setInputIndicatorFr(
-                                                                                                                  ind.name_fr
-                                                                                                            );
-                                                                                                      }}
-                                                                                                />
-                                                                                                <Popconfirm
-                                                                                                      title={translate(
-                                                                                                            'Delete'
-                                                                                                      )}
-                                                                                                      description={translate(
-                                                                                                            'Remove_Indicator_From_List'
-                                                                                                      )}
-                                                                                                      onConfirm={() =>
-                                                                                                            handleDeleteIndicator(
-                                                                                                                  ind.id
-                                                                                                            )
-                                                                                                      }
-                                                                                                >
-                                                                                                      <RiDeleteBin6Line
-                                                                                                            style={{
-                                                                                                                  color: 'red',
-                                                                                                                  fontSize: '18px',
-                                                                                                                  cursor: 'pointer'
-                                                                                                            }}
-                                                                                                      />
-                                                                                                </Popconfirm>
-                                                                                          </div>
-                                                                                    </div>
-                                                                              ))}
-                                                                        </div>
-                                                                  </td>
-                                                            </tr>
-                                                      </tbody>
-                                                </table>
-                                          </>
-                                    ) : (
-                                          <></>
-                                    )}
-                              </ModalContent>
-                              <ModalActions className="w-100">
+                                </div>
+                            )}
+
+                            {(selectedIndicatorType || inputIndicatorType) && (
+                                <>
                                     <div
-                                          style={{
-                                                justifyContent: 'space-between',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                width: '100%',
-                                                gap: '20px'
-                                          }}
-                                          className="w-100"
+                                        style={{
+                                            display: 'flex',
+                                            marginTop: '10px',
+                                            cursor: 'pointer',
+                                            gap: '10px',
+                                            alignItems: 'center'
+                                        }}
+                                        onClick={() => setIsStock(!isStock)}
                                     >
-                                          <Button onClick={handleCloseModal}>{translate('Annuler')}</Button>
-                                          <div
-                                                style={{
-                                                      display: 'flex',
-                                                      alignItems: 'center',
-                                                      gap: '5px'
-                                                }}
-                                          >
-                                                {dataStoreIndicators
-                                                      ?.map(i => i.name)
-                                                      ?.includes(selectedIndicatorType) && (
-                                                      <div>
-                                                            <Button
-                                                                  destructive
-                                                                  onClick={() => handleDeleteEverything()}
-                                                            >
-                                                                  {translate('Remove_All')}
-                                                            </Button>
-                                                      </div>
-                                                )}
-                                                <Button
-                                                      primary
-                                                      onClick={handleSave}
-                                                      icon={<FiSave style={{ fontSize: '18px' }} />}
-                                                      loading={loadingSave}
-                                                >
-                                                      {translate('Enregistrer')}
-                                                </Button>
-                                          </div>
+                                        <Checkbox checked={isStock} onChange={() => setIsStock(!isStock)} />
+                                        <span>{translate('Is_Stock')}</span>
                                     </div>
-                              </ModalActions>
-                        </Modal>
-                  )}
-            </>
-      );
+
+                                    <div
+                                        style={{
+                                            display: 'flex',
+                                            marginTop: '10px',
+                                            cursor: 'pointer',
+                                            gap: '10px',
+                                            alignItems: 'center'
+                                        }}
+                                        onClick={() => setIsNotInDHIS2(!isNotInDHIS2)}
+                                    >
+                                        <Checkbox checked={isNotInDHIS2} onChange={() => setIsNotInDHIS2(!isNotInDHIS2)} />
+                                        <span>{translate('Does_not_exist_in_dhis2')}</span>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                        {selectedIndicatorType || inputIndicatorType ? (
+                            <>
+                                <div style={{ fontWeight: 'bold', marginTop: '20px' }}>{translate('Indicateurs')}</div>
+                                <table
+                                    style={{
+                                        width: '100%',
+                                        borderCollapse: 'collapse',
+                                        marginTop: '10px',
+                                        fontSize: '14px'
+                                    }}
+                                >
+                                    <thead>
+                                        <tr style={{ background: '#C3E9E2' }}>
+                                            <th
+                                                style={{
+                                                    padding: '5px',
+                                                    border: '1px solid #00000060',
+                                                    width: '30%',
+                                                    textAlign: 'center'
+                                                }}
+                                            >
+                                                {translate('Group')}
+                                            </th>
+                                            <th
+                                                style={{
+                                                    padding: '5px',
+                                                    border: '1px solid #00000060'
+                                                }}
+                                            >
+                                                {translate('Indicateurs')}
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td
+                                                style={{
+                                                    padding: '5px',
+                                                    border: '1px solid #00000060',
+                                                    textAlign: 'center'
+                                                }}
+                                            >
+                                                {type === 'SELECT' ? selectedIndicatorType : inputIndicatorType}
+                                            </td>
+                                            <td style={{ border: '1px solid #00000060' }}>
+                                                <div>
+                                                    {newIndicatorList?.map((ind, index) => (
+                                                        <div
+                                                            key={index}
+                                                            style={{
+                                                                padding: '5px',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'space-between',
+                                                                borderTop: '1px solid #00000060'
+                                                            }}
+                                                        >
+                                                            <div
+                                                                style={{
+                                                                    color: '#00000099'
+                                                                }}
+                                                            >
+                                                                {`${ind.name} ${ind.parent && ind.isStock ? '(' + newIndicatorList?.find(i => i.id === ind.parent)?.name + ')' : ''}`}
+                                                            </div>
+                                                            <div
+                                                                style={{
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    gap: '5px'
+                                                                }}
+                                                            >
+                                                                <FaRegEdit
+                                                                    title={translate('Edit_Indicator')}
+                                                                    style={{
+                                                                        fontSize: '22px',
+                                                                        color: 'blue',
+                                                                        cursor: 'pointer'
+                                                                    }}
+                                                                    onClick={() => {
+                                                                        setCurrentItem(ind);
+                                                                        setIsStock(ind.isStock || false);
+                                                                        setIsNotInDHIS2(ind.isNotInDHIS2 || false);
+                                                                        setInputIndicator(ind.name);
+                                                                        setInputIndicatorFr(ind.name_fr);
+                                                                    }}
+                                                                />
+                                                                <Popconfirm title={translate('Delete')} description={translate('Remove_Element_From_List')} onConfirm={() => handleDeleteIndicator(ind.id)}>
+                                                                    <RiDeleteBin6Line
+                                                                        style={{
+                                                                            color: 'red',
+                                                                            fontSize: '18px',
+                                                                            cursor: 'pointer'
+                                                                        }}
+                                                                    />
+                                                                </Popconfirm>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </>
+                        ) : (
+                            <></>
+                        )}
+                    </ModalContent>
+                    <ModalActions className="w-100">
+                        <div
+                            style={{
+                                justifyContent: 'space-between',
+                                display: 'flex',
+                                alignItems: 'center',
+                                width: '100%',
+                                gap: '20px'
+                            }}
+                            className="w-100"
+                        >
+                            <Button onClick={handleCloseModal}>{translate('Annuler')}</Button>
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '5px'
+                                }}
+                            >
+                                {dataStoreIndicators?.map(i => i.name)?.includes(selectedIndicatorType) && (
+                                    <div>
+                                        <Button destructive onClick={() => handleDeleteEverything()}>
+                                            {translate('Remove_All')}
+                                        </Button>
+                                    </div>
+                                )}
+                                <Button primary onClick={handleSave} icon={<FiSave style={{ fontSize: '18px' }} />} loading={loadingSave}>
+                                    {translate('Enregistrer')}
+                                </Button>
+                            </div>
+                        </div>
+                    </ModalActions>
+                </Modal>
+            )}
+        </>
+    );
 };
 
 export default SettingIndicatorsMappingNew;

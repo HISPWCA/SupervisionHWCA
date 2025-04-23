@@ -356,7 +356,7 @@ const SettingIndicatorsMapping = () => {
                                             width: '8%'
                                         }}
                                     >
-                                        {translate('Indicator_Group')}
+                                        {translate('Group')}
                                     </th>
                                     <th
                                         style={{
