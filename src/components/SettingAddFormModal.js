@@ -12,13 +12,21 @@ import { FaRegEdit } from 'react-icons/fa';
 import { loadDataStore, saveDataToDataStore } from '../utils/functions';
 import { useAlert } from '@dhis2/app-runtime';
 import { v4 as uuid } from 'uuid';
+import useGetGroups from '../hooks/useGetGroups';
 
-const SettingAddFormModal = ({ currentSelectedGroup, setCurrentSelectedGroup, setOpen, dataStoreElements, elementName, dataStoreKey, refreshElements }) => {
-    const [type, setType] = useState('NEW');
-    const [selectedGroup, setSelectedGroup] = useState('');
+const SettingAddFormModal = ({
+    currentSelectedGroup,
+    setCurrentSelectedGroup,
+    setOpen,
+    dataStoreElements,
+    elementName,
+    dataStoreKey,
+    refreshElements
+}) => {
+    const [type, setType] = useState('SELECT');
+    const [selectedGroup, setSelectedGroup] = useState(null);
     const [newElementsList, setNewElementsList] = useState([]);
     const [inputName, setInputName] = useState('');
-    const [inputGroupName, setInputGroupName] = useState('');
     const [currentItem, setCurrentItem] = useState(null);
     const { show } = useAlert(
         ({ message }) => message,
@@ -29,43 +37,28 @@ const SettingAddFormModal = ({ currentSelectedGroup, setCurrentSelectedGroup, se
         })
     );
     const [loadingDelete, setLoadingDelete] = useState(false);
-
     const [loadingSave, setLoadingSave] = useState(false);
+
+    const { groups, loading: loadingGroups } = useGetGroups();
 
     const handleSelectGroup = value => {
         if (value) {
-            const found_group = dataStoreElements?.find(i => i.name === value);
+            const found_group = groups.find(g => g.name === value);
 
             if (found_group) {
                 setSelectedGroup(value);
-                setNewElementsList(found_group.children || []);
+                setNewElementsList(dataStoreElements?.find(i => i.name === value)?.children || []);
                 setInputName('');
-                setInputGroupName('');
                 setCurrentItem('');
             }
         }
     };
 
-    const handleInputGroup = e => {
-        setInputGroupName(e.target.value);
-        setSelectedGroup('');
-    };
-
-    const handleSelectType = ({ value }) => {
-        setType(value);
-        setNewElementsList([]);
-        setInputGroupName('');
-        setInputName('');
-        setSelectedGroup('');
-        setCurrentItem(null);
-    };
-
     const cleanAllState = () => {
-        setType('NEW');
-        setSelectedGroup('');
+        setType('SELECT');
+        setSelectedGroup(null);
         setNewElementsList([]);
         setInputName('');
-        setInputGroupName('');
         setCurrentItem(null);
     };
 
@@ -90,27 +83,42 @@ const SettingAddFormModal = ({ currentSelectedGroup, setCurrentSelectedGroup, se
             const lastDataStoreList = (await loadDataStore(dataStoreKey, null, null, [])) || [];
 
             let payloads = lastDataStoreList;
-            if (type === 'SELECT') {
+
+            if (lastDataStoreList?.map(i => i.name)?.includes(selectedGroup?.trim())) {
                 payloads = lastDataStoreList.map(i => {
                     if (i.name === selectedGroup) {
-                        return { ...i, children: newElementsList || [] };
+                        return {
+                            ...i,
+                            children: newElementsList || []
+                        };
                     }
                     return i;
                 });
+            } else {
+                payloads = [
+                    ...lastDataStoreList,
+                    {
+                        name: selectedGroup?.trim(),
+                        children: newElementsList || []
+                    }
+                ];
             }
 
-            if (type === 'NEW') {
-                payloads = [...lastDataStoreList, { name: inputGroupName?.trim(), children: newElementsList || [] }];
-            }
             await saveDataToDataStore(dataStoreKey, payloads);
             refreshElements();
-            show({ type: 'success', message: translate('Operation_Success') });
+            show({
+                type: 'success',
+                message: translate('Operation_Success')
+            });
 
             cleanAllState();
             setLoadingSave(false);
             handleCloseModal();
         } catch (err) {
-            show({ type: 'error', message: err.response?.data?.message || err.message });
+            show({
+                type: 'error',
+                message: err.response?.data?.message || err.message
+            });
             setLoadingSave(false);
         }
     };
@@ -133,7 +141,16 @@ const SettingAddFormModal = ({ currentSelectedGroup, setCurrentSelectedGroup, se
         }
 
         if (currentItem) {
-            setNewElementsList(newElementsList.map(i => (i.id === currentItem.id ? { ...i, ...payload } : i)));
+            setNewElementsList(
+                newElementsList.map(i =>
+                    i.id === currentItem.id
+                        ? {
+                              ...i,
+                              ...payload
+                          }
+                        : i
+                )
+            );
         } else {
             setNewElementsList([...newElementsList, payload]);
         }
@@ -141,27 +158,34 @@ const SettingAddFormModal = ({ currentSelectedGroup, setCurrentSelectedGroup, se
         setCurrentItem(null);
         setInputName('');
     };
+   // const handleDeleteEverything = async () => {
+    //     try {
+    //         setLoadingDelete(true);
 
-    const handleDeleteEverything = async () => {
-        try {
-            setLoadingDelete(true);
+    //         const lastDataStoreList = (await loadDataStore(dataStoreKey, null, null, [])) || [];
+    //         let payloads =
+    //             lastDataStoreList?.filter(i => i.name !== currentSelectedGroup?.name) || [];
 
-            const lastDataStoreList = (await loadDataStore(dataStoreKey, null, null, [])) || [];
-            let payloads = lastDataStoreList?.filter(i => i.name !== currentSelectedGroup?.name) || [];
+    //         await saveDataToDataStore(dataStoreKey, payloads);
+    //         show({
+    //             type: 'success',
+    //             message: translate('Operation_Success')
+    //         });
 
-            await saveDataToDataStore(dataStoreKey, payloads);
-            show({ type: 'success', message: translate('Operation_Success') });
-
-            setCurrentSelectedGroup(null);
-            cleanAllState();
-            refreshElements();
-            handleCloseModal();
-            setLoadingDelete(false);
-        } catch (err) {
-            setLoadingDelete(false);
-            show({ type: 'error', message: err.response?.data?.message || err.message });
-        }
-    };
+    //         setCurrentSelectedGroup(null);
+    //         cleanAllState();
+    //         refreshElements();
+    //         handleCloseModal();
+    //         setLoadingDelete(false);
+    //     } catch (err) {
+    //         setLoadingDelete(false);
+    //         show({
+    //             type: 'error',
+    //             message: err.response?.data?.message || err.message
+    //         });
+    //     }
+    // };
+ 
 
     useEffect(() => {
         if (currentSelectedGroup) {
@@ -175,7 +199,14 @@ const SettingAddFormModal = ({ currentSelectedGroup, setCurrentSelectedGroup, se
         <>
             <Modal onClose={handleCloseModal}>
                 <ModalTitle>
-                    <div style={{ fontWeight: 'bold', fontSize: '16px' }}>{translate('Create_And_Modification')}</div>
+                    <div
+                        style={{
+                            fontWeight: 'bold',
+                            fontSize: '16px'
+                        }}
+                    >
+                        {translate('Create_And_Modification')}
+                    </div>
                 </ModalTitle>
                 <ModalContent>
                     <div
@@ -185,49 +216,61 @@ const SettingAddFormModal = ({ currentSelectedGroup, setCurrentSelectedGroup, se
                             borderRadius: '10px'
                         }}
                     >
-                        <div>
-                            <div>
-                                <Radio label={translate('Select_Group')} className="cursor-pointer" onChange={handleSelectType} value="SELECT" checked={type === 'SELECT' ? true : false} />
-                            </div>
-                            <div>
-                                <Radio label={translate('Create_New_Group')} className="cursor-pointer" onChange={handleSelectType} value="NEW" checked={type === 'NEW' ? true : false} />
-                            </div>
-                        </div>
-
-                        <div style={{ marginTop: '20px' }}>
+                        <div
+                            style={{
+                                marginTop: '20px'
+                            }}
+                        >
                             {type === 'SELECT' && (
                                 <div>
                                     <div>{translate('Group')}</div>
-                                    <div style={{ marginTop: '5px' }}>
+                                    <div
+                                        style={{
+                                            marginTop: '5px'
+                                        }}
+                                    >
                                         <Select
-                                            options={dataStoreElements?.map(i => ({
+                                            options={loadingGroups?.map(i => ({
                                                 label: i.name,
                                                 value: i.name
                                             }))}
                                             placeholder={translate('Group')}
                                             onChange={handleSelectGroup}
                                             value={selectedGroup}
-                                            style={{ width: '100%' }}
+                                            style={{
+                                                width: '100%'
+                                            }}
                                         />
-                                    </div>
-                                </div>
-                            )}
-                            {type === 'NEW' && (
-                                <div>
-                                    <div>{translate('Group')}</div>
-                                    <div style={{ marginTop: '5px' }}>
-                                        <Input placeholder={translate('Name')} value={inputGroupName} onChange={handleInputGroup} />
                                     </div>
                                 </div>
                             )}
                         </div>
 
-                        {(selectedGroup || inputGroupName) && (
-                            <div style={{ display: 'flex', gap: '5px', alignItems: 'end' }}>
-                                <div style={{ marginTop: '10px', width: '50%' }}>
+                        {(selectedGroup ) && (
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    gap: '5px',
+                                    alignItems: 'end'
+                                }}
+                            >
+                                <div
+                                    style={{
+                                        marginTop: '10px',
+                                        width: '50%'
+                                    }}
+                                >
                                     <div>{translate(elementName)}</div>
-                                    <div style={{ marginTop: '5px' }}>
-                                        <Input placeholder={translate('Name')} value={inputName} onChange={e => setInputName(e.target.value)} />
+                                    <div
+                                        style={{
+                                            marginTop: '5px'
+                                        }}
+                                    >
+                                        <Input
+                                            placeholder={translate('Name')}
+                                            value={inputName}
+                                            onChange={e => setInputName(e.target.value)}
+                                        />
                                     </div>
                                 </div>
 
@@ -235,7 +278,16 @@ const SettingAddFormModal = ({ currentSelectedGroup, setCurrentSelectedGroup, se
                                     <Button
                                         small
                                         primary
-                                        disabled={currentItem ? false : inputName && !newElementsList?.map(i => i.name?.trim()?.toLowerCase())?.includes(inputName?.trim()?.toLowerCase()) ? false : true}
+                                        disabled={
+                                            currentItem
+                                                ? false
+                                                : inputName &&
+                                                  !newElementsList
+                                                      ?.map(i => i.name?.trim()?.toLowerCase())
+                                                      ?.includes(inputName?.trim()?.toLowerCase())
+                                                ? false
+                                                : true
+                                        }
                                         onClick={handleAddElement}
                                         icon={
                                             currentItem ? (
@@ -261,9 +313,16 @@ const SettingAddFormModal = ({ currentSelectedGroup, setCurrentSelectedGroup, se
                             </div>
                         )}
                     </div>
-                    {selectedGroup || inputGroupName ? (
+                    {selectedGroup ? (
                         <>
-                            <div style={{ fontWeight: 'bold', marginTop: '20px' }}>{translate(elementName)}</div>
+                            <div
+                                style={{
+                                    fontWeight: 'bold',
+                                    marginTop: '20px'
+                                }}
+                            >
+                                {translate(elementName)}
+                            </div>
                             <table
                                 style={{
                                     width: '100%',
@@ -273,7 +332,11 @@ const SettingAddFormModal = ({ currentSelectedGroup, setCurrentSelectedGroup, se
                                 }}
                             >
                                 <thead>
-                                    <tr style={{ background: '#C3E9E2' }}>
+                                    <tr
+                                        style={{
+                                            background: '#C3E9E2'
+                                        }}
+                                    >
                                         <th
                                             style={{
                                                 padding: '5px',
@@ -303,9 +366,13 @@ const SettingAddFormModal = ({ currentSelectedGroup, setCurrentSelectedGroup, se
                                                 textAlign: 'center'
                                             }}
                                         >
-                                            {type === 'SELECT' ? selectedGroup : inputGroupName}
+                                           {selectedGroup}
                                         </td>
-                                        <td style={{ border: '1px solid #00000060' }}>
+                                        <td
+                                            style={{
+                                                border: '1px solid #00000060'
+                                            }}
+                                        >
                                             <div>
                                                 {newElementsList?.map((ind, index) => (
                                                     <div
@@ -344,7 +411,15 @@ const SettingAddFormModal = ({ currentSelectedGroup, setCurrentSelectedGroup, se
                                                                     setInputName(ind.name);
                                                                 }}
                                                             />
-                                                            <Popconfirm title={translate('Delete')} description={translate('Remove_Element_From_List')} onConfirm={() => handleDeleteElement(ind.id)}>
+                                                            <Popconfirm
+                                                                title={translate('Delete')}
+                                                                description={translate(
+                                                                    'Remove_Element_From_List'
+                                                                )}
+                                                                onConfirm={() =>
+                                                                    handleDeleteElement(ind.id)
+                                                                }
+                                                            >
                                                                 <RiDeleteBin6Line
                                                                     style={{
                                                                         color: 'red',
@@ -385,14 +460,29 @@ const SettingAddFormModal = ({ currentSelectedGroup, setCurrentSelectedGroup, se
                                 gap: '5px'
                             }}
                         >
-                            {dataStoreElements?.map(i => i.name)?.includes(selectedGroup) && (
+                            {/* {dataStoreElements?.map(i => i.name)?.includes(selectedGroup) && (
                                 <div>
-                                    <Button destructive loading={loadingDelete} onClick={handleDeleteEverything}>
+                                    <Button
+                                        destructive
+                                        loading={loadingDelete}
+                                        onClick={handleDeleteEverything}
+                                    >
                                         {translate('Remove_All')}
                                     </Button>
                                 </div>
-                            )}
-                            <Button primary onClick={handleSaveInfos} icon={<FiSave style={{ fontSize: '18px' }} />} loading={loadingSave}>
+                            )} */}
+                            <Button
+                                primary
+                                onClick={handleSaveInfos}
+                                icon={
+                                    <FiSave
+                                        style={{
+                                            fontSize: '18px'
+                                        }}
+                                    />
+                                }
+                                loading={loadingSave}
+                            >
                                 {translate('Enregistrer')}
                             </Button>
                         </div>

@@ -12,46 +12,20 @@ import { FaRegEdit } from 'react-icons/fa';
 const SettingCrossChecksManagement = () => {
     const [openModal, setOpenModal] = useState(false);
     const [dataStoreElements, setDataStoreElements] = useState([]);
-    const [loadingProcess, setLoadingProcess] = useState(false);
     const [currentSelectedGroup, setCurrentSelectedGroup] = useState(null);
     const [loadingElements, setLoadingElements] = useState(false);
 
-    const { show } = useAlert(
-        ({ message }) => message,
-        ({ type }) => ({
-            success: type === 'success' ? true : false,
-            critical: type === 'error' ? true : false,
-            duration: 3000
-        })
-    );
-
     const initFields = () => {};
-
-    const handleSave = async () => {
-        try {
-            setLoadingProcess(true);
-            const newList = formState?.indicators;
-            await saveDataToDataStore(process.env.REACT_APP_REGISTRES_KEY, newList, null, null, null);
-            setNotification({
-                show: true,
-                message: translate('Operation_Success'),
-                type: NOTIFICATION_SUCCESS
-            });
-            setLoadingProcess(false);
-        } catch (err) {
-            // setNotification({
-            //     show: true,
-            //     message: err.response?.data?.message || err.message,
-            //     type: NOTIFICATION_CRITICAL
-            // });
-            // setLoadingProcess(false);
-        }
-    };
 
     const loadDataStoreElements = async () => {
         try {
             setLoadingElements(true);
-            const response = await loadDataStore(process.env.REACT_APP_REGISTRES_KEY, null, null, []);
+            const response = await loadDataStore(
+                process.env.REACT_APP_REGISTRES_KEY,
+                null,
+                null,
+                []
+            );
             setDataStoreElements(response);
             setLoadingElements(false);
         } catch (err) {
@@ -194,7 +168,10 @@ const SettingCrossChecksManagement = () => {
                                                     key={element.id}
                                                     style={{
                                                         marginTop: '5px',
-                                                        borderBottom: index +1 === group.children.length ? '' : '1px solid #ccc',
+                                                        borderBottom:
+                                                            index + 1 === group.children.length
+                                                                ? ''
+                                                                : '1px solid #ccc',
                                                         paddingBottom: '5px'
                                                     }}
                                                 >
@@ -213,7 +190,9 @@ const SettingCrossChecksManagement = () => {
                                                                         textDecoration: 'none'
                                                                     }}
                                                                 >
-                                                                    {translateDataStoreLabel(element)}
+                                                                    {translateDataStoreLabel(
+                                                                        element
+                                                                    )}
                                                                 </span>
                                                             </div>
                                                         </Col>
@@ -254,7 +233,7 @@ const SettingCrossChecksManagement = () => {
                 <SettingAddFormModal
                     dataStoreElements={dataStoreElements}
                     refreshElements={loadDataStoreElements}
-                    elementName='Register'
+                    elementName="Register"
                     setOpen={setOpenModal}
                     open={openModal}
                     dataStoreKey={process.env.REACT_APP_REGISTRES_KEY}
