@@ -1840,7 +1840,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                         <div>
                                             <TagsInput
                                                 style={{ width: '100%' }}
-                                                value={item?.keyWords?.id}
+                                                value={item?.keyWords}
                                                 onChange={word => {
                                                     setFormState({
                                                         ...formState,
