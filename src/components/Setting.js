@@ -163,6 +163,7 @@ const Setting = () => {
         selectedNbrIndicatorsToShow: null,
         selectedPeriodVerification: null,
         selectedIndicatorsPeriodType: null,
+        selectedConsistencyOverTimePeriodType: null,
         indicators: [],
         recoupements: [],
         completeness: {
@@ -357,6 +358,7 @@ const Setting = () => {
             selectedNbrIndicatorsToShow: null,
             selectedPeriodVerification: null,
             selectedIndicatorsPeriodType: null,
+            selectedConsistencyOverTimePeriodType: null,
             globalProgramArea: null,
             globalProgramAreaKeyWords: [],
             indicators: [],
@@ -795,6 +797,7 @@ const Setting = () => {
                     selectedNbrIndicatorsToShow: null,
                     selectedPeriodVerification: null,
                     selectedIndicatorsPeriodType: null,
+                    selectedConsistencyOverTimePeriodType: null,
                     globalProgramArea: null,
                     globalProgramAreaKeyWords: [],
                     indicators: [],
@@ -952,6 +955,7 @@ const Setting = () => {
             selectedNbrIndicatorsToShow: null,
             selectedPeriodVerification: null,
             selectedIndicatorsPeriodType: null,
+            selectedConsistencyOverTimePeriodType: null,
             globalProgramArea: null,
             globalProgramAreaKeyWords: [],
             indicators: [],
@@ -1090,6 +1094,8 @@ const Setting = () => {
                                       selectedNbrIndicatorsToShow: formState?.selectedNbrIndicatorsToShow,
                                       selectedPeriodVerification: formState?.selectedPeriodVerification,
                                       selectedIndicatorsPeriodType: formState?.selectedIndicatorsPeriodType,
+                                      selectedConsistencyOverTimePeriodType:
+                                          formState?.selectedConsistencyOverTimePeriodType,
                                       indicators: formState?.indicators,
                                       recoupements: formState?.recoupements,
                                       completeness: formState?.completeness,
@@ -1112,6 +1118,8 @@ const Setting = () => {
                                   selectedNbrIndicatorsToShow: formState.selectedNbrIndicatorsToShow,
                                   selectedPeriodVerification: formState.selectedPeriodVerification,
                                   selectedIndicatorsPeriodType: formState.selectedIndicatorsPeriodType,
+                                  selectedConsistencyOverTimePeriodType:
+                                      formState.selectedConsistencyOverTimePeriodType,
                                   indicators: formState.indicators,
                                   recoupements: formState.recoupements,
                                   completeness: formState.completeness,
@@ -1129,6 +1137,7 @@ const Setting = () => {
                               selectedNbrIndicatorsToShow: formState.selectedNbrIndicatorsToShow,
                               selectedPeriodVerification: formState.selectedPeriodVerification,
                               selectedIndicatorsPeriodType: formState.selectedIndicatorsPeriodType,
+                              selectedConsistencyOverTimePeriodType: formState.selectedConsistencyOverTimePeriodType,
                               statusSupervisionField: formState?.selectedStatusSupervisionDataElement,
                               indicators: formState.indicators,
                               recoupements: formState.recoupements,
@@ -1616,6 +1625,7 @@ const Setting = () => {
             selectedNbrIndicatorsToShow: null,
             selectedPeriodVerification: null,
             selectedIndicatorsPeriodType: null,
+            selectedConsistencyOverTimePeriodType: null,
             selectedSupervisorDataElements: [],
             globalProgramArea: formState?.globalProgramArea,
             globalProgramAreaKeyWords: formState?.globalProgramAreaKeyWords || [],
@@ -1635,6 +1645,7 @@ const Setting = () => {
             selectedNbrIndicatorsToShow: null,
             selectedPeriodVerification: null,
             selectedIndicatorsPeriodType: null,
+            selectedConsistencyOverTimePeriodType: null,
             selectedSupervisorDataElements: [],
             selectedProgramStageForConfiguration: programStages.find(pstage => pstage.id === value)
         });
@@ -1862,6 +1873,7 @@ const Setting = () => {
                     selectedNbrIndicatorsToShow: value.selectedNbrIndicatorsToShow,
                     selectedPeriodVerification: value.selectedPeriodVerification,
                     selectedIndicatorsPeriodType: value.selectedIndicatorsPeriodType,
+                    selectedConsistencyOverTimePeriodType: value.selectedConsistencyOverTimePeriodType,
                     globalProgramArea: value?.globalProgramArea,
                     globalProgramAreaKeyWords: value?.globalProgramAreaKeyWords || [],
                     completeness: {
@@ -2293,6 +2305,54 @@ const Setting = () => {
                                                                 });
                                                             }}
                                                             value={formState?.selectedIndicatorsPeriodType?.id}
+                                                            optionFilterProp="label"
+                                                            showSearch
+                                                            allowClear
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            )}
+
+                                            {formState?.selectedConfigurationType !== NORMAL_PROGRAM && (
+                                                <tr>
+                                                    <td
+                                                        style={{
+                                                            border: '1px solid #00000070',
+                                                            padding: '2px 5px',
+                                                            verticalAlign: 'top',
+                                                            width: '50%'
+                                                        }}
+                                                    >
+                                                        {translate('ConsistencyOverTime_Period_Type')}
+                                                    </td>
+                                                    <td
+                                                        style={{
+                                                            border: '1px solid #00000070',
+                                                            padding: '2px 5px',
+                                                            verticalAlign: 'top'
+                                                        }}
+                                                    >
+                                                        <Select
+                                                            options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                progStageDE => ({
+                                                                    label: progStageDE.dataElement?.displayName,
+                                                                    value: progStageDE.dataElement?.id
+                                                                })
+                                                            )}
+                                                            placeholder={translate('ConsistencyOverTime_Period_Type')}
+                                                            style={{ width: '100%' }}
+                                                            onChange={value => {
+                                                                setFormState({
+                                                                    ...formState,
+                                                                    selectedConsistencyOverTimePeriodType:
+                                                                        formState?.selectedProgramStageForConfiguration?.programStageDataElements
+                                                                            ?.map(p => p.dataElement)
+                                                                            .find(
+                                                                                dataElement => dataElement.id === value
+                                                                            )
+                                                                });
+                                                            }}
+                                                            value={formState?.selectedConsistencyOverTimePeriodType?.id}
                                                             optionFilterProp="label"
                                                             showSearch
                                                             allowClear

@@ -404,5 +404,6 @@
     "Period3": "Période 3",
     "Last_Period": "Période precedente",
     "Current_Period": "Période actuelle",
-    "ConsistencyOverTimeKeyWords": "Mots clés de la Cohérence dans le temps"
+    "ConsistencyOverTimeKeyWords": "Mots clés de la Cohérence dans le temps",
+    "ConsistencyOverTime_Period_Type": "Type de période des cohérences dans le temps"
 }
