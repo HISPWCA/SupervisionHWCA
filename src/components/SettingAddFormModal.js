@@ -36,7 +36,6 @@ const SettingAddFormModal = ({
             duration: 3000
         })
     );
-    const [loadingDelete, setLoadingDelete] = useState(false);
     const [loadingSave, setLoadingSave] = useState(false);
 
     const { groups, loading: loadingGroups } = useGetGroups();
@@ -230,7 +229,7 @@ const SettingAddFormModal = ({
                                         }}
                                     >
                                         <Select
-                                            options={loadingGroups?.map(i => ({
+                                            options={groups?.map(i => ({
                                                 label: i.name,
                                                 value: i.name
                                             }))}

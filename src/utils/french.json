@@ -396,5 +396,13 @@
     "Create_And_Modification": "Création et Modification",
     "Edit": "Modifier",
     "Register": "Régistre",
-    "Cross_Check": "Recoupement"
+    "Cross_Check": "Recoupement",
+    "What_Is_The_Current_Period": "Quelle est la valeur de la periode actuelle",
+    "What_Was_The_Value_Of_The_Indicator_For_The_Current_Period_One_Year_Ago": "Quelle était la valeur de l'indicateur pour la periode actuelle un an auparavant",
+    "Period1": "Période 1",
+    "Period2": "Période 2",
+    "Period3": "Période 3",
+    "Last_Period": "Période precedente",
+    "Current_Period": "Période actuelle",
+    "ConsistencyOverTimeKeyWords": "Mots clés de la Cohérence dans le temps"
 }

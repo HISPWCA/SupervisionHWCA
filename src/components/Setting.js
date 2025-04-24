@@ -30,7 +30,16 @@ import {
     PAGE_SOURCE_DOCUMENT_MANAGEMENT
 } from '../utils/constants';
 import { Card, Checkbox, Col, Divider, Input, InputNumber, Popconfirm, Row, Select, Table } from 'antd';
-import { DATA_ELEMENTS_ROUTE, INDICATORS_GROUP_ROUTE, INDICATORS_ROUTE, MAPS_ROUTE, ORGANISATION_UNIT_GROUPS_ROUTE, PROGRAMS_ROUTE, PROGRAMS_STAGE_ROUTE, VISUALIZATIONS_ROUTE } from '../utils/api.routes';
+import {
+    DATA_ELEMENTS_ROUTE,
+    INDICATORS_GROUP_ROUTE,
+    INDICATORS_ROUTE,
+    MAPS_ROUTE,
+    ORGANISATION_UNIT_GROUPS_ROUTE,
+    PROGRAMS_ROUTE,
+    PROGRAMS_STAGE_ROUTE,
+    VISUALIZATIONS_ROUTE
+} from '../utils/api.routes';
 import axios from 'axios';
 import { v1 as uuid } from 'uuid';
 import { FiSave } from 'react-icons/fi';
@@ -237,12 +246,18 @@ const Setting = () => {
                 DHIS2MonthlyValue7: fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue7 || null,
                 DHIS2MonthlyValue8: fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue8 || null,
                 DHIS2MonthlyValue9: fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue9 || null,
-                DHIS2MonthlyValue10: fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue10 || null,
-                DHIS2MonthlyValue11: fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue11 || null,
-                DHIS2MonthlyValue12: fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue12 || null,
-                DHIS2MonthlyValue13: fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue13 || null,
-                DHIS2MonthlyValue14: fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue14 || null,
-                DHIS2MonthlyValue15: fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue15 || null,
+                DHIS2MonthlyValue10:
+                    fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue10 || null,
+                DHIS2MonthlyValue11:
+                    fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue11 || null,
+                DHIS2MonthlyValue12:
+                    fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue12 || null,
+                DHIS2MonthlyValue13:
+                    fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue13 || null,
+                DHIS2MonthlyValue14:
+                    fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue14 || null,
+                DHIS2MonthlyValue15:
+                    fieldList?.indicators?.find(ind => ind.position === i)?.DHIS2MonthlyValue15 || null,
                 programArea: fieldList?.indicators?.find(ind => ind.position === i)?.programArea || null,
                 keyWords: fieldList?.indicators?.find(ind => ind.position === i)?.keyWords || []
             });
@@ -262,8 +277,10 @@ const Setting = () => {
                 margin: fieldList?.recoupements?.find(rec => rec.position === i)?.margin || null,
                 programArea: fieldList?.recoupements?.find(rec => rec.position === i)?.programArea || null,
                 keyWords: fieldList?.recoupements?.find(rec => rec.position === i)?.keyWords || [],
-                primaryDataSourceKeyWords: fieldList?.recoupements?.find(rec => rec.position === i)?.primaryDataSourceKeyWords || [],
-                secondaryDataSourceKeyWords: fieldList?.recoupements?.find(rec => rec.position === i)?.secondaryDataSourceKeyWords || []
+                primaryDataSourceKeyWords:
+                    fieldList?.recoupements?.find(rec => rec.position === i)?.primaryDataSourceKeyWords || [],
+                secondaryDataSourceKeyWords:
+                    fieldList?.recoupements?.find(rec => rec.position === i)?.secondaryDataSourceKeyWords || []
             });
         }
 
@@ -273,7 +290,16 @@ const Setting = () => {
                 position: i,
                 value: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.value || null,
                 margin: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.margin || null,
-                programArea: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.programArea || null
+                programArea: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.programArea || null,
+                keyWords: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.keyWords || [],
+                currentPeriod:
+                    fieldList?.consistencyOvertimes?.find(el => el.position === i)?.currentPeriod || null,
+                currentPeriodOneYearAgo:
+                    fieldList?.consistencyOvertimes?.find(el => el.position === i)?.currentPeriodOneYearAgo || null,
+                period1: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.period1 || null,
+                period2: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.period2 || null,
+                period3: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.period3 || null,
+                lastPeriod: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.lastPeriod || null,
             });
         }
 
@@ -395,7 +421,9 @@ const Setting = () => {
                         id: uuid(),
                         name: `${translate('Recoupements')} ${j}`,
                         position: j,
-                        value: fieldList?.find(ind => ind?.position === i)?.recoupements?.find(rec => rec.position === j)?.value,
+                        value: fieldList
+                            ?.find(ind => ind?.position === i)
+                            ?.recoupements?.find(rec => rec.position === j)?.value,
                         indicatorMargin: null,
                         recoupementMargin: null
                     };
@@ -564,9 +592,11 @@ const Setting = () => {
     const handleSelectIndicatorIND = value => {
         let currentIndicator = null;
 
-        if (selectedIndicatorType === AGGREGATE_INDICATOR) currentIndicator = selectedIndicatorGroup.indicators?.find(ind => ind.id === value);
+        if (selectedIndicatorType === AGGREGATE_INDICATOR)
+            currentIndicator = selectedIndicatorGroup.indicators?.find(ind => ind.id === value);
 
-        if (selectedIndicatorType === PROGRAM_INDICATOR) currentIndicator = selectedProgram.programIndicators?.find(progInd => progInd.id === value);
+        if (selectedIndicatorType === PROGRAM_INDICATOR)
+            currentIndicator = selectedProgram.programIndicators?.find(progInd => progInd.id === value);
 
         if (currentIndicator) {
             setSelectedIndicator(currentIndicator);
@@ -706,9 +736,19 @@ const Setting = () => {
             setSelectedIndicator(null);
 
             loadOrganisationUnitGroups();
-            const responseSupervisionTracker = await loadDataStore(process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY, null, null, null);
+            const responseSupervisionTracker = await loadDataStore(
+                process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY,
+                null,
+                null,
+                null
+            );
 
-            const responsePeriodConfigs = await loadDataStore(process.env.REACT_APP_PERIODS_CONFIG_KEY, null, null, null);
+            const responsePeriodConfigs = await loadDataStore(
+                process.env.REACT_APP_PERIODS_CONFIG_KEY,
+                null,
+                null,
+                null
+            );
 
             setDataStorePeriodConfigs(responsePeriodConfigs);
             setMappingConfigSupervisions(responseSupervisionTracker);
@@ -857,7 +897,9 @@ const Setting = () => {
             if (selectedTypeSupervisionPage === PAGE_CONFIG_INDICATORS && currentItem) {
                 if (currentItem.indicatorType === AGGREGATE_INDICATOR) {
                     const selectedIndGroup = indicatorGroups.find(p => p.id === currentItem.indicatorGroup?.id);
-                    const selectedInd = selectedIndGroup?.indicators?.find(ind => ind.id === currentItem?.indicator?.id);
+                    const selectedInd = selectedIndGroup?.indicators?.find(
+                        ind => ind.id === currentItem?.indicator?.id
+                    );
 
                     if (selectedInd) {
                         setSelectedIndicatorGroup(selectedIndGroup);
@@ -872,7 +914,9 @@ const Setting = () => {
 
                 if (currentItem.indicatorType === PROGRAM_INDICATOR) {
                     const selectedProg = programs.find(p => p.id === currentItem.program?.id);
-                    const selectedInd = selectedProg?.programIndicators?.find(pInd => pInd.id === currentItem?.indicator?.id);
+                    const selectedInd = selectedProg?.programIndicators?.find(
+                        pInd => pInd.id === currentItem?.indicator?.id
+                    );
 
                     if (selectedInd) {
                         setSelectedProgram(selectedProg);
@@ -963,27 +1007,54 @@ const Setting = () => {
 
             if (!formState?.selectedTEIProgram) throw new Error(translate('Veuillez_Selectionner_Un_Programme'));
 
-            if ((formState?.selectedConfigurationType === DQR || formState?.selectedConfigurationType === NORMAL_PROGRAM) && !formState?.selectedProgramStageForConfiguration)
+            if (
+                (formState?.selectedConfigurationType === DQR ||
+                    formState?.selectedConfigurationType === NORMAL_PROGRAM) &&
+                !formState?.selectedProgramStageForConfiguration
+            )
                 throw new Error(translate('Please_Select_Program_Stage'));
 
-            if (formState?.selectedConfigurationType === RDQA && !formStateForRDQA?.selectedProgramStageForConfiguration) throw new Error(translate('Please_Select_Program_Stage'));
+            if (
+                formState?.selectedConfigurationType === RDQA &&
+                !formStateForRDQA?.selectedProgramStageForConfiguration
+            )
+                throw new Error(translate('Please_Select_Program_Stage'));
 
-            if (formState?.selectedConfigurationType === RDQA && !formStateForRDQA?.selectedOrganisationUnitGroup) throw new Error(translate('Please_Select_Organisation_Unit_Group'));
-
-            if ((formState?.selectedConfigurationType === DQR || formState?.selectedConfigurationType === NORMAL_PROGRAM) && formState?.selectedSupervisorDataElements?.length === 0)
-                throw new Error(translate('Please_Select_Supervisor_Fields'));
-
-            if (formState?.selectedConfigurationType === RDQA && formStateForRDQA?.selectedSupervisorDataElements?.length === 0) throw new Error(translate('Please_Select_Supervisor_Fields'));
-
-            const responseSupervisionTracker = await loadDataStore(process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY, null, null, null);
-
-            const existingConfig = responseSupervisionTracker.find(mapping => mapping.program?.id === formState?.selectedTEIProgram?.id);
+            if (formState?.selectedConfigurationType === RDQA && !formStateForRDQA?.selectedOrganisationUnitGroup)
+                throw new Error(translate('Please_Select_Organisation_Unit_Group'));
 
             if (
-                (formState?.selectedConfigurationType === DQR || formState?.selectedConfigurationType === NORMAL_PROGRAM) &&
+                (formState?.selectedConfigurationType === DQR ||
+                    formState?.selectedConfigurationType === NORMAL_PROGRAM) &&
+                formState?.selectedSupervisorDataElements?.length === 0
+            )
+                throw new Error(translate('Please_Select_Supervisor_Fields'));
+
+            if (
+                formState?.selectedConfigurationType === RDQA &&
+                formStateForRDQA?.selectedSupervisorDataElements?.length === 0
+            )
+                throw new Error(translate('Please_Select_Supervisor_Fields'));
+
+            const responseSupervisionTracker = await loadDataStore(
+                process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY,
+                null,
+                null,
+                null
+            );
+
+            const existingConfig = responseSupervisionTracker.find(
+                mapping => mapping.program?.id === formState?.selectedTEIProgram?.id
+            );
+
+            if (
+                (formState?.selectedConfigurationType === DQR ||
+                    formState?.selectedConfigurationType === NORMAL_PROGRAM) &&
                 !formState?.isFieldEditingMode &&
                 existingConfig &&
-                existingConfig.programStageConfigurations?.map(p => p.programStage?.id)?.includes(formState?.selectedProgramStageForConfiguration?.id)
+                existingConfig.programStageConfigurations
+                    ?.map(p => p.programStage?.id)
+                    ?.includes(formState?.selectedProgramStageForConfiguration?.id)
             ) {
                 throw new Error(translate('ProgramStage_Already_Configured'));
             }
@@ -992,7 +1063,9 @@ const Setting = () => {
                 formState?.selectedConfigurationType === RDQA &&
                 !formState?.isFieldEditingMode &&
                 existingConfig &&
-                existingConfig.programStageConfigurations?.map(p => p.programStage?.id)?.includes(formStateForRDQA?.selectedProgramStageForConfiguration?.id)
+                existingConfig.programStageConfigurations
+                    ?.map(p => p.programStage?.id)
+                    ?.includes(formStateForRDQA?.selectedProgramStageForConfiguration?.id)
             ) {
                 throw new Error(translate('ProgramStage_Already_Configured'));
             }
@@ -1000,7 +1073,10 @@ const Setting = () => {
             let newProgramStageConfigurations = [];
 
             // Case of DQR
-            if (formState?.selectedConfigurationType === DQR || formState?.selectedConfigurationType === NORMAL_PROGRAM) {
+            if (
+                formState?.selectedConfigurationType === DQR ||
+                formState?.selectedConfigurationType === NORMAL_PROGRAM
+            ) {
                 newProgramStageConfigurations = existingConfig
                     ? formState?.isFieldEditingMode && currentProgramstageConfiguration
                         ? programStageConfigurations.map(p => {
@@ -1129,7 +1205,8 @@ const Setting = () => {
                 planificationType: formState.selectedPlanificationType,
                 configurationType: formState.selectedConfigurationType,
                 selectedSupervisionAutoGenerateID:
-                    formState?.selectedConfigurationType === DQR || formState?.selectedConfigurationType === NORMAL_PROGRAM
+                    formState?.selectedConfigurationType === DQR ||
+                    formState?.selectedConfigurationType === NORMAL_PROGRAM
                         ? formState.selectedSupervisionAutoGenerateID
                         : formStateForRDQA.selectedSupervisionAutoGenerateID,
                 program: {
@@ -1146,8 +1223,14 @@ const Setting = () => {
                 }))
             };
 
-            if (formState?.selectedConfigurationType === DQR || formState?.selectedConfigurationType === NORMAL_PROGRAM) {
-                if (formState.selectedProgramStageForConfiguration && formState.selectedSupervisorDataElements?.length > 0) {
+            if (
+                formState?.selectedConfigurationType === DQR ||
+                formState?.selectedConfigurationType === NORMAL_PROGRAM
+            ) {
+                if (
+                    formState.selectedProgramStageForConfiguration &&
+                    formState.selectedSupervisorDataElements?.length > 0
+                ) {
                     payload.fieldConfig = {
                         supervisor: {
                             programStage: {
@@ -1171,7 +1254,10 @@ const Setting = () => {
             }
 
             if (formState?.selectedConfigurationType === RDQA) {
-                if (formStateForRDQA.selectedProgramStageForConfiguration && formStateForRDQA.selectedSupervisorDataElements?.length > 0) {
+                if (
+                    formStateForRDQA.selectedProgramStageForConfiguration &&
+                    formStateForRDQA.selectedSupervisorDataElements?.length > 0
+                ) {
                     payload.fieldConfig = {
                         supervisor: {
                             programStage: {
@@ -1183,7 +1269,10 @@ const Setting = () => {
                     };
                 }
 
-                if (formStateForRDQA.selectedProgramStageForConfiguration && formStateForRDQA.selectedStatusSupervisionDataElement) {
+                if (
+                    formStateForRDQA.selectedProgramStageForConfiguration &&
+                    formStateForRDQA.selectedStatusSupervisionDataElement
+                ) {
                     payload.statusSupervision = {
                         programStage: {
                             id: formStateForRDQA.selectedProgramStageForConfiguration.id,
@@ -1208,9 +1297,18 @@ const Setting = () => {
                 newList = [...mappingConfigSupervisions, payload];
             }
 
-            await saveDataToDataStore(process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY, newList, setLoadingSaveSupervionsConfig, null, null);
+            await saveDataToDataStore(
+                process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY,
+                newList,
+                setLoadingSaveSupervionsConfig,
+                null,
+                null
+            );
 
-            if (formState?.selectedConfigurationType === DQR || formState?.selectedConfigurationType === NORMAL_PROGRAM) {
+            if (
+                formState?.selectedConfigurationType === DQR ||
+                formState?.selectedConfigurationType === NORMAL_PROGRAM
+            ) {
                 const newPeriodConfigPayload = {
                     ...dataStorePeriodConfigs,
                     month1KeyWords: periodFormState.month1KeyWords,
@@ -1218,7 +1316,13 @@ const Setting = () => {
                     month3KeyWords: periodFormState.month3KeyWords
                 };
 
-                await saveDataToDataStore(process.env.REACT_APP_PERIODS_CONFIG_KEY, newPeriodConfigPayload, null, null, null);
+                await saveDataToDataStore(
+                    process.env.REACT_APP_PERIODS_CONFIG_KEY,
+                    newPeriodConfigPayload,
+                    null,
+                    null,
+                    null
+                );
             }
 
             let glabalConfigPayload = {
@@ -1235,7 +1339,12 @@ const Setting = () => {
 
             await saveDataToDataStore(process.env.REACT_APP_GLOBAL_SETTING_KEY, glabalConfigPayload, null, null, null);
 
-            const responsePeriodConfigs = await loadDataStore(process.env.REACT_APP_PERIODS_CONFIG_KEY, null, null, null);
+            const responsePeriodConfigs = await loadDataStore(
+                process.env.REACT_APP_PERIODS_CONFIG_KEY,
+                null,
+                null,
+                null
+            );
 
             setDataStorePeriodConfigs(responsePeriodConfigs);
             setMappingConfigSupervisions(newList);
@@ -1247,7 +1356,9 @@ const Setting = () => {
             setNotification({
                 show: true,
                 type: NOTIFICATION_SUCCESS,
-                message: formState?.isFieldEditingMode ? translate('Mise_A_Jour_Effectuer') : translate('Configuration_Added_For_Program_stage')
+                message: formState?.isFieldEditingMode
+                    ? translate('Mise_A_Jour_Effectuer')
+                    : translate('Configuration_Added_For_Program_stage')
             });
             setLoadingSaveSupervionsConfig(false);
         } catch (err) {
@@ -1267,7 +1378,8 @@ const Setting = () => {
 
             if (!indicatorEtiquette?.trim()) throw new Error(translate('Etiquette_Obligatoire'));
 
-            if (indicatorWeight === undefined || indicatorWeight === null) throw new Error(translate('Poid_Obligatoire'));
+            if (indicatorWeight === undefined || indicatorWeight === null)
+                throw new Error(translate('Poid_Obligatoire'));
 
             if (indicatorName && indicatorEtiquette) {
                 const existingConfig = mappingConfigs.find(mapping => mapping.indicator?.id === selectedIndicator?.id);
@@ -1308,7 +1420,13 @@ const Setting = () => {
                     newList = [...mappingConfigs, payload];
                 }
 
-                await saveDataToDataStore(process.env.REACT_APP_INDICATORS_CONFIG_KEY, newList, setLoadingSaveIndicatorsConfig, null, null);
+                await saveDataToDataStore(
+                    process.env.REACT_APP_INDICATORS_CONFIG_KEY,
+                    newList,
+                    setLoadingSaveIndicatorsConfig,
+                    null,
+                    null
+                );
 
                 setMappingConfigs(newList);
                 setNotification({
@@ -1387,9 +1505,11 @@ const Setting = () => {
         try {
             setLoadingAddAnalyseConfigs(true);
 
-            if (selectedAnalyseType === TYPE_ANALYSE_DATA_ELEMENT && !selectedAnalyseDataElement) throw new Error(translate('Element_De_Donner_Obligatoire'));
+            if (selectedAnalyseType === TYPE_ANALYSE_DATA_ELEMENT && !selectedAnalyseDataElement)
+                throw new Error(translate('Element_De_Donner_Obligatoire'));
 
-            if (selectedAnalyseType === TYPE_ANALYSE_INDICATOR && !selectedAnalyseIndicator) throw new Error(translate('Indicateur_Obligatoire'));
+            if (selectedAnalyseType === TYPE_ANALYSE_INDICATOR && !selectedAnalyseIndicator)
+                throw new Error(translate('Indicateur_Obligatoire'));
 
             const existingConfig = analyseConfigs.find(config => {
                 if (selectedAnalyseType === TYPE_ANALYSE_DATA_ELEMENT) {
@@ -1450,19 +1570,29 @@ const Setting = () => {
     const handleSelectDataElements = values => {
         setFormState({
             ...formState,
-            selectedSupervisorDataElements: values.map(value => formState?.selectedProgramStageForConfiguration.programStageDataElements?.map(p => p.dataElement).find(dataElement => dataElement.id === value))
+            selectedSupervisorDataElements: values.map(value =>
+                formState?.selectedProgramStageForConfiguration.programStageDataElements
+                    ?.map(p => p.dataElement)
+                    .find(dataElement => dataElement.id === value)
+            )
         });
     };
 
     const handleSelectDataElementsForRDQA = values => {
         setFormStateForRDQA({
             ...formStateForRDQA,
-            selectedSupervisorDataElements: values.map(value => formStateForRDQA?.selectedProgramStageForConfiguration.programStageDataElements?.map(p => p.dataElement).find(dataElement => dataElement.id === value))
+            selectedSupervisorDataElements: values.map(value =>
+                formStateForRDQA?.selectedProgramStageForConfiguration.programStageDataElements
+                    ?.map(p => p.dataElement)
+                    .find(dataElement => dataElement.id === value)
+            )
         });
     };
 
     const handleSelectStatutSupervisionDataElement = value => {
-        const statusDataElement = formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(p => p.dataElement).find(dataElement => dataElement.id === value);
+        const statusDataElement = formState?.selectedProgramStageForConfiguration?.programStageDataElements
+            ?.map(p => p.dataElement)
+            .find(dataElement => dataElement.id === value);
         setFormState({
             ...formState,
             selectedStatusSupervisionDataElement: statusDataElement
@@ -1470,7 +1600,9 @@ const Setting = () => {
     };
 
     const handleSelectStatutSupervisionDataElementForRDQA = value => {
-        const statusDataElement = formStateForRDQA?.selectedProgramStageForConfiguration?.programStageDataElements?.map(p => p.dataElement).find(dataElement => dataElement.id === value);
+        const statusDataElement = formStateForRDQA?.selectedProgramStageForConfiguration?.programStageDataElements
+            ?.map(p => p.dataElement)
+            .find(dataElement => dataElement.id === value);
         setFormStateForRDQA({
             ...formStateForRDQA,
             selectedStatusSupervisionDataElement: statusDataElement
@@ -1526,7 +1658,9 @@ const Setting = () => {
                     borderRadius: '8px'
                 }}
             >
-                <div style={{ fontWeight: 'bold', marginBottom: '25px' }}>{translate('Tracker_Program_Choice_Title')}</div>
+                <div style={{ fontWeight: 'bold', marginBottom: '25px' }}>
+                    {translate('Tracker_Program_Choice_Title')}
+                </div>
 
                 <div>
                     <div style={{ marginBottom: '5px' }}>{translate('Programmes_Tracker')}</div>
@@ -1588,7 +1722,13 @@ const Setting = () => {
                                 />
                             </div>
                             <div>
-                                <Radio label={translate('Agent')} onChange={handleSupervisionPlanificationType} value={AGENT} checked={formState?.selectedPlanificationType === AGENT} disabled={true} />
+                                <Radio
+                                    label={translate('Agent')}
+                                    onChange={handleSupervisionPlanificationType}
+                                    value={AGENT}
+                                    checked={formState?.selectedPlanificationType === AGENT}
+                                    disabled={true}
+                                />
                             </div>
                         </div>
                     </div>
@@ -1707,11 +1847,16 @@ const Setting = () => {
             const foundProgramStage = programStages.find(p => p.id === value.programStage?.id);
             if (!foundProgramStage) throw new Error('No program stage found ');
 
-            if (formState?.selectedConfigurationType === DQR || formState?.selectedConfigurationType === NORMAL_PROGRAM) {
+            if (
+                formState?.selectedConfigurationType === DQR ||
+                formState?.selectedConfigurationType === NORMAL_PROGRAM
+            ) {
                 setFormState({
                     ...formState,
                     selectedProgramStageForConfiguration: foundProgramStage,
-                    selectedOrganisationUnitGroup: organisationUnitGroups.find(orgG => orgG.id === value.organisationUnitGroup?.id),
+                    selectedOrganisationUnitGroup: organisationUnitGroups.find(
+                        orgG => orgG.id === value.organisationUnitGroup?.id
+                    ),
                     selectedSupervisorDataElements: value.supervisorField || [],
                     selectedStatusSupervisionDataElement: value.statusSupervisionField,
                     selectedNbrIndicatorsToShow: value.selectedNbrIndicatorsToShow,
@@ -1741,7 +1886,9 @@ const Setting = () => {
                 setFormStateForRDQA({
                     ...formStateForRDQA,
                     selectedProgramStageForConfiguration: foundProgramStage,
-                    selectedOrganisationUnitGroup: organisationUnitGroups.find(orgG => orgG.id === value.organisationUnitGroup?.id),
+                    selectedOrganisationUnitGroup: organisationUnitGroups.find(
+                        orgG => orgG.id === value.organisationUnitGroup?.id
+                    ),
                     selectedSupervisorDataElements: value.supervisorField || [],
                     selectedStatusSupervisionDataElement: value.statusSupervisionField
                 });
@@ -1762,14 +1909,19 @@ const Setting = () => {
             <Card className="my-shadow" size="small">
                 <div>
                     <div style={{ fontWeight: 'bold' }}>{translate('Program_Stage_Configuration')}</div>
-                    <div style={{ marginTop: '10px', color: '#00000070', fontSize: '13px' }}>{translate('Program_Stage_Configuration_Help')}</div>
+                    <div style={{ marginTop: '10px', color: '#00000070', fontSize: '13px' }}>
+                        {translate('Program_Stage_Configuration_Help')}
+                    </div>
                     <div style={{ margin: '10px 0px' }}>
                         <Row gutter={[10, 10]}>
                             <Col md={12} sm={24}>
                                 <div>
                                     <div style={{ marginBottom: '5px' }}>{translate('Programmes_Stage')}</div>
                                     <Select
-                                        disabled={loadingProgramStages || (formState?.isFieldEditingMode && currentProgramstageConfiguration)}
+                                        disabled={
+                                            loadingProgramStages ||
+                                            (formState?.isFieldEditingMode && currentProgramstageConfiguration)
+                                        }
                                         options={programStages.map(programStage => ({
                                             label: programStage.displayName,
                                             value: programStage.id
@@ -1791,10 +1943,12 @@ const Setting = () => {
                                     <div>
                                         <div style={{ marginBottom: '5px' }}>{translate('Supervisor_Fields')}</div>
                                         <Select
-                                            options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(progStageDE => ({
-                                                label: progStageDE.dataElement?.displayName,
-                                                value: progStageDE.dataElement?.id
-                                            }))}
+                                            options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                progStageDE => ({
+                                                    label: progStageDE.dataElement?.displayName,
+                                                    value: progStageDE.dataElement?.id
+                                                })
+                                            )}
                                             showSearch
                                             allowClear
                                             optionFilterProp="label"
@@ -1813,10 +1967,12 @@ const Setting = () => {
                                     <div>
                                         <div style={{ marginBottom: '5px' }}>{translate('Status_Supervision')}</div>
                                         <Select
-                                            options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(progStageDE => ({
-                                                label: progStageDE.dataElement?.displayName,
-                                                value: progStageDE.dataElement?.id
-                                            }))}
+                                            options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                progStageDE => ({
+                                                    label: progStageDE.dataElement?.displayName,
+                                                    value: progStageDE.dataElement?.id
+                                                })
+                                            )}
                                             placeholder={translate('Status_Supervision')}
                                             style={{ width: '100%' }}
                                             onChange={handleSelectStatutSupervisionDataElement}
@@ -1866,18 +2022,21 @@ const Setting = () => {
                                                     }}
                                                 >
                                                     <Select
-                                                        options={formState?.selectedTEIProgram?.programTrackedEntityAttributes?.map(program => ({
-                                                            label: program.trackedEntityAttribute?.displayName,
-                                                            value: program.trackedEntityAttribute?.id
-                                                        }))}
+                                                        options={formState?.selectedTEIProgram?.programTrackedEntityAttributes?.map(
+                                                            program => ({
+                                                                label: program.trackedEntityAttribute?.displayName,
+                                                                value: program.trackedEntityAttribute?.id
+                                                            })
+                                                        )}
                                                         placeholder={translate('System_Auto_Generate_Attribute_ID')}
                                                         style={{ width: '100%' }}
                                                         onChange={value => {
                                                             setFormState({
                                                                 ...formState,
-                                                                selectedSupervisionAutoGenerateID: formState?.selectedTEIProgram?.programTrackedEntityAttributes
-                                                                    ?.map(p => p.trackedEntityAttribute)
-                                                                    .find(attribute => attribute.id === value)
+                                                                selectedSupervisionAutoGenerateID:
+                                                                    formState?.selectedTEIProgram?.programTrackedEntityAttributes
+                                                                        ?.map(p => p.trackedEntityAttribute)
+                                                                        .find(attribute => attribute.id === value)
                                                             });
                                                         }}
                                                         value={formState?.selectedSupervisionAutoGenerateID?.id}
@@ -1908,18 +2067,23 @@ const Setting = () => {
                                                         }}
                                                     >
                                                         <Select
-                                                            options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(progStageDE => ({
-                                                                label: progStageDE.dataElement?.displayName,
-                                                                value: progStageDE.dataElement?.id
-                                                            }))}
+                                                            options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                progStageDE => ({
+                                                                    label: progStageDE.dataElement?.displayName,
+                                                                    value: progStageDE.dataElement?.id
+                                                                })
+                                                            )}
                                                             placeholder={translate('How_Many_Indicators')}
                                                             style={{ width: '100%' }}
                                                             onChange={value => {
                                                                 setFormState({
                                                                     ...formState,
-                                                                    selectedNbrIndicatorsToShow: formState?.selectedProgramStageForConfiguration?.programStageDataElements
-                                                                        ?.map(p => p.dataElement)
-                                                                        .find(dataElement => dataElement.id === value)
+                                                                    selectedNbrIndicatorsToShow:
+                                                                        formState?.selectedProgramStageForConfiguration?.programStageDataElements
+                                                                            ?.map(p => p.dataElement)
+                                                                            .find(
+                                                                                dataElement => dataElement.id === value
+                                                                            )
                                                                 });
                                                             }}
                                                             value={formState?.selectedNbrIndicatorsToShow?.id}
@@ -1951,10 +2115,12 @@ const Setting = () => {
                                                         }}
                                                     >
                                                         <Select
-                                                            options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(progStageDE => ({
-                                                                label: progStageDE.dataElement?.displayName,
-                                                                value: progStageDE.dataElement?.id
-                                                            }))}
+                                                            options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                progStageDE => ({
+                                                                    label: progStageDE.dataElement?.displayName,
+                                                                    value: progStageDE.dataElement?.id
+                                                                })
+                                                            )}
                                                             placeholder={translate('How_Many_Document_Source')}
                                                             style={{ width: '100%' }}
                                                             onChange={value => {
@@ -1962,13 +2128,20 @@ const Setting = () => {
                                                                     ...formState,
                                                                     completeness: {
                                                                         ...formState?.completeness,
-                                                                        selectedNbrDocumentsSourceToShow: formState?.selectedProgramStageForConfiguration?.programStageDataElements
-                                                                            ?.map(p => p.dataElement)
-                                                                            .find(dataElement => dataElement.id === value)
+                                                                        selectedNbrDocumentsSourceToShow:
+                                                                            formState?.selectedProgramStageForConfiguration?.programStageDataElements
+                                                                                ?.map(p => p.dataElement)
+                                                                                .find(
+                                                                                    dataElement =>
+                                                                                        dataElement.id === value
+                                                                                )
                                                                     }
                                                                 });
                                                             }}
-                                                            value={formState?.completeness?.selectedNbrDocumentsSourceToShow?.id}
+                                                            value={
+                                                                formState?.completeness
+                                                                    ?.selectedNbrDocumentsSourceToShow?.id
+                                                            }
                                                             optionFilterProp="label"
                                                             showSearch
                                                             allowClear
@@ -1997,10 +2170,12 @@ const Setting = () => {
                                                         }}
                                                     >
                                                         <Select
-                                                            options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(progStageDE => ({
-                                                                label: progStageDE.dataElement?.displayName,
-                                                                value: progStageDE.dataElement?.id
-                                                            }))}
+                                                            options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                progStageDE => ({
+                                                                    label: progStageDE.dataElement?.displayName,
+                                                                    value: progStageDE.dataElement?.id
+                                                                })
+                                                            )}
                                                             placeholder={translate('How_Many_Data_Element')}
                                                             style={{ width: '100%' }}
                                                             onChange={value => {
@@ -2008,13 +2183,20 @@ const Setting = () => {
                                                                     ...formState,
                                                                     completeness: {
                                                                         ...formState?.completeness,
-                                                                        selectedNbrDataElementsToShow: formState?.selectedProgramStageForConfiguration?.programStageDataElements
-                                                                            ?.map(p => p.dataElement)
-                                                                            .find(dataElement => dataElement.id === value)
+                                                                        selectedNbrDataElementsToShow:
+                                                                            formState?.selectedProgramStageForConfiguration?.programStageDataElements
+                                                                                ?.map(p => p.dataElement)
+                                                                                .find(
+                                                                                    dataElement =>
+                                                                                        dataElement.id === value
+                                                                                )
                                                                     }
                                                                 });
                                                             }}
-                                                            value={formState?.completeness.selectedNbrDataElementsToShow?.id}
+                                                            value={
+                                                                formState?.completeness.selectedNbrDataElementsToShow
+                                                                    ?.id
+                                                            }
                                                             optionFilterProp="label"
                                                             showSearch
                                                             allowClear
@@ -2043,18 +2225,23 @@ const Setting = () => {
                                                         }}
                                                     >
                                                         <Select
-                                                            options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(progStageDE => ({
-                                                                label: progStageDE.dataElement?.displayName,
-                                                                value: progStageDE.dataElement?.id
-                                                            }))}
+                                                            options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                progStageDE => ({
+                                                                    label: progStageDE.dataElement?.displayName,
+                                                                    value: progStageDE.dataElement?.id
+                                                                })
+                                                            )}
                                                             placeholder={translate('Recent_Verification_Period')}
                                                             style={{ width: '100%' }}
                                                             onChange={value => {
                                                                 setFormState({
                                                                     ...formState,
-                                                                    selectedPeriodVerification: formState?.selectedProgramStageForConfiguration?.programStageDataElements
-                                                                        ?.map(p => p.dataElement)
-                                                                        .find(dataElement => dataElement.id === value)
+                                                                    selectedPeriodVerification:
+                                                                        formState?.selectedProgramStageForConfiguration?.programStageDataElements
+                                                                            ?.map(p => p.dataElement)
+                                                                            .find(
+                                                                                dataElement => dataElement.id === value
+                                                                            )
                                                                 });
                                                             }}
                                                             value={formState?.selectedPeriodVerification?.id}
@@ -2086,18 +2273,23 @@ const Setting = () => {
                                                         }}
                                                     >
                                                         <Select
-                                                            options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(progStageDE => ({
-                                                                label: progStageDE.dataElement?.displayName,
-                                                                value: progStageDE.dataElement?.id
-                                                            }))}
+                                                            options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                progStageDE => ({
+                                                                    label: progStageDE.dataElement?.displayName,
+                                                                    value: progStageDE.dataElement?.id
+                                                                })
+                                                            )}
                                                             placeholder={translate('Indicators_Period_Type')}
                                                             style={{ width: '100%' }}
                                                             onChange={value => {
                                                                 setFormState({
                                                                     ...formState,
-                                                                    selectedIndicatorsPeriodType: formState?.selectedProgramStageForConfiguration?.programStageDataElements
-                                                                        ?.map(p => p.dataElement)
-                                                                        .find(dataElement => dataElement.id === value)
+                                                                    selectedIndicatorsPeriodType:
+                                                                        formState?.selectedProgramStageForConfiguration?.programStageDataElements
+                                                                            ?.map(p => p.dataElement)
+                                                                            .find(
+                                                                                dataElement => dataElement.id === value
+                                                                            )
                                                                 });
                                                             }}
                                                             value={formState?.selectedIndicatorsPeriodType?.id}
@@ -2129,10 +2321,12 @@ const Setting = () => {
                                                         }}
                                                     >
                                                         <Select
-                                                            options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(progStageDE => ({
-                                                                label: progStageDE.dataElement?.displayName,
-                                                                value: progStageDE.dataElement?.id
-                                                            }))}
+                                                            options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                progStageDE => ({
+                                                                    label: progStageDE.dataElement?.displayName,
+                                                                    value: progStageDE.dataElement?.id
+                                                                })
+                                                            )}
                                                             placeholder={translate('Register_Name')}
                                                             style={{ width: '100%' }}
                                                             onChange={value => {
@@ -2140,9 +2334,13 @@ const Setting = () => {
                                                                     ...formState,
                                                                     completeness: {
                                                                         ...formState?.completeness,
-                                                                        selectedRegister: formState?.selectedProgramStageForConfiguration?.programStageDataElements
-                                                                            ?.map(p => p.dataElement)
-                                                                            .find(dataElement => dataElement.id === value)
+                                                                        selectedRegister:
+                                                                            formState?.selectedProgramStageForConfiguration?.programStageDataElements
+                                                                                ?.map(p => p.dataElement)
+                                                                                .find(
+                                                                                    dataElement =>
+                                                                                        dataElement.id === value
+                                                                                )
                                                                     }
                                                                 });
                                                             }}
@@ -2211,18 +2409,23 @@ const Setting = () => {
                                                         }}
                                                     >
                                                         <Select
-                                                            options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(progStageDE => ({
-                                                                label: progStageDE.dataElement?.displayName,
-                                                                value: progStageDE.dataElement?.id
-                                                            }))}
+                                                            options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                progStageDE => ({
+                                                                    label: progStageDE.dataElement?.displayName,
+                                                                    value: progStageDE.dataElement?.id
+                                                                })
+                                                            )}
                                                             placeholder={translate('Global_Program_Area')}
                                                             style={{ width: '100%' }}
                                                             onChange={value => {
                                                                 setFormState({
                                                                     ...formState,
-                                                                    globalProgramArea: formState?.selectedProgramStageForConfiguration?.programStageDataElements
-                                                                        ?.map(p => p.dataElement)
-                                                                        .find(dataElement => dataElement.id === value)
+                                                                    globalProgramArea:
+                                                                        formState?.selectedProgramStageForConfiguration?.programStageDataElements
+                                                                            ?.map(p => p.dataElement)
+                                                                            .find(
+                                                                                dataElement => dataElement.id === value
+                                                                            )
                                                                 });
                                                             }}
                                                             value={formState?.globalProgramArea?.id}
@@ -2303,7 +2506,9 @@ const Setting = () => {
                                                                     indicators:
                                                                         formState?.indicators?.map(i => ({
                                                                             ...i,
-                                                                            viewMonthlyValue: value ? parseInt(value) : 0
+                                                                            viewMonthlyValue: value
+                                                                                ? parseInt(value)
+                                                                                : 0
                                                                         })) || []
                                                                 });
                                                             }}
@@ -2312,530 +2517,560 @@ const Setting = () => {
                                                 </tr>
                                             )}
 
-                                            {formState?.indicators[0]?.viewMonthlyValue && formState?.selectedConfigurationType !== NORMAL_PROGRAM && parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 1 && (
-                                                <tr>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top',
-                                                            width: '50%'
-                                                        }}
-                                                    >
-                                                        {translate('Keys_Word_Month1')}
-                                                    </td>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top'
-                                                        }}
-                                                    >
-                                                        <TagsInput
+                                            {formState?.indicators[0]?.viewMonthlyValue &&
+                                                formState?.selectedConfigurationType !== NORMAL_PROGRAM &&
+                                                parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 1 && (
+                                                    <tr>
+                                                        <td
                                                             style={{
-                                                                width: '100%'
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top',
+                                                                width: '50%'
                                                             }}
-                                                            value={periodFormState?.month1KeyWords || []}
-                                                            onChange={word => {
-                                                                setPeriodFormState({
-                                                                    ...periodFormState,
-                                                                    month1KeyWords: word
-                                                                });
+                                                        >
+                                                            {translate('Keys_Word_Month1')}
+                                                        </td>
+                                                        <td
+                                                            style={{
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top'
                                                             }}
-                                                        />
-                                                    </td>
-                                                </tr>
-                                            )}
+                                                        >
+                                                            <TagsInput
+                                                                style={{
+                                                                    width: '100%'
+                                                                }}
+                                                                value={periodFormState?.month1KeyWords || []}
+                                                                onChange={word => {
+                                                                    setPeriodFormState({
+                                                                        ...periodFormState,
+                                                                        month1KeyWords: word
+                                                                    });
+                                                                }}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                )}
 
-                                            {formState?.indicators[0]?.viewMonthlyValue && formState?.selectedConfigurationType !== NORMAL_PROGRAM && parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 2 && (
-                                                <tr>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top',
-                                                            width: '50%'
-                                                        }}
-                                                    >
-                                                        {translate('Keys_Word_Month2')}
-                                                    </td>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top'
-                                                        }}
-                                                    >
-                                                        <TagsInput
+                                            {formState?.indicators[0]?.viewMonthlyValue &&
+                                                formState?.selectedConfigurationType !== NORMAL_PROGRAM &&
+                                                parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 2 && (
+                                                    <tr>
+                                                        <td
                                                             style={{
-                                                                width: '100%'
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top',
+                                                                width: '50%'
                                                             }}
-                                                            value={periodFormState?.month2KeyWords || []}
-                                                            onChange={word => {
-                                                                setPeriodFormState({
-                                                                    ...periodFormState,
-                                                                    month2KeyWords: word
-                                                                });
+                                                        >
+                                                            {translate('Keys_Word_Month2')}
+                                                        </td>
+                                                        <td
+                                                            style={{
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top'
                                                             }}
-                                                        />
-                                                    </td>
-                                                </tr>
-                                            )}
+                                                        >
+                                                            <TagsInput
+                                                                style={{
+                                                                    width: '100%'
+                                                                }}
+                                                                value={periodFormState?.month2KeyWords || []}
+                                                                onChange={word => {
+                                                                    setPeriodFormState({
+                                                                        ...periodFormState,
+                                                                        month2KeyWords: word
+                                                                    });
+                                                                }}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                )}
 
-                                            {formState?.indicators[0]?.viewMonthlyValue && formState?.selectedConfigurationType !== NORMAL_PROGRAM && parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 3 && (
-                                                <tr>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top',
-                                                            width: '50%'
-                                                        }}
-                                                    >
-                                                        {translate('Keys_Word_Month3')}
-                                                    </td>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top'
-                                                        }}
-                                                    >
-                                                        <TagsInput
+                                            {formState?.indicators[0]?.viewMonthlyValue &&
+                                                formState?.selectedConfigurationType !== NORMAL_PROGRAM &&
+                                                parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 3 && (
+                                                    <tr>
+                                                        <td
                                                             style={{
-                                                                width: '100%'
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top',
+                                                                width: '50%'
                                                             }}
-                                                            value={periodFormState?.month3KeyWords || []}
-                                                            onChange={word => {
-                                                                setPeriodFormState({
-                                                                    ...periodFormState,
-                                                                    month3KeyWords: word
-                                                                });
+                                                        >
+                                                            {translate('Keys_Word_Month3')}
+                                                        </td>
+                                                        <td
+                                                            style={{
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top'
                                                             }}
-                                                        />
-                                                    </td>
-                                                </tr>
-                                            )}
+                                                        >
+                                                            <TagsInput
+                                                                style={{
+                                                                    width: '100%'
+                                                                }}
+                                                                value={periodFormState?.month3KeyWords || []}
+                                                                onChange={word => {
+                                                                    setPeriodFormState({
+                                                                        ...periodFormState,
+                                                                        month3KeyWords: word
+                                                                    });
+                                                                }}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                )}
 
-                                            {formState?.indicators[0]?.viewMonthlyValue && formState?.selectedConfigurationType !== NORMAL_PROGRAM && parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 4 && (
-                                                <tr>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top',
-                                                            width: '50%'
-                                                        }}
-                                                    >
-                                                        {translate('Keys_Word_Month4')}
-                                                    </td>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top'
-                                                        }}
-                                                    >
-                                                        <TagsInput
+                                            {formState?.indicators[0]?.viewMonthlyValue &&
+                                                formState?.selectedConfigurationType !== NORMAL_PROGRAM &&
+                                                parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 4 && (
+                                                    <tr>
+                                                        <td
                                                             style={{
-                                                                width: '100%'
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top',
+                                                                width: '50%'
                                                             }}
-                                                            value={periodFormState?.month4KeyWords || []}
-                                                            onChange={word => {
-                                                                setPeriodFormState({
-                                                                    ...periodFormState,
-                                                                    month4KeyWords: word
-                                                                });
+                                                        >
+                                                            {translate('Keys_Word_Month4')}
+                                                        </td>
+                                                        <td
+                                                            style={{
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top'
                                                             }}
-                                                        />
-                                                    </td>
-                                                </tr>
-                                            )}
+                                                        >
+                                                            <TagsInput
+                                                                style={{
+                                                                    width: '100%'
+                                                                }}
+                                                                value={periodFormState?.month4KeyWords || []}
+                                                                onChange={word => {
+                                                                    setPeriodFormState({
+                                                                        ...periodFormState,
+                                                                        month4KeyWords: word
+                                                                    });
+                                                                }}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                )}
 
-                                            {formState?.indicators[0]?.viewMonthlyValue && formState?.selectedConfigurationType !== NORMAL_PROGRAM && parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 5 && (
-                                                <tr>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top',
-                                                            width: '50%'
-                                                        }}
-                                                    >
-                                                        {translate('Keys_Word_Month5')}
-                                                    </td>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top'
-                                                        }}
-                                                    >
-                                                        <TagsInput
+                                            {formState?.indicators[0]?.viewMonthlyValue &&
+                                                formState?.selectedConfigurationType !== NORMAL_PROGRAM &&
+                                                parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 5 && (
+                                                    <tr>
+                                                        <td
                                                             style={{
-                                                                width: '100%'
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top',
+                                                                width: '50%'
                                                             }}
-                                                            value={periodFormState?.month5KeyWords || []}
-                                                            onChange={word => {
-                                                                setPeriodFormState({
-                                                                    ...periodFormState,
-                                                                    month5KeyWords: word
-                                                                });
+                                                        >
+                                                            {translate('Keys_Word_Month5')}
+                                                        </td>
+                                                        <td
+                                                            style={{
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top'
                                                             }}
-                                                        />
-                                                    </td>
-                                                </tr>
-                                            )}
+                                                        >
+                                                            <TagsInput
+                                                                style={{
+                                                                    width: '100%'
+                                                                }}
+                                                                value={periodFormState?.month5KeyWords || []}
+                                                                onChange={word => {
+                                                                    setPeriodFormState({
+                                                                        ...periodFormState,
+                                                                        month5KeyWords: word
+                                                                    });
+                                                                }}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                )}
 
-                                            {formState?.indicators[0]?.viewMonthlyValue && formState?.selectedConfigurationType !== NORMAL_PROGRAM && parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 6 && (
-                                                <tr>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top',
-                                                            width: '50%'
-                                                        }}
-                                                    >
-                                                        {translate('Keys_Word_Month6')}
-                                                    </td>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top'
-                                                        }}
-                                                    >
-                                                        <TagsInput
+                                            {formState?.indicators[0]?.viewMonthlyValue &&
+                                                formState?.selectedConfigurationType !== NORMAL_PROGRAM &&
+                                                parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 6 && (
+                                                    <tr>
+                                                        <td
                                                             style={{
-                                                                width: '100%'
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top',
+                                                                width: '50%'
                                                             }}
-                                                            value={periodFormState?.month6KeyWords || []}
-                                                            onChange={word => {
-                                                                setPeriodFormState({
-                                                                    ...periodFormState,
-                                                                    month6KeyWords: word
-                                                                });
+                                                        >
+                                                            {translate('Keys_Word_Month6')}
+                                                        </td>
+                                                        <td
+                                                            style={{
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top'
                                                             }}
-                                                        />
-                                                    </td>
-                                                </tr>
-                                            )}
+                                                        >
+                                                            <TagsInput
+                                                                style={{
+                                                                    width: '100%'
+                                                                }}
+                                                                value={periodFormState?.month6KeyWords || []}
+                                                                onChange={word => {
+                                                                    setPeriodFormState({
+                                                                        ...periodFormState,
+                                                                        month6KeyWords: word
+                                                                    });
+                                                                }}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                )}
 
-                                            {formState?.indicators[0]?.viewMonthlyValue && formState?.selectedConfigurationType !== NORMAL_PROGRAM && parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 7 && (
-                                                <tr>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top',
-                                                            width: '50%'
-                                                        }}
-                                                    >
-                                                        {translate('Keys_Word_Month7')}
-                                                    </td>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top'
-                                                        }}
-                                                    >
-                                                        <TagsInput
+                                            {formState?.indicators[0]?.viewMonthlyValue &&
+                                                formState?.selectedConfigurationType !== NORMAL_PROGRAM &&
+                                                parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 7 && (
+                                                    <tr>
+                                                        <td
                                                             style={{
-                                                                width: '100%'
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top',
+                                                                width: '50%'
                                                             }}
-                                                            value={periodFormState?.month7KeyWords || []}
-                                                            onChange={word => {
-                                                                setPeriodFormState({
-                                                                    ...periodFormState,
-                                                                    month7KeyWords: word
-                                                                });
+                                                        >
+                                                            {translate('Keys_Word_Month7')}
+                                                        </td>
+                                                        <td
+                                                            style={{
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top'
                                                             }}
-                                                        />
-                                                    </td>
-                                                </tr>
-                                            )}
+                                                        >
+                                                            <TagsInput
+                                                                style={{
+                                                                    width: '100%'
+                                                                }}
+                                                                value={periodFormState?.month7KeyWords || []}
+                                                                onChange={word => {
+                                                                    setPeriodFormState({
+                                                                        ...periodFormState,
+                                                                        month7KeyWords: word
+                                                                    });
+                                                                }}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                )}
 
-                                            {formState?.indicators[0]?.viewMonthlyValue && formState?.selectedConfigurationType !== NORMAL_PROGRAM && parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 8 && (
-                                                <tr>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top',
-                                                            width: '50%'
-                                                        }}
-                                                    >
-                                                        {translate('Keys_Word_Month8')}
-                                                    </td>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top'
-                                                        }}
-                                                    >
-                                                        <TagsInput
+                                            {formState?.indicators[0]?.viewMonthlyValue &&
+                                                formState?.selectedConfigurationType !== NORMAL_PROGRAM &&
+                                                parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 8 && (
+                                                    <tr>
+                                                        <td
                                                             style={{
-                                                                width: '100%'
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top',
+                                                                width: '50%'
                                                             }}
-                                                            value={periodFormState?.month8KeyWords || []}
-                                                            onChange={word => {
-                                                                setPeriodFormState({
-                                                                    ...periodFormState,
-                                                                    month8KeyWords: word
-                                                                });
+                                                        >
+                                                            {translate('Keys_Word_Month8')}
+                                                        </td>
+                                                        <td
+                                                            style={{
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top'
                                                             }}
-                                                        />
-                                                    </td>
-                                                </tr>
-                                            )}
+                                                        >
+                                                            <TagsInput
+                                                                style={{
+                                                                    width: '100%'
+                                                                }}
+                                                                value={periodFormState?.month8KeyWords || []}
+                                                                onChange={word => {
+                                                                    setPeriodFormState({
+                                                                        ...periodFormState,
+                                                                        month8KeyWords: word
+                                                                    });
+                                                                }}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                )}
 
-                                            {formState?.indicators[0]?.viewMonthlyValue && formState?.selectedConfigurationType !== NORMAL_PROGRAM && parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 9 && (
-                                                <tr>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top',
-                                                            width: '50%'
-                                                        }}
-                                                    >
-                                                        {translate('Keys_Word_Month9')}
-                                                    </td>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top'
-                                                        }}
-                                                    >
-                                                        <TagsInput
+                                            {formState?.indicators[0]?.viewMonthlyValue &&
+                                                formState?.selectedConfigurationType !== NORMAL_PROGRAM &&
+                                                parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 9 && (
+                                                    <tr>
+                                                        <td
                                                             style={{
-                                                                width: '100%'
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top',
+                                                                width: '50%'
                                                             }}
-                                                            value={periodFormState?.month9KeyWords || []}
-                                                            onChange={word => {
-                                                                setPeriodFormState({
-                                                                    ...periodFormState,
-                                                                    month9KeyWords: word
-                                                                });
+                                                        >
+                                                            {translate('Keys_Word_Month9')}
+                                                        </td>
+                                                        <td
+                                                            style={{
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top'
                                                             }}
-                                                        />
-                                                    </td>
-                                                </tr>
-                                            )}
+                                                        >
+                                                            <TagsInput
+                                                                style={{
+                                                                    width: '100%'
+                                                                }}
+                                                                value={periodFormState?.month9KeyWords || []}
+                                                                onChange={word => {
+                                                                    setPeriodFormState({
+                                                                        ...periodFormState,
+                                                                        month9KeyWords: word
+                                                                    });
+                                                                }}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                )}
 
-                                            {formState?.indicators[0]?.viewMonthlyValue && formState?.selectedConfigurationType !== NORMAL_PROGRAM && parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 10 && (
-                                                <tr>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top',
-                                                            width: '50%'
-                                                        }}
-                                                    >
-                                                        {translate('Keys_Word_Month10')}
-                                                    </td>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top'
-                                                        }}
-                                                    >
-                                                        <TagsInput
+                                            {formState?.indicators[0]?.viewMonthlyValue &&
+                                                formState?.selectedConfigurationType !== NORMAL_PROGRAM &&
+                                                parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 10 && (
+                                                    <tr>
+                                                        <td
                                                             style={{
-                                                                width: '100%'
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top',
+                                                                width: '50%'
                                                             }}
-                                                            value={periodFormState?.month10KeyWords || []}
-                                                            onChange={word => {
-                                                                setPeriodFormState({
-                                                                    ...periodFormState,
-                                                                    month10KeyWords: word
-                                                                });
+                                                        >
+                                                            {translate('Keys_Word_Month10')}
+                                                        </td>
+                                                        <td
+                                                            style={{
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top'
                                                             }}
-                                                        />
-                                                    </td>
-                                                </tr>
-                                            )}
+                                                        >
+                                                            <TagsInput
+                                                                style={{
+                                                                    width: '100%'
+                                                                }}
+                                                                value={periodFormState?.month10KeyWords || []}
+                                                                onChange={word => {
+                                                                    setPeriodFormState({
+                                                                        ...periodFormState,
+                                                                        month10KeyWords: word
+                                                                    });
+                                                                }}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                )}
 
-                                            {formState?.indicators[0]?.viewMonthlyValue && formState?.selectedConfigurationType !== NORMAL_PROGRAM && parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 11 && (
-                                                <tr>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top',
-                                                            width: '50%'
-                                                        }}
-                                                    >
-                                                        {translate('Keys_Word_Month11')}
-                                                    </td>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top'
-                                                        }}
-                                                    >
-                                                        <TagsInput
+                                            {formState?.indicators[0]?.viewMonthlyValue &&
+                                                formState?.selectedConfigurationType !== NORMAL_PROGRAM &&
+                                                parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 11 && (
+                                                    <tr>
+                                                        <td
                                                             style={{
-                                                                width: '100%'
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top',
+                                                                width: '50%'
                                                             }}
-                                                            value={periodFormState?.month11KeyWords || []}
-                                                            onChange={word => {
-                                                                setPeriodFormState({
-                                                                    ...periodFormState,
-                                                                    month11KeyWords: word
-                                                                });
+                                                        >
+                                                            {translate('Keys_Word_Month11')}
+                                                        </td>
+                                                        <td
+                                                            style={{
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top'
                                                             }}
-                                                        />
-                                                    </td>
-                                                </tr>
-                                            )}
+                                                        >
+                                                            <TagsInput
+                                                                style={{
+                                                                    width: '100%'
+                                                                }}
+                                                                value={periodFormState?.month11KeyWords || []}
+                                                                onChange={word => {
+                                                                    setPeriodFormState({
+                                                                        ...periodFormState,
+                                                                        month11KeyWords: word
+                                                                    });
+                                                                }}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                )}
 
-                                            {formState?.indicators[0]?.viewMonthlyValue && formState?.selectedConfigurationType !== NORMAL_PROGRAM && parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 12 && (
-                                                <tr>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top',
-                                                            width: '50%'
-                                                        }}
-                                                    >
-                                                        {translate('Keys_Word_Month12')}
-                                                    </td>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top'
-                                                        }}
-                                                    >
-                                                        <TagsInput
+                                            {formState?.indicators[0]?.viewMonthlyValue &&
+                                                formState?.selectedConfigurationType !== NORMAL_PROGRAM &&
+                                                parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 12 && (
+                                                    <tr>
+                                                        <td
                                                             style={{
-                                                                width: '100%'
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top',
+                                                                width: '50%'
                                                             }}
-                                                            value={periodFormState?.month12KeyWords || []}
-                                                            onChange={word => {
-                                                                setPeriodFormState({
-                                                                    ...periodFormState,
-                                                                    month12KeyWords: word
-                                                                });
+                                                        >
+                                                            {translate('Keys_Word_Month12')}
+                                                        </td>
+                                                        <td
+                                                            style={{
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top'
                                                             }}
-                                                        />
-                                                    </td>
-                                                </tr>
-                                            )}
+                                                        >
+                                                            <TagsInput
+                                                                style={{
+                                                                    width: '100%'
+                                                                }}
+                                                                value={periodFormState?.month12KeyWords || []}
+                                                                onChange={word => {
+                                                                    setPeriodFormState({
+                                                                        ...periodFormState,
+                                                                        month12KeyWords: word
+                                                                    });
+                                                                }}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                )}
 
-                                            {formState?.indicators[0]?.viewMonthlyValue && formState?.selectedConfigurationType !== NORMAL_PROGRAM && parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 13 && (
-                                                <tr>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top',
-                                                            width: '50%'
-                                                        }}
-                                                    >
-                                                        {translate('Keys_Word_Month13')}
-                                                    </td>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top'
-                                                        }}
-                                                    >
-                                                        <TagsInput
+                                            {formState?.indicators[0]?.viewMonthlyValue &&
+                                                formState?.selectedConfigurationType !== NORMAL_PROGRAM &&
+                                                parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 13 && (
+                                                    <tr>
+                                                        <td
                                                             style={{
-                                                                width: '100%'
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top',
+                                                                width: '50%'
                                                             }}
-                                                            value={periodFormState?.month13KeyWords || []}
-                                                            onChange={word => {
-                                                                setPeriodFormState({
-                                                                    ...periodFormState,
-                                                                    month13KeyWords: word
-                                                                });
+                                                        >
+                                                            {translate('Keys_Word_Month13')}
+                                                        </td>
+                                                        <td
+                                                            style={{
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top'
                                                             }}
-                                                        />
-                                                    </td>
-                                                </tr>
-                                            )}
+                                                        >
+                                                            <TagsInput
+                                                                style={{
+                                                                    width: '100%'
+                                                                }}
+                                                                value={periodFormState?.month13KeyWords || []}
+                                                                onChange={word => {
+                                                                    setPeriodFormState({
+                                                                        ...periodFormState,
+                                                                        month13KeyWords: word
+                                                                    });
+                                                                }}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                )}
 
-                                            {formState?.indicators[0]?.viewMonthlyValue && formState?.selectedConfigurationType !== NORMAL_PROGRAM && parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 14 && (
-                                                <tr>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top',
-                                                            width: '50%'
-                                                        }}
-                                                    >
-                                                        {translate('Keys_Word_Month14')}
-                                                    </td>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top'
-                                                        }}
-                                                    >
-                                                        <TagsInput
+                                            {formState?.indicators[0]?.viewMonthlyValue &&
+                                                formState?.selectedConfigurationType !== NORMAL_PROGRAM &&
+                                                parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 14 && (
+                                                    <tr>
+                                                        <td
                                                             style={{
-                                                                width: '100%'
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top',
+                                                                width: '50%'
                                                             }}
-                                                            value={periodFormState?.month14KeyWords || []}
-                                                            onChange={word => {
-                                                                setPeriodFormState({
-                                                                    ...periodFormState,
-                                                                    month14KeyWords: word
-                                                                });
+                                                        >
+                                                            {translate('Keys_Word_Month14')}
+                                                        </td>
+                                                        <td
+                                                            style={{
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top'
                                                             }}
-                                                        />
-                                                    </td>
-                                                </tr>
-                                            )}
+                                                        >
+                                                            <TagsInput
+                                                                style={{
+                                                                    width: '100%'
+                                                                }}
+                                                                value={periodFormState?.month14KeyWords || []}
+                                                                onChange={word => {
+                                                                    setPeriodFormState({
+                                                                        ...periodFormState,
+                                                                        month14KeyWords: word
+                                                                    });
+                                                                }}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                )}
 
-                                            {formState?.indicators[0]?.viewMonthlyValue && formState?.selectedConfigurationType !== NORMAL_PROGRAM && parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 15 && (
-                                                <tr>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top',
-                                                            width: '50%'
-                                                        }}
-                                                    >
-                                                        {translate('Keys_Word_Month15')}
-                                                    </td>
-                                                    <td
-                                                        style={{
-                                                            border: '1px solid #00000070',
-                                                            padding: '2px 5px',
-                                                            verticalAlign: 'top'
-                                                        }}
-                                                    >
-                                                        <TagsInput
+                                            {formState?.indicators[0]?.viewMonthlyValue &&
+                                                formState?.selectedConfigurationType !== NORMAL_PROGRAM &&
+                                                parseInt(formState?.indicators[0]?.viewMonthlyValue) >= 15 && (
+                                                    <tr>
+                                                        <td
                                                             style={{
-                                                                width: '100%'
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top',
+                                                                width: '50%'
                                                             }}
-                                                            value={periodFormState?.month15KeyWords || []}
-                                                            onChange={word => {
-                                                                setPeriodFormState({
-                                                                    ...periodFormState,
-                                                                    month15KeyWords: word
-                                                                });
+                                                        >
+                                                            {translate('Keys_Word_Month15')}
+                                                        </td>
+                                                        <td
+                                                            style={{
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top'
                                                             }}
-                                                        />
-                                                    </td>
-                                                </tr>
-                                            )}
+                                                        >
+                                                            <TagsInput
+                                                                style={{
+                                                                    width: '100%'
+                                                                }}
+                                                                value={periodFormState?.month15KeyWords || []}
+                                                                onChange={word => {
+                                                                    setPeriodFormState({
+                                                                        ...periodFormState,
+                                                                        month15KeyWords: word
+                                                                    });
+                                                                }}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                )}
                                         </tbody>
                                     </table>
                                 </div>
@@ -2849,7 +3084,9 @@ const Setting = () => {
 
     const handleDeleteProgramStageConfiguration = async value => {
         try {
-            const filteredProgramStages = programStageConfigurations.filter(p => p.programStage?.id !== value.programStage?.id);
+            const filteredProgramStages = programStageConfigurations.filter(
+                p => p.programStage?.id !== value.programStage?.id
+            );
             const newList = mappingConfigSupervisions.map(mappingConf => {
                 if (mappingConf.program?.id === formState?.selectedTEIProgram?.id) {
                     return {
@@ -2860,7 +3097,13 @@ const Setting = () => {
                 return mappingConf;
             });
 
-            await saveDataToDataStore(process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY, newList, setLoadingSaveSupervionsConfig, null, null);
+            await saveDataToDataStore(
+                process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY,
+                newList,
+                setLoadingSaveSupervionsConfig,
+                null,
+                null
+            );
 
             setProgramStageConfigurations(filteredProgramStages);
             setMappingConfigSupervisions(newList);
@@ -2893,7 +3136,9 @@ const Setting = () => {
             <div style={{ marginTop: '20px', position: 'sticky', top: 5 }}>
                 <Card className="my-shadow" size="small">
                     <div style={{ marginBottom: '10px' }}>
-                        <span style={{ marginRight: '5px', fontWeight: 'bold' }}>{translate('Program_Stage_Configuration_List')}</span>
+                        <span style={{ marginRight: '5px', fontWeight: 'bold' }}>
+                            {translate('Program_Stage_Configuration_List')}
+                        </span>
                         <span
                             style={{
                                 backgroundColor: 'orange',
@@ -2990,9 +3235,17 @@ const Setting = () => {
             setLoadingSaveVisualizationInDatastore(true);
 
             if (favorisItems.length > 0) {
-                const listFromDataStore = await loadDataStore(process.env.REACT_APP_VISUALIZATION_KEY, null, null, null);
+                const listFromDataStore = await loadDataStore(
+                    process.env.REACT_APP_VISUALIZATION_KEY,
+                    null,
+                    null,
+                    null
+                );
 
-                if (listFromDataStore?.map(d => d.program?.id)?.includes(selectedProgramForVisualization?.id) && !currentVisualizationConfig) {
+                if (
+                    listFromDataStore?.map(d => d.program?.id)?.includes(selectedProgramForVisualization?.id) &&
+                    !currentVisualizationConfig
+                ) {
                     throw new Error(translate('Configuration_Deja_Ajoutee'));
                 }
 
@@ -3018,7 +3271,13 @@ const Setting = () => {
                           ...listFromDataStore
                       ];
 
-                await saveDataToDataStore(process.env.REACT_APP_VISUALIZATION_KEY, newList, setLoadingSaveVisualizationInDatastore, null, null);
+                await saveDataToDataStore(
+                    process.env.REACT_APP_VISUALIZATION_KEY,
+                    newList,
+                    setLoadingSaveVisualizationInDatastore,
+                    null,
+                    null
+                );
 
                 await loadDataStoreVisualizations();
                 setNotification({
@@ -3061,7 +3320,11 @@ const Setting = () => {
         <div style={{ marginTop: '22px', display: 'flex', alignItems: 'center' }}>
             {formState?.isFieldEditingMode && (
                 <div style={{ marginRight: '10px' }}>
-                    <Button destructive onClick={handleCancelSupConfig} icon={<GiCancel style={{ fontSize: '18px', color: 'white' }} />}>
+                    <Button
+                        destructive
+                        onClick={handleCancelSupConfig}
+                        icon={<GiCancel style={{ fontSize: '18px', color: 'white' }} />}
+                    >
                         {translate('Annulée')}
                     </Button>
                 </div>
@@ -3069,7 +3332,8 @@ const Setting = () => {
 
             <Button
                 disabled={
-                    formState?.selectedConfigurationType === DQR || formState?.selectedConfigurationType === NORMAL_PROGRAM
+                    formState?.selectedConfigurationType === DQR ||
+                    formState?.selectedConfigurationType === NORMAL_PROGRAM
                         ? formState?.selectedProgramStageForConfiguration
                             ? false
                             : true
@@ -3082,9 +3346,13 @@ const Setting = () => {
                 loading={loadingSaveSupervionsConfig}
                 icon={<FiSave style={{ fontSize: '18px', color: '#FFF' }} />}
             >
-                {(formState?.selectedConfigurationType === DQR || formState?.selectedConfigurationType === NORMAL_PROGRAM) && currentProgramstageConfiguration
+                {(formState?.selectedConfigurationType === DQR ||
+                    formState?.selectedConfigurationType === NORMAL_PROGRAM) &&
+                currentProgramstageConfiguration
                     ? translate('Mise_A_Jour_Configuration')
-                    : (formState?.selectedConfigurationType === DQR || formState?.selectedConfigurationType === NORMAL_PROGRAM) && '+ '.concat(translate('AddConfiguration'))}
+                    : (formState?.selectedConfigurationType === DQR ||
+                          formState?.selectedConfigurationType === NORMAL_PROGRAM) &&
+                      '+ '.concat(translate('AddConfiguration'))}
                 {formState?.selectedConfigurationType === RDQA && currentProgramstageConfigurationForRDQA
                     ? translate('Mise_A_Jour_Configuration')
                     : formState?.selectedConfigurationType === RDQA && '+ '.concat(translate('AddConfiguration'))}
@@ -3114,7 +3382,9 @@ const Setting = () => {
                         <div style={{ margin: '10px 0px' }}>
                             <>
                                 <GenerateIndicatorsFieldsRDQA
-                                    selectedProgramStageForConfiguration={formStateForRDQA?.selectedProgramStageForConfiguration}
+                                    selectedProgramStageForConfiguration={
+                                        formStateForRDQA?.selectedProgramStageForConfiguration
+                                    }
                                     indicatorsFieldsConfigsForRDQA={indicatorsFieldsConfigsForRDQA}
                                     setIndicatorsFieldsConfigsForRDQA={setIndicatorsFieldsConfigsForRDQA}
                                     formStateForRDQA={formStateForRDQA}
@@ -3131,14 +3401,19 @@ const Setting = () => {
             <Card className="my-shadow" size="small">
                 <div>
                     <div style={{ fontWeight: 'bold' }}>{translate('Program_Stage_Configuration')}</div>
-                    <div style={{ marginTop: '10px', color: '#00000070', fontSize: '13px' }}>{translate('Program_Stage_Configuration_Help')}</div>
+                    <div style={{ marginTop: '10px', color: '#00000070', fontSize: '13px' }}>
+                        {translate('Program_Stage_Configuration_Help')}
+                    </div>
                     <div style={{ margin: '10px 0px' }}>
                         <Row gutter={[10, 10]}>
                             <Col md={12} sm={24}>
                                 <div>
                                     <div style={{ marginBottom: '5px' }}>{translate('Programmes_Stage')}</div>
                                     <Select
-                                        disabled={loadingProgramStages || (formState?.isFieldEditingMode && currentProgramstageConfigurationForRDQA)}
+                                        disabled={
+                                            loadingProgramStages ||
+                                            (formState?.isFieldEditingMode && currentProgramstageConfigurationForRDQA)
+                                        }
                                         options={programStages?.map(programStage => ({
                                             label: programStage.displayName,
                                             value: programStage.id
@@ -3181,10 +3456,12 @@ const Setting = () => {
                                     <div>
                                         <div style={{ marginBottom: '5px' }}>{translate('Supervisor_Fields')}</div>
                                         <Select
-                                            options={formStateForRDQA?.selectedProgramStageForConfiguration?.programStageDataElements?.map(progStageDE => ({
-                                                label: progStageDE.dataElement?.displayName,
-                                                value: progStageDE.dataElement?.id
-                                            }))}
+                                            options={formStateForRDQA?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                progStageDE => ({
+                                                    label: progStageDE.dataElement?.displayName,
+                                                    value: progStageDE.dataElement?.id
+                                                })
+                                            )}
                                             showSearch
                                             allowClear
                                             optionFilterProp="label"
@@ -3201,12 +3478,16 @@ const Setting = () => {
                             {formStateForRDQA?.selectedProgramStageForConfiguration && (
                                 <Col md={12}>
                                     <div>
-                                        <div style={{ marginBottom: '5px' }}>{translate('Supervision_statut_fields')}</div>
+                                        <div style={{ marginBottom: '5px' }}>
+                                            {translate('Supervision_statut_fields')}
+                                        </div>
                                         <Select
-                                            options={formStateForRDQA?.selectedProgramStageForConfiguration?.programStageDataElements?.map(progStageDE => ({
-                                                label: progStageDE.dataElement?.displayName,
-                                                value: progStageDE.dataElement?.id
-                                            }))}
+                                            options={formStateForRDQA?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                progStageDE => ({
+                                                    label: progStageDE.dataElement?.displayName,
+                                                    value: progStageDE.dataElement?.id
+                                                })
+                                            )}
                                             placeholder={translate('Elements_De_Donnees')}
                                             style={{ width: '100%' }}
                                             onChange={handleSelectStatutSupervisionDataElementForRDQA}
@@ -3255,18 +3536,21 @@ const Setting = () => {
                                                     }}
                                                 >
                                                     <Select
-                                                        options={formState?.selectedTEIProgram?.programTrackedEntityAttributes?.map(program => ({
-                                                            label: program.trackedEntityAttribute?.displayName,
-                                                            value: program.trackedEntityAttribute?.id
-                                                        }))}
+                                                        options={formState?.selectedTEIProgram?.programTrackedEntityAttributes?.map(
+                                                            program => ({
+                                                                label: program.trackedEntityAttribute?.displayName,
+                                                                value: program.trackedEntityAttribute?.id
+                                                            })
+                                                        )}
                                                         placeholder={translate('System_Auto_Generate_Attribute_ID')}
                                                         style={{ width: '100%' }}
                                                         onChange={value => {
                                                             setFormStateForRDQA({
                                                                 ...formStateForRDQA,
-                                                                selectedSupervisionAutoGenerateID: formState?.selectedTEIProgram?.programTrackedEntityAttributes
-                                                                    ?.map(p => p.trackedEntityAttribute)
-                                                                    .find(attribute => attribute.id === value)
+                                                                selectedSupervisionAutoGenerateID:
+                                                                    formState?.selectedTEIProgram?.programTrackedEntityAttributes
+                                                                        ?.map(p => p.trackedEntityAttribute)
+                                                                        .find(attribute => attribute.id === value)
                                                             });
                                                         }}
                                                         value={formStateForRDQA?.selectedSupervisionAutoGenerateID?.id}
@@ -3326,7 +3610,11 @@ const Setting = () => {
                                         });
                                     }
                                 }}
-                                value={formState?.selectedConfigurationType === DQR ? numberOfIndicatorAndRecoupement?.DQR?.nbrIndicator : numberOfIndicatorAndRecoupement?.ERDQ?.nbrIndicator}
+                                value={
+                                    formState?.selectedConfigurationType === DQR
+                                        ? numberOfIndicatorAndRecoupement?.DQR?.nbrIndicator
+                                        : numberOfIndicatorAndRecoupement?.ERDQ?.nbrIndicator
+                                }
                                 placeholder={translate('Number_Of_Indicator')}
                             />
                         </div>
@@ -3357,7 +3645,11 @@ const Setting = () => {
                                         });
                                     }
                                 }}
-                                value={formState?.selectedConfigurationType === DQR ? numberOfIndicatorAndRecoupement?.DQR?.nbrRecoupement : numberOfIndicatorAndRecoupement?.ERDQ?.nbrRecoupement}
+                                value={
+                                    formState?.selectedConfigurationType === DQR
+                                        ? numberOfIndicatorAndRecoupement?.DQR?.nbrRecoupement
+                                        : numberOfIndicatorAndRecoupement?.ERDQ?.nbrRecoupement
+                                }
                                 placeholder={translate('Number_Of_Recoupement')}
                             />
                         </div>
@@ -3634,7 +3926,9 @@ const Setting = () => {
                                                     <div>
                                                         <Popconfirm
                                                             title={translate('Suppression')}
-                                                            description={translate('Confirmation_Suppression_Configuration')}
+                                                            description={translate(
+                                                                'Confirmation_Suppression_Configuration'
+                                                            )}
                                                             icon={
                                                                 <QuestionCircleOutlined
                                                                     style={{
@@ -4045,11 +4339,20 @@ const Setting = () => {
                                 </Col>
                                 <Col md={12} sm={24}>
                                     <div style={{ marginBottom: '5px' }}>{translate('Etiquette')}</div>
-                                    <Input name="indicatorName" value={indicatorEtiquette} onChange={event => setIndicatorEtiquette(''.concat(event.target.value))} />
+                                    <Input
+                                        name="indicatorName"
+                                        value={indicatorEtiquette}
+                                        onChange={event => setIndicatorEtiquette(''.concat(event.target.value))}
+                                    />
                                 </Col>
                                 <Col md={12} sm={24}>
                                     <div style={{ marginBottom: '5px' }}>{translate('Poids')}</div>
-                                    <InputNumber style={{ width: '100%' }} name="indicatorName" value={indicatorWeight} onChange={event => setIndicatorWeight(event)} />
+                                    <InputNumber
+                                        style={{ width: '100%' }}
+                                        name="indicatorName"
+                                        value={indicatorWeight}
+                                        onChange={event => setIndicatorWeight(event)}
+                                    />
                                 </Col>
                                 <Col md={12}>
                                     <div
@@ -4059,7 +4362,10 @@ const Setting = () => {
                                             marginTop: '25px'
                                         }}
                                     >
-                                        <Checkbox checked={indicatorBestPositive} onChange={() => setIndicatorBestPositive(!indicatorBestPositive)} />
+                                        <Checkbox
+                                            checked={indicatorBestPositive}
+                                            onChange={() => setIndicatorBestPositive(!indicatorBestPositive)}
+                                        />
                                         <span style={{ marginLeft: '10px' }}> {translate('Meilleur_Positif')}</span>
                                     </div>
                                 </Col>
@@ -4203,7 +4509,9 @@ const Setting = () => {
                                                     />
                                                     <Popconfirm
                                                         title={translate('Suppression_Configuration')}
-                                                        description={translate('Confirmation_Suppression_Configuration')}
+                                                        description={translate(
+                                                            'Confirmation_Suppression_Configuration'
+                                                        )}
                                                         icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
                                                         onConfirm={() => handleDeleteConfigItem(value)}
                                                     >
@@ -4252,12 +4560,22 @@ const Setting = () => {
                                 </Col>
                                 <Col>
                                     <div>
-                                        <Radio label={translate('Element_De_Donnee')} onChange={handleChangeElementType} value={TYPE_ANALYSE_DATA_ELEMENT} checked={selectedAnalyseType === TYPE_ANALYSE_DATA_ELEMENT} />
+                                        <Radio
+                                            label={translate('Element_De_Donnee')}
+                                            onChange={handleChangeElementType}
+                                            value={TYPE_ANALYSE_DATA_ELEMENT}
+                                            checked={selectedAnalyseType === TYPE_ANALYSE_DATA_ELEMENT}
+                                        />
                                     </div>
                                 </Col>
                                 <Col>
                                     <div>
-                                        <Radio label={translate('Indicateurs')} onChange={handleChangeElementType} value={TYPE_ANALYSE_INDICATOR} checked={selectedAnalyseType === TYPE_ANALYSE_INDICATOR} />
+                                        <Radio
+                                            label={translate('Indicateurs')}
+                                            onChange={handleChangeElementType}
+                                            value={TYPE_ANALYSE_INDICATOR}
+                                            checked={selectedAnalyseType === TYPE_ANALYSE_INDICATOR}
+                                        />
                                     </div>
                                 </Col>
                             </Row>
@@ -4310,7 +4628,12 @@ const Setting = () => {
                                 <Col md={6} xs={24}>
                                     {selectedAnalyseDataElement || selectedAnalyseIndicator ? (
                                         <div style={{ marginTop: '18px' }}>
-                                            <Button loading={loadingAddAnalyseConfigs} disabled={loadingAddAnalyseConfigs} primary onClick={handleSaveAnalyseConfigs}>
+                                            <Button
+                                                loading={loadingAddAnalyseConfigs}
+                                                disabled={loadingAddAnalyseConfigs}
+                                                primary
+                                                onClick={handleSaveAnalyseConfigs}
+                                            >
                                                 + {translate('Ajouter')}
                                             </Button>
                                         </div>
@@ -4346,7 +4669,10 @@ const Setting = () => {
                             <Table
                                 dataSource={analyseConfigs?.map(config => ({
                                     ...config,
-                                    nom: config.elementType === TYPE_ANALYSE_DATA_ELEMENT ? config?.dataElement?.displayName : config?.indicator?.displayName,
+                                    nom:
+                                        config.elementType === TYPE_ANALYSE_DATA_ELEMENT
+                                            ? config?.dataElement?.displayName
+                                            : config?.indicator?.displayName,
                                     elementType: config.elementType,
                                     action: { ...config }
                                 }))}
@@ -4379,7 +4705,9 @@ const Setting = () => {
                                                 >
                                                     <Popconfirm
                                                         title={translate('Suppression_Configuration')}
-                                                        description={translate('Confirmation_Suppression_Configuration')}
+                                                        description={translate(
+                                                            'Confirmation_Suppression_Configuration'
+                                                        )}
                                                         icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
                                                         onConfirm={() => handleDeleteAnalyseConfig(value)}
                                                     >
@@ -4417,29 +4745,69 @@ const Setting = () => {
             <Row gutter={[8, 8]}>
                 <Col md={4} sm={24}>
                     <div style={{ marginBottom: '2px', position: 'sticky', top: 30 }}>
-                        <div className={`setting-menu-item ${selectedTypeSupervisionPage === PAGE_CONFIG_SUPERVISION ? 'active' : ''}`} onClick={() => handleClickConfigMenu(PAGE_CONFIG_SUPERVISION)}>
+                        <div
+                            className={`setting-menu-item ${
+                                selectedTypeSupervisionPage === PAGE_CONFIG_SUPERVISION ? 'active' : ''
+                            }`}
+                            onClick={() => handleClickConfigMenu(PAGE_CONFIG_SUPERVISION)}
+                        >
                             {translate('Parametre_Supervision')}
                         </div>
-                        <div className={`setting-menu-item ${selectedTypeSupervisionPage === PAGE_INDICATORS_MAPPING ? 'active' : ''}`} onClick={() => handleClickConfigMenu(PAGE_INDICATORS_MAPPING)}>
+                        <div
+                            className={`setting-menu-item ${
+                                selectedTypeSupervisionPage === PAGE_INDICATORS_MAPPING ? 'active' : ''
+                            }`}
+                            onClick={() => handleClickConfigMenu(PAGE_INDICATORS_MAPPING)}
+                        >
                             {translate('Indicators_Mapping')}
                         </div>
-                        <div className={`setting-menu-item ${selectedTypeSupervisionPage === PAGE_REGISTERS_MANAGEMENT ? 'active' : ''}`} onClick={() => handleClickConfigMenu(PAGE_REGISTERS_MANAGEMENT)}>
+                        <div
+                            className={`setting-menu-item ${
+                                selectedTypeSupervisionPage === PAGE_REGISTERS_MANAGEMENT ? 'active' : ''
+                            }`}
+                            onClick={() => handleClickConfigMenu(PAGE_REGISTERS_MANAGEMENT)}
+                        >
                             {translate('Registers_Management')}
                         </div>
-                        <div className={`setting-menu-item ${selectedTypeSupervisionPage === PAGE_CROSS_CHECK_MANAGAEMENT ? 'active' : ''}`} onClick={() => handleClickConfigMenu(PAGE_CROSS_CHECK_MANAGAEMENT)}>
+                        <div
+                            className={`setting-menu-item ${
+                                selectedTypeSupervisionPage === PAGE_CROSS_CHECK_MANAGAEMENT ? 'active' : ''
+                            }`}
+                            onClick={() => handleClickConfigMenu(PAGE_CROSS_CHECK_MANAGAEMENT)}
+                        >
                             {translate('Cross_Chek_Management')}
                         </div>
-                        <div className={`setting-menu-item ${selectedTypeSupervisionPage === PAGE_DATA_ELEMENT_MANAGEMENT ? 'active' : ''}`} onClick={() => handleClickConfigMenu(PAGE_DATA_ELEMENT_MANAGEMENT)}>
+                        <div
+                            className={`setting-menu-item ${
+                                selectedTypeSupervisionPage === PAGE_DATA_ELEMENT_MANAGEMENT ? 'active' : ''
+                            }`}
+                            onClick={() => handleClickConfigMenu(PAGE_DATA_ELEMENT_MANAGEMENT)}
+                        >
                             {translate('Data_element_Management')}
                         </div>
-                        <div className={`setting-menu-item ${selectedTypeSupervisionPage === PAGE_SOURCE_DOCUMENT_MANAGEMENT ? 'active' : ''}`} onClick={() => handleClickConfigMenu(PAGE_SOURCE_DOCUMENT_MANAGEMENT)}>
+                        <div
+                            className={`setting-menu-item ${
+                                selectedTypeSupervisionPage === PAGE_SOURCE_DOCUMENT_MANAGEMENT ? 'active' : ''
+                            }`}
+                            onClick={() => handleClickConfigMenu(PAGE_SOURCE_DOCUMENT_MANAGEMENT)}
+                        >
                             {translate('Source_Document_Management')}
                         </div>
-                        <div className={`setting-menu-item ${selectedTypeSupervisionPage === PAGE_CONFIG_VISUALIZATION ? 'active' : ''}`} onClick={() => handleClickConfigMenu(PAGE_CONFIG_VISUALIZATION)}>
+                        <div
+                            className={`setting-menu-item ${
+                                selectedTypeSupervisionPage === PAGE_CONFIG_VISUALIZATION ? 'active' : ''
+                            }`}
+                            onClick={() => handleClickConfigMenu(PAGE_CONFIG_VISUALIZATION)}
+                        >
                             {translate('Visualizations')}
                         </div>
                         {0 > 1 && (
-                            <div className={`setting-menu-item ${selectedTypeSupervisionPage === PAGE_CONFIG_ANALYSE ? 'active' : ''}`} onClick={() => handleClickConfigMenu(PAGE_CONFIG_ANALYSE)}>
+                            <div
+                                className={`setting-menu-item ${
+                                    selectedTypeSupervisionPage === PAGE_CONFIG_ANALYSE ? 'active' : ''
+                                }`}
+                                onClick={() => handleClickConfigMenu(PAGE_CONFIG_ANALYSE)}
+                            >
                                 {translate('Analyses')}
                             </div>
                         )}
@@ -4453,8 +4821,10 @@ const Setting = () => {
                     {selectedTypeSupervisionPage === PAGE_CONFIG_ANALYSE && RenderPageAnalyseConfig()}
                     {selectedTypeSupervisionPage === PAGE_REGISTERS_MANAGEMENT && RenderPageRegistersManagement()}
                     {selectedTypeSupervisionPage === PAGE_CROSS_CHECK_MANAGAEMENT && RenderPageCrossChecksManagement()}
-                    {selectedTypeSupervisionPage === PAGE_DATA_ELEMENT_MANAGEMENT && RenderPageDataElementsCompletenessManagement()}
-                    {selectedTypeSupervisionPage === PAGE_SOURCE_DOCUMENT_MANAGEMENT && RenderPageSourceDocumentsCompletenessManagement()}
+                    {selectedTypeSupervisionPage === PAGE_DATA_ELEMENT_MANAGEMENT &&
+                        RenderPageDataElementsCompletenessManagement()}
+                    {selectedTypeSupervisionPage === PAGE_SOURCE_DOCUMENT_MANAGEMENT &&
+                        RenderPageSourceDocumentsCompletenessManagement()}
                 </Col>
             </Row>
         </div>
@@ -4470,7 +4840,10 @@ const Setting = () => {
                 }}
             >
                 <TabBar>
-                    <Tab selected={renderPage === PAGE_CONFIGURATION_TYPE_SUPERVISIONS} onClick={_ => setRenderPage(PAGE_CONFIGURATION_TYPE_SUPERVISIONS)}>
+                    <Tab
+                        selected={renderPage === PAGE_CONFIGURATION_TYPE_SUPERVISIONS}
+                        onClick={_ => setRenderPage(PAGE_CONFIGURATION_TYPE_SUPERVISIONS)}
+                    >
                         {translate('Type_De_Supervision')}
                     </Tab>
                 </TabBar>
@@ -4502,9 +4875,16 @@ const Setting = () => {
     }, []);
 
     useEffect(() => {
-        numberOfIndicatorAndRecoupement.DQR && formState?.selectedConfigurationType === DQR && !formState?.isFieldEditingMode && !currentProgramstageConfiguration && initFields();
+        numberOfIndicatorAndRecoupement.DQR &&
+            formState?.selectedConfigurationType === DQR &&
+            !formState?.isFieldEditingMode &&
+            !currentProgramstageConfiguration &&
+            initFields();
 
-        numberOfIndicatorAndRecoupement && !currentProgramstageConfigurationForRDQA && formState?.selectedConfigurationType === RDQA && initFieldsForRDQA();
+        numberOfIndicatorAndRecoupement &&
+            !currentProgramstageConfigurationForRDQA &&
+            formState?.selectedConfigurationType === RDQA &&
+            initFieldsForRDQA();
     }, [
         numberOfIndicatorAndRecoupement,
         formState?.selectedConfigurationType,
