@@ -8,5 +8,5 @@
 - Consitency over time configuration for Period 1 value
 - Consitency over time configuration for Period 2 value
 - Consitency over time configuration for Period 3 value
-- Consitency over time configuration for consistency key word
+- Consitency over time configuration for consistency key words
 
