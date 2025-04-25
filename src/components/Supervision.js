@@ -3102,7 +3102,7 @@ const Supervision = ({ me }) => {
                             );
 
                             console.log('foundOvertime  : ', foundOvertime);
-                           
+
                             if (foundOvertime) {
                                 const newObject = dataStoreIndicatorsMapping?.find(
                                     d =>
@@ -3292,11 +3292,10 @@ const Supervision = ({ me }) => {
                     newEventsList.push(eventPayload);
                 }
 
-                await createEvents({
-                    events: [...new Set(dataValues.map(d => d.dataElement))].map(d =>
-                        dataValues.find(dv => dv.dataElement === d)
-                    )
-                });
+                eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValueList];
+                eventPayload.dataValues = [...new Set(eventPayload.dataValues.map(d => d.dataElement))].map(d =>
+                    eventPayload.dataValues.find(dv => dv.dataElement === d)
+                );
 
                 const currentTEI = await axios.get(
                     `${TRACKED_ENTITY_INSTANCES_ROUTE}/${current_tei.trackedEntityInstance}?program=${selectedProgram.program?.id}&fields=*,enrollments`
