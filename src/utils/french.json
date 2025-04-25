@@ -405,5 +405,8 @@
     "Last_Period": "Période precedente",
     "Current_Period": "Période actuelle",
     "ConsistencyOverTimeKeyWords": "Mots clés de la Cohérence dans le temps",
-    "ConsistencyOverTime_Period_Type": "Type de période des cohérences dans le temps"
+    "ConsistencyOverTime_Period_Type": "Type de période des cohérences dans le temps",
+    "CurrentPeriodKeyWords":"Mots clets de la périod actuelle",
+    "CurrentPeriodOnYearAgoKeyWords":"Mots clets de la période actuelle un an auparavant",
+    "LastPeriodKeyWords":"Mots clets de la dernière période"
 }

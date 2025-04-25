@@ -1555,6 +1555,37 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                 marginBottom: '5px'
                                             }}
                                         >
+                                            {`${translate('ConsistencyOverTimeKeyWords')}`}
+                                        </div>
+                                        <div>
+                                            <TagsInput
+                                                style={{ width: '100%' }}
+                                                value={item?.keyWords}
+                                                onChange={word => {
+                                                    setFormState({
+                                                        ...formState,
+                                                        consistencyOvertimes:
+                                                            formState?.consistencyOvertimes?.map(i => {
+                                                                if (i.id === item.id) {
+                                                                    return {
+                                                                        ...i,
+                                                                        keyWords: word
+                                                                    };
+                                                                }
+                                                                return i;
+                                                            }) || []
+                                                    });
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div style={{ marginTop: '5px' }}>
+                                        <div
+                                            style={{
+                                                marginBottom: '5px'
+                                            }}
+                                        >
                                             {`${translate('What_Is_The_Current_Period')}`}
                                         </div>
                                         <div>
@@ -1585,6 +1616,37 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                                             formState?.selectedProgramStageForConfiguration?.programStageDataElements?.find(
                                                                                 p => p.dataElement.id === value
                                                                             )?.dataElement
+                                                                    };
+                                                                }
+                                                                return i;
+                                                            }) || []
+                                                    });
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div style={{ marginTop: '5px' }}>
+                                        <div
+                                            style={{
+                                                marginBottom: '5px'
+                                            }}
+                                        >
+                                            {`${translate('CurrentPeriodKeyWords')}`}
+                                        </div>
+                                        <div>
+                                            <TagsInput
+                                                style={{ width: '100%' }}
+                                                value={item?.currentPeriodKeyWords}
+                                                onChange={word => {
+                                                    setFormState({
+                                                        ...formState,
+                                                        consistencyOvertimes:
+                                                            formState?.consistencyOvertimes?.map(i => {
+                                                                if (i.id === item.id) {
+                                                                    return {
+                                                                        ...i,
+                                                                        currentPeriodKeyWords: word
                                                                     };
                                                                 }
                                                                 return i;
@@ -1635,6 +1697,37 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                                             formState?.selectedProgramStageForConfiguration?.programStageDataElements?.find(
                                                                                 p => p.dataElement.id === value
                                                                             )?.dataElement
+                                                                    };
+                                                                }
+                                                                return i;
+                                                            }) || []
+                                                    });
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div style={{ marginTop: '5px' }}>
+                                        <div
+                                            style={{
+                                                marginBottom: '5px'
+                                            }}
+                                        >
+                                            {`${translate('CurrentPeriodOnYearAgoKeyWords')}`}
+                                        </div>
+                                        <div>
+                                            <TagsInput
+                                                style={{ width: '100%' }}
+                                                value={item?.currentPeriodOneYearAgoKeyWords}
+                                                onChange={word => {
+                                                    setFormState({
+                                                        ...formState,
+                                                        consistencyOvertimes:
+                                                            formState?.consistencyOvertimes?.map(i => {
+                                                                if (i.id === item.id) {
+                                                                    return {
+                                                                        ...i,
+                                                                        currentPeriodOneYearAgoKeyWords: word
                                                                     };
                                                                 }
                                                                 return i;
@@ -1828,19 +1921,18 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                             />
                                         </div>
                                     </div>
-
                                     <div style={{ marginTop: '5px' }}>
                                         <div
                                             style={{
                                                 marginBottom: '5px'
                                             }}
                                         >
-                                            {`${translate('ConsistencyOverTimeKeyWords')}`}
+                                            {`${translate('CurrentPeriodOnYearAgoKeyWords')}`}
                                         </div>
                                         <div>
                                             <TagsInput
                                                 style={{ width: '100%' }}
-                                                value={item?.keyWords}
+                                                value={item?.lastPeriodKeyWords}
                                                 onChange={word => {
                                                     setFormState({
                                                         ...formState,
@@ -1849,7 +1941,7 @@ const GenerateIndicatorsFieldsDQR = ({ formState, setFormState }) => {
                                                                 if (i.id === item.id) {
                                                                     return {
                                                                         ...i,
-                                                                        keyWords: word
+                                                                        lastPeriodKeyWords: word
                                                                     };
                                                                 }
                                                                 return i;

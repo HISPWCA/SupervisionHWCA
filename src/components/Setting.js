@@ -293,14 +293,19 @@ const Setting = () => {
                 margin: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.margin || null,
                 programArea: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.programArea || null,
                 keyWords: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.keyWords || [],
-                currentPeriod:
-                    fieldList?.consistencyOvertimes?.find(el => el.position === i)?.currentPeriod || null,
+                currentPeriodKeyWords:
+                    fieldList?.consistencyOvertimes?.find(el => el.position === i)?.currentPeriodKeyWords || [],
+                currentPeriodOneYearAgoKeyWords:
+                    fieldList?.consistencyOvertimes?.find(el => el.position === i)?.currentPeriodOneYearAgoKeyWords ||
+                    [],
+                currentPeriod: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.currentPeriod || null,
                 currentPeriodOneYearAgo:
                     fieldList?.consistencyOvertimes?.find(el => el.position === i)?.currentPeriodOneYearAgo || null,
                 period1: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.period1 || null,
                 period2: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.period2 || null,
                 period3: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.period3 || null,
                 lastPeriod: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.lastPeriod || null,
+                lastPeriodKeyWords: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.lastPeriodKeyWords || null
             });
         }
 

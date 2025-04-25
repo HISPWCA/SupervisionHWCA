@@ -395,13 +395,15 @@
     "Edit": "Edit",
     "Register": "Register",
     "Cross_Check": "Cross Check",
-    
-    "What_Is_The_Current_Period":"What is the current period value",
-    "What_Was_The_Value_Of_The_Indicator_For_The_Current_Period_One_Year_Ago":"What was the value of the indicator for the current period one year ago",
-    "Period1":"Period 1",
-    "Period2":"Period 2",
-    "Period3":"Period 3",
-    "Last_Period":"Last Period",
-    "ConsistencyOverTimeKeyWords":"Consistency over time keywords",
-    "ConsistencyOverTime_Period_Type": "Consistency Over time period type"
+    "What_Is_The_Current_Period": "What is the current period value",
+    "What_Was_The_Value_Of_The_Indicator_For_The_Current_Period_One_Year_Ago": "What was the value of the indicator for the current period one year ago",
+    "Period1": "Period 1",
+    "Period2": "Period 2",
+    "Period3": "Period 3",
+    "Last_Period": "Last Period",
+    "ConsistencyOverTimeKeyWords": "Consistency over time keywords",
+    "ConsistencyOverTime_Period_Type": "Consistency Over time period type",
+    "CurrentPeriodKeyWords": "Current period keywords",
+    "CurrentPeriodOnYearAgoKeyWords": "Current period One year ago keywords",
+    "LastPeriodKeyWords": "Last period Keywords"
 }
