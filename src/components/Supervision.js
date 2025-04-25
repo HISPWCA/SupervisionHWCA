@@ -2186,7 +2186,7 @@ const Supervision = ({ me }) => {
                                     const orgUnitId = eventPayload.orgUnit;
                                     const dx = foundAggrageMappingElement.id;
 
-                                    const value = await getAnalyticValue(periodObject?.analytic, orgUnitId, dx);
+                                    const value = (await getAnalyticValue(periodObject?.analytic, orgUnitId, dx)) || 20;
 
                                     if (value) {
                                         newDvList.push({
@@ -2335,16 +2335,16 @@ const Supervision = ({ me }) => {
                 ...newDataValueListForOvertimes
             ];
 
+            eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValueList];
+            eventPayload.dataValues = [...new Set(eventPayload.dataValues.map(d => d.dataElement))].map(d =>
+                eventPayload.dataValues.find(dv => dv.dataElement === d)
+            );
+
             if (!newEventsList.map(ev => ev.programStage).includes(payload.programStage?.id)) {
                 newEventsList.push(eventPayload);
             }
 
-            await createEvents({
-                events: [...new Set(dataValues.map(d => d.dataElement))].map(d =>
-                    dataValues.find(dv => dv.dataElement === d)
-                )
-            });
-
+            await createEvents({ events: newEventsList });
             const currentTEI = await axios.get(`${TRACKED_ENTITY_INSTANCES_ROUTE}/${tei_id}?fields=*,enrollments`);
             return currentTEI.data;
         } catch (err) {
@@ -3288,15 +3288,17 @@ const Supervision = ({ me }) => {
                     ...newDataValueListForOvertimes
                 ];
 
-                if (!newEventsList.map(ev => ev.programStage).includes(payload.programStage?.id)) {
-                    newEventsList.push(eventPayload);
-                }
-
                 eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValueList];
                 eventPayload.dataValues = [...new Set(eventPayload.dataValues.map(d => d.dataElement))].map(d =>
                     eventPayload.dataValues.find(dv => dv.dataElement === d)
                 );
 
+                if (!newEventsList.map(ev => ev.programStage).includes(payload.programStage?.id)) {
+                    newEventsList.push(eventPayload);
+                }
+
+                console.log('newEventsList ', newEventsList);
+                await createEvents({ events: newEventsList });
                 const currentTEI = await axios.get(
                     `${TRACKED_ENTITY_INSTANCES_ROUTE}/${current_tei.trackedEntityInstance}?program=${selectedProgram.program?.id}&fields=*,enrollments`
                 );
