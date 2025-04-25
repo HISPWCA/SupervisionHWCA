@@ -6931,7 +6931,6 @@ const Supervision = ({ me }) => {
             }
 
             const DEs = programStages[0]?.programStageDataElements?.map(de => de.dataElement) || [];
-            console.log('DEs : ', DEs);
 
             const translatedList =
                   nonTranslateMappingConfigs.map(mapConf => {

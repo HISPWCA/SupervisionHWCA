@@ -374,10 +374,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                 border: '1px solid #00000070'
                                             }}
                                         >
-                                            {console.log(
-                                                'rec.selectedSourceProgramArea : ',
-                                                rec.selectedSourceProgramArea
-                                            )}
+                                          
                                             <div>
                                                 <Select
                                                     placeholder={`${translate('Primary_Source')} `}
