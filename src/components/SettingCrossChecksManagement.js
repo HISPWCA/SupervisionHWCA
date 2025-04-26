@@ -67,20 +67,6 @@ const SettingCrossChecksManagement = () => {
                         >
                             {translate('Add')}
                         </Button>
-                        {/* <Button
-                            primary
-                            onClick={handleSave}
-                            loading={loadingProcess}
-                            icon={
-                                <FiSave
-                                    style={{
-                                        fontSize: '18px'
-                                    }}
-                                />
-                            }
-                        >
-                            {translate('Save_Configs')}
-                        </Button> */}
                     </div>
                 </div>
                 <div style={{ marginTop: '10px' }}>
@@ -167,26 +153,21 @@ const SettingCrossChecksManagement = () => {
                                                         paddingBottom: '5px'
                                                     }}
                                                 >
-                                                    <Row gutter={[5, 5]}>
-                                                        <Col md={4}>
-                                                            <div
-                                                                style={{
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    gap: '1px'
-                                                                }}
-                                                            >
-                                                                <span
-                                                                    style={{
-                                                                        fontWeight: 'normal',
-                                                                        textDecoration: 'none'
-                                                                    }}
-                                                                >
-                                                                    {translateDataStoreLabel(element)}
-                                                                </span>
-                                                            </div>
-                                                        </Col>
-                                                    </Row>
+                                                    <div
+                                                        style={{
+                                                            display: 'flex',
+                                                            alignItems: 'center'
+                                                        }}
+                                                    >
+                                                        <span
+                                                            style={{
+                                                                fontWeight: 'normal',
+                                                                textDecoration: 'none'
+                                                            }}
+                                                        >
+                                                            {translateDataStoreLabel(element)}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             ))}
                                         </td>

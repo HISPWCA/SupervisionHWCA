@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Card, Col, Row } from 'antd';
 import { loadDataStore } from '../utils/functions';
-import { useAlert } from '@dhis2/app-runtime';
 import Loading from './Loading';
 import { Button } from '@dhis2/ui';
 import SettingAddFormModal from './SettingAddFormModal';
@@ -12,41 +11,10 @@ import { FaRegEdit } from 'react-icons/fa';
 const SettingSourceDocumentCompletenessManagement = () => {
     const [openModal, setOpenModal] = useState(false);
     const [dataStoreElements, setDataStoreElements] = useState([]);
-    const [loadingProcess, setLoadingProcess] = useState(false);
     const [currentSelectedGroup, setCurrentSelectedGroup] = useState(null);
     const [loadingElements, setLoadingElements] = useState(false);
 
-    const { show } = useAlert(
-        ({ message }) => message,
-        ({ type }) => ({
-            success: type === 'success' ? true : false,
-            critical: type === 'error' ? true : false,
-            duration: 3000
-        })
-    );
-
     const initFields = () => {};
-
-    const handleSave = async () => {
-        try {
-            setLoadingProcess(true);
-            const newList = formState?.indicators;
-            await saveDataToDataStore(process.env.REACT_APP_DS_COMPLETNESS_KEY, newList, null, null, null);
-            setNotification({
-                show: true,
-                message: translate('Operation_Success'),
-                type: NOTIFICATION_SUCCESS
-            });
-            setLoadingProcess(false);
-        } catch (err) {
-            // setNotification({
-            //     show: true,
-            //     message: err.response?.data?.message || err.message,
-            //     type: NOTIFICATION_CRITICAL
-            // });
-            // setLoadingProcess(false);
-        }
-    };
 
     const loadDataStoreElements = async () => {
         try {
@@ -99,20 +67,6 @@ const SettingSourceDocumentCompletenessManagement = () => {
                         >
                             {translate('Add')}
                         </Button>
-                        {/* <Button
-                            primary
-                            onClick={handleSave}
-                            loading={loadingProcess}
-                            icon={
-                                <FiSave
-                                    style={{
-                                        fontSize: '18px'
-                                    }}
-                                />
-                            }
-                        >
-                            {translate('Save_Configs')}
-                        </Button> */}
                     </div>
                 </div>
                 <div style={{ marginTop: '10px' }}>
@@ -194,30 +148,27 @@ const SettingSourceDocumentCompletenessManagement = () => {
                                                     key={element.id}
                                                     style={{
                                                         marginTop: '5px',
-                                                        borderBottom: index + 1 === group.children.length ? '' : '1px solid #ccc',
+                                                        borderBottom:
+                                                            index + 1 === group.children.length ? '' : '1px solid #ccc',
                                                         paddingBottom: '5px'
                                                     }}
                                                 >
-                                                    <Row gutter={[5, 5]}>
-                                                        <Col md={4}>
-                                                            <div
-                                                                style={{
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    gap: '1px'
-                                                                }}
-                                                            >
-                                                                <span
-                                                                    style={{
-                                                                        fontWeight: 'normal',
-                                                                        textDecoration: 'none'
-                                                                    }}
-                                                                >
-                                                                    {translateDataStoreLabel(element)}
-                                                                </span>
-                                                            </div>
-                                                        </Col>
-                                                    </Row>
+                                                    <div
+                                                        style={{
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            gap: '1px'
+                                                        }}
+                                                    >
+                                                        <span
+                                                            style={{
+                                                                fontWeight: 'normal',
+                                                                textDecoration: 'none'
+                                                            }}
+                                                        >
+                                                            {translateDataStoreLabel(element)}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             ))}
                                         </td>
