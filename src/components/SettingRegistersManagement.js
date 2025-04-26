@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Card, Col, Row } from 'antd';
 import { loadDataStore } from '../utils/functions';
-import { useAlert } from '@dhis2/app-runtime';
 import Loading from './Loading';
 import { Button } from '@dhis2/ui';
 import SettingAddFormModal from './SettingAddFormModal';
@@ -20,12 +19,7 @@ const SettingCrossChecksManagement = () => {
     const loadDataStoreElements = async () => {
         try {
             setLoadingElements(true);
-            const response = await loadDataStore(
-                process.env.REACT_APP_REGISTRES_KEY,
-                null,
-                null,
-                []
-            );
+            const response = await loadDataStore(process.env.REACT_APP_REGISTRES_KEY, null, null, []);
             setDataStoreElements(response);
             setLoadingElements(false);
         } catch (err) {
@@ -73,20 +67,6 @@ const SettingCrossChecksManagement = () => {
                         >
                             {translate('Add')}
                         </Button>
-                        {/* <Button
-                            primary
-                            onClick={handleSave}
-                            loading={loadingProcess}
-                            icon={
-                                <FiSave
-                                    style={{
-                                        fontSize: '18px'
-                                    }}
-                                />
-                            }
-                        >
-                            {translate('Save_Configs')}
-                        </Button> */}
                     </div>
                 </div>
                 <div style={{ marginTop: '10px' }}>
@@ -169,34 +149,25 @@ const SettingCrossChecksManagement = () => {
                                                     style={{
                                                         marginTop: '5px',
                                                         borderBottom:
-                                                            index + 1 === group.children.length
-                                                                ? ''
-                                                                : '1px solid #ccc',
+                                                            index + 1 === group.children.length ? '' : '1px solid #ccc',
                                                         paddingBottom: '5px'
                                                     }}
                                                 >
-                                                    <Row gutter={[5, 5]}>
-                                                        <Col md={4}>
-                                                            <div
-                                                                style={{
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    gap: '1px'
-                                                                }}
-                                                            >
-                                                                <span
-                                                                    style={{
-                                                                        fontWeight: 'normal',
-                                                                        textDecoration: 'none'
-                                                                    }}
-                                                                >
-                                                                    {translateDataStoreLabel(
-                                                                        element
-                                                                    )}
-                                                                </span>
-                                                            </div>
-                                                        </Col>
-                                                    </Row>
+                                                    <div
+                                                        style={{
+                                                            display: 'flex',
+                                                            alignItems: 'center'
+                                                        }}
+                                                    >
+                                                        <span
+                                                            style={{
+                                                                fontWeight: 'normal',
+                                                                textDecoration: 'none'
+                                                            }}
+                                                        >
+                                                            {translateDataStoreLabel(element)}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             ))}
                                         </td>
