@@ -118,9 +118,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                             </span>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <span style={{ fontWeight: 'bold' }}>
-                                {translate('How_Many_Indicators')}
-                            </span>
+                            <span style={{ fontWeight: 'bold' }}>{translate('How_Many_Indicators')}</span>
                             <span style={{ marginLeft: '10px' }}>
                                 <Select
                                     style={{ width: '100px' }}
@@ -204,21 +202,17 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                             ?.find(
                                                                 d =>
                                                                     d.name ===
-                                                                    indicator
-                                                                        ?.selectedSourceProgramArea
-                                                                        ?.name
+                                                                    formState?.selectedGlobalProgramArea?.name
                                                             )
                                                             ?.children?.filter(
-                                                                ind =>
-                                                                    !ind.isStock ||
-                                                                    ind.isStock === false
+                                                                ind => !ind.isStock || ind.isStock === false
                                                             )
                                                             ?.map(ind => ({
                                                                 label: translateDataStoreLabel(ind),
                                                                 value: ind.id
                                                             })) || []
                                                     }
-                                                    disabled={!indicator.selectedSourceProgramArea}
+                                                    disabled={!formState?.selectedGlobalProgramArea?.name}
                                                     showSearch
                                                     allowClear
                                                     optionFilterProp="label"
@@ -226,30 +220,22 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                     onChange={value => {
                                                         setFormState({
                                                             ...formState,
-                                                            indicators: formState?.indicators?.map(
-                                                                (i, iIndex) => {
-                                                                    if (iIndex === indIndex) {
-                                                                        return {
-                                                                            ...i,
-                                                                            selectedSourceIndicator:
-                                                                                dataStoreIndicators
-                                                                                    ?.find(
-                                                                                        d =>
-                                                                                            d.name ===
-                                                                                            indicator
-                                                                                                ?.selectedSourceProgramArea
-                                                                                                ?.name
-                                                                                    )
-                                                                                    ?.children?.find(
-                                                                                        d =>
-                                                                                            d.id ===
-                                                                                            value
-                                                                                    )
-                                                                        };
-                                                                    }
-                                                                    return i;
+                                                            indicators: formState?.indicators?.map((i, iIndex) => {
+                                                                if (iIndex === indIndex) {
+                                                                    return {
+                                                                        ...i,
+                                                                        selectedSourceIndicator: dataStoreIndicators
+                                                                            ?.find(
+                                                                                d =>
+                                                                                    d.name ===
+                                                                                    formState?.selectedGlobalProgramArea
+                                                                                        ?.name
+                                                                            )
+                                                                            ?.children?.find(d => d.id === value)
+                                                                    };
                                                                 }
-                                                            )
+                                                                return i;
+                                                            })
                                                         });
                                                     }}
                                                 />
@@ -273,18 +259,15 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                     onChange={event => {
                                                         setFormState({
                                                             ...formState,
-                                                            indicators: formState?.indicators?.map(
-                                                                (i, iIndex) => {
-                                                                    if (iIndex === indIndex) {
-                                                                        return {
-                                                                            ...i,
-                                                                            selectedSourceMargin:
-                                                                                event.target.value
-                                                                        };
-                                                                    }
-                                                                    return i;
+                                                            indicators: formState?.indicators?.map((i, iIndex) => {
+                                                                if (iIndex === indIndex) {
+                                                                    return {
+                                                                        ...i,
+                                                                        selectedSourceMargin: event.target.value
+                                                                    };
                                                                 }
-                                                            )
+                                                                return i;
+                                                            })
                                                         });
                                                     }}
                                                 />
@@ -361,9 +344,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                 border: '1px solid #00000070'
                                             }}
                                         >
-                                            {`${translate('Recoupements')} ${getLetter(
-                                                recIndex + 1
-                                            )}`}
+                                            {`${translate('Recoupements')} ${getLetter(recIndex + 1)}`}
                                         </td>
 
                                         <td
@@ -374,7 +355,6 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                 border: '1px solid #00000070'
                                             }}
                                         >
-                                          
                                             <div>
                                                 <Select
                                                     placeholder={`${translate('Primary_Source')} `}
@@ -383,15 +363,13 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                     }}
                                                     options={dataStoreCrosschecks
                                                         ?.find(
-                                                            c =>
-                                                                c.name ===
-                                                                rec.selectedSourceProgramArea?.name
+                                                            c => c.name === formState?.selectedGlobalProgramArea?.name
                                                         )
                                                         ?.children?.map(ind => ({
                                                             label: translateDataStoreLabel(ind),
                                                             value: ind.id
                                                         }))}
-                                                    disabled={!rec.selectedSourceProgramArea}
+                                                    disabled={!formState?.selectedGlobalProgramArea}
                                                     showSearch
                                                     allowClear
                                                     optionFilterProp="label"
@@ -399,31 +377,22 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                     onChange={value => {
                                                         setFormState({
                                                             ...formState,
-                                                            recoupements:
-                                                                formState?.recoupements?.map(
-                                                                    (i, iIndex) => {
-                                                                        if (iIndex === recIndex) {
-                                                                            return {
-                                                                                ...i,
-                                                                                selectedSourcePrimary:
-                                                                                    dataStoreCrosschecks
-                                                                                        ?.find(
-                                                                                            c =>
-                                                                                                c.name ===
-                                                                                                rec
-                                                                                                    .selectedSourceProgramArea
-                                                                                                    ?.name
-                                                                                        )
-                                                                                        ?.children?.find(
-                                                                                            d =>
-                                                                                                d.id ===
-                                                                                                value
-                                                                                        )
-                                                                            };
-                                                                        }
-                                                                        return i;
-                                                                    }
-                                                                )
+                                                            recoupements: formState?.recoupements?.map((i, iIndex) => {
+                                                                if (iIndex === recIndex) {
+                                                                    return {
+                                                                        ...i,
+                                                                        selectedSourcePrimary: dataStoreCrosschecks
+                                                                            ?.find(
+                                                                                c =>
+                                                                                    c.name ===
+                                                                                    formState?.selectedGlobalProgramArea
+                                                                                        ?.name
+                                                                            )
+                                                                            ?.children?.find(d => d.id === value)
+                                                                    };
+                                                                }
+                                                                return i;
+                                                            })
                                                         });
                                                     }}
                                                 />
@@ -440,23 +409,19 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                         >
                                             <div>
                                                 <Select
-                                                    placeholder={`${translate(
-                                                        'Secondary_Source'
-                                                    )} `}
+                                                    placeholder={`${translate('Secondary_Source')} `}
                                                     style={{
                                                         width: '100%'
                                                     }}
                                                     options={dataStoreCrosschecks
                                                         ?.find(
-                                                            c =>
-                                                                c.name ===
-                                                                rec.selectedSourceProgramArea?.name
+                                                            c => c.name === formState?.selectedGlobalProgramArea?.name
                                                         )
                                                         ?.children?.map(ind => ({
                                                             label: translateDataStoreLabel(ind),
                                                             value: ind.id
                                                         }))}
-                                                    disabled={!rec.selectedSourceProgramArea}
+                                                    disabled={!formState?.selectedGlobalProgramArea}
                                                     showSearch
                                                     allowClear
                                                     optionFilterProp="label"
@@ -464,31 +429,22 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                     onChange={value => {
                                                         setFormState({
                                                             ...formState,
-                                                            recoupements:
-                                                                formState?.recoupements?.map(
-                                                                    (i, iIndex) => {
-                                                                        if (iIndex === recIndex) {
-                                                                            return {
-                                                                                ...i,
-                                                                                selectedSourceSecondary:
-                                                                                    dataStoreCrosschecks
-                                                                                        ?.find(
-                                                                                            c =>
-                                                                                                c.name ===
-                                                                                                rec
-                                                                                                    .selectedSourceProgramArea
-                                                                                                    ?.name
-                                                                                        )
-                                                                                        ?.children?.find(
-                                                                                            d =>
-                                                                                                d.id ===
-                                                                                                value
-                                                                                        )
-                                                                            };
-                                                                        }
-                                                                        return i;
-                                                                    }
-                                                                )
+                                                            recoupements: formState?.recoupements?.map((i, iIndex) => {
+                                                                if (iIndex === recIndex) {
+                                                                    return {
+                                                                        ...i,
+                                                                        selectedSourceSecondary: dataStoreCrosschecks
+                                                                            ?.find(
+                                                                                c =>
+                                                                                    c.name ===
+                                                                                    formState?.selectedGlobalProgramArea
+                                                                                        ?.name
+                                                                            )
+                                                                            ?.children?.find(d => d.id === value)
+                                                                    };
+                                                                }
+                                                                return i;
+                                                            })
                                                         });
                                                     }}
                                                 />
@@ -513,20 +469,15 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                     onChange={event => {
                                                         setFormState({
                                                             ...formState,
-                                                            recoupements:
-                                                                formState?.recoupements?.map(
-                                                                    (i, iIndex) => {
-                                                                        if (iIndex === recIndex) {
-                                                                            return {
-                                                                                ...i,
-                                                                                selectedSourceMargin:
-                                                                                    event.target
-                                                                                        .value
-                                                                            };
-                                                                        }
-                                                                        return i;
-                                                                    }
-                                                                )
+                                                            recoupements: formState?.recoupements?.map((i, iIndex) => {
+                                                                if (iIndex === recIndex) {
+                                                                    return {
+                                                                        ...i,
+                                                                        selectedSourceMargin: event.target.value
+                                                                    };
+                                                                }
+                                                                return i;
+                                                            })
                                                         });
                                                     }}
                                                 />
@@ -554,9 +505,9 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                     }}
                                 >
                                     {}
-                                    {`${translate('Stock')} ( ${translate(
-                                        'Recoupements'
-                                    )} ${getLetter(formState?.recoupements?.length)} )`}
+                                    {`${translate('Stock')} ( ${translate('Recoupements')} ${getLetter(
+                                        formState?.recoupements?.length
+                                    )} )`}
                                 </th>
 
                                 <th
@@ -610,17 +561,9 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                             }}
                                             options={
                                                 dataStoreIndicators
-                                                    ?.find(
-                                                        d =>
-                                                            d.name ===
-                                                            formState?.selectedGlobalProgramArea
-                                                                ?.name
-                                                    )
+                                                    ?.find(d => d.name === formState?.selectedGlobalProgramArea?.name)
                                                     ?.children?.filter(
-                                                        ind =>
-                                                            ind.isStock &&
-                                                            ind.isStock === true &&
-                                                            !ind.parent
+                                                        ind => ind.isStock && ind.isStock === true && !ind.parent
                                                     )
                                                     ?.map(ind => ({
                                                         label: translateDataStoreLabel(ind),
@@ -637,10 +580,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                     ...formState,
                                                     selectedStockIndicator: dataStoreIndicators
                                                         ?.find(
-                                                            d =>
-                                                                d.name ===
-                                                                formState?.selectedGlobalProgramArea
-                                                                    ?.name
+                                                            d => d.name === formState?.selectedGlobalProgramArea?.name
                                                         )
                                                         ?.children?.find(d => d.id === value)
                                                 });
@@ -678,9 +618,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                 </div>
 
                 <div style={{ marginTop: '30px' }}>
-                    <div style={{ marginBottom: '10px', fontWeight: 'bold' }}>
-                        {translate('ConsistencyOverTime')}
-                    </div>
+                    <div style={{ marginBottom: '10px', fontWeight: 'bold' }}>{translate('ConsistencyOverTime')}</div>
                     <table style={{ borderCollapse: 'collapse', width: '100%' }}>
                         <thead>
                             <tr style={{ background: '#ccc' }}>
@@ -746,19 +684,13 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                     width: '100%'
                                                 }}
                                                 options={dataStoreIndicators
-                                                    ?.find(
-                                                        d =>
-                                                            d.name ===
-                                                            cons.selectedSourceProgramArea?.name
-                                                    )
-                                                    ?.children?.filter(
-                                                        ind => !ind.isStock || ind.isStock === false
-                                                    )
+                                                    ?.find(d => d.name === formState?.selectedGlobalProgramArea?.name)
+                                                    ?.children?.filter(ind => !ind.isStock || ind.isStock === false)
                                                     ?.map(ind => ({
                                                         label: translateDataStoreLabel(ind),
                                                         value: ind.id
                                                     }))}
-                                                disabled={!cons.selectedSourceProgramArea}
+                                                disabled={!formState?.selectedGlobalProgramArea}
                                                 showSearch
                                                 allowClear
                                                 optionFilterProp="label"
@@ -766,31 +698,24 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                 onChange={value => {
                                                     setFormState({
                                                         ...formState,
-                                                        consistencyOvertimes:
-                                                            formState?.consistencyOvertimes?.map(
-                                                                (i, iIndex) => {
-                                                                    if (iIndex === consIndex) {
-                                                                        return {
-                                                                            ...i,
-                                                                            selectedSourceConsistency:
-                                                                                dataStoreIndicators
-                                                                                    ?.find(
-                                                                                        d =>
-                                                                                            d.name ===
-                                                                                            cons
-                                                                                                .selectedSourceProgramArea
-                                                                                                ?.name
-                                                                                    )
-                                                                                    ?.children?.find(
-                                                                                        d =>
-                                                                                            d.id ===
-                                                                                            value
-                                                                                    )
-                                                                        };
-                                                                    }
-                                                                    return i;
+                                                        consistencyOvertimes: formState?.consistencyOvertimes?.map(
+                                                            (i, iIndex) => {
+                                                                if (iIndex === consIndex) {
+                                                                    return {
+                                                                        ...i,
+                                                                        selectedSourceConsistency: dataStoreIndicators
+                                                                            ?.find(
+                                                                                d =>
+                                                                                    d.name ===
+                                                                                    formState?.selectedGlobalProgramArea
+                                                                                        ?.name
+                                                                            )
+                                                                            ?.children?.find(d => d.id === value)
+                                                                    };
                                                                 }
-                                                            )
+                                                                return i;
+                                                            }
+                                                        )
                                                     });
                                                 }}
                                             />
@@ -814,19 +739,17 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                 onChange={event => {
                                                     setFormState({
                                                         ...formState,
-                                                        consistencyOvertimes:
-                                                            formState?.consistencyOvertimes?.map(
-                                                                (i, iIndex) => {
-                                                                    if (iIndex === consIndex) {
-                                                                        return {
-                                                                            ...i,
-                                                                            selectedSourceMargin:
-                                                                                event.target.value
-                                                                        };
-                                                                    }
-                                                                    return i;
+                                                        consistencyOvertimes: formState?.consistencyOvertimes?.map(
+                                                            (i, iIndex) => {
+                                                                if (iIndex === consIndex) {
+                                                                    return {
+                                                                        ...i,
+                                                                        selectedSourceMargin: event.target.value
+                                                                    };
                                                                 }
-                                                            )
+                                                                return i;
+                                                            }
+                                                        )
                                                     });
                                                 }}
                                             />
@@ -851,9 +774,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                             {translate('Data_Element_&_Source_Documentation_Configurations')}
                         </div>
                         <div>
-                            <div style={{ fontWeight: 'bold' }}>
-                                {translate('How_Many_Data_Element')}
-                            </div>
+                            <div style={{ fontWeight: 'bold' }}>{translate('How_Many_Data_Element')}</div>
                             <div>
                                 <Select
                                     style={{ width: '100%' }}
@@ -872,9 +793,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                             </div>
                         </div>
                         <div>
-                            <div style={{ fontWeight: 'bold' }}>
-                                {translate('How_Many_Document_Source')}
-                            </div>
+                            <div style={{ fontWeight: 'bold' }}>{translate('How_Many_Document_Source')}</div>
                             <div>
                                 <Select
                                     style={{ width: '100%' }}
@@ -904,9 +823,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                         border: '1px solid #00000070'
                                     }}
                                 >
-                                    {`${translate('Data_Element')} & ${translate(
-                                        'Source_Document'
-                                    )}`}
+                                    {`${translate('Data_Element')} & ${translate('Source_Document')}`}
                                 </th>
                                 <th
                                     style={{
@@ -967,20 +884,12 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                 width: '100%'
                                             }}
                                             options={dataStoreRegistres
-                                                ?.find(
-                                                    d =>
-                                                        d.name ===
-                                                        formState?.selectedGlobalProgramArea?.name
-                                                )
+                                                ?.find(d => d.name === formState?.selectedGlobalProgramArea?.name)
                                                 ?.children?.map(ind => ({
                                                     label: translateDataStoreLabel(ind),
                                                     value: ind.id
                                                 }))}
-                                            disabled={
-                                                formState?.selectedGlobalProgramArea?.name
-                                                    ? false
-                                                    : true
-                                            }
+                                            disabled={!formState?.selectedGlobalProgramArea?.name}
                                             showSearch
                                             allowClear
                                             optionFilterProp="label"
@@ -994,9 +903,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                             ?.find(
                                                                 d =>
                                                                     d.name ===
-                                                                    formState
-                                                                        ?.selectedGlobalProgramArea
-                                                                        ?.name
+                                                                    formState?.selectedGlobalProgramArea?.name
                                                             )
                                                             ?.children?.find(d => d.id === value)
                                                     }
@@ -1043,37 +950,23 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                     rowSpan={2}
                                 >
                                     {formState?.completeness?.sourceDocuments
-                                        ?.slice(
-                                            0,
-                                            +formState?.completeness?.nbrDocumentsSourceToShow
-                                        )
+                                        ?.slice(0, +formState?.completeness?.nbrDocumentsSourceToShow)
                                         ?.map((de, deIndex) => (
                                             <div key={deIndex} style={{ marginTop: '5px' }}>
                                                 <Select
-                                                    placeholder={`${translate('Source_Document')} ${
-                                                        deIndex + 1
-                                                    }`}
+                                                    placeholder={`${translate('Source_Document')} ${deIndex + 1}`}
                                                     style={{
                                                         width: '100%'
                                                     }}
                                                     options={dataStoreDSCompletness
                                                         ?.find(
-                                                            c =>
-                                                                c.name ===
-                                                                formState?.completeness
-                                                                    ?.selectedSourceProgramAreaDS
-                                                                    ?.name
+                                                            c => c.name === formState?.selectedGlobalProgramArea?.name
                                                         )
                                                         ?.children?.map(ind => ({
                                                             label: translateDataStoreLabel(ind),
                                                             value: ind.id
                                                         }))}
-                                                    disabled={
-                                                        formState?.completeness
-                                                            ?.selectedSourceProgramAreaDS
-                                                            ? false
-                                                            : true
-                                                    }
+                                                    disabled={!formState?.selectedGlobalProgramArea}
                                                     showSearch
                                                     allowClear
                                                     optionFilterProp="label"
@@ -1086,9 +979,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                 sourceDocuments:
                                                                     formState?.completeness?.sourceDocuments?.map(
                                                                         (i, iIndex) => {
-                                                                            if (
-                                                                                iIndex === deIndex
-                                                                            ) {
+                                                                            if (iIndex === deIndex) {
                                                                                 return {
                                                                                     ...i,
                                                                                     selectedSourceDS:
@@ -1097,14 +988,11 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                                 c =>
                                                                                                     c.name ===
                                                                                                     formState
-                                                                                                        ?.completeness
-                                                                                                        ?.selectedSourceProgramAreaDS
+                                                                                                        ?.selectedGlobalProgramArea
                                                                                                         ?.name
                                                                                             )
                                                                                             ?.children?.find(
-                                                                                                d =>
-                                                                                                    d.id ===
-                                                                                                    value
+                                                                                                d => d.id === value
                                                                                             )
                                                                                 };
                                                                             }
@@ -1129,9 +1017,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                         border: '1px solid #00000070'
                                     }}
                                 >
-                                    {`${translate('Data_Element')} & ${translate(
-                                        'Source_Document'
-                                    )}`}
+                                    {`${translate('Data_Element')} & ${translate('Source_Document')}`}
                                 </td>
 
                                 <td
@@ -1147,30 +1033,19 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                         ?.map((de, deIndex) => (
                                             <div key={deIndex} style={{ marginTop: '5px' }}>
                                                 <Select
-                                                    placeholder={`${translate('Data_Element')} ${
-                                                        deIndex + 1
-                                                    }`}
+                                                    placeholder={`${translate('Data_Element')} ${deIndex + 1}`}
                                                     style={{
                                                         width: '100%'
                                                     }}
                                                     options={dataStoreDECompletness
                                                         ?.find(
-                                                            c =>
-                                                                c.name ===
-                                                                formState?.completeness
-                                                                    ?.selectedSourceProgramAreaDE
-                                                                    ?.name
+                                                            c => c.name === formState?.selectedGlobalProgramArea?.name
                                                         )
                                                         ?.children?.map(ind => ({
                                                             label: translateDataStoreLabel(ind),
                                                             value: ind.id
                                                         }))}
-                                                    disabled={
-                                                        formState?.completeness
-                                                            ?.selectedSourceProgramAreaDE
-                                                            ? false
-                                                            : true
-                                                    }
+                                                    disabled={!formState?.selectedGlobalProgramArea?.name}
                                                     showSearch
                                                     allowClear
                                                     optionFilterProp="label"
@@ -1183,9 +1058,7 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                 dataElements:
                                                                     formState?.completeness?.dataElements?.map(
                                                                         (i, iIndex) => {
-                                                                            if (
-                                                                                iIndex === deIndex
-                                                                            ) {
+                                                                            if (iIndex === deIndex) {
                                                                                 return {
                                                                                     ...i,
                                                                                     selectedSourceDE:
@@ -1194,14 +1067,11 @@ const FavoriteGenerateIndicatorsFieldsDQR = ({
                                                                                                 c =>
                                                                                                     c.name ===
                                                                                                     formState
-                                                                                                        ?.completeness
-                                                                                                        ?.selectedSourceProgramAreaDE
+                                                                                                        ?.selectedGlobalProgramArea
                                                                                                         ?.name
                                                                                             )
                                                                                             ?.children?.find(
-                                                                                                d =>
-                                                                                                    d.id ===
-                                                                                                    value
+                                                                                                d => d.id === value
                                                                                             )
                                                                                 };
                                                                             }

@@ -260,175 +260,170 @@ export const Dashboard = ({ me }) => {
       };
 
       const RenderFilters = () => (
-            <>
-                  <div
-                        className="my-shadow"
-                        style={{
-                              backgroundColor: '#fff',
-                              padding: '10px',
-                              marginTop: '5px',
-                              marginBottom: '20px',
-                              borderRadius: '8px',
-                              position: 'sticky',
-                              top: '0px',
-                              zIndex: '10'
-                        }}
-                  >
-                        <Row gutter={[8, 8]} align="middle">
-                              <Col sm={24} md={4}>
-                                    <div style={{ marginBottom: '2px' }}>{translate('Programme')}</div>
-                                    <Select
-                                          placeholder={translate('Programme')}
-                                          onChange={handleSelectProgram}
-                                          value={selectedProgram?.program?.id}
-                                          style={{ width: '100%' }}
-                                          options={dataStoreSupervisionsConfigs.map(d => ({
-                                                value: d.program?.id,
-                                                label: d.program?.displayName
-                                          }))}
-                                          loading={loadingDataStoreSupervisionsConfigs}
-                                    />
-                              </Col>
+          <>
+              <div
+                  className="my-shadow"
+                  style={{
+                      backgroundColor: '#fff',
+                      padding: '10px',
+                      marginTop: '5px',
+                      marginBottom: '20px',
+                      borderRadius: '8px',
+                      position: 'sticky',
+                      top: '0px',
+                      zIndex: '10'
+                  }}
+              >
+                  <Row gutter={[8, 8]} align="middle">
+                      <Col sm={24} md={4}>
+                          <div style={{ marginBottom: '2px' }}>{translate('Programme')}</div>
+                          <Select
+                              placeholder={translate('Programme')}
+                              onChange={handleSelectProgram}
+                              value={selectedProgram?.program?.id}
+                              style={{ width: '100%' }}
+                              options={dataStoreSupervisionsConfigs.map(d => ({
+                                  value: d.program?.id,
+                                  label: d.program?.displayName
+                              }))}
+                              loading={loadingDataStoreSupervisionsConfigs}
+                          />
+                      </Col>
 
-                              {selectedProgram && (
-                                    <Col sm={24} md={4}>
-                                          <div style={{ marginBottom: '2px' }}>{translate('Unite_Organisation')}</div>
-                                          <OrganisationUnitsTree
-                                                meOrgUnitId={me?.organisationUnits[0]?.id}
-                                                orgUnits={organisationUnits}
-                                                currentOrgUnits={selectedOrganisationUnit}
-                                                setCurrentOrgUnits={setSelectedOrganisationUnit}
-                                                loadingOrganisationUnits={loadingOrganisationUnits}
-                                                setLoadingOrganisationUnits={setLoadingOrganisationUnits}
-                                          />
-                                    </Col>
-                              )}
+                      {selectedProgram && (
+                          <Col sm={24} md={4}>
+                              <div style={{ marginBottom: '2px' }}>{translate('Unite_Organisation')}</div>
+                              <OrganisationUnitsTree
+                                  meOrgUnitId={me?.organisationUnits[0]?.id}
+                                  orgUnits={organisationUnits}
+                                  currentOrgUnits={selectedOrganisationUnit}
+                                  setCurrentOrgUnits={setSelectedOrganisationUnit}
+                                  loadingOrganisationUnits={loadingOrganisationUnits}
+                                  setLoadingOrganisationUnits={setLoadingOrganisationUnits}
+                              />
+                          </Col>
+                      )}
 
-                              <Col sm={24} md={3}>
-                                    <div style={{ marginBottom: '2px' }}>{translate('Level')}</div>
-                                    <Select
-                                          placeholder={translate('Level')}
-                                          onChange={handleSelectLevel}
-                                          value={selectedLevel?.id}
-                                          style={{ width: '100%' }}
-                                          options={organisationUnitLevels.map(d => ({
-                                                value: d.id,
-                                                label: d.displayName
-                                          }))}
-                                          loading={loadingOrganisationUnitLevels}
-                                    />
-                              </Col>
+                      <Col sm={24} md={3}>
+                          <div style={{ marginBottom: '2px' }}>{translate('Level')}</div>
+                          <Select
+                              placeholder={translate('Level')}
+                              onChange={handleSelectLevel}
+                              value={selectedLevel?.id}
+                              style={{ width: '100%' }}
+                              options={organisationUnitLevels.map(d => ({
+                                  value: d.id,
+                                  label: d.displayName
+                              }))}
+                              loading={loadingOrganisationUnitLevels}
+                          />
+                      </Col>
 
-                              <Col sm={24} md={4}>
-                                    <div style={{ marginBottom: '2px' }}>{translate('Periode')}</div>
-                                    <DatePicker.RangePicker
-                                          picker="date"
-                                          style={{ width: '100%' }}
-                                          placeholder={translate('Periode')}
-                                          onChange={handleSelectPeriodRange}
-                                          value={selectedPeriods}
-                                          allowClear={false}
-                                    />
-                              </Col>
+                      <Col sm={24} md={4}>
+                          <div style={{ marginBottom: '2px' }}>{translate('Periode')}</div>
+                          <DatePicker.RangePicker
+                              picker="date"
+                              style={{ width: '100%' }}
+                              placeholder={translate('Periode')}
+                              onChange={handleSelectPeriodRange}
+                              value={selectedPeriods}
+                              allowClear={false}
+                          />
+                      </Col>
 
-                              <Col sm={24} md={9}>
-                                    <div
+                      <Col sm={24} md={9}>
+                          <div
+                              style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between',
+                                  marginTop: '20px'
+                              }}
+                          >
+                              <div style={{ display: 'flex' }}>
+                                  <div style={{ marginRight: '20px' }}>
+                                      <Button
+                                          onClick={handleSearch}
+                                          icon={<FaSearch style={{ fontSize: '20px' }} />}
+                                          loading={loadingTeiList || loadingInjection}
+                                          disabled={
+                                              selectedLevel?.level &&
+                                              selectedOrganisationUnit &&
+                                              selectedPeriods.length > 0 &&
+                                              selectedProgram
+                                                  ? false
+                                                  : true
+                                          }
+                                          primary
+                                      >
+                                          {translate('Apply')}
+                                      </Button>
+                                  </div>
+                                  <div>
+                                      <Button
+                                          disabled={
+                                              selectedLevel?.level &&
+                                              selectedOrganisationUnit &&
+                                              selectedPeriods.length > 0 &&
+                                              selectedProgram
+                                                  ? false
+                                                  : true
+                                          }
+                                          loading={loadingPrint}
+                                          onClick={printReportAsPDF}
+                                          icon={<ImPrinter style={{ fontSize: '20px' }} />}
+                                      >
+                                          {translate('Print_Dashboard')}
+                                      </Button>
+                                  </div>
+                              </div>
+                              <div style={{ display: 'flex', alignItems: 'end' }}>
+                                  {concerningOUs?.length > 0 && (
+                                      <div
                                           style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'space-between',
-                                                marginTop: '20px'
+                                              marginRight: '20px',
+                                              fontWeight: 'bold',
+                                              padding: '1px',
+                                              background: 'green',
+                                              color: '#fff',
+                                              fontSize: '18px'
                                           }}
-                                    >
-                                          <div style={{ display: 'flex' }}>
-                                                <div style={{ marginRight: '20px' }}>
-                                                      <Button
-                                                            onClick={handleSearch}
-                                                            icon={<FaSearch style={{ fontSize: '20px' }} />}
-                                                            loading={loadingTeiList || loadingInjection}
-                                                            disabled={
-                                                                  selectedLevel?.level &&
-                                                                  selectedOrganisationUnit &&
-                                                                  selectedPeriods.length > 0 &&
-                                                                  selectedProgram
-                                                                        ? false
-                                                                        : true
-                                                            }
-                                                            primary
-                                                      >
-                                                            {translate('Apply')}
-                                                      </Button>
-                                                </div>
-                                                <div>
-                                                      <Button
-                                                            loading={loadingPrint}
-                                                            onClick={printReportAsPDF}
-                                                            icon={<ImPrinter style={{ fontSize: '20px' }} />}
-                                                      >
-                                                            {translate('Print_Dashboard')}
-                                                      </Button>
-                                                </div>
-                                          </div>
-                                          <div style={{ display: 'flex', alignItems: 'end' }}>
-                                                {concerningOUs?.length > 0 && (
-                                                      <div
-                                                            style={{
-                                                                  marginRight: '20px',
-                                                                  fontWeight: 'bold',
-                                                                  padding: '1px',
-                                                                  background: 'green',
-                                                                  color: '#fff',
-                                                                  fontSize: '18px'
-                                                            }}
-                                                      >
-                                                            {`Page:    ${currentPosition + 1}/${concerningOUs?.length}`}
-                                                      </div>
-                                                )}
-                                                <div>
-                                                      <Button
-                                                            small
-                                                            icon={
-                                                                  <IoIosArrowRoundBack
-                                                                        style={{ fontSize: '20px', color: '#fff' }}
-                                                                  />
-                                                            }
-                                                            disabled={
-                                                                  currentPosition === 0 || currentPosition < 0
-                                                                        ? true
-                                                                        : false
-                                                            }
-                                                            primary
-                                                            onClick={handleGoPrevious}
-                                                      >
-                                                            {translate('Prev')}
-                                                      </Button>
-                                                </div>
-                                                <div style={{ marginLeft: '5px' }}>
-                                                      <Button
-                                                            small
-                                                            icon={
-                                                                  <IoIosArrowRoundForward
-                                                                        style={{ fontSize: '20px', color: '#fff' }}
-                                                                  />
-                                                            }
-                                                            disabled={
-                                                                  +currentPosition + +numberOfGeneration >=
-                                                                  concerningOUs?.length
-                                                                        ? true
-                                                                        : false
-                                                            }
-                                                            primary
-                                                            onClick={handleGotoNext}
-                                                      >
-                                                            {translate('Next')}
-                                                      </Button>
-                                                </div>
-                                          </div>
-                                    </div>
-                              </Col>
-                        </Row>
-                  </div>
-            </>
+                                      >
+                                          {`Page:    ${currentPosition + 1}/${concerningOUs?.length}`}
+                                      </div>
+                                  )}
+                                  <div>
+                                      <Button
+                                          small
+                                          icon={<IoIosArrowRoundBack style={{ fontSize: '20px', color: '#fff' }} />}
+                                          disabled={currentPosition === 0 || currentPosition < 0 ? true : false}
+                                          primary
+                                          onClick={handleGoPrevious}
+                                      >
+                                          {translate('Prev')}
+                                      </Button>
+                                  </div>
+                                  <div style={{ marginLeft: '5px' }}>
+                                      <Button
+                                          small
+                                          icon={<IoIosArrowRoundForward style={{ fontSize: '20px', color: '#fff' }} />}
+                                          disabled={
+                                              +currentPosition + +numberOfGeneration >= concerningOUs?.length
+                                                  ? true
+                                                  : false
+                                          }
+                                          primary
+                                          onClick={handleGotoNext}
+                                      >
+                                          {translate('Next')}
+                                      </Button>
+                                  </div>
+                              </div>
+                          </div>
+                      </Col>
+                  </Row>
+              </div>
+          </>
       );
 
       const RenderNoOrganisationUnitsAtThisLevel = () =>
