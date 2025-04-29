@@ -38,7 +38,10 @@ import ALL_STORE_FILE from '../datastores/userDataStorePayload/DEMO_3_STORE.json
 
 const STORES = ALL_STORE_FILE['supervision'];
 
-console.log(' STORES[process.env.REACT_APP_GLOBAL_SETTING_KEY]: ', STORES[process.env.REACT_APP_GLOBAL_SETTING_KEY]);
+console.log(
+    ' STORES[process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY]: ',
+    STORES[process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY]
+);
 
 export const Body = () => {
     const [renderPage, setRenderPage] = useState(PAGE_DASHBOARD);
@@ -415,19 +418,20 @@ export const Body = () => {
         try {
             const metaData = await loadDataStore(process.env.REACT_APP_META_INFOS_NAME, null, null, []);
             if (!metaData?.dataStoreSchemaIsUpdated || metaData?.dataStoreSchemaIsUpdated === 'false') {
-                await updateIndicatorDataStore();
-                await updateCrossCheckDataStore();
-                await updateDECompletessDataStore();
-                await updateDSCompletnessDataStore();
-                await updateRegistersDataStore();
-                await updateIndicatorMappingDataStore();
-                await updateBackgroundInformationsDataStore();
-
-                await saveDataToDataStore(process.env.REACT_APP_META_INFOS_NAME, {
-                    ...metaData,
-                    metadata_version: process.env.REACT_APP_META_DATA_VERSION,
-                    dataStoreSchemaIsUpdated: true
-                });
+                await Promise.all([
+                    updateIndicatorDataStore(),
+                    updateCrossCheckDataStore(),
+                    updateDECompletessDataStore(),
+                    updateDSCompletnessDataStore(),
+                    updateRegistersDataStore(),
+                    updateIndicatorMappingDataStore(),
+                    updateBackgroundInformationsDataStore(),
+                    saveDataToDataStore(process.env.REACT_APP_META_INFOS_NAME, {
+                        ...metaData,
+                        metadata_version: process.env.REACT_APP_META_DATA_VERSION,
+                        dataStoreSchemaIsUpdated: true
+                    })
+                ]);
             }
         } catch (err) {
             console.log('Error : ', err);
@@ -531,10 +535,10 @@ export const Body = () => {
                     null,
                     STORES[process.env.REACT_APP_GLOBAL_SETTING_KEY]
                 ),
-                updateDatastoreSchemas(),
                 loadMe()
             ]);
 
+            updateDatastoreSchemas();
             setDataStoreInitialized(true);
             setLoadingDataStoreInitialization(false);
         } catch (err) {
@@ -785,7 +789,6 @@ export const Body = () => {
                         className="my-shadow"
                         style={{
                             display: 'flex',
-                            // alignItems: 'center',
                             maxWidth: '500px',
                             padding: '10px',
                             background: '#fff',
