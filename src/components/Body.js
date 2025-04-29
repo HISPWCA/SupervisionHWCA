@@ -538,7 +538,7 @@ export const Body = () => {
                 loadMe()
             ]);
 
-            updateDatastoreSchemas();
+            await updateDatastoreSchemas();
             setDataStoreInitialized(true);
             setLoadingDataStoreInitialization(false);
         } catch (err) {
