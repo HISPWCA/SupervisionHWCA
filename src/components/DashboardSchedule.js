@@ -4,32 +4,32 @@ import { Calendar, dayjsLocalizer } from 'react-big-calendar';
 import ReactEchart from 'echarts-for-react';
 import axios from 'axios';
 import {
-      DATA_ELEMENT_OPTION_SETS,
-      ORGANISATION_UNITS_ROUTE,
-      SERVER_URL,
-      TRACKED_ENTITY_INSTANCES_ROUTE,
-      USERS_ROUTE
+    DATA_ELEMENT_OPTION_SETS,
+    ORGANISATION_UNITS_ROUTE,
+    SERVER_URL,
+    TRACKED_ENTITY_INSTANCES_ROUTE,
+    USERS_ROUTE
 } from '../utils/api.routes';
 import OrganisationUnitsTree from './OrganisationUnitsTree';
 import {
-      CANCELED,
-      DESCENDANTS,
-      NOTICE_BOX_DEFAULT,
-      NOTIFICATION_CRITICAL,
-      PENDING_VALIDATION,
-      PLANIFICATION_PAR_MOI,
-      PLANIFICATION_PAR_TOUS,
-      PLANIFICATION_PAR_UN_USER,
-      COMPLETED,
-      SCHEDULED,
-      TYPE_GENERATION_AS_ENROLMENT,
-      TYPE_GENERATION_AS_EVENT,
-      TYPE_GENERATION_AS_TEI,
-      NA,
-      PAYMENT_DONE,
-      PENDING_PAYMENT,
-      AGENT,
-      MES_PLANIFICATIONS
+    CANCELED,
+    DESCENDANTS,
+    NOTICE_BOX_DEFAULT,
+    NOTIFICATION_CRITICAL,
+    PENDING_VALIDATION,
+    PLANIFICATION_PAR_MOI,
+    PLANIFICATION_PAR_TOUS,
+    PLANIFICATION_PAR_UN_USER,
+    COMPLETED,
+    SCHEDULED,
+    TYPE_GENERATION_AS_ENROLMENT,
+    TYPE_GENERATION_AS_EVENT,
+    TYPE_GENERATION_AS_TEI,
+    NA,
+    PAYMENT_DONE,
+    PENDING_PAYMENT,
+    AGENT,
+    MES_PLANIFICATIONS
 } from '../utils/constants';
 import { goToNewPage, loadDataStore } from '../utils/functions';
 import { IoMdOpen } from 'react-icons/io';
@@ -60,1320 +60,1130 @@ const localizer = dayjsLocalizer(dayjs);
 export const getDefaultStatusSupervisionIfStatusIsNull = _ => SCHEDULED.value;
 export const getDefaultStatusPaymentIfStatusIsNull = _ => NA.value;
 export const Dashboard = ({ me }) => {
-      const { apiVersion } = useConfig();
-      const [organisationUnits, setOrganisationUnits] = useState([]);
-      const [users, setUsers] = useState([]);
-      const [dataStoreSupervisionsConfigs, setDataStoreSupervisionsConfigs] = useState([]);
-      const [teiList, setTeiList] = useState([]);
-      const [noticeBox, setNoticeBox] = useState({
-            show: false,
-            message: null,
-            title: null,
-            type: NOTICE_BOX_DEFAULT
-      });
-      const [notification, setNotification] = useState({
-            show: false,
-            message: null,
-            type: null
-      });
-      const [calendarDate, setCalendarDate] = useState(dayjs().format('YYYY-MM-DD'));
-      const [statusSupervisionOptions, setStatusSupervisionOptions] = useState([]);
-      const [statusPaymentOptions, setStatusPaymentOptions] = useState([]);
+    const { apiVersion } = useConfig();
+    const [organisationUnits, setOrganisationUnits] = useState([]);
+    const [users, setUsers] = useState([]);
+    const [dataStoreSupervisionsConfigs, setDataStoreSupervisionsConfigs] = useState([]);
+    const [teiList, setTeiList] = useState([]);
+    const [noticeBox, setNoticeBox] = useState({
+        show: false,
+        message: null,
+        title: null,
+        type: NOTICE_BOX_DEFAULT
+    });
+    const [notification, setNotification] = useState({
+        show: false,
+        message: null,
+        type: null
+    });
+    const [calendarDate, setCalendarDate] = useState(dayjs().format('YYYY-MM-DD'));
+    const [statusSupervisionOptions, setStatusSupervisionOptions] = useState([]);
+    const [statusPaymentOptions, setStatusPaymentOptions] = useState([]);
 
-      const [selectedOrganisationUnit, setSelectedOrganisationUnit] = useState(null);
-      const [selectedPlanification, setSelectedPlanification] = useState(PLANIFICATION_PAR_TOUS);
-      const [selectedPeriod, setSelectedPeriod] = useState(dayjs(new Date()));
-      const [selectedProgram, setSelectedProgram] = useState(null);
+    const [selectedOrganisationUnit, setSelectedOrganisationUnit] = useState(null);
+    const [selectedPlanification, setSelectedPlanification] = useState(PLANIFICATION_PAR_TOUS);
+    const [selectedPeriod, setSelectedPeriod] = useState(dayjs(new Date()));
+    const [selectedProgram, setSelectedProgram] = useState(null);
 
-      const [loadingOrganisationUnits, setLoadingOrganisationUnits] = useState(false);
-      const [loadingUsers, setLoadingUsers] = useState(false);
-      const [loadingDataStoreSupervisionsConfigs, setLoadingDataStoreSupervisionsConfigs] = useState(false);
-      const [loadingTeiList, setLoadingTeiList] = useState(false);
+    const [loadingOrganisationUnits, setLoadingOrganisationUnits] = useState(false);
+    const [loadingUsers, setLoadingUsers] = useState(false);
+    const [loadingDataStoreSupervisionsConfigs, setLoadingDataStoreSupervisionsConfigs] = useState(false);
+    const [loadingTeiList, setLoadingTeiList] = useState(false);
 
-      const colors = ['#5470C6', '#EE6666'];
+    const loadOrganisationUnits = async () => {
+        try {
+            setLoadingOrganisationUnits(true);
+            const response = await axios.get(ORGANISATION_UNITS_ROUTE);
+            const orgUnits = response.data.organisationUnits;
+            const progs = await loadDataStoreSupervisionsConfigs();
 
-      const loadOrganisationUnits = async () => {
-            try {
-                  setLoadingOrganisationUnits(true);
-                  const response = await axios.get(ORGANISATION_UNITS_ROUTE);
-                  const orgUnits = response.data.organisationUnits;
-                  const progs = await loadDataStoreSupervisionsConfigs();
+            setOrganisationUnits(orgUnits);
+            setSelectedPeriod(dayjs());
+            if (progs.length > 0) {
+                const currentProgram = progs[0];
+                const currentOrgUnit = orgUnits.find(ou => ou.id === me?.organisationUnits?.[0]?.id);
+                const currentPeriod = dayjs();
+                const currentPlanification = PLANIFICATION_PAR_TOUS;
 
-                  setOrganisationUnits(orgUnits);
-                  setSelectedPeriod(dayjs());
-                  if (progs.length > 0) {
-                        const currentProgram = progs[0];
-                        const currentOrgUnit = orgUnits.find(ou => ou.id === me?.organisationUnits?.[0]?.id);
-                        const currentPeriod = dayjs();
-                        const currentPlanification = PLANIFICATION_PAR_TOUS;
-
-                        if (currentProgram) {
-                              setSelectedProgram(currentProgram);
-                              setSelectedOrganisationUnit(currentOrgUnit);
-                              setSelectedPeriod(currentPeriod);
-                              setSelectedPlanification(currentPlanification);
-                              loadTeisPlanifications(currentProgram.program.id, currentOrgUnit?.id, null, DESCENDANTS);
-                              loadOptions(
-                                    currentProgram?.programStageConfigurations?.[0]?.statusSupervisionField?.id,
-                                    setStatusSupervisionOptions
-                              );
-                              // loadOptions(
-                              //   currentProgram.statusPayment?.dataElement?.id,
-                              //   setStatusPaymentOptions
-                              // );
-                        }
-                  }
-                  loadUsers(me?.organisationUnits?.[0]?.id);
-                  setLoadingOrganisationUnits(false);
-            } catch (err) {
-                  setLoadingOrganisationUnits(false);
-                  setNotification({
-                        show: true,
-                        message: err.response?.data?.message || err.message,
-                        type: NOTIFICATION_CRITICAL
-                  });
+                if (currentProgram) {
+                    setSelectedProgram(currentProgram);
+                    setSelectedOrganisationUnit(currentOrgUnit);
+                    setSelectedPeriod(currentPeriod);
+                    setSelectedPlanification(currentPlanification);
+                    loadTeisPlanifications(currentProgram.program.id, currentOrgUnit?.id, null, DESCENDANTS);
+                    loadOptions(
+                        currentProgram?.programStageConfigurations?.[0]?.statusSupervisionField?.id,
+                        setStatusSupervisionOptions
+                    );
+                    // loadOptions(
+                    //   currentProgram.statusPayment?.dataElement?.id,
+                    //   setStatusPaymentOptions
+                    // );
+                }
             }
-      };
+            loadUsers(me?.organisationUnits?.[0]?.id);
+            setLoadingOrganisationUnits(false);
+        } catch (err) {
+            setLoadingOrganisationUnits(false);
+            setNotification({
+                show: true,
+                message: err.response?.data?.message || err.message,
+                type: NOTIFICATION_CRITICAL
+            });
+        }
+    };
 
-      const loadTeisPlanifications = async (program_id, orgUnit_id, period, ouMode = DESCENDANTS) => {
-            try {
-                  setLoadingTeiList(true);
-                  const response = await axios.get(
-                        `${TRACKED_ENTITY_INSTANCES_ROUTE}.json?program=${program_id}&ou=${orgUnit_id}&ouMode=${ouMode}&order=created:DESC&fields=trackedEntityInstance,created,program,orgUnit,enrollments[*],attributes&pageSize=10000`
-                  );
-                  const trackedEntityInstances = response.data.trackedEntityInstances;
-                  setTeiList(trackedEntityInstances);
-                  setLoadingTeiList(false);
-                  setCalendarDate(period ? period : selectedPeriod);
-            } catch (err) {
-                  setNotification({
-                        show: true,
-                        message: err.response?.data?.message || err.message,
-                        type: NOTIFICATION_CRITICAL
-                  });
-                  setLoadingTeiList(false);
+    const loadTeisPlanifications = async (program_id, orgUnit_id, period, ouMode = DESCENDANTS) => {
+        try {
+            setLoadingTeiList(true);
+            const response = await axios.get(
+                `${TRACKED_ENTITY_INSTANCES_ROUTE}.json?program=${program_id}&ou=${orgUnit_id}&ouMode=${ouMode}&order=created:DESC&fields=trackedEntityInstance,created,program,orgUnit,enrollments[*],attributes&pageSize=10000`
+            );
+            const trackedEntityInstances = response.data.trackedEntityInstances;
+            setTeiList(trackedEntityInstances);
+            setLoadingTeiList(false);
+            setCalendarDate(period ? period : selectedPeriod);
+        } catch (err) {
+            setNotification({
+                show: true,
+                message: err.response?.data?.message || err.message,
+                type: NOTIFICATION_CRITICAL
+            });
+            setLoadingTeiList(false);
+        }
+    };
+
+    const loadDataStoreSupervisionsConfigs = async () => {
+        try {
+            setLoadingDataStoreSupervisionsConfigs(true);
+            const response = await loadDataStore(process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY, null, null, null);
+
+            setDataStoreSupervisionsConfigs(response);
+            setLoadingDataStoreSupervisionsConfigs(false);
+            return response;
+        } catch (err) {
+            setLoadingDataStoreSupervisionsConfigs(false);
+            throw err;
+        }
+    };
+
+    const loadUsers = async userOrgUnitId => {
+        try {
+            if (userOrgUnitId) {
+                setLoadingUsers(true);
+
+                const route = `${USERS_ROUTE}&filter=organisationUnits.path:like:${userOrgUnitId}`;
+                const response = await axios.get(route);
+
+                setUsers(response.data.users);
+                setLoadingUsers(false);
             }
-      };
+        } catch (err) {
+            setLoadingUsers(false);
+        }
+    };
 
-      const loadDataStoreSupervisionsConfigs = async () => {
-            try {
-                  setLoadingDataStoreSupervisionsConfigs(true);
-                  const response = await loadDataStore(process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY, null, null, null);
+    const handleSelectPlanification = value => {
+        setSelectedPlanification(value);
+    };
 
-                  setDataStoreSupervisionsConfigs(response);
-                  setLoadingDataStoreSupervisionsConfigs(false);
-                  return response;
-            } catch (err) {
-                  setLoadingDataStoreSupervisionsConfigs(false);
-                  throw err;
-            }
-      };
+    const handleSelectedPeriod = event => {
+        setSelectedPeriod(dayjs(event));
+    };
 
-      const loadUsers = async userOrgUnitId => {
-            try {
-                  if (userOrgUnitId) {
-                        setLoadingUsers(true);
+    const filterAndGetPlanfications = () =>
+        teiList
+            .reduce((prev, current) => {
+                if (selectedProgram.generationType === TYPE_GENERATION_AS_TEI) {
+                    if (
+                        selectedPeriod &&
+                        dayjs(current.created).format('YYYYMM') === dayjs(selectedPeriod).format('YYYYMM') &&
+                        current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)
+                    ) {
+                        const eventDate = current.enrollments?.filter(
+                            en => en.program === selectedProgram?.program?.id
+                        )[0]?.events[0]?.eventDate;
 
-                        const route = `${USERS_ROUTE}&filter=organisationUnits.path:like:${userOrgUnitId}`;
-                        const response = await axios.get(route);
-
-                        setUsers(response.data.users);
-                        setLoadingUsers(false);
-                  }
-            } catch (err) {
-                  setLoadingUsers(false);
-            }
-      };
-
-      const handleSelectPlanification = value => {
-            setSelectedPlanification(value);
-      };
-
-      const handleSelectedPeriod = event => {
-            setSelectedPeriod(dayjs(event));
-      };
-
-      const filterAndGetPlanfications = () =>
-            teiList
-                  .reduce((prev, current) => {
-                        if (selectedProgram.generationType === TYPE_GENERATION_AS_TEI) {
-                              if (
-                                    selectedPeriod &&
-                                    dayjs(current.created).format('YYYYMM') ===
-                                          dayjs(selectedPeriod).format('YYYYMM') &&
-                                    current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)
-                              ) {
-                                    const eventDate = current.enrollments?.filter(
-                                          en => en.program === selectedProgram?.program?.id
-                                    )[0]?.events[0]?.eventDate;
-
-                                    if (
-                                          current.enrollments?.filter(
-                                                en => en.program === selectedProgram?.program?.id
-                                          )[0]?.events[0]?.programStage !==
-                                          selectedProgram?.statusSupervision?.programStage?.id
-                                    ) {
-                                          return prev;
-                                    }
-
-                                    const superviseursEvents =
-                                          selectedProgram?.fieldConfig?.supervisor?.dataElements?.reduce(
-                                                (prevEl, curr) => {
-                                                      const foundedDataValue = current.enrollments
-                                                            ?.filter(
-                                                                  en => en.program === selectedProgram?.program?.id
-                                                            )[0]
-                                                            ?.events[0]?.dataValues?.find(
-                                                                  el => el.dataElement === curr.id
-                                                            );
-                                                      if (foundedDataValue) prevEl.push(foundedDataValue);
-                                                      return prevEl;
-                                                },
-                                                []
-                                          ) || [];
-
-                                    const superviseurs = superviseursEvents.reduce((prevEl, curr) => {
-                                          if (curr.value && curr.value?.trim()?.length > 0) prevEl.push(curr.value);
-                                          return prevEl;
-                                    }, []);
-
-                                    return [
-                                          ...prev,
-                                          {
-                                                trackedEntityInstance: current.trackedEntityInstance,
-                                                period: eventDate,
-                                                superviseurs: superviseurs,
-                                                agent: `${
-                                                      current.attributes?.find(
-                                                            att => att.attribute === selectedProgram?.attributeName?.id
-                                                      )?.value || ''
-                                                } ${
-                                                      current.attributes?.find(
-                                                            att =>
-                                                                  att.attribute ===
-                                                                  selectedProgram?.attributeFirstName?.id
-                                                      )?.value || ''
-                                                }`,
-                                                enrollment: current.enrollments?.filter(
-                                                      en => en.program === selectedProgram?.program?.id
-                                                )[0]?.enrollment,
-                                                program: current.enrollments?.filter(
-                                                      en => en.program === selectedProgram?.program?.id
-                                                )[0]?.program,
-                                                orgUnit: current.orgUnit,
-                                                storedBy: current.enrollments?.filter(
-                                                      en => en.program === selectedProgram?.program?.id
-                                                )[0]?.storedBy,
-                                                libelle: current.enrollments?.filter(
-                                                      en => en.program === selectedProgram?.program?.id
-                                                )[0]?.orgUnitName,
-                                                programStageId: current.enrollments?.filter(
-                                                      en => en.program === selectedProgram?.program?.id
-                                                )[0]?.events[0]?.programStage,
-                                                statusSupervision:
-                                                      current.enrollments
-                                                            ?.filter(
-                                                                  en => en.program === selectedProgram?.program?.id
-                                                            )[0]
-                                                            ?.events[0]?.dataValues?.find(
-                                                                  dv =>
-                                                                        dv.dataElement ===
-                                                                        selectedProgram?.statusSupervision?.dataElement
-                                                                              ?.id
-                                                            )?.value || getDefaultStatusSupervisionIfStatusIsNull(),
-                                                statusPayment:
-                                                      current.enrollments
-                                                            ?.filter(
-                                                                  en => en.program === selectedProgram?.program?.id
-                                                            )[0]
-                                                            ?.events[0]?.dataValues?.find(
-                                                                  dv =>
-                                                                        dv.dataElement ===
-                                                                        selectedProgram?.statusPayment?.dataElement?.id
-                                                            )?.value || getDefaultStatusPaymentIfStatusIsNull()
-                                          }
-                                    ].filter(ev => ev.period);
-                              }
+                        if (
+                            current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)[0]?.events[0]
+                                ?.programStage !== selectedProgram?.statusSupervision?.programStage?.id
+                        ) {
+                            return prev;
                         }
 
-                        if (selectedProgram.generationType === TYPE_GENERATION_AS_ENROLMENT) {
-                              if (selectedPeriod) {
-                                    const enrollmentsList = [];
-                                    for (let en of current.enrollments?.filter(
-                                          en => en.program === selectedProgram?.program?.id
-                                    )) {
-                                          if (
-                                                dayjs(en.enrollmentDate).format('YYYYMM') ===
-                                                dayjs(selectedPeriod).format('YYYYMM')
-                                          ) {
-                                                if (
-                                                      en?.events[0]?.programStage ===
-                                                      selectedProgram?.statusSupervision?.programStage?.id
-                                                ) {
-                                                      enrollmentsList.push(en);
-                                                }
-                                          }
-                                    }
-                                    return [
-                                          ...prev,
-                                          ...enrollmentsList
-                                                .filter(en => en?.events[0]?.eventDate)
-                                                .map(en => ({
-                                                      trackedEntityInstance: en.trackedEntityInstance,
-                                                      agent: `${
-                                                            current.attributes?.find(
-                                                                  att =>
-                                                                        att.attribute ===
-                                                                        selectedProgram?.attributeName?.id
-                                                            )?.value || ''
-                                                      } ${
-                                                            current.attributes?.find(
-                                                                  att =>
-                                                                        att.attribute ===
-                                                                        selectedProgram?.attributeFirstName?.id
-                                                            )?.value || ''
-                                                      }`,
-                                                      period: en?.events[0]?.eventDate,
-                                                      enrollment: en.enrollment,
-                                                      program: en.program,
-                                                      superviseurs:
-                                                            selectedProgram?.fieldConfig?.supervisor?.dataElements?.reduce(
-                                                                  (prevEl, curr) => {
-                                                                        const foundedDataValue =
-                                                                              en?.events[0]?.dataValues?.find(
-                                                                                    el => el.dataElement === curr.id
-                                                                              );
-                                                                        if (
-                                                                              foundedDataValue &&
-                                                                              foundedDataValue.value &&
-                                                                              foundedDataValue.value?.trim()?.length > 0
-                                                                        )
-                                                                              prevEl.push(foundedDataValue.value);
-                                                                        return prevEl;
-                                                                  },
-                                                                  []
-                                                            ),
-                                                      orgUnit: current.orgUnit,
-                                                      storedBy: en.storedBy,
-                                                      libelle: en.orgUnitName,
-                                                      programStageId: en?.events[0]?.programStage,
-                                                      // statusSupervision: dayjs(en?.events[0]?.eventDate).isAfter(dayjs()) ? getDefaultStatusSupervisionIfStatusIsNull() : en?.events[0]?.dataValues?.find(dv => dv.dataElement === selectedProgram?.statusSupervision?.dataElement?.id)?.value || getDefaultStatusSupervisionIfStatusIsNull(),
-                                                      statusSupervision:
-                                                            en?.events[0]?.dataValues?.find(
-                                                                  dv =>
-                                                                        dv.dataElement ===
-                                                                        selectedProgram?.statusSupervision?.dataElement
-                                                                              ?.id
-                                                            )?.value || getDefaultStatusSupervisionIfStatusIsNull(),
-                                                      statusPayment:
-                                                            en?.events[0]?.dataValues?.find(
-                                                                  dv =>
-                                                                        dv.dataElement ===
-                                                                        selectedProgram?.statusPayment?.dataElement?.id
-                                                            )?.value || getDefaultStatusPaymentIfStatusIsNull()
-                                                }))
-                                    ];
-                              }
+                        const superviseursEvents =
+                            selectedProgram?.fieldConfig?.supervisor?.dataElements?.reduce((prevEl, curr) => {
+                                const foundedDataValue = current.enrollments
+                                    ?.filter(en => en.program === selectedProgram?.program?.id)[0]
+                                    ?.events[0]?.dataValues?.find(el => el.dataElement === curr.id);
+                                if (foundedDataValue) prevEl.push(foundedDataValue);
+                                return prevEl;
+                            }, []) || [];
+
+                        const superviseurs = superviseursEvents.reduce((prevEl, curr) => {
+                            if (curr.value && curr.value?.trim()?.length > 0) prevEl.push(curr.value);
+                            return prevEl;
+                        }, []);
+
+                        return [
+                            ...prev,
+                            {
+                                trackedEntityInstance: current.trackedEntityInstance,
+                                period: eventDate,
+                                superviseurs: superviseurs,
+                                agent: `${
+                                    current.attributes?.find(
+                                        att => att.attribute === selectedProgram?.attributeName?.id
+                                    )?.value || ''
+                                } ${
+                                    current.attributes?.find(
+                                        att => att.attribute === selectedProgram?.attributeFirstName?.id
+                                    )?.value || ''
+                                }`,
+                                enrollment: current.enrollments?.filter(
+                                    en => en.program === selectedProgram?.program?.id
+                                )[0]?.enrollment,
+                                program: current.enrollments?.filter(
+                                    en => en.program === selectedProgram?.program?.id
+                                )[0]?.program,
+                                orgUnit: current.orgUnit,
+                                storedBy: current.enrollments?.filter(
+                                    en => en.program === selectedProgram?.program?.id
+                                )[0]?.storedBy,
+                                libelle: current.enrollments?.filter(
+                                    en => en.program === selectedProgram?.program?.id
+                                )[0]?.orgUnitName,
+                                programStageId: current.enrollments?.filter(
+                                    en => en.program === selectedProgram?.program?.id
+                                )[0]?.events[0]?.programStage,
+                                statusSupervision:
+                                    current.enrollments
+                                        ?.filter(en => en.program === selectedProgram?.program?.id)[0]
+                                        ?.events[0]?.dataValues?.find(
+                                            dv => dv.dataElement === selectedProgram?.statusSupervision?.dataElement?.id
+                                        )?.value || getDefaultStatusSupervisionIfStatusIsNull(),
+                                statusPayment:
+                                    current.enrollments
+                                        ?.filter(en => en.program === selectedProgram?.program?.id)[0]
+                                        ?.events[0]?.dataValues?.find(
+                                            dv => dv.dataElement === selectedProgram?.statusPayment?.dataElement?.id
+                                        )?.value || getDefaultStatusPaymentIfStatusIsNull()
+                            }
+                        ].filter(ev => ev.period);
+                    }
+                }
+
+                if (selectedProgram.generationType === TYPE_GENERATION_AS_ENROLMENT) {
+                    if (selectedPeriod) {
+                        const enrollmentsList = [];
+                        for (let en of current.enrollments?.filter(en => en.program === selectedProgram?.program?.id)) {
+                            if (dayjs(en.enrollmentDate).format('YYYYMM') === dayjs(selectedPeriod).format('YYYYMM')) {
+                                if (
+                                    en?.events[0]?.programStage === selectedProgram?.statusSupervision?.programStage?.id
+                                ) {
+                                    enrollmentsList.push(en);
+                                }
+                            }
+                        }
+                        return [
+                            ...prev,
+                            ...enrollmentsList
+                                .filter(en => en?.events[0]?.eventDate)
+                                .map(en => ({
+                                    trackedEntityInstance: en.trackedEntityInstance,
+                                    agent: `${
+                                        current.attributes?.find(
+                                            att => att.attribute === selectedProgram?.attributeName?.id
+                                        )?.value || ''
+                                    } ${
+                                        current.attributes?.find(
+                                            att => att.attribute === selectedProgram?.attributeFirstName?.id
+                                        )?.value || ''
+                                    }`,
+                                    period: en?.events[0]?.eventDate,
+                                    enrollment: en.enrollment,
+                                    program: en.program,
+                                    superviseurs: selectedProgram?.fieldConfig?.supervisor?.dataElements?.reduce(
+                                        (prevEl, curr) => {
+                                            const foundedDataValue = en?.events[0]?.dataValues?.find(
+                                                el => el.dataElement === curr.id
+                                            );
+                                            if (
+                                                foundedDataValue &&
+                                                foundedDataValue.value &&
+                                                foundedDataValue.value?.trim()?.length > 0
+                                            )
+                                                prevEl.push(foundedDataValue.value);
+                                            return prevEl;
+                                        },
+                                        []
+                                    ),
+                                    orgUnit: current.orgUnit,
+                                    storedBy: en.storedBy,
+                                    libelle: en.orgUnitName,
+                                    programStageId: en?.events[0]?.programStage,
+                                    statusSupervision:
+                                        en?.events[0]?.dataValues?.find(
+                                            dv => dv.dataElement === selectedProgram?.statusSupervision?.dataElement?.id
+                                        )?.value || getDefaultStatusSupervisionIfStatusIsNull(),
+                                    statusPayment:
+                                        en?.events[0]?.dataValues?.find(
+                                            dv => dv.dataElement === selectedProgram?.statusPayment?.dataElement?.id
+                                        )?.value || getDefaultStatusPaymentIfStatusIsNull()
+                                }))
+                        ];
+                    }
+                }
+
+                if (selectedProgram.generationType === TYPE_GENERATION_AS_EVENT) {
+                    if (selectedPeriod) {
+                        const eventList = [];
+                        const currentEnrollment = current.enrollments?.filter(
+                            en => en.program === selectedProgram?.program?.id
+                        )[0];
+
+                        for (let event of currentEnrollment?.events || []) {
+                            if (
+                                event.eventDate &&
+                                dayjs(event.eventDate).format('YYYYMM') === dayjs(selectedPeriod).format('YYYYMM')
+                            ) {
+                                eventList.push(event);
+                            }
                         }
 
-                        if (selectedProgram.generationType === TYPE_GENERATION_AS_EVENT) {
-                              if (selectedPeriod) {
-                                    const eventList = [];
-                                    const currentEnrollment = current.enrollments?.filter(
-                                          en => en.program === selectedProgram?.program?.id
-                                    )[0];
-                                    for (let event of currentEnrollment?.events || []) {
-                                          if (
-                                                event.eventDate &&
-                                                dayjs(event.eventDate).format('YYYYMM') ===
-                                                      dayjs(selectedPeriod).format('YYYYMM')
-                                          ) {
-                                                // if (
-                                                //   event.programStage ===
-                                                //   selectedProgram?.statusSupervision?.programStage?.id
-                                                // ) {
-                                                //   eventList.push(event);
-                                                // }
-                                                eventList.push(event);
-                                          }
-                                    }
+                        console.log('event : ', ev);
 
-                                    return [
-                                          ...prev,
-                                          ...eventList.map(ev => ({
-                                                trackedEntityInstance: currentEnrollment?.trackedEntityInstance,
-                                                period: ev.eventDate,
-                                                event: ev.event,
-                                                agent: `${
-                                                      current.attributes?.find(
-                                                            att => att.attribute === selectedProgram?.attributeName?.id
-                                                      )?.value || ''
-                                                } ${
-                                                      current.attributes?.find(
-                                                            att =>
-                                                                  att.attribute ===
-                                                                  selectedProgram?.attributeFirstName?.id
-                                                      )?.value || ''
-                                                }`,
-                                                enrollment: currentEnrollment?.enrollment,
-                                                program: currentEnrollment?.program,
-                                                orgUnit: currentEnrollment?.orgUnit,
-                                                storedBy: ev?.storedBy,
-                                                superviseurs: selectedProgram?.programStageConfigurations
-                                                      ?.find(p => p.programStage?.id === ev.programStage)
-                                                      .supervisorField?.reduce((prevEl, curr) => {
-                                                            const foundedDataValue = ev?.dataValues?.find(
-                                                                  el => el.dataElement === curr.id
-                                                            );
-                                                            if (
-                                                                  foundedDataValue &&
-                                                                  foundedDataValue.value &&
-                                                                  foundedDataValue.value?.trim()?.length > 0
-                                                            )
-                                                                  prevEl.push(foundedDataValue.value);
+                        return [
+                            ...prev,
+                            ...eventList.map(ev => ({
+                                trackedEntityInstance: currentEnrollment?.trackedEntityInstance,
+                                period: ev.eventDate,
+                                event: ev.event,
+                                agent: `${
+                                    current.attributes?.find(
+                                        att => att.attribute === selectedProgram?.attributeName?.id
+                                    )?.value || ''
+                                } ${
+                                    current.attributes?.find(
+                                        att => att.attribute === selectedProgram?.attributeFirstName?.id
+                                    )?.value || ''
+                                }`,
+                                enrollment: currentEnrollment?.enrollment,
+                                program: currentEnrollment?.program,
+                                orgUnit: currentEnrollment?.orgUnit,
+                                storedBy: ev?.storedBy,
+                                superviseurs: selectedProgram?.programStageConfigurations
+                                    ?.find(p => p.programStage?.id === ev.programStage)
+                                    .supervisorField?.reduce((prevEl, curr) => {
+                                        const foundedDataValue = ev?.dataValues?.find(el => el.dataElement === curr.id);
+                                        if (
+                                            foundedDataValue &&
+                                            foundedDataValue.value &&
+                                            foundedDataValue.value?.trim()?.length > 0
+                                        )
+                                            prevEl.push(foundedDataValue.value);
 
-                                                            return prevEl;
-                                                      }, []),
-                                                libelle: currentEnrollment?.orgUnitName,
-                                                programStageId: ev.programStage,
-                                                statusSupervision:
-                                                      ev.dataValues?.find(
-                                                            dv =>
-                                                                  dv.dataElement ===
-                                                                  selectedProgram?.programStageConfigurations?.find(
-                                                                        p => p.programStage?.id === ev.programStage
-                                                                  ).statusSupervisionField?.id
-                                                      )?.value || getDefaultStatusSupervisionIfStatusIsNull(),
-                                                statusPayment:
-                                                      ev.dataValues?.find(
-                                                            dv =>
-                                                                  dv.dataElement ===
-                                                                  selectedProgram?.statusPayment?.dataElement?.id
-                                                      )?.value || getDefaultStatusPaymentIfStatusIsNull()
-                                          }))
-                                    ];
-                              }
-                        }
+                                        return prevEl;
+                                    }, []),
+                                libelle: currentEnrollment?.orgUnitName,
+                                programStageId: ev.programStage,
+                                statusSupervision: selectedProgram?.programStageConfigurations?.find(
+                                    p => p.programStage?.id === ev.programStage
+                                ).statusSupervisionField?.id
+                                    ? ev.dataValues?.find(
+                                          dv =>
+                                              dv.dataElement ===
+                                              selectedProgram?.programStageConfigurations?.find(
+                                                  p => p.programStage?.id === ev.programStage
+                                              ).statusSupervisionField?.id
+                                      )?.value || getDefaultStatusSupervisionIfStatusIsNull()
+                                    : ev.status,
+                                statusPayment:
+                                    ev.dataValues?.find(
+                                        dv => dv.dataElement === selectedProgram?.statusPayment?.dataElement?.id
+                                    )?.value || getDefaultStatusPaymentIfStatusIsNull()
+                            }))
+                        ];
+                    }
+                }
 
-                        return prev;
-                  }, [])
-                  .filter(planification => {
-                        if (selectedPlanification === MES_PLANIFICATIONS)
-                              return planification.superviseurs?.includes(me?.displayName);
+                return prev;
+            }, [])
+            .filter(planification => {
+                if (selectedPlanification === MES_PLANIFICATIONS)
+                    return planification.superviseurs?.includes(me?.displayName);
 
-                        if (selectedPlanification === PLANIFICATION_PAR_MOI)
-                              return me?.username?.toLowerCase() === planification.storedBy?.toLowerCase();
+                if (selectedPlanification === PLANIFICATION_PAR_MOI)
+                    return me?.username?.toLowerCase() === planification.storedBy?.toLowerCase();
 
-                        if (selectedPlanification === PLANIFICATION_PAR_TOUS) return true;
+                if (selectedPlanification === PLANIFICATION_PAR_TOUS) return true;
 
-                        if (selectedPlanification === PLANIFICATION_PAR_UN_USER) return false;
+                if (selectedPlanification === PLANIFICATION_PAR_UN_USER) return false;
 
-                        return true;
-                  })
-                  .sort((a, b) => parseInt(dayjs(b.period).valueOf()) - parseInt(dayjs(a.period).valueOf()));
+                return true;
+            })
+            .sort((a, b) => parseInt(dayjs(b.period).valueOf()) - parseInt(dayjs(a.period).valueOf()));
 
-      const getPieChartDatasForSupervisions = () => ({
-            title: {
-                  text: translate('Supervisions'),
-                  left: 'center'
-            },
+    const getPieChartDatasForSupervisions = () => ({
+        title: {
+            text: translate('Supervisions'),
+            left: 'center'
+        },
 
-            tooltip: {
-                  trigger: 'item'
-            },
+        tooltip: {
+            trigger: 'item'
+        },
 
-            legend: {
-                  orient: 'vertical',
-                  bottom: '10',
-                  left: 'left'
-            },
+        legend: {
+            orient: 'vertical',
+            bottom: '10',
+            left: 'left'
+        },
 
-            color: [
-                  { code: SCHEDULED.value, id: null, displayName: translate(SCHEDULED.name) },
-                  ...statusSupervisionOptions
-            ].map(option => getStatusNameAndColor(option.code).color.background),
+        color: [
+            { code: SCHEDULED.value, id: null, displayName: translate(SCHEDULED.name) },
+            ...statusSupervisionOptions
+        ].map(option => getStatusNameAndColor(option.code).color.background),
 
-            series: [
-                  {
-                        type: 'pie',
-                        radius: '65%',
-                        center: ['50%', '50%'],
-                        selectedMode: 'single',
-                        label: { show: false },
-                        data: [
-                              { code: SCHEDULED.value, id: null, displayName: translate(SCHEDULED.name) },
-                              ...statusSupervisionOptions
-                        ].map(option => {
-                              const statusPayload = filterAndGetPlanfications().reduce((prev, curr) => {
-                                    if (curr.statusSupervision && prev[`${curr.statusSupervision}`]) {
-                                          prev[`${curr.statusSupervision}`] = {
-                                                name: getStatusNameAndColor(curr.statusSupervision)?.name,
-                                                value: prev[`${curr.statusSupervision}`].value + 1
-                                          };
-                                    } else {
-                                          prev[`${curr.statusSupervision}`] = {
-                                                name: getStatusNameAndColor(curr.statusSupervision)?.name,
-                                                value: 1
-                                          };
-                                    }
-
-                                    return prev;
-                              }, {});
-                              return statusPayload[option.code] || { name: translate(option.displayName), value: 0 };
-                        }),
-                        emphasis: {
-                              itemStyle: {
-                                    shadowBlur: 30,
-                                    shadowOffsetX: 0,
-                                    shadowColor: `${BLACK}50`
-                              }
-                        }
-                  }
-            ]
-      });
-
-      const calculatePourcentageOfSupervision = value => {
-            const list = [
-                  { id: null, displayName: translate(SCHEDULED.name), code: SCHEDULED.value },
-                  ...statusSupervisionOptions
-            ].map(option => {
-                  const statusPayload = filterAndGetPlanfications().reduce((prev, curr) => {
+        series: [
+            {
+                type: 'pie',
+                radius: '65%',
+                center: ['50%', '50%'],
+                selectedMode: 'single',
+                label: { show: false },
+                data: [
+                    { code: SCHEDULED.value, id: null, displayName: translate(SCHEDULED.name) },
+                    ...statusSupervisionOptions
+                ].map(option => {
+                    const statusPayload = filterAndGetPlanfications().reduce((prev, curr) => {
                         if (curr.statusSupervision && prev[`${curr.statusSupervision}`]) {
-                              prev[`${curr.statusSupervision}`] = {
-                                    name: getStatusNameAndColor(curr.statusSupervision)?.name,
-                                    value: prev[`${curr.statusSupervision}`].value + 1
-                              };
+                            prev[`${curr.statusSupervision}`] = {
+                                name: getStatusNameAndColor(curr.statusSupervision)?.name,
+                                value: prev[`${curr.statusSupervision}`].value + 1
+                            };
                         } else {
-                              prev[`${curr.statusSupervision}`] = {
-                                    name: getStatusNameAndColor(curr.statusSupervision)?.name,
-                                    value: 1
-                              };
+                            prev[`${curr.statusSupervision}`] = {
+                                name: getStatusNameAndColor(curr.statusSupervision)?.name,
+                                value: 1
+                            };
                         }
 
                         return prev;
-                  }, {});
-
-                  return statusPayload[`${option.code}`]?.value || 0;
-            });
-
-            let total = 0;
-
-            for (let i = 0; i < list.length; i++) {
-                  total = total + list[i];
+                    }, {});
+                    return statusPayload[option.code] || { name: translate(option.displayName), value: 0 };
+                }),
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 30,
+                        shadowOffsetX: 0,
+                        shadowColor: `${BLACK}50`
+                    }
+                }
             }
+        ]
+    });
 
-            if (total > 0) return `${parseFloat((parseInt(value) * 100) / total).toFixed(2)}%`;
+    const calculatePourcentageOfSupervision = value => {
+        const list = [
+            { id: null, displayName: translate(SCHEDULED.name), code: SCHEDULED.value },
+            ...statusSupervisionOptions
+        ].map(option => {
+            const statusPayload = filterAndGetPlanfications().reduce((prev, curr) => {
+                if (curr.statusSupervision && prev[`${curr.statusSupervision}`]) {
+                    prev[`${curr.statusSupervision}`] = {
+                        name: getStatusNameAndColor(curr.statusSupervision)?.name,
+                        value: prev[`${curr.statusSupervision}`].value + 1
+                    };
+                } else {
+                    prev[`${curr.statusSupervision}`] = {
+                        name: getStatusNameAndColor(curr.statusSupervision)?.name,
+                        value: 1
+                    };
+                }
 
-            return '0%';
-      };
+                return prev;
+            }, {});
 
-      const calculatePourcentageOfPayment = value => {
-            const list = statusPaymentOptions.map(option => {
-                  const statusPayload = filterAndGetPlanfications().reduce((prev, curr) => {
-                        if (curr.statusPayment && prev[`${curr.statusPayment}`]) {
-                              prev[`${curr.statusPayment}`] = {
-                                    name: getStatusNameAndColorForPayment(curr.statusPayment)?.name,
-                                    value: prev[`${curr.statusPayment}`].value + 1
-                              };
-                        } else {
-                              prev[`${curr.statusPayment}`] = {
-                                    name: getStatusNameAndColorForPayment(curr.statusPayment)?.name,
-                                    value: 1
-                              };
-                        }
+            return statusPayload[`${option.code}`]?.value || 0;
+        });
 
-                        return prev;
-                  }, {});
+        let total = 0;
 
-                  return statusPayload[`${option.code}`]?.value || 0;
-            });
+        for (let i = 0; i < list.length; i++) {
+            total = total + list[i];
+        }
 
-            let total = 0;
+        if (total > 0) return `${parseFloat((parseInt(value) * 100) / total).toFixed(2)}%`;
 
-            for (let i = 0; i < list.length; i++) {
-                  total = total + list[i];
-            }
+        return '0%';
+    };
 
-            if (total > 0) return `${parseFloat((parseInt(value) * 100) / total).toFixed(2)}%`;
+    const calculatePourcentageOfPayment = value => {
+        const list = statusPaymentOptions.map(option => {
+            const statusPayload = filterAndGetPlanfications().reduce((prev, curr) => {
+                if (curr.statusPayment && prev[`${curr.statusPayment}`]) {
+                    prev[`${curr.statusPayment}`] = {
+                        name: getStatusNameAndColorForPayment(curr.statusPayment)?.name,
+                        value: prev[`${curr.statusPayment}`].value + 1
+                    };
+                } else {
+                    prev[`${curr.statusPayment}`] = {
+                        name: getStatusNameAndColorForPayment(curr.statusPayment)?.name,
+                        value: 1
+                    };
+                }
 
-            return '0%';
-      };
+                return prev;
+            }, {});
 
-      const getFiveLastPlanifications = () =>
-            filterAndGetPlanfications()
-                  .slice(0, 5)
-                  .map(planification => ({
-                        ...planification,
-                        key: uuid(),
-                        nom: planification.libelle,
-                        tei: planification
-                  }));
+            return statusPayload[`${option.code}`]?.value || 0;
+        });
 
-      const getCalendarEvents = () =>
-            filterAndGetPlanfications().map(planification => ({
-                  id: uuid(),
-                  allDay: true,
-                  title: (
-                        <>
-                              <Popover
-                                    content={
-                                          <div
-                                                style={{
-                                                      fontWeight: 'bold',
-                                                      color: getStatusNameAndColor(planification.statusSupervision)
-                                                            ?.color?.text
-                                                }}
-                                          >{`${planification.libelle}  (  ${selectedProgram?.program?.displayName} )`}</div>
-                                    }
-                                    color={getStatusNameAndColor(planification.statusSupervision)?.color?.background}
-                              >
-                                    <div
-                                          style={{
-                                                fontWeight: 'bold',
-                                                fontSize: '12px',
-                                                borderRadius: '5px',
-                                                backgroundColor: getStatusNameAndColor(planification.statusSupervision)
-                                                      ?.color?.background,
-                                                color: getStatusNameAndColor(planification.statusSupervision)?.color
-                                                      ?.text,
-                                                margin: '0px',
-                                                padding: '1px',
-                                                display: 'flex',
-                                                gap: '1px',
-                                                alignItems: 'center'
-                                          }}
-                                          className="text-truncate-one"
-                                    >
-                                          <span>{planification.libelle}</span>
-                                          <span
-                                                style={{
-                                                      background: '#fff',
-                                                      color: '#000',
-                                                      padding: '1px',
-                                                      borderRadius: '15px',
-                                                      fontSize: '10px'
-                                                }}
-                                          >
-                                                ( {selectedProgram?.program?.displayName} )
-                                          </span>
-                                    </div>
-                              </Popover>
-                        </>
-                  ),
-                  start: dayjs(planification.period).format('YYYY-MM-DD HH:mm:ss'),
-                  end: dayjs(planification.period).format('YYYY-MM-DD HH:mm:ss')
+        let total = 0;
+
+        for (let i = 0; i < list.length; i++) {
+            total = total + list[i];
+        }
+
+        if (total > 0) return `${parseFloat((parseInt(value) * 100) / total).toFixed(2)}%`;
+
+        return '0%';
+    };
+
+    const getFiveLastPlanifications = () =>
+        filterAndGetPlanfications()
+            .slice(0, 5)
+            .map(planification => ({
+                ...planification,
+                key: uuid(),
+                nom: planification.libelle,
+                tei: planification
             }));
 
-      const RenderCalendar = () => (
-            <Col md={12} sm={24}>
-                  <div
-                        style={{
-                              backgroundColor: '#fff',
-                              padding: '10px',
-                              borderRadius: '8px',
-                              marginBottom: '2px'
-                        }}
-                        className="my-shadow"
-                  >
-                        <div>
-                              <Calendar
-                                    localizer={localizer}
-                                    events={getCalendarEvents()}
-                                    startAccessor="start"
-                                    endAccessor="end"
-                                    style={{ height: '500px' }}
-                                    popup={true}
-                                    date={dayjs(calendarDate).format('YYYY-MM-DD')}
-                                    onNavigate={(newDate, view, action) => {
-                                          setCalendarDate(dayjs(newDate));
-                                          setSelectedPeriod(dayjs(newDate));
-
-                                          if (newDate && selectedProgram?.program?.id && selectedOrganisationUnit?.id) {
-                                                loadTeisPlanifications(
-                                                      selectedProgram.program?.id,
-                                                      selectedOrganisationUnit.id,
-                                                      newDate
-                                                );
-                                          }
-                                    }}
-                                    // selectable
-                              />
+    const getCalendarEvents = () =>
+        filterAndGetPlanfications().map(planification => ({
+            id: uuid(),
+            allDay: true,
+            title: (
+                <>
+                    <Popover
+                        content={
+                            <div
+                                style={{
+                                    fontWeight: 'bold',
+                                    color: getStatusNameAndColor(planification.statusSupervision)?.color?.text
+                                }}
+                            >{`${planification.libelle}  (  ${selectedProgram?.program?.displayName} )`}</div>
+                        }
+                        color={getStatusNameAndColor(planification.statusSupervision)?.color?.background}
+                    >
+                        <div
+                            style={{
+                                fontWeight: 'bold',
+                                fontSize: '12px',
+                                borderRadius: '5px',
+                                backgroundColor: getStatusNameAndColor(planification.statusSupervision)?.color
+                                    ?.background,
+                                color: getStatusNameAndColor(planification.statusSupervision)?.color?.text,
+                                margin: '0px',
+                                padding: '1px',
+                                display: 'flex',
+                                gap: '1px',
+                                alignItems: 'center'
+                            }}
+                            className="text-truncate-one"
+                        >
+                            <span>{planification.libelle}</span>
+                            <span
+                                style={{
+                                    background: '#fff',
+                                    color: '#000',
+                                    padding: '1px',
+                                    borderRadius: '15px',
+                                    fontSize: '10px'
+                                }}
+                            >
+                                ( {selectedProgram?.program?.displayName} )
+                            </span>
                         </div>
-                  </div>
+                    </Popover>
+                </>
+            ),
+            start: dayjs(planification.period).format('YYYY-MM-DD HH:mm:ss'),
+            end: dayjs(planification.period).format('YYYY-MM-DD HH:mm:ss')
+        }));
 
-                  <div style={{ marginTop: '10px' }}>
-                        <Card size="small" className="my-shadow">
-                              <Row gutter={[10, 10]}>
-                                    {[
-                                          { id: null, displayName: SCHEDULED.name, code: SCHEDULED.value },
-                                          ...statusSupervisionOptions
-                                    ].map(option => {
-                                          const statusPayload = filterAndGetPlanfications().reduce((prev, curr) => {
-                                                if (curr.statusSupervision && prev[`${curr.statusSupervision}`]) {
-                                                      prev[`${curr.statusSupervision}`] = {
-                                                            name: getStatusNameAndColor(curr.statusSupervision)?.name,
-                                                            value: prev[`${curr.statusSupervision}`].value + 1
-                                                      };
-                                                } else {
-                                                      prev[`${curr.statusSupervision}`] = {
-                                                            name: getStatusNameAndColor(curr.statusSupervision)?.name,
-                                                            value: 1
-                                                      };
-                                                }
+    const RenderCalendar = () => (
+        <Col md={12} sm={24}>
+            <div
+                style={{
+                    backgroundColor: '#fff',
+                    padding: '10px',
+                    borderRadius: '8px',
+                    marginBottom: '2px'
+                }}
+                className="my-shadow"
+            >
+                <div>
+                    <Calendar
+                        localizer={localizer}
+                        events={getCalendarEvents()}
+                        startAccessor="start"
+                        endAccessor="end"
+                        style={{ height: '500px' }}
+                        popup={true}
+                        date={dayjs(calendarDate).format('YYYY-MM-DD')}
+                        onNavigate={(newDate, view, action) => {
+                            setCalendarDate(dayjs(newDate));
+                            setSelectedPeriod(dayjs(newDate));
 
-                                                return prev;
-                                          }, {});
-
-                                          return (
-                                                <Col flex="auto">
-                                                      <div
-                                                            className="my-shadow"
-                                                            style={{
-                                                                  backgroundColor: '#fff',
-                                                                  borderRadius: '8px',
-                                                                  marginBottom: '2px',
-                                                                  padding: '10px',
-                                                                  height: '100%',
-                                                                  borderLeft: `3px solid ${
-                                                                        getStatusNameAndColor(option.code)?.color
-                                                                              ?.background
-                                                                  }`
-                                                            }}
-                                                      >
-                                                            <div>
-                                                                  <div
-                                                                        style={{
-                                                                              fontWeight: 'bold',
-                                                                              color: `${
-                                                                                    getStatusNameAndColor(option.code)
-                                                                                          ?.color?.background
-                                                                              }`,
-                                                                              textAlign: 'center',
-                                                                              fontSize: '13px'
-                                                                        }}
-                                                                  >
-                                                                        <div
-                                                                              style={{
-                                                                                    backgroundColor: `${
-                                                                                          getStatusNameAndColor(
-                                                                                                option.code
-                                                                                          )?.color?.background
-                                                                                    }`,
-                                                                                    padding: '4px',
-                                                                                    color: `${
-                                                                                          getStatusNameAndColor(
-                                                                                                option.code
-                                                                                          )?.color?.text
-                                                                                    }`
-                                                                              }}
-                                                                        >
-                                                                              {translate(option.displayName)}
-                                                                        </div>
-                                                                  </div>
-                                                                  <div
-                                                                        style={{
-                                                                              marginTop: '20px',
-                                                                              textAlign: 'center'
-                                                                        }}
-                                                                  >
-                                                                        <span
-                                                                              style={{
-                                                                                    fontWeight: 'bold',
-                                                                                    fontSize: '20px',
-                                                                                    borderRight: '1px solid #ccc',
-                                                                                    paddingRight: '20px'
-                                                                              }}
-                                                                        >
-                                                                              {statusPayload[option.code]?.value || 0}
-                                                                        </span>
-                                                                        <span
-                                                                              style={{
-                                                                                    paddingLeft: '20px',
-                                                                                    color: `${BLACK}90`,
-                                                                                    fontSize: '13px'
-                                                                              }}
-                                                                        >
-                                                                              {calculatePourcentageOfSupervision(
-                                                                                    statusPayload[option.code]?.value ||
-                                                                                          0
-                                                                              )}
-                                                                        </span>
-                                                                  </div>
-                                                            </div>
-                                                      </div>
-                                                </Col>
-                                          );
-                                    })}
-                              </Row>
-                        </Card>
-                  </div>
-
-                  {selectedProgram?.planificationType === AGENT && (
-                        <div style={{ marginTop: '10px' }}>
-                              <Card size="small" className="my-shadow">
-                                    <Row gutter={[10, 10]}>
-                                          {statusPaymentOptions.map(option => {
-                                                const statusPayload = filterAndGetPlanfications().reduce(
-                                                      (prev, curr) => {
-                                                            if (curr.statusPayment && prev[`${curr.statusPayment}`]) {
-                                                                  prev[`${curr.statusPayment}`] = {
-                                                                        name: getStatusNameAndColorForPayment(
-                                                                              curr.statusPayment
-                                                                        )?.name,
-                                                                        value: prev[`${curr.statusPayment}`].value + 1
-                                                                  };
-                                                            } else {
-                                                                  prev[`${curr.statusPayment}`] = {
-                                                                        name: getStatusNameAndColorForPayment(
-                                                                              curr.statusPayment
-                                                                        )?.name,
-                                                                        value: 1
-                                                                  };
-                                                            }
-
-                                                            return prev;
-                                                      },
-                                                      {}
-                                                );
-
-                                                return (
-                                                      <Col flex="auto">
-                                                            <div
-                                                                  className="my-shadow"
-                                                                  style={{
-                                                                        backgroundColor: '#fff',
-                                                                        borderRadius: '8px',
-                                                                        marginBottom: '2px',
-                                                                        padding: '10px',
-                                                                        height: '100%',
-                                                                        borderLeft: `3px solid ${
-                                                                              getStatusNameAndColorForPayment(
-                                                                                    option.code
-                                                                              )?.color?.background
-                                                                        }`
-                                                                  }}
-                                                            >
-                                                                  <div>
-                                                                        <div
-                                                                              style={{
-                                                                                    fontWeight: 'bold',
-                                                                                    color: `${
-                                                                                          getStatusNameAndColorForPayment(
-                                                                                                option.code
-                                                                                          )?.color?.background
-                                                                                    }`,
-                                                                                    textAlign: 'center'
-                                                                              }}
-                                                                        >
-                                                                              <div
-                                                                                    style={{
-                                                                                          backgroundColor: `${
-                                                                                                getStatusNameAndColorForPayment(
-                                                                                                      option.code
-                                                                                                )?.color?.background
-                                                                                          }`,
-                                                                                          fontSize: '13px',
-                                                                                          padding: '4px',
-                                                                                          color: `${
-                                                                                                getStatusNameAndColorForPayment(
-                                                                                                      option.code
-                                                                                                )?.color?.text
-                                                                                          }`
-                                                                                    }}
-                                                                              >
-                                                                                    {option.displayName}
-                                                                              </div>
-                                                                        </div>
-                                                                        <div
-                                                                              style={{
-                                                                                    marginTop: '20px',
-                                                                                    textAlign: 'center'
-                                                                              }}
-                                                                        >
-                                                                              <span
-                                                                                    style={{
-                                                                                          fontWeight: 'bold',
-                                                                                          fontSize: '20px',
-                                                                                          borderRight: '1px solid #ccc',
-                                                                                          paddingRight: '20px'
-                                                                                    }}
-                                                                              >
-                                                                                    {statusPayload[option.code]
-                                                                                          ?.value || 0}
-                                                                              </span>
-                                                                              <span
-                                                                                    style={{
-                                                                                          paddingLeft: '20px',
-                                                                                          color: `${BLACK}90`,
-                                                                                          fontSize: '13px'
-                                                                                    }}
-                                                                              >
-                                                                                    {' '}
-                                                                                    {calculatePourcentageOfPayment(
-                                                                                          statusPayload[option.code]
-                                                                                                ?.value || 0
-                                                                                    )}{' '}
-                                                                              </span>
-                                                                        </div>
-                                                                  </div>
-                                                            </div>
-                                                      </Col>
-                                                );
-                                          })}
-                                    </Row>
-                              </Card>
-                        </div>
-                  )}
-            </Col>
-      );
-
-      const getStatusNameAndColor = status => {
-            if (status === NA.value) {
-                  return {
-                        name: translate(`${NA.name}`),
-                        color: { background: GRAY_DARK, text: WHITE }
-                  };
-            }
-
-            if (status === CANCELED.value) {
-                  return {
-                        name: translate(`${CANCELED.name}`),
-                        color: { background: RED, text: WHITE }
-                  };
-            }
-
-            if (status === PENDING_VALIDATION.value) {
-                  return {
-                        name: translate(`${PENDING_VALIDATION.name}`),
-                        color: { background: ORANGE, text: WHITE }
-                  };
-            }
-
-            if (status === COMPLETED.value) {
-                  return {
-                        name: translate(`${COMPLETED.name}`),
-                        color: { background: GREEN, text: WHITE }
-                  };
-            }
-
-            if (status === SCHEDULED.value) {
-                  return {
-                        name: translate(`${SCHEDULED.name}`),
-                        color: { background: BLUE, text: WHITE }
-                  };
-            }
-
-            return {
-                  name: translate(`${SCHEDULED.name}`),
-                  color: { background: BLUE, text: WHITE }
-            };
-      };
-
-      const getStatusNameAndColorForPayment = status => {
-            if (status === PAYMENT_DONE.value) {
-                  return {
-                        name: translate(`${PAYMENT_DONE.name}`),
-                        color: { background: GREEN, text: WHITE }
-                  };
-            }
-
-            if (status === PENDING_PAYMENT.value) {
-                  return {
-                        name: translate(`${PENDING_PAYMENT.name}`),
-                        color: { background: ORANGE, text: WHITE }
-                  };
-            }
-
-            if (status === NA.value) {
-                  return {
-                        name: translate(`${NA.name}`),
-                        color: { background: GRAY_DARK, text: WHITE }
-                  };
-            }
-
-            return {
-                  name: translate(`${NA.name}`),
-                  color: { background: GRAY_DARK, text: WHITE }
-            };
-      };
-
-      const columns = () =>
-            selectedProgram?.planificationType === AGENT
-                  ? [
-                          {
-                                title: translate('Agent_0rg_Unit'),
-                                dataIndex: 'tei',
-                                render: tei => (
-                                      <>
-                                            {tei.agent?.trim()?.length > 0 ? (
-                                                  <div>
-                                                        <span style={{ fontSize: '13px' }}>{tei?.agent}</span>
-                                                        <span
-                                                              style={{
-                                                                    fontSize: '12px',
-                                                                    color: '#00000090',
-                                                                    marginLeft: '5px'
-                                                              }}
-                                                        >
-                                                              ( {tei?.libelle}){' '}
-                                                        </span>
-                                                  </div>
-                                            ) : (
-                                                  <div>
-                                                        <span style={{ color: '#00000090', fontSize: '13px' }}>
-                                                              {tei?.libelle}{' '}
-                                                        </span>
-                                                  </div>
-                                            )}
-                                      </>
-                                )
-                          },
-                          {
-                                title: translate('Periode'),
-                                dataIndex: 'period',
-                                render: value => (
-                                      <div style={{ fontSize: '13px' }}>{dayjs(value).format('YYYY-MM-DD')} </div>
-                                )
-                          },
-                          {
-                                title: translate('Status_Supervision'),
-                                dataIndex: 'statusSupervision',
-                                width: '150px',
-                                render: value => (
-                                      <>
-                                            <span
-                                                  className="text-truncate-one"
-                                                  title={getStatusNameAndColor(value)?.name}
-                                                  style={{
-                                                        fontWeight: 'bold',
-                                                        textAlign: 'center',
-                                                        background: getStatusNameAndColor(value)?.color?.background,
-                                                        color: getStatusNameAndColor(value)?.color?.text,
-                                                        padding: '3px',
-                                                        fontSize: '12px',
-                                                        borderRadius: '5px'
-                                                  }}
-                                            >
-                                                  {getStatusNameAndColor(value)?.name}
-                                            </span>
-                                      </>
-                                )
-                          },
-                          {
-                                title: translate('Actions'),
-                                width: '50px',
-                                dataIndex: 'tei',
-                                render: tei => (
-                                      <div style={{ textAlign: 'center' }}>
-                                            <Tooltip
-                                                  onClick={() =>
-                                                        parseInt(apiVersion) >=
-                                                        parseInt(process.env.REACT_APP_NEW_DHIS2_VERSION)
-                                                              ? goToNewPage(
-                                                                      `${SERVER_URL}/dhis-web-capture/index.html#/enrollmentEventEdit?eventId=${tei.event}&orgUnitId=${tei.orgUnit}`
-                                                                )
-                                                              : goToNewPage(
-                                                                      `${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${tei.trackedEntityInstance}&program=${tei.program}&ou=${tei.orgUnit}`
-                                                                )
-                                                  }
-                                                  title={translate('Ouvrir_Dans_Le_Tracker')}
-                                            >
-                                                  <IoMdOpen
-                                                        style={{
-                                                              fontSize: '18px',
-                                                              color: BLUE,
-                                                              cursor: 'pointer'
-                                                        }}
-                                                  />
-                                            </Tooltip>
-                                      </div>
-                                )
-                          }
-                    ]
-                  : [
-                          { title: translate('Unite_Organisation'), dataIndex: 'nom' },
-                          {
-                                title: translate('Periode'),
-                                key: 'period',
-                                dataIndex: 'period',
-                                render: value => (
-                                      <div style={{ fontSize: '13px' }}>{dayjs(value).format('YYYY-MM-DD')} </div>
-                                )
-                          },
-                          {
-                                title: translate('Status_Supervision'),
-                                dataIndex: 'statusSupervision',
-                                width: '150px',
-                                render: value => (
-                                      <>
-                                            <span
-                                                  className="text-truncate-one"
-                                                  title={getStatusNameAndColor(value)?.name}
-                                                  style={{
-                                                        fontWeight: 'bold',
-                                                        textAlign: 'center',
-                                                        background: getStatusNameAndColor(value)?.color?.background,
-                                                        color: getStatusNameAndColor(value)?.color?.text,
-                                                        padding: '3px',
-                                                        fontSize: '12px',
-                                                        borderRadius: '5px'
-                                                  }}
-                                            >
-                                                  {getStatusNameAndColor(value)?.name}
-                                            </span>
-                                      </>
-                                )
-                          },
-                          {
-                                title: translate('Actions'),
-                                width: '50px',
-                                dataIndex: 'tei',
-                                render: tei => (
-                                      <div style={{ textAlign: 'center' }}>
-                                            <Tooltip
-                                                  onClick={() =>
-                                                        parseInt(apiVersion) >=
-                                                        parseInt(process.env.REACT_APP_NEW_DHIS2_VERSION)
-                                                              ? goToNewPage(
-                                                                      `${SERVER_URL}/dhis-web-capture/index.html#/enrollmentEventEdit?eventId=${tei.event}&orgUnitId=${tei.orgUnit}`
-                                                                )
-                                                              : goToNewPage(
-                                                                      `${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${tei.trackedEntityInstance}&program=${tei.program}&ou=${tei.orgUnit}`
-                                                                )
-                                                  }
-                                                  title={translate('Ouvrir_Dans_Le_Tracker')}
-                                            >
-                                                  <IoMdOpen
-                                                        style={{
-                                                              fontSize: '18px',
-                                                              color: BLUE,
-                                                              cursor: 'pointer'
-                                                        }}
-                                                  />
-                                            </Tooltip>
-                                      </div>
-                                )
-                          }
-                    ];
-
-      const RenderCharts = () => (
-            <Col md={12} sm={24}>
-                  <Row gutter={[8, 8]}>
-                        <Col md={24}>
-                              <div
-                                    className="my-shadow"
-                                    style={{
-                                          backgroundColor: '#fff',
-                                          borderRadius: '8px',
-                                          marginBottom: '2px',
-                                          padding: '10px',
-                                          height: '100%'
-                                    }}
-                              >
-                                    <Table
-                                          size="small"
-                                          columns={columns()}
-                                          dataSource={
-                                                getFiveLastPlanifications()?.map(i => ({
-                                                      ...i,
-                                                      nom: `${i.nom} ( ${selectedProgram?.program?.displayName} )`
-                                                })) || []
-                                          }
-                                          pagination={false}
-                                          style={{ height: '100%' }}
-                                    />
-                              </div>
-                        </Col>
-                        <Col sm={24} md={24}>
-                              <div
-                                    className="my-shadow"
-                                    style={{
-                                          backgroundColor: '#fff',
-                                          borderRadius: '8px',
-                                          padding: '10px',
-                                          marginBottom: '2px',
-                                          height: '100%',
-                                          width: '100%',
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          justifyContent: 'center'
-                                    }}
-                              >
-                                    {teiList.length === 0 && (
-                                          <div style={{ fontWeight: 'bold', color: `${BLACK}90` }}>
-                                                {translate('Aucune_donnees_Disponibles')} !
-                                          </div>
-                                    )}
-                                    {teiList.length > 0 && (
-                                          <ReactEchart
-                                                style={{
-                                                      height:
-                                                            selectedProgram?.planificationType === AGENT
-                                                                  ? '448px'
-                                                                  : '302px',
-                                                      width: '100%'
-                                                }}
-                                                option={getPieChartDatasForSupervisions()}
-                                          />
-                                    )}
-                              </div>
-                        </Col>
-                  </Row>
-            </Col>
-      );
-
-      const handleSearch = () => {
-            if (selectedPeriod && selectedOrganisationUnit && selectedProgram) {
-                  loadTeisPlanifications(selectedProgram.program?.id, selectedOrganisationUnit.id);
-            }
-      };
-
-      const loadOptions = async (dataElementId, setState) => {
-            try {
-                  if (!dataElementId) throw new Error(translate('Element_De_Donnee_Introuvable'));
-
-                  const response = await axios.get(
-                        `${DATA_ELEMENT_OPTION_SETS}/${dataElementId}.json?fields=optionSet[options[id,code,displayName]]`
-                  );
-                  setState && setState(response.data.optionSet?.options || []);
-            } catch (err) {
-                  setState && setState([]);
-            }
-      };
-
-      const handleSelectProgram = value => {
-            if (value) {
-                  const supFound = dataStoreSupervisionsConfigs.find(d => d.program?.id === value);
-                  setTeiList([]);
-                  setSelectedProgram(supFound);
-                  loadOptions(
-                        supFound?.programStageConfigurations?.[0]?.statusSupervisionField?.id,
-                        setStatusSupervisionOptions
-                  );
-            }
-      };
-
-      const RenderFilters = () => (
-            <>
-                  <div
-                        className="my-shadow"
-                        style={{
-                              backgroundColor: '#fff',
-                              padding: '10px',
-                              marginTop: '5px',
-                              marginBottom: '20px',
-                              borderRadius: '8px'
+                            if (newDate && selectedProgram?.program?.id && selectedOrganisationUnit?.id) {
+                                loadTeisPlanifications(
+                                    selectedProgram.program?.id,
+                                    selectedOrganisationUnit.id,
+                                    newDate
+                                );
+                            }
                         }}
-                  >
-                        <Row gutter={[8, 8]} align="middle">
-                              <Col sm={24} md={4}>
-                                    <div style={{ marginBottom: '2px' }}>{translate('Programme')}</div>
-                                    <Select
-                                          placeholder={translate('Programme')}
-                                          onChange={handleSelectProgram}
-                                          value={selectedProgram?.program?.id}
-                                          style={{ width: '100%' }}
-                                          options={dataStoreSupervisionsConfigs.map(d => ({
-                                                value: d.program?.id,
-                                                label: d.program?.displayName
-                                          }))}
-                                          loading={loadingDataStoreSupervisionsConfigs}
-                                    />
-                              </Col>
-                              <Col sm={24} md={5}>
-                                    <div style={{ marginBottom: '2px' }}>{translate('Unites_Organisation')}</div>
-                                    <OrganisationUnitsTree
-                                          meOrgUnitId={me?.organisationUnits[0]?.id}
-                                          orgUnits={organisationUnits}
-                                          currentOrgUnits={selectedOrganisationUnit}
-                                          setCurrentOrgUnits={setSelectedOrganisationUnit}
-                                          loadingOrganisationUnits={loadingOrganisationUnits}
-                                          setLoadingOrganisationUnits={setLoadingOrganisationUnits}
-                                    />
-                              </Col>
-                              <Col sm={24} md={3}>
-                                    <div style={{ marginBottom: '2px' }}>{translate('Periode')}</div>
-                                    <DatePicker
-                                          picker="month"
-                                          style={{ width: '100%' }}
-                                          placeholder={translate('Periode')}
-                                          onChange={handleSelectedPeriod}
-                                          value={selectedPeriod}
-                                          allowClear={false}
-                                    />
-                              </Col>
-
-                              <Col sm={24} md={4}>
-                                    <div style={{ marginBottom: '2px' }}>{translate('Planifier_Par')} </div>
-                                    <Select
-                                          placeholder={translate('Planifier_Par')}
-                                          onChange={handleSelectPlanification}
-                                          value={selectedPlanification}
-                                          style={{ width: '100%' }}
-                                          options={[
-                                                {
-                                                      value: MES_PLANIFICATIONS,
-                                                      label: translate('My_Planifications')
-                                                },
-                                                {
-                                                      value: PLANIFICATION_PAR_MOI,
-                                                      label: translate('Planned_By_Me')
-                                                },
-                                                {
-                                                      value: PLANIFICATION_PAR_TOUS,
-                                                      label: translate('Tous')
-                                                }
-                                          ]}
-                                    />
-                              </Col>
-
-                              <Col sm={24} md={1}>
-                                    <div style={{ marginTop: '20px' }}>
-                                          <Button
-                                                onClick={handleSearch}
-                                                loading={loadingTeiList}
-                                                primary
-                                                icon={<AiOutlineSearch style={{ fontSize: '20px' }} />}
-                                          >
-                                                {translate('Appliquer')}
-                                          </Button>
-                                    </div>
-                              </Col>
-                        </Row>
-                  </div>
-            </>
-      );
-
-      const RenderNoticeBox = () => (
-            <div style={{ padding: '10px' }}>
-                  <MyNoticeBox
-                        show={noticeBox.show}
-                        message={noticeBox.message}
-                        title={noticeBox.title}
-                        type={noticeBox.type}
-                  />
+                    />
+                </div>
             </div>
-      );
 
-      useEffect(() => {
-            me?.organisationUnits?.length > 0 && loadOrganisationUnits();
-      }, [me]);
+            <div style={{ marginTop: '10px' }}>
+                <Card size="small" className="my-shadow">
+                    <Row gutter={[10, 10]}>
+                        {[
+                            { id: null, displayName: SCHEDULED.name, code: SCHEDULED.value },
+                            ...statusSupervisionOptions
+                        ].map(option => {
+                            const statusPayload = filterAndGetPlanfications().reduce((prev, curr) => {
+                                if (curr.statusSupervision && prev[`${curr.statusSupervision}`]) {
+                                    prev[`${curr.statusSupervision}`] = {
+                                        name: getStatusNameAndColor(curr.statusSupervision)?.name,
+                                        value: prev[`${curr.statusSupervision}`].value + 1
+                                    };
+                                } else {
+                                    prev[`${curr.statusSupervision}`] = {
+                                        name: getStatusNameAndColor(curr.statusSupervision)?.name,
+                                        value: 1
+                                    };
+                                }
 
-      return (
-            <>
-                  <div style={{ padding: '10px', width: '100%' }}>
-                        {RenderFilters()}
+                                return prev;
+                            }, {});
 
-                        <Row gutter={[8, 8]}>
-                              {RenderCalendar()}
-                              {RenderCharts()}
-                        </Row>
+                            return (
+                                <Col flex="auto">
+                                    <div
+                                        className="my-shadow"
+                                        style={{
+                                            backgroundColor: '#fff',
+                                            borderRadius: '8px',
+                                            marginBottom: '2px',
+                                            padding: '10px',
+                                            height: '100%',
+                                            borderLeft: `3px solid ${
+                                                getStatusNameAndColor(option.code)?.color?.background
+                                            }`
+                                        }}
+                                    >
+                                        <div>
+                                            <div
+                                                style={{
+                                                    fontWeight: 'bold',
+                                                    color: `${getStatusNameAndColor(option.code)?.color?.background}`,
+                                                    textAlign: 'center',
+                                                    fontSize: '13px'
+                                                }}
+                                            >
+                                                <div
+                                                    style={{
+                                                        backgroundColor: `${
+                                                            getStatusNameAndColor(option.code)?.color?.background
+                                                        }`,
+                                                        padding: '4px',
+                                                        color: `${getStatusNameAndColor(option.code)?.color?.text}`
+                                                    }}
+                                                >
+                                                    {translate(option.displayName)}
+                                                </div>
+                                            </div>
+                                            <div
+                                                style={{
+                                                    marginTop: '20px',
+                                                    textAlign: 'center'
+                                                }}
+                                            >
+                                                <span
+                                                    style={{
+                                                        fontWeight: 'bold',
+                                                        fontSize: '20px',
+                                                        borderRight: '1px solid #ccc',
+                                                        paddingRight: '20px'
+                                                    }}
+                                                >
+                                                    {statusPayload[option.code]?.value || 0}
+                                                </span>
+                                                <span
+                                                    style={{
+                                                        paddingLeft: '20px',
+                                                        color: `${BLACK}90`,
+                                                        fontSize: '13px'
+                                                    }}
+                                                >
+                                                    {calculatePourcentageOfSupervision(
+                                                        statusPayload[option.code]?.value || 0
+                                                    )}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Col>
+                            );
+                        })}
+                    </Row>
+                </Card>
+            </div>
+        </Col>
+    );
 
-                        {RenderNoticeBox()}
-                        <MyNotification notification={notification} setNotification={setNotification} />
-                  </div>
-            </>
-      );
+    const getStatusNameAndColor = status => {
+        if (status === NA.value) {
+            return {
+                name: translate(`${NA.name}`),
+                color: { background: GRAY_DARK, text: WHITE }
+            };
+        }
+
+        if (status === CANCELED.value) {
+            return {
+                name: translate(`${CANCELED.name}`),
+                color: { background: RED, text: WHITE }
+            };
+        }
+
+        if (status === PENDING_VALIDATION.value) {
+            return {
+                name: translate(`${PENDING_VALIDATION.name}`),
+                color: { background: ORANGE, text: WHITE }
+            };
+        }
+
+        if (status === COMPLETED.value) {
+            return {
+                name: translate(`${COMPLETED.name}`),
+                color: { background: GREEN, text: WHITE }
+            };
+        }
+
+        if (status === SCHEDULED.value || status === 'ACTIVE') {
+            return {
+                name: translate(`${SCHEDULED.name}`),
+                color: { background: BLUE, text: WHITE }
+            };
+        }
+
+        return {
+            name: translate(`${SCHEDULED.name}`),
+            color: { background: BLUE, text: WHITE }
+        };
+    };
+
+    const getStatusNameAndColorForPayment = status => {
+        if (status === PAYMENT_DONE.value) {
+            return {
+                name: translate(`${PAYMENT_DONE.name}`),
+                color: { background: GREEN, text: WHITE }
+            };
+        }
+
+        if (status === PENDING_PAYMENT.value) {
+            return {
+                name: translate(`${PENDING_PAYMENT.name}`),
+                color: { background: ORANGE, text: WHITE }
+            };
+        }
+
+        if (status === NA.value) {
+            return {
+                name: translate(`${NA.name}`),
+                color: { background: GRAY_DARK, text: WHITE }
+            };
+        }
+
+        return {
+            name: translate(`${NA.name}`),
+            color: { background: GRAY_DARK, text: WHITE }
+        };
+    };
+
+    const columns = () =>
+        selectedProgram?.planificationType === AGENT
+            ? [
+                  {
+                      title: translate('Agent_0rg_Unit'),
+                      dataIndex: 'tei',
+                      render: tei => (
+                          <>
+                              {tei.agent?.trim()?.length > 0 ? (
+                                  <div>
+                                      <span style={{ fontSize: '13px' }}>{tei?.agent}</span>
+                                      <span
+                                          style={{
+                                              fontSize: '12px',
+                                              color: '#00000090',
+                                              marginLeft: '5px'
+                                          }}
+                                      >
+                                          ( {tei?.libelle}){' '}
+                                      </span>
+                                  </div>
+                              ) : (
+                                  <div>
+                                      <span style={{ color: '#00000090', fontSize: '13px' }}>{tei?.libelle} </span>
+                                  </div>
+                              )}
+                          </>
+                      )
+                  },
+                  {
+                      title: translate('Periode'),
+                      dataIndex: 'period',
+                      render: value => <div style={{ fontSize: '13px' }}>{dayjs(value).format('YYYY-MM-DD')} </div>
+                  },
+                  {
+                      title: translate('Status_Supervision'),
+                      dataIndex: 'statusSupervision',
+                      width: '150px',
+                      render: value => (
+                          <>
+                              <span
+                                  className="text-truncate-one"
+                                  title={getStatusNameAndColor(value)?.name}
+                                  style={{
+                                      fontWeight: 'bold',
+                                      textAlign: 'center',
+                                      background: getStatusNameAndColor(value)?.color?.background,
+                                      color: getStatusNameAndColor(value)?.color?.text,
+                                      padding: '3px',
+                                      fontSize: '12px',
+                                      borderRadius: '5px'
+                                  }}
+                              >
+                                  {getStatusNameAndColor(value)?.name}
+                              </span>
+                          </>
+                      )
+                  },
+                  {
+                      title: translate('Actions'),
+                      width: '50px',
+                      dataIndex: 'tei',
+                      render: tei => (
+                          <div style={{ textAlign: 'center' }}>
+                              <Tooltip
+                                  onClick={() =>
+                                      parseInt(apiVersion) >= parseInt(process.env.REACT_APP_NEW_DHIS2_VERSION)
+                                          ? goToNewPage(
+                                                `${SERVER_URL}/dhis-web-capture/index.html#/enrollmentEventEdit?eventId=${tei.event}&orgUnitId=${tei.orgUnit}`
+                                            )
+                                          : goToNewPage(
+                                                `${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${tei.trackedEntityInstance}&program=${tei.program}&ou=${tei.orgUnit}`
+                                            )
+                                  }
+                                  title={translate('Ouvrir_Dans_Le_Tracker')}
+                              >
+                                  <IoMdOpen
+                                      style={{
+                                          fontSize: '18px',
+                                          color: BLUE,
+                                          cursor: 'pointer'
+                                      }}
+                                  />
+                              </Tooltip>
+                          </div>
+                      )
+                  }
+              ]
+            : [
+                  { title: translate('Unite_Organisation'), dataIndex: 'nom' },
+                  {
+                      title: translate('Periode'),
+                      key: 'period',
+                      dataIndex: 'period',
+                      render: value => <div style={{ fontSize: '13px' }}>{dayjs(value).format('YYYY-MM-DD')} </div>
+                  },
+                  {
+                      title: translate('Status_Supervision'),
+                      dataIndex: 'statusSupervision',
+                      width: '150px',
+                      render: value => (
+                          <>
+                              <span
+                                  className="text-truncate-one"
+                                  title={getStatusNameAndColor(value)?.name}
+                                  style={{
+                                      fontWeight: 'bold',
+                                      textAlign: 'center',
+                                      background: getStatusNameAndColor(value)?.color?.background,
+                                      color: getStatusNameAndColor(value)?.color?.text,
+                                      padding: '3px',
+                                      fontSize: '12px',
+                                      borderRadius: '5px'
+                                  }}
+                              >
+                                  {getStatusNameAndColor(value)?.name}
+                              </span>
+                          </>
+                      )
+                  },
+                  {
+                      title: translate('Actions'),
+                      width: '50px',
+                      dataIndex: 'tei',
+                      render: tei => (
+                          <div style={{ textAlign: 'center' }}>
+                              <Tooltip
+                                  onClick={() =>
+                                      parseInt(apiVersion) >= parseInt(process.env.REACT_APP_NEW_DHIS2_VERSION)
+                                          ? goToNewPage(
+                                                `${SERVER_URL}/dhis-web-capture/index.html#/enrollmentEventEdit?eventId=${tei.event}&orgUnitId=${tei.orgUnit}`
+                                            )
+                                          : goToNewPage(
+                                                `${SERVER_URL}/dhis-web-tracker-capture/index.html#/dashboard?tei=${tei.trackedEntityInstance}&program=${tei.program}&ou=${tei.orgUnit}`
+                                            )
+                                  }
+                                  title={translate('Ouvrir_Dans_Le_Tracker')}
+                              >
+                                  <IoMdOpen
+                                      style={{
+                                          fontSize: '18px',
+                                          color: BLUE,
+                                          cursor: 'pointer'
+                                      }}
+                                  />
+                              </Tooltip>
+                          </div>
+                      )
+                  }
+              ];
+
+    const RenderCharts = () => (
+        <Col md={12} sm={24}>
+            <Row gutter={[8, 8]}>
+                <Col md={24}>
+                    <div
+                        className="my-shadow"
+                        style={{
+                            backgroundColor: '#fff',
+                            borderRadius: '8px',
+                            marginBottom: '2px',
+                            padding: '10px',
+                            height: '100%'
+                        }}
+                    >
+                        <Table
+                            size="small"
+                            columns={columns()}
+                            dataSource={
+                                getFiveLastPlanifications()?.map(i => ({
+                                    ...i,
+                                    nom: `${i.nom} ( ${selectedProgram?.program?.displayName} )`
+                                })) || []
+                            }
+                            pagination={false}
+                            style={{ height: '100%' }}
+                        />
+                    </div>
+                </Col>
+                <Col sm={24} md={24}>
+                    <div
+                        className="my-shadow"
+                        style={{
+                            backgroundColor: '#fff',
+                            borderRadius: '8px',
+                            padding: '10px',
+                            marginBottom: '2px',
+                            height: '100%',
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}
+                    >
+                        {teiList.length === 0 && (
+                            <div style={{ fontWeight: 'bold', color: `${BLACK}90` }}>
+                                {translate('Aucune_donnees_Disponibles')} !
+                            </div>
+                        )}
+                        {teiList.length > 0 && (
+                            <ReactEchart
+                                style={{
+                                    height: selectedProgram?.planificationType === AGENT ? '448px' : '302px',
+                                    width: '100%'
+                                }}
+                                option={getPieChartDatasForSupervisions()}
+                            />
+                        )}
+                    </div>
+                </Col>
+            </Row>
+        </Col>
+    );
+
+    const handleSearch = () => {
+        if (selectedPeriod && selectedOrganisationUnit && selectedProgram) {
+            loadTeisPlanifications(selectedProgram.program?.id, selectedOrganisationUnit.id);
+        }
+    };
+
+    const loadOptions = async (dataElementId, setState) => {
+        try {
+            if (!dataElementId) throw new Error(translate('Element_De_Donnee_Introuvable'));
+
+            const response = await axios.get(
+                `${DATA_ELEMENT_OPTION_SETS}/${dataElementId}.json?fields=optionSet[options[id,code,displayName]]`
+            );
+            setState && setState(response.data.optionSet?.options || []);
+        } catch (err) {
+            setState && setState([]);
+        }
+    };
+
+    const handleSelectProgram = value => {
+        if (value) {
+            const supFound = dataStoreSupervisionsConfigs.find(d => d.program?.id === value);
+            setTeiList([]);
+            setSelectedProgram(supFound);
+            loadOptions(
+                supFound?.programStageConfigurations?.[0]?.statusSupervisionField?.id,
+                setStatusSupervisionOptions
+            );
+        }
+    };
+
+    const RenderFilters = () => (
+        <>
+            <div
+                className="my-shadow"
+                style={{
+                    backgroundColor: '#fff',
+                    padding: '10px',
+                    marginTop: '5px',
+                    marginBottom: '20px',
+                    borderRadius: '8px'
+                }}
+            >
+                <Row gutter={[8, 8]} align="middle">
+                    <Col sm={24} md={4}>
+                        <div style={{ marginBottom: '2px' }}>{translate('Programme')}</div>
+                        <Select
+                            placeholder={translate('Programme')}
+                            onChange={handleSelectProgram}
+                            value={selectedProgram?.program?.id}
+                            style={{ width: '100%' }}
+                            options={dataStoreSupervisionsConfigs.map(d => ({
+                                value: d.program?.id,
+                                label: d.program?.displayName
+                            }))}
+                            loading={loadingDataStoreSupervisionsConfigs}
+                        />
+                    </Col>
+                    <Col sm={24} md={5}>
+                        <div style={{ marginBottom: '2px' }}>{translate('Unites_Organisation')}</div>
+                        <OrganisationUnitsTree
+                            meOrgUnitId={me?.organisationUnits[0]?.id}
+                            orgUnits={organisationUnits}
+                            currentOrgUnits={selectedOrganisationUnit}
+                            setCurrentOrgUnits={setSelectedOrganisationUnit}
+                            loadingOrganisationUnits={loadingOrganisationUnits}
+                            setLoadingOrganisationUnits={setLoadingOrganisationUnits}
+                        />
+                    </Col>
+                    <Col sm={24} md={3}>
+                        <div style={{ marginBottom: '2px' }}>{translate('Periode')}</div>
+                        <DatePicker
+                            picker="month"
+                            style={{ width: '100%' }}
+                            placeholder={translate('Periode')}
+                            onChange={handleSelectedPeriod}
+                            value={selectedPeriod}
+                            allowClear={false}
+                        />
+                    </Col>
+
+                    <Col sm={24} md={4}>
+                        <div style={{ marginBottom: '2px' }}>{translate('Planifier_Par')} </div>
+                        <Select
+                            placeholder={translate('Planifier_Par')}
+                            onChange={handleSelectPlanification}
+                            value={selectedPlanification}
+                            style={{ width: '100%' }}
+                            options={[
+                                {
+                                    value: MES_PLANIFICATIONS,
+                                    label: translate('My_Planifications')
+                                },
+                                {
+                                    value: PLANIFICATION_PAR_MOI,
+                                    label: translate('Planned_By_Me')
+                                },
+                                {
+                                    value: PLANIFICATION_PAR_TOUS,
+                                    label: translate('Tous')
+                                }
+                            ]}
+                        />
+                    </Col>
+
+                    <Col sm={24} md={1}>
+                        <div style={{ marginTop: '20px' }}>
+                            <Button
+                                onClick={handleSearch}
+                                loading={loadingTeiList}
+                                primary
+                                icon={<AiOutlineSearch style={{ fontSize: '20px' }} />}
+                            >
+                                {translate('Appliquer')}
+                            </Button>
+                        </div>
+                    </Col>
+                </Row>
+            </div>
+        </>
+    );
+
+    const RenderNoticeBox = () => (
+        <div style={{ padding: '10px' }}>
+            <MyNoticeBox
+                show={noticeBox.show}
+                message={noticeBox.message}
+                title={noticeBox.title}
+                type={noticeBox.type}
+            />
+        </div>
+    );
+
+    useEffect(() => {
+        me?.organisationUnits?.length > 0 && loadOrganisationUnits();
+    }, [me]);
+
+    return (
+        <>
+            <div style={{ padding: '10px', width: '100%' }}>
+                {RenderFilters()}
+
+                <Row gutter={[8, 8]}>
+                    {RenderCalendar()}
+                    {RenderCharts()}
+                </Row>
+
+                {RenderNoticeBox()}
+                <MyNotification notification={notification} setNotification={setNotification} />
+            </div>
+        </>
+    );
 };
 
 export default Dashboard;
