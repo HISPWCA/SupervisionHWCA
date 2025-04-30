@@ -38,10 +38,6 @@ import ALL_STORE_FILE from '../datastores/userDataStorePayload/DEMO_3_STORE.json
 
 const STORES = ALL_STORE_FILE['supervision'];
 
-console.log(
-    ' STORES[process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY]: ',
-    STORES[process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY]
-);
 
 export const Body = () => {
     const [renderPage, setRenderPage] = useState(PAGE_DASHBOARD);

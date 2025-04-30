@@ -1697,7 +1697,7 @@ const Setting = () => {
                 </div>
 
                 <div style={{ marginTop: '20px' }}>
-                    <div style={{ marginTop: '5px' }}>
+                    {/* <div style={{ marginTop: '5px' }}>
                         <Radio
                             label={translate('Generer_Supervision_Comme_TEI')}
                             onChange={handleSupervisionGenerationType}
@@ -1714,7 +1714,7 @@ const Setting = () => {
                             checked={formState?.selectedSupervisionGenerationType === TYPE_GENERATION_AS_ENROLMENT}
                             disabled={true}
                         />
-                    </div>
+                    </div> */}
                     <div style={{ marginTop: '5px' }}>
                         <Radio
                             label={translate('Generer_Supervision_Comme_EV')}
