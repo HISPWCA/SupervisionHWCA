@@ -368,7 +368,7 @@
     "Pending": "En attente",
     "pending": "En attente",
     "Recent_Verification_Period": "Période la plus récente de vérification",
-    "Recent_Verification_Period_Help": "Choisir une date quelconque de la période la plus récente des périodes de vérification de données. ( par exemple : Si votre configuration prend 3 mois  de données, en choisissant 01 Mai 2024, le système va compter comme: Mai 2024, Avril 2024 et Mars 2024 )",
+    "Recent_Verification_Period_Help": "Sélectionnez n'importe quelle date dans la période de vérification des données la plus récente. (Par exemple: si votre configuration prend 3 mois de données, en choisissant le 01 mai 2024, le système examinera mai 2024, avril 2024 et mars 2024)",
     "Indicator_Updating": "Mise à jour des indicateurs",
     "CrossCheck_Updating": "Mise à jour des recoupements",
     "Registers_Updating": "Mise à jour des régistres",
@@ -408,7 +408,7 @@
     "Current_Period": "Période actuelle",
     "ConsistencyOverTimeKeyWords": "Mots clés de la Cohérence dans le temps",
     "ConsistencyOverTime_Period_Type": "Type de période des cohérences dans le temps",
-    "CurrentPeriodKeyWords":"Mots clets de la périod actuelle",
-    "CurrentPeriodOnYearAgoKeyWords":"Mots clets de la période actuelle un an auparavant",
-    "LastPeriodKeyWords":"Mots clets de la dernière période"
+    "CurrentPeriodKeyWords": "Mots clets de la périod actuelle",
+    "CurrentPeriodOnYearAgoKeyWords": "Mots clets de la période actuelle un an auparavant",
+    "LastPeriodKeyWords": "Mots clets de la dernière période"
 }

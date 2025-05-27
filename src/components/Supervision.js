@@ -1463,7 +1463,8 @@ const Supervision = ({ me }) => {
                         value: ev.indicator?.displayName
                     }));
             } else {
-                eventPayload.status = 'SCHEDULE';
+                // eventPayload.status = 'SCHEDULE';
+                eventPayload.status = 'ACTIVE';
                 eventPayload.dueDate = payload.period
                     ? dayjs(payload.period).format('YYYY-MM-DD')
                     : dayjs().format('YYYY-MM-DD');
@@ -2147,8 +2148,6 @@ const Supervision = ({ me }) => {
                     eventPayload.dataValues?.map(async dv => {
                         const newDvList = [];
                         const foundOvertime = consistencyOvertimesList.find(ind => ind.value?.id === dv.dataElement);
-
-                        console.log('foundOvertime  : ', foundOvertime);
 
                         if (foundOvertime) {
                             const newObject = dataStoreIndicatorsMapping?.find(
@@ -3084,7 +3083,6 @@ const Supervision = ({ me }) => {
                         dataElement: selectedIndicatorsPeriodType.id
                     };
 
-                    console.log('payload: ', typePayload);
                     eventPayload.dataValues = [...eventPayload.dataValues, typePayload];
                 }
                 // period implémentation for consistency over time
@@ -3100,8 +3098,6 @@ const Supervision = ({ me }) => {
                             const foundOvertime = consistencyOvertimesList.find(
                                 ind => ind.value?.id === dv.dataElement
                             );
-
-                            console.log('foundOvertime  : ', foundOvertime);
 
                             if (foundOvertime) {
                                 const newObject = dataStoreIndicatorsMapping?.find(
@@ -3297,7 +3293,6 @@ const Supervision = ({ me }) => {
                     newEventsList.push(eventPayload);
                 }
 
-                console.log('newEventsList ', newEventsList);
                 await createEvents({ events: newEventsList });
                 const currentTEI = await axios.get(
                     `${TRACKED_ENTITY_INSTANCES_ROUTE}/${current_tei.trackedEntityInstance}?program=${selectedProgram.program?.id}&fields=*,enrollments`
@@ -3578,7 +3573,7 @@ const Supervision = ({ me }) => {
                                         : true
                                 }
                             >
-                                Rechercher
+                                {translate('Recherche')}
                             </Button>
                         </Col>
                     </Row>

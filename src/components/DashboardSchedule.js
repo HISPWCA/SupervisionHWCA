@@ -351,8 +351,6 @@ export const Dashboard = ({ me }) => {
                             }
                         }
 
-                        console.log('event : ', ev);
-
                         return [
                             ...prev,
                             ...eventList.map(ev => ({
@@ -387,17 +385,14 @@ export const Dashboard = ({ me }) => {
                                     }, []),
                                 libelle: currentEnrollment?.orgUnitName,
                                 programStageId: ev.programStage,
-                                statusSupervision: selectedProgram?.programStageConfigurations?.find(
-                                    p => p.programStage?.id === ev.programStage
-                                ).statusSupervisionField?.id
-                                    ? ev.dataValues?.find(
-                                          dv =>
-                                              dv.dataElement ===
-                                              selectedProgram?.programStageConfigurations?.find(
-                                                  p => p.programStage?.id === ev.programStage
-                                              ).statusSupervisionField?.id
-                                      )?.value || getDefaultStatusSupervisionIfStatusIsNull()
-                                    : ev.status,
+                                statusSupervision:
+                                    ev.dataValues?.find(
+                                        dv =>
+                                            dv.dataElement ===
+                                            selectedProgram?.programStageConfigurations?.find(
+                                                p => p.programStage?.id === ev.programStage
+                                            ).statusSupervisionField?.id
+                                    )?.value || getDefaultStatusSupervisionIfStatusIsNull(),
                                 statusPayment:
                                     ev.dataValues?.find(
                                         dv => dv.dataElement === selectedProgram?.statusPayment?.dataElement?.id

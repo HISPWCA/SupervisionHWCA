@@ -34,10 +34,6 @@ import Indicators from '../datastores/Indicators.json';
 import Registres from '../datastores/Registres.json';
 import MetadataInfos from '../datastores/metadataInfos.json';
 import { IoCheckmarkDoneCircle } from 'react-icons/io5';
-import ALL_STORE_FILE from '../datastores/userDataStorePayload/DEMO_3_STORE.json';
-
-const STORES = ALL_STORE_FILE['supervision'];
-
 
 export const Body = () => {
     const [renderPage, setRenderPage] = useState(PAGE_DASHBOARD);
@@ -422,6 +418,7 @@ export const Body = () => {
                     updateRegistersDataStore(),
                     updateIndicatorMappingDataStore(),
                     updateBackgroundInformationsDataStore(),
+
                     saveDataToDataStore(process.env.REACT_APP_META_INFOS_NAME, {
                         ...metaData,
                         metadata_version: process.env.REACT_APP_META_DATA_VERSION,
@@ -440,97 +437,55 @@ export const Body = () => {
 
             await Promise.all([
                 loadUserSettings(),
-                loadDataStore(
-                    process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY,
-                    null,
-                    null,
-                    STORES[process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY]
-                ),
-                loadDataStore(
-                    process.env.REACT_APP_INDICATORS_CONFIG_KEY,
-                    null,
-                    null,
-                    STORES[process.env.REACT_APP_INDICATORS_CONFIG_KEY]
-                ),
-                loadDataStore(
-                    process.env.REACT_APP_ANALYSES_CONFIG_KEY,
-                    null,
-                    null,
-
-                    STORES[process.env.REACT_APP_ANALYSES_CONFIG_KEY]
-                ),
-                loadDataStore(
-                    process.env.REACT_APP_PERFORMANCE_FAVORITS_KEY,
-                    null,
-                    null,
-                    STORES[process.env.REACT_APP_PERFORMANCE_FAVORITS_KEY]
-                ),
-                loadDataStore(
-                    process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY,
-                    null,
-                    null,
-                    STORES[process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY]
-                ),
-                loadDataStore(
-                    process.env.REACT_APP_VISUALIZATION_KEY,
-                    null,
-                    null,
-                    STORES[process.env.REACT_APP_VISUALIZATION_KEY]
-                ),
-                loadDataStore(
-                    process.env.REACT_APP_CROSS_CUT_KEY,
-                    null,
-                    null,
-                    STORES[process.env.REACT_APP_CROSS_CUT_KEY]
-                ),
-                loadDataStore(
-                    process.env.REACT_APP_INDICATORS_KEY,
-                    null,
-                    null,
-                    STORES[process.env.REACT_APP_INDICATORS_KEY]
-                ),
-                loadDataStore(
-                    process.env.REACT_APP_REGISTRES_KEY,
-                    null,
-                    null,
-                    STORES[process.env.REACT_APP_REGISTRES_KEY]
-                ),
-                loadDataStore(
-                    process.env.REACT_APP_DE_COMPLETNESS_KEY,
-                    null,
-                    null,
-                    STORES[process.env.REACT_APP_DE_COMPLETNESS_KEY]
-                ),
-                loadDataStore(
-                    process.env.REACT_APP_DS_COMPLETNESS_KEY,
-                    null,
-                    null,
-                    STORES[process.env.REACT_APP_DS_COMPLETNESS_KEY]
-                ),
-                loadDataStore(
-                    process.env.REACT_APP_INDICATORS_MAPPING_KEY,
-                    null,
-                    null,
-                    STORES[process.env.REACT_APP_INDICATORS_MAPPING_KEY]
-                ),
+                loadDataStore(process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY, null, null, []),
+                loadDataStore(process.env.REACT_APP_INDICATORS_CONFIG_KEY, null, null, []),
+                loadDataStore(process.env.REACT_APP_ANALYSES_CONFIG_KEY, null, null, []),
+                loadDataStore(process.env.REACT_APP_PERFORMANCE_FAVORITS_KEY, null, null, []),
+                loadDataStore(process.env.REACT_APP_BACKGROUND_INFORMATION_FAVORITS_KEY, null, null, []),
+                loadDataStore(process.env.REACT_APP_VISUALIZATION_KEY, null, null, []),
+                loadDataStore(process.env.REACT_APP_CROSS_CUT_KEY, null, null, modifierKeyInList(Cross_cuts)),
+                loadDataStore(process.env.REACT_APP_INDICATORS_KEY, null, null, modifierKeyInList(Indicators)),
+                loadDataStore(process.env.REACT_APP_REGISTRES_KEY, null, null, modifierKeyInList(Registres)),
+                loadDataStore(process.env.REACT_APP_DE_COMPLETNESS_KEY, null, null, modifierKeyInList(DE_Completness)),
+                loadDataStore(process.env.REACT_APP_DS_COMPLETNESS_KEY, null, null, modifierKeyInList(DS_Completness)),
+                loadDataStore(process.env.REACT_APP_INDICATORS_MAPPING_KEY, null, null, []),
                 loadDataStore(
                     process.env.REACT_APP_META_INFOS_NAME,
                     null,
                     null,
-                    STORES[process.env.REACT_APP_META_INFOS_NAME]
+                    MetadataInfos && {
+                        ...MetadataInfos,
+                        metadata_version: process.env.REACT_APP_META_DATA_VERSION,
+                        dataStoreSchemaIsUpdated: true
+                    }
                 ),
-                loadDataStore(
-                    process.env.REACT_APP_PERIODS_CONFIG_KEY,
-                    null,
-                    null,
-                    STORES[process.env.REACT_APP_PERIODS_CONFIG_KEY]
-                ),
-                loadDataStore(
-                    process.env.REACT_APP_GLOBAL_SETTING_KEY,
-                    null,
-                    null,
-                    STORES[process.env.REACT_APP_GLOBAL_SETTING_KEY]
-                ),
+                loadDataStore(process.env.REACT_APP_PERIODS_CONFIG_KEY, null, null, {
+                    month1KeyWords: [],
+                    month2KeyWords: [],
+                    month3KeyWords: [],
+                    month4KeyWords: [],
+                    month5KeyWords: [],
+                    month6KeyWords: [],
+                    month7KeyWords: [],
+                    month8KeyWords: [],
+                    month9KeyWords: [],
+                    month10KeyWords: [],
+                    month11KeyWords: [],
+                    month12KeyWords: [],
+                    month13KeyWords: [],
+                    month14KeyWords: [],
+                    month15KeyWords: []
+                }),
+                loadDataStore(process.env.REACT_APP_GLOBAL_SETTING_KEY, null, null, {
+                    DQR: {
+                        nbrIndicator: 5,
+                        nbrRecoupement: 3,
+                        nbrConsistencyOverTime: 1,
+                        nbrDataElementCompleteness: 6,
+                        nbrSourceDocumentCompleteness: 7
+                    },
+                    ERDQ: { nbrIndicator: 3, nbrRecoupement: 3 }
+                }),
                 loadMe()
             ]);
 
@@ -785,6 +740,7 @@ export const Body = () => {
                         className="my-shadow"
                         style={{
                             display: 'flex',
+                            // alignItems: 'center',
                             maxWidth: '500px',
                             padding: '10px',
                             background: '#fff',

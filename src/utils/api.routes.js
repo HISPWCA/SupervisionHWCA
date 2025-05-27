@@ -15,8 +15,7 @@ export const USERS_ROUTE = API_BASE_ROUTE.concat(
     '/users.json?fields=id,displayName,name,organisationUnits[id,path,name,displayName]&paging=false'
 );
 export const SYSTEM_INFOS_ROUTE = API_BASE_ROUTE.concat('/system/info.json');
-// export const DATA_STORE_ROUTE = API_BASE_ROUTE.concat('/dataStore');
-export const DATA_STORE_ROUTE = API_BASE_ROUTE.concat('/userDataStore');
+export const DATA_STORE_ROUTE = API_BASE_ROUTE.concat('/dataStore');
 
 export const PROGRAMS_ROUTE = API_BASE_ROUTE.concat(
     '/programs.json?paging=false&fields=id,name,displayName,programIndicators[id,displayName],programTrackedEntityAttributes[trackedEntityAttribute[id,displayName]]'
