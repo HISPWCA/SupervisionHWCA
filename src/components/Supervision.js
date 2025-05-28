@@ -1464,10 +1464,13 @@ const Supervision = ({ me }) => {
                     }));
             } else {
                 // eventPayload.status = 'SCHEDULE';
-                eventPayload.status = 'ACTIVE';
-                eventPayload.dueDate = payload.period
-                    ? dayjs(payload.period).format('YYYY-MM-DD')
-                    : dayjs().format('YYYY-MM-DD');
+                 eventPayload.status = 'ACTIVE';
+                 eventPayload.eventDate = payload.period
+                     ? dayjs(payload.period).format('YYYY-MM-DD')
+                     : dayjs().format('YYYY-MM-DD');
+                 eventPayload.dueDate = payload.period
+                     ? dayjs(payload.period).format('YYYY-MM-DD')
+                     : dayjs().format('YYYY-MM-DD');
             }
 
             // Ajoute des dataValues superviseurs
@@ -2421,7 +2424,11 @@ const Supervision = ({ me }) => {
                                   value: ev.indicator?.displayName
                               }));
                 } else {
-                    eventPayload.status = 'SCHEDULE';
+                    // eventPayload.status = 'SCHEDULE';
+                    eventPayload.status = 'ACTIVE';
+                    eventPayload.eventDate = payload.period
+                        ? dayjs(payload.period).format('YYYY-MM-DD')
+                        : dayjs().format('YYYY-MM-DD');
                     eventPayload.dueDate = payload.period
                         ? dayjs(payload.period).format('YYYY-MM-DD')
                         : dayjs().format('YYYY-MM-DD');
