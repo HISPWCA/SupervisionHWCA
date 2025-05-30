@@ -1,7 +1,7 @@
 import { CircularLoader, NoticeBox } from '@dhis2/ui';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
-import { ME_ROUTE, ME_SETTINGS_ROUTE, USER_GROUPS_ROUTE } from '../utils/api.routes';
+import { ME_ROUTE, ME_SETTINGS_ROUTE, USER_GROUPS_ROUTE } from './utils/api.routes';
 import {
     PAGE_DASHBOARD,
     PAGE_SUPERVISIONS,
@@ -9,30 +9,30 @@ import {
     PAGE_PAYMENT,
     PAGE_FAVORIS_CREATION,
     PAGE_SCHEDULE
-} from '../utils/constants';
-import { BORDER_COLOR } from '../utils/couleurs';
-import { loadDataStore, modifierKeyInList, saveDataToDataStore } from '../utils/functions';
-import DashboardSchedule from './DashboardSchedule';
-import Dashboard from './Dashboard';
-import Setting from './Setting';
+} from './utils/constants';
+import { BORDER_COLOR } from './utils/couleurs';
+import { loadDataStore, modifierKeyInList, saveDataToDataStore } from './utils/functions';
+import DashboardSchedule from './components/DashboardSchedule';
+import Dashboard from './components/Dashboard';
+import Setting from './components/Setting';
 import Supervision from './Supervision';
 import { AiOutlineSetting } from 'react-icons/ai';
 import { RxDashboard } from 'react-icons/rx';
 import { GrSchedule } from 'react-icons/gr';
 
 import { MdOutlineEditNote } from 'react-icons/md';
-import translate from '../utils/translator';
-import Payment from './Payment';
-import Favorites from './Favorites';
+import translate from './utils/translator';
+import Payment from './components/Payment';
+import Favorites from './components/Favorites';
 import { MdStars } from 'react-icons/md';
 import { v4 as uuid } from 'uuid';
 
-import DE_Completness from '../datastores/DE_Completness.json';
-import DS_Completness from '../datastores/DS_Completness.json';
-import Cross_cuts from '../datastores/Cross_cuts.json';
-import Indicators from '../datastores/Indicators.json';
-import Registres from '../datastores/Registres.json';
-import MetadataInfos from '../datastores/metadataInfos.json';
+import DE_Completness from './datastores/DE_Completness.json';
+import DS_Completness from './datastores/DS_Completness.json';
+import Cross_cuts from './datastores/Cross_cuts.json';
+import Indicators from './datastores/Indicators.json';
+import Registres from './datastores/Registres.json';
+import MetadataInfos from './datastores/metadataInfos.json';
 import { IoCheckmarkDoneCircle } from 'react-icons/io5';
 
 export const Body = () => {

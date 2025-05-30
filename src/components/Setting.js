@@ -62,8 +62,14 @@ import SettingRegistersManagement from './SettingRegistersManagement';
 import SettingCrossChecksManagement from './SettingCrossChecksManagement';
 import SettingDataElementCompletenessManagement from './SettingDataElementCompletenessManagement';
 import SettingSourceDocumentCompletenessManagement from './SettingSourceDocumentCompletenessManagement';
+import SettingList from './SettingList';
+import SettingCreate from './SettingCreate';
 
 const Setting = () => {
+    const [settingPageStates, setSettingPageStates] = useState({
+        page: 'LIST'
+    });
+
     const [currentItem, setCurrentItem] = useState(null);
     const [renderPage, setRenderPage] = useState(PAGE_CONFIGURATION_TYPE_SUPERVISIONS);
     const [programs, setPrograms] = useState([]);
@@ -305,7 +311,8 @@ const Setting = () => {
                 period2: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.period2 || null,
                 period3: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.period3 || null,
                 lastPeriod: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.lastPeriod || null,
-                lastPeriodKeyWords: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.lastPeriodKeyWords || null
+                lastPeriodKeyWords:
+                    fieldList?.consistencyOvertimes?.find(el => el.position === i)?.lastPeriodKeyWords || null
             });
         }
 
@@ -777,89 +784,6 @@ const Setting = () => {
         setCurrentPaymentConfig(null);
     };
 
-    const handleDeleteSupervisionConfig = async item => {
-        try {
-            if (item) {
-                const newList = mappingConfigSupervisions.filter(mapConf => mapConf.id !== item.id);
-                await saveDataToDataStore(process.env.REACT_APP_SUPERVISIONS_CONFIG_KEY, newList, null, null, null);
-                setMappingConfigSupervisions(newList);
-                setNotification({
-                    show: true,
-                    message: translate('Suppression_Effectuee'),
-                    type: NOTIFICATION_SUCCESS
-                });
-
-                setFormState({
-                    selectedConfigurationType: DQR,
-                    selectedSupervisionGenerationType: TYPE_GENERATION_AS_EVENT,
-                    selectedPlanificationType: ORGANISATION_UNIT,
-                    selectedProgramStageForConfiguration: null,
-                    selectedOrganisationUnitGroup: null,
-                    selectedTEIProgram: null,
-                    selectedSupervisorDataElements: [],
-                    selectedStatusSupervisionDataElement: null,
-                    selectedSupervisionAutoGenerateID: null,
-                    selectedNbrIndicatorsToShow: null,
-                    selectedPeriodVerification: null,
-                    selectedIndicatorsPeriodType: null,
-                    selectedConsistencyOverTimePeriodType: null,
-                    globalProgramArea: null,
-                    globalProgramAreaKeyWords: [],
-                    indicators: [],
-                    recoupements: [],
-                    completeness: {
-                        registerKeyWords: [],
-                        selectedNbrDataElementsToShow: null,
-                        selectedNbrDocumentsSourceToShow: null,
-                        selectedRegister: null,
-                        dataElements: [],
-                        sourceDocuments: [],
-                        margin: null,
-                        programAreaDOC: null,
-                        programAreaDE: null
-                    },
-                    consistencyOvertimes: [],
-                    isFieldEditingMode: false
-                });
-
-                setFormStateForRDQA({
-                    selectedProgramStageForConfiguration: null,
-                    selectedOrganisationUnitGroup: null,
-                    selectedSupervisorDataElements: [],
-                    selectedStatusSupervisionDataElement: null,
-                    selectedSupervisionAutoGenerateID: null
-                });
-
-                setPeriodFormState({
-                    month1KeyWords: [],
-                    month2KeyWords: [],
-                    month3KeyWords: [],
-                    month4KeyWords: [],
-                    month5KeyWords: [],
-                    month6KeyWords: [],
-                    month7KeyWords: [],
-                    month8KeyWords: [],
-                    month9KeyWords: [],
-                    month10KeyWords: [],
-                    month11KeyWords: [],
-                    month12KeyWords: [],
-                    month13KeyWords: [],
-                    month14KeyWords: [],
-                    month15KeyWords: []
-                });
-
-                setCurrentProgramstageConfiguration(null);
-                setCurrentProgramstageConfigurationForRDQA(null);
-                setProgramStageConfigurations([]);
-            }
-        } catch (err) {
-            setNotification({
-                show: true,
-                message: err.response?.data?.message || err.message,
-                type: NOTIFICATION_CRITICAL
-            });
-        }
-    };
 
     const handleDeleteVisatualizationProgramConfig = async item => {
         try {
@@ -1697,24 +1621,6 @@ const Setting = () => {
                 </div>
 
                 <div style={{ marginTop: '20px' }}>
-                    {/* <div style={{ marginTop: '5px' }}>
-                        <Radio
-                            label={translate('Generer_Supervision_Comme_TEI')}
-                            onChange={handleSupervisionGenerationType}
-                            value={TYPE_GENERATION_AS_TEI}
-                            checked={formState?.selectedSupervisionGenerationType === TYPE_GENERATION_AS_TEI}
-                            disabled={true}
-                        />
-                    </div>
-                    <div style={{ marginTop: '5px' }}>
-                        <Radio
-                            label={translate('Generer_Supervision_Comme_EN')}
-                            onChange={handleSupervisionGenerationType}
-                            value={TYPE_GENERATION_AS_ENROLMENT}
-                            checked={formState?.selectedSupervisionGenerationType === TYPE_GENERATION_AS_ENROLMENT}
-                            disabled={true}
-                        />
-                    </div> */}
                     <div style={{ marginTop: '5px' }}>
                         <Radio
                             label={translate('Generer_Supervision_Comme_EV')}
@@ -3726,7 +3632,9 @@ const Setting = () => {
 
     const RenderPageSupervisionConfig = () => (
         <>
-            <Row gutter={[8, 10]}>
+            {settingPageStates.page === 'LIST' && <SettingList setSettingPageStates={setSettingPageStates} />}
+            {settingPageStates.page === 'CREATE' && <SettingCreate setSettingPageStates={setSettingPageStates} />}
+            {/* <Row gutter={[8, 10]}>
                 <Col md={12} sm={24}>
                     <div>
                         {RenderSupervisionConfiguration()}
@@ -3842,8 +3750,8 @@ const Setting = () => {
                     )}
 
                     {RenderConfigurationForEachProgramStageList()}
-                </Col>
-            </Row>
+                </Col> 
+            </Row> */}
         </>
     );
 
