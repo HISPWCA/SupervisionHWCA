@@ -1,11 +1,11 @@
 const config = {
-      type: 'app',
-      name: 'Supervision',
-      title: 'Supervision',
-      description: 'Supervision App',
-      entryPoints: {
-            app: './src/App.js'
-      }
+    type: 'app',
+    name: 'Supervision-dynamic',
+    title: 'Supervision-dynamic',
+    description: 'Supervision-dynamic App',
+    entryPoints: {
+        app: './src/App.tsx'
+    }
 };
 
 module.exports = config;

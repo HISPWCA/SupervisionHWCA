@@ -19,8 +19,8 @@ import timezone from 'dayjs/plugin/timezone'
 import axios from 'axios'
 import { loadDataStore } from '../utils/functions'
 
-const quarterOfYear = require('dayjs/plugin/quarterOfYear')
-const weekOfYear = require('dayjs/plugin/weekOfYear')
+import quarterOfYear from 'dayjs/plugin/quarterOfYear'
+import weekOfYear from 'dayjs/plugin/weekOfYear'
 
 dayjs.extend(weekOfYear)
 dayjs.extend(quarterOfYear)

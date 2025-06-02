@@ -37,8 +37,8 @@ import { FaSearch } from 'react-icons/fa';
 import { IoIosArrowRoundForward } from 'react-icons/io';
 import { IoIosArrowRoundBack } from 'react-icons/io';
 
-const quarterOfYear = require('dayjs/plugin/quarterOfYear');
-const weekOfYear = require('dayjs/plugin/weekOfYear');
+import  quarterOfYear from 'dayjs/plugin/quarterOfYear' 
+import weekOfYear from 'dayjs/plugin/weekOfYear' 
 
 dayjs.extend(weekOfYear);
 dayjs.extend(quarterOfYear);

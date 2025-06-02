@@ -36,6 +36,10 @@ import MetadataInfos from '../datastores/metadataInfos.json';
 import { IoCheckmarkDoneCircle } from 'react-icons/io5';
 
 export const Body = () => {
+
+console.log('Env content +++');
+console.log(import.meta);
+
     const [renderPage, setRenderPage] = useState(PAGE_DASHBOARD);
     const [isDataStoreInitialized, setDataStoreInitialized] = useState(false);
     const [errorMessage, setErrorMessage] = useState(null);

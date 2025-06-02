@@ -46,8 +46,8 @@ import translate from '../utils/translator';
 import { v1 as uuid } from 'uuid';
 import { useConfig } from '@dhis2/app-runtime';
 
-const quarterOfYear = require('dayjs/plugin/quarterOfYear');
-const weekOfYear = require('dayjs/plugin/weekOfYear');
+import quarterOfYear from 'dayjs/plugin/quarterOfYear';
+import weekOfYear from 'dayjs/plugin/weekOfYear';
 
 dayjs.extend(weekOfYear);
 dayjs.extend(quarterOfYear);

@@ -107,8 +107,8 @@ import { BLUE, GRAY_DARK, GREEN, ORANGE, RED, WHITE } from '../utils/couleurs';
 import { getDefaultStatusPaymentIfStatusIsNull, getDefaultStatusSupervisionIfStatusIsNull } from './DashboardSchedule';
 import translate, { translateDataStoreLabel } from '../utils/translator';
 import { useConfig } from '@dhis2/app-runtime';
-const quarterOfYear = require('dayjs/plugin/quarterOfYear');
-const weekOfYear = require('dayjs/plugin/weekOfYear');
+import quarterOfYear from 'dayjs/plugin/quarterOfYear'
+import weekOfYear from 'dayjs/plugin/weekOfYear'
 
 dayjs.extend(weekOfYear);
 dayjs.extend(quarterOfYear);
