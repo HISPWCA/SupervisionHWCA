@@ -5,17 +5,17 @@
   "license": "BSD-3-Clause",
   "private": true,
   "scripts": {
-    "build": "d2-app-scripts build --verbose --no-verify --forced && yarn manifest && cd build && cp -r manifest.webapp app && cd app && zip -r ../../Supervision-dynamic.zip * && cd ../../ && rm -r build && mkdir build && mv Supervision-dynamic.zip build && clear",
+    "build": "d2-app-scripts build --no-verify --debug --forced && yarn manifest && cd build && cp -r manifest.webapp app && cd app && zip -r ../../Supervision-dynamic.zip * && cd ../../ && rm -r build && mkdir build && mv Supervision-dynamic.zip build && clear",
     "prod": "yarn build",
     "manifest": "d2-manifest package.json build/manifest.webapp",
     "start": "d2-app-scripts start",
     "test": "d2-app-scripts test",
     "deploy": "d2-app-scripts deploy",
-    "b": "d2-app-scripts build",
+    "b": "d2-app-scripts build --debug",
     "clean": "sudo rm -rf node_modules .d2 && yarn && yarn prod"
   },
   "devDependencies": {
-    "@dhis2/cli-app-scripts": "^10.3.8"
+    "@dhis2/cli-app-scripts": "12.0.0"
   },
   "dependencies": {
     "@ant-design/icons": "^5.1.0",
@@ -38,9 +38,7 @@
     "mantine-react-table": "^1.0.0-beta.8",
     "mapbox-gl": "^2.14.1",
     "maplibre-gl": "^2.4.0",
-    "react": "^19.1.0",
     "react-big-calendar": "^1.6.9",
-    "react-dom": "^19.1.0",
     "react-form-stepper": "^2.0.3",
     "react-icons": "^4.8.0",
     "react-map-gl": "^7.0.23",

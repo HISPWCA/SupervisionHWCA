@@ -13,9 +13,11 @@ import {
 import { BORDER_COLOR } from './utils/couleurs';
 import { loadDataStore, modifierKeyInList, saveDataToDataStore } from './utils/functions';
 import DashboardSchedule from './components/DashboardSchedule';
+
 import Dashboard from './components/Dashboard';
 import Setting from './components/Setting';
-import Supervision from './Supervision';
+// import Supervision from './Supervision';
+
 import { AiOutlineSetting } from 'react-icons/ai';
 import { RxDashboard } from 'react-icons/rx';
 import { GrSchedule } from 'react-icons/gr';
@@ -23,7 +25,8 @@ import { GrSchedule } from 'react-icons/gr';
 import { MdOutlineEditNote } from 'react-icons/md';
 import translate from './utils/translator';
 import Payment from './components/Payment';
-import Favorites from './components/Favorites';
+// import Favorites from './components/Favorites';
+
 import { MdStars } from 'react-icons/md';
 import { v4 as uuid } from 'uuid';
 
@@ -678,7 +681,7 @@ export const Body = () => {
             case PAGE_DASHBOARD:
                 return (
                     <div className="my-scrollable" style={{ height: '100%', width: '100%', overflowY: 'scroll' }}>
-                        <Dashboard me={me} />
+                        {/* <Dashboard me={me} /> */}
                     </div>
                 );
 
@@ -699,28 +702,28 @@ export const Body = () => {
             case PAGE_SUPERVISIONS:
                 return (
                     <div className="my-scrollable" style={{ height: '100%', width: '100%', overflowY: 'scroll' }}>
-                        <Supervision me={me} />
+                        {/* <Supervision me={me} /> */}
                     </div>
                 );
 
             case PAGE_FAVORIS_CREATION:
                 return (
                     <div className="my-scrollable" style={{ height: '100%', width: '100%', overflowY: 'scroll' }}>
-                        <Favorites me={me} />
+                        {/* <Favorites me={me} /> */}
                     </div>
                 );
 
             case PAGE_SETTINGS:
                 return (
                     <div className="my-scrollable" style={{ height: '100%', width: '100%', overflowY: 'scroll' }}>
-                        <Setting me={me} />
+                        {/* <Setting me={me} /> */}
                     </div>
                 );
 
             default:
                 return (
                     <div className="my-scrollable" style={{ height: '100%', width: '100%', overflowY: 'scroll' }}>
-                        <Dashboard me={me} />
+                        {/* <Dashboard me={me} /> */}
                     </div>
                 );
         }
@@ -734,7 +737,7 @@ export const Body = () => {
 
     return (
         <>
-            <div className="app">
+            {/* <div className="app">
                 {loadingDataStoreInitialization && (
                     <div
                         className="my-shadow"
@@ -776,7 +779,7 @@ export const Body = () => {
                         </NoticeBox>
                     </div>
                 )}
-            </div>
+            </div> */}
         </>
     );
 };

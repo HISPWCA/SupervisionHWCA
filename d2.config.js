@@ -4,7 +4,7 @@ const config = {
     title: 'Supervision-dynamic',
     description: 'Supervision-dynamic App',
     entryPoints: {
-        app: './src/App.js'
+        app: './src/App.jsx'
     }
 };
 
