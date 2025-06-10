@@ -57,8 +57,8 @@ dayjs.locale('fr-FR');
 
 const localizer = dayjsLocalizer(dayjs);
 
-export const getDefaultStatusSupervisionIfStatusIsNull = _ => SCHEDULED.value;
-export const getDefaultStatusPaymentIfStatusIsNull = _ => NA.value;
+export const getDefaultStatusSupervisionIfStatusIsNull = (_?:any) => SCHEDULED.value;
+export const getDefaultStatusPaymentIfStatusIsNull = (_?:any) => NA.value;
 export const Dashboard = ({ me }) => {
     const { apiVersion } = useConfig();
     const [organisationUnits, setOrganisationUnits] = useState([]);

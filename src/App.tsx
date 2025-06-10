@@ -6,8 +6,6 @@ import 'antd/dist/reset.css';
 import './App.css';
 
 
-
-
 const App = () => <Body />;
 
 export default App;

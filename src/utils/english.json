@@ -407,5 +407,7 @@
     "ConsistencyOverTime_Period_Type": "Consistency Over time period type",
     "CurrentPeriodKeyWords": "Current period keywords",
     "CurrentPeriodOnYearAgoKeyWords": "Current period One year ago keywords",
-    "LastPeriodKeyWords": "Last period Keywords"
+    "LastPeriodKeyWords": "Last period Keywords",
+    "Please_Select_System_Assessment": "Please select the system assessment",
+    "System_Assessment": "System Assessment"
 }

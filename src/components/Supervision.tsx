@@ -21,6 +21,7 @@ import { IoMdAdd } from 'react-icons/io';
 import { IoListCircleOutline } from 'react-icons/io5';
 import { MdOutlineSettingsBackupRestore } from 'react-icons/md';
 import { FcInfo } from 'react-icons/fc';
+import { Accordion, AccordionItem } from '@szhsin/react-accordion';
 
 import {
     Button,
@@ -107,125 +108,127 @@ import { BLUE, GRAY_DARK, GREEN, ORANGE, RED, WHITE } from '../utils/couleurs';
 import { getDefaultStatusPaymentIfStatusIsNull, getDefaultStatusSupervisionIfStatusIsNull } from './DashboardSchedule';
 import translate, { translateDataStoreLabel } from '../utils/translator';
 import { useConfig } from '@dhis2/app-runtime';
-import quarterOfYear from 'dayjs/plugin/quarterOfYear'
-import weekOfYear from 'dayjs/plugin/weekOfYear'
+import quarterOfYear from 'dayjs/plugin/quarterOfYear';
+import weekOfYear from 'dayjs/plugin/weekOfYear';
+import GenerateFields from './GenerateFields';
 
 dayjs.extend(weekOfYear);
 dayjs.extend(quarterOfYear);
 dayjs.extend(customParseFormat);
 
 const Supervision = ({ me }) => {
-    const [dataStoreSupervisionConfigs, setDataStoreSupervisionConfigs] = useState([]);
-    const [dataStoreIndicatorConfigs, setDataStoreIndicatorConfigs] = useState([]);
+    const [dataStoreSupervisionConfigs, setDataStoreSupervisionConfigs] = useState<any>([]);
+    const [dataStoreIndicatorConfigs, setDataStoreIndicatorConfigs] = useState<any>([]);
 
-    const [dataStoreIndicators, setDataStoreIndicators] = useState([]);
-    const [dataStoreCrosschecks, setDataStoreCrosschecks] = useState([]);
-    const [dataStoreDECompletness, setDataStoreDECompletness] = useState([]);
-    const [dataStoreDSCompletness, setDataStoreDSCompletness] = useState([]);
-    const [dataStoreRegistres, setDataStoreRegistres] = useState([]);
+    const [dataStoreIndicators, setDataStoreIndicators] = useState<any>([]);
+    const [dataStoreCrosschecks, setDataStoreCrosschecks] = useState<any>([]);
+    const [dataStoreDECompletness, setDataStoreDECompletness] = useState<any>([]);
+    const [dataStoreDSCompletness, setDataStoreDSCompletness] = useState<any>([]);
+    const [dataStoreRegistres, setDataStoreRegistres] = useState<any>([]);
 
-    const [dataStoreIndicatorsMapping, setDataStoreIndicatorsMapping] = useState([]);
-    const { apiVersion } = useConfig();
+    const [dataStoreIndicatorsMapping, setDataStoreIndicatorsMapping] = useState<any>([]);
+    const { apiVersion }: any = useConfig();
 
-    const [isEditionMode, setEditionMode] = useState(false);
+    const [isEditionMode, setEditionMode] = useState<any>(false);
 
-    const [noticeBox, setNoticeBox] = useState({
+    const [noticeBox, setNoticeBox] = useState<any>({
         show: false,
         message: null,
         title: null,
         type: NOTICE_BOX_DEFAULT
     });
 
-    const [notification, setNotification] = useState({
+    const [notification, setNotification] = useState<any>({
         show: false,
         message: null,
         type: null
     });
 
-    const [organisationUnits, setOrganisationUnits] = useState([]);
-    const [programs, setPrograms] = useState([]);
-    const [users, setUsers] = useState([]);
-    const [organisationUnitGroupSets, setOrganisationUnitGroupSets] = useState([]);
-    const [programStages, setProgramStages] = useState([]);
-    const [isNewMappingMode, setIsNewMappingMode] = useState(false);
-    const [mappingConfigs, setMappingConfigs] = useState([]);
-    const [nonTranslateMappingConfigs, setNonTranslateMappingConfigs] = useState([]);
-    const [analyticIndicatorResults, setAnalyticIndicatorResults] = useState([]);
-    const [randomResults, setRandomResults] = useState([]);
-    const [_, setAnalyticErrorMessage] = useState(null);
-    const [teisList, setTeisList] = useState([]);
-    const [isEmpty, setEmpty] = useState(false);
-    const [allSupervisionsFromTracker, setAllSupervisionsFromTracker] = useState([]);
-    const [organisationUnitGroups, setOrganisationUnitGroups] = useState([]);
-    const [teisPerformanceList, setTeisPerformanceList] = useState([]);
-    const [equipeList, setEquipeList] = useState([]);
-    const [favoritPerformanceList, setFavoritPerformanceList] = useState([]);
-    const [dataElementGroups, setDataElementGroups] = useState([]);
-    const [favoritBackgroundInformationList, setFavoritBackgroundInformationList] = useState([]);
+    const [organisationUnits, setOrganisationUnits] = useState<any>([]);
+    const [programs, setPrograms] = useState<any>([]);
+    const [users, setUsers] = useState<any>([]);
+    const [organisationUnitGroupSets, setOrganisationUnitGroupSets] = useState<any>([]);
+    const [programStages, setProgramStages] = useState<any>([]);
+    const [isNewMappingMode, setIsNewMappingMode] = useState<any>(false);
+    const [mappingConfigs, setMappingConfigs] = useState<any>([]);
+    const [nonTranslateMappingConfigs, setNonTranslateMappingConfigs] = useState<any>([]);
+    const [analyticIndicatorResults, setAnalyticIndicatorResults] = useState<any>([]);
+    const [randomResults, setRandomResults] = useState<any>([]);
+    const [_, setAnalyticErrorMessage] = useState<any>(null);
+    const [teisList, setTeisList] = useState<any>([]);
+    const [isEmpty, setEmpty] = useState<any>(false);
+    const [allSupervisionsFromTracker, setAllSupervisionsFromTracker] = useState<any>([]);
+    const [organisationUnitGroups, setOrganisationUnitGroups] = useState<any>([]);
+    const [teisPerformanceList, setTeisPerformanceList] = useState<any>([]);
+    const [equipeList, setEquipeList] = useState<any>([]);
+    const [favoritPerformanceList, setFavoritPerformanceList] = useState<any>([]);
+    const [dataElementGroups, setDataElementGroups] = useState<any>([]);
+    const [favoritBackgroundInformationList, setFavoritBackgroundInformationList] = useState<any>([]);
 
-    const [visibleTeamLeadContent, setVisibleTeamLeadContent] = useState(false);
-    const [visibleAnalyticComponentModal, setVisibleAnalyticComponentModal] = useState(false);
-    const [visibleAnalyticComponentPerformanceModal, setVisibleAnalyticComponentPerformanceModal] = useState(false);
-    const [visibleAddEquipeModal, setVisibleAddEquipeModal] = useState(false);
-    const [visibleAddFavoritPerformanceModal, setVisibleAddFavoritPerformanceModal] = useState(false);
+    const [visibleTeamLeadContent, setVisibleTeamLeadContent] = useState<any>(false);
+    const [visibleAnalyticComponentModal, setVisibleAnalyticComponentModal] = useState<any>(false);
+    const [visibleAnalyticComponentPerformanceModal, setVisibleAnalyticComponentPerformanceModal] =
+        useState<any>(false);
+    const [visibleAddEquipeModal, setVisibleAddEquipeModal] = useState<any>(false);
+    const [visibleAddFavoritPerformanceModal, setVisibleAddFavoritPerformanceModal] = useState<any>(false);
 
     const [selectedBackgroundInformationTypeConfiguration, setSelectedBackgroundInformationTypeConfiguration] =
-        useState(DIRECTE);
-    const [selectedBackgroundInformationFavorit, setSelectedBackgroundInformationFavorit] = useState([]);
+        useState<any>(DIRECTE);
+    const [selectedBackgroundInformationFavorit, setSelectedBackgroundInformationFavorit] = useState<any>([]);
 
-    const [selectedTeamLead, setSelectedTeamLead] = useState(null);
-    const [selectedStep, setSelectedStep] = useState(0);
-    const [selectedSupervisionType, setSelectedSupervisionType] = useState(null);
-    const [selectedProgram, setSelectedProgram] = useState(null);
-    const [selectedPlanificationType, setSelectedPlanificationType] = useState(null);
-    const [selectedOrganisationUnits, setSelectedOrganisationUnits] = useState([]);
-    const [selectedIndicators, setSelectedIndicators] = useState([]);
-    const [selectedPeriod, setSelectedPeriod] = useState(null);
-    const [selectedOrganisationUnitGroupSet, setSelectedOrganisationUnitGroupSet] = useState(null);
-    const [selectedOrganisationUnitGroup, setSelectedOrganisationUnitGroup] = useState(null);
-    const [selectedPeriodType, setSelectedPeriodType] = useState(null);
-    const [selectedProgramStage, setSelectedProgramStage] = useState(null);
-    const [selectedDataElement, setSelectedDataElement] = useState(null);
-    const [selectedMetaDatas, setSelectedMetaDatas] = useState([]);
-    const [selectedOrganisationUnitSingle, setSelectedOrganisationUnitSingle] = useState(null);
-    const [selectedAgents, setSelectedAgents] = useState([]);
-    const [selectedSupervisionsConfigProgram, setSelectedSupervisionConfigProgram] = useState(null);
-    const [selectedOrgUnitSupervisionFromTracker, setSelectedOrgUnitSupervisionFromTracker] = useState(null);
-    const [selectedPeriodSupervisionConfig, setSelectedPeriodSupervisionConfig] = useState(null);
-    const [selectedOrganisationUnitGroups, setSelectedOrganisationUnitGroups] = useState([]);
-    const [selectedEquipeSuperviseurs, setSelectedEquipeSuperviseurs] = useState([]);
-    const [selectedEquipeAutreSuperviseurs, setSelectedEquipeAutreSuperviseurs] = useState([]);
-    const [selectedSelectionTypeForPerformance, setSelectedSelectionTypeForPerformance] = useState(DIRECTE);
-    const [selectedElementForPerformances, setSelectedElementForPerformances] = useState([]);
-    const [selectedFavoritForPerformance, setSelectedFavoritForPerformance] = useState(null);
+    const [selectedTeamLead, setSelectedTeamLead] = useState<any>(null);
+    const [selectedStep, setSelectedStep] = useState<any>(0);
+    const [selectedSupervisionType, setSelectedSupervisionType] = useState<any>(null);
+    const [selectedProgram, setSelectedProgram] = useState<any>(null);
+    const [selectedPlanificationType, setSelectedPlanificationType] = useState<any>(null);
+    const [selectedOrganisationUnits, setSelectedOrganisationUnits] = useState<any>([]);
+    const [selectedIndicators, setSelectedIndicators] = useState<any>([]);
+    const [selectedPeriod, setSelectedPeriod] = useState<any>(null);
+    const [selectedOrganisationUnitGroupSet, setSelectedOrganisationUnitGroupSet] = useState<any>(null);
+    const [selectedOrganisationUnitGroup, setSelectedOrganisationUnitGroup] = useState<any>(null);
+    const [selectedPeriodType, setSelectedPeriodType] = useState<any>(null);
+    const [selectedProgramStage, setSelectedProgramStage] = useState<any>(null);
+    const [selectedDataElement, setSelectedDataElement] = useState<any>(null);
+    const [selectedMetaDatas, setSelectedMetaDatas] = useState<any>([]);
+    const [selectedOrganisationUnitSingle, setSelectedOrganisationUnitSingle] = useState<any>(null);
+    const [selectedAgents, setSelectedAgents] = useState<any>([]);
+    const [selectedSupervisionsConfigProgram, setSelectedSupervisionConfigProgram] = useState<any>(null);
+    const [selectedOrgUnitSupervisionFromTracker, setSelectedOrgUnitSupervisionFromTracker] = useState<any>(null);
+    const [selectedPeriodSupervisionConfig, setSelectedPeriodSupervisionConfig] = useState<any>(null);
+    const [selectedOrganisationUnitGroups, setSelectedOrganisationUnitGroups] = useState<any>([]);
+    const [selectedEquipeSuperviseurs, setSelectedEquipeSuperviseurs] = useState<any>([]);
+    const [selectedEquipeAutreSuperviseurs, setSelectedEquipeAutreSuperviseurs] = useState<any>([]);
+    const [selectedSelectionTypeForPerformance, setSelectedSelectionTypeForPerformance] = useState<any>(DIRECTE);
+    const [selectedElementForPerformances, setSelectedElementForPerformances] = useState<any>([]);
+    const [selectedFavoritForPerformance, setSelectedFavoritForPerformance] = useState<any>(null);
 
-    const [inputFavorisName, setInputFavoritName] = useState('');
-    const [inputEquipeAutreSuperviseur, setInputEquipeAutreSuperviseur] = useState('');
-    const [inputMeilleur, setInputMeilleur] = useState(0);
-    const [inputMauvais, setInputMauvais] = useState(0);
-    const [inputMeilleurPositif, setInputMeilleurPositif] = useState(true);
-    const [inputFields, setInputFields] = useState([]);
-    const [inputDataSourceDisplayName, setInputDataSourceDisplayName] = useState('');
-    const [inputDataSourceID, setInputDataSourceID] = useState(null);
-    const [inputEquipeName, setInputEquipeName] = useState('');
-    const [inputNbrOrgUnit, setInputNbrOrgUnit] = useState(0);
+    const [inputFavorisName, setInputFavoritName] = useState<any>('');
+    const [inputEquipeAutreSuperviseur, setInputEquipeAutreSuperviseur] = useState<any>('');
+    const [inputMeilleur, setInputMeilleur] = useState<any>(0);
+    const [inputMauvais, setInputMauvais] = useState<any>(0);
+    const [inputMeilleurPositif, setInputMeilleurPositif] = useState<any>(true);
+    const [inputFields, setInputFields] = useState<any[]>([]);
+    const [inputDataSourceDisplayName, setInputDataSourceDisplayName] = useState<any>('');
+    const [inputDataSourceID, setInputDataSourceID] = useState<any>(null);
+    const [inputEquipeName, setInputEquipeName] = useState<any>('');
+    const [inputNbrOrgUnit, setInputNbrOrgUnit] = useState<any>(0);
 
-    const [loadingDataStoreSupervisionConfigs, setLoadingDataStoreSupervisionConfigs] = useState(false);
-    const [loadingDataStoreIndicatorConfigs, setLoadingDataStoreIndicatorConfigs] = useState(false);
-    const [loadingOrganisationUnits, setLoadingOrganisationUnits] = useState(false);
-    const [loadingOrganisationUnitGroupSets, setLoadingOrganisationUnitGroupSets] = useState(false);
-    const [loadingUsers, setLoadingUsers] = useState(false);
-    const [loadingProgramStages, setLoadingProgramStages] = useState(false);
-    const [loadingSupervisionPlanification, setLoadingSupervisionPlanification] = useState(false);
-    const [loadingAnalyticIndicatorResults, setLoadingAnalyticIndicatorResults] = useState(false);
-    const [loadingTeiList, setLoadingTeiList] = useState(false);
-    const [loadingAllSupervisionsFromTracker, setLoadingAllSupervisionsFromTracker] = useState(false);
-    const [loadingOrgUnitsSupervisionsFromTracker, setLoadingOrgUnitsSupervisionsFromTracker] = useState(false);
-    const [loadingOrganisationUnitGroups, setLoadingOrganisationUnitGroups] = useState(false);
-    const [loadingPerformanceFavoritsConfigs, setLoadingPerformanceFavoritsConfigs] = useState(false);
+    const [loadingDataStoreSupervisionConfigs, setLoadingDataStoreSupervisionConfigs] = useState<any>(false);
+    const [loadingDataStoreIndicatorConfigs, setLoadingDataStoreIndicatorConfigs] = useState<any>(false);
+    const [loadingOrganisationUnits, setLoadingOrganisationUnits] = useState<any>(false);
+    const [loadingOrganisationUnitGroupSets, setLoadingOrganisationUnitGroupSets] = useState<any>(false);
+    const [loadingUsers, setLoadingUsers] = useState<any>(false);
+    const [loadingProgramStages, setLoadingProgramStages] = useState<any>(false);
+    const [loadingSupervisionPlanification, setLoadingSupervisionPlanification] = useState<any>(false);
+    const [loadingAnalyticIndicatorResults, setLoadingAnalyticIndicatorResults] = useState<any>(false);
+    const [loadingTeiList, setLoadingTeiList] = useState<any>(false);
+    const [loadingAllSupervisionsFromTracker, setLoadingAllSupervisionsFromTracker] = useState<any>(false);
+    const [loadingOrgUnitsSupervisionsFromTracker, setLoadingOrgUnitsSupervisionsFromTracker] = useState<any>(false);
+    const [loadingOrganisationUnitGroups, setLoadingOrganisationUnitGroups] = useState<any>(false);
+    const [loadingPerformanceFavoritsConfigs, setLoadingPerformanceFavoritsConfigs] = useState<any>(false);
     const [loadingBackgroundInformationFavoritsConfigs, setLoadingBackgroundInformationFavoritsConfigs] =
-        useState(false);
-    const [loadingDataElementGroups, setLoadingDataElementGroups] = useState(false);
+        useState<any>(false);
+    const [loadingDataElementGroups, setLoadingDataElementGroups] = useState<any>(false);
 
     const periodTypesOptions = () => {
         return [
@@ -252,32 +255,32 @@ const Supervision = ({ me }) => {
         ];
     };
 
-    const disabledDate = current => {
+    const disabledDate = (current: any) => {
         return current && dayjs(new Date()).subtract(1, 'day').isBefore(current) ? false : true;
     };
 
-    const isAssigned = orgId => {
+    const isAssigned = (orgId: string) => {
         if (selectedProgram?.program?.id && orgId) {
-            const prog_ous = programs?.find(p => p.id === selectedProgram?.program?.id)?.organisationUnits || [];
-            return prog_ous?.map(o => o.id)?.includes(orgId) || false;
+            const prog_ous = programs?.find((p: any) => p.id === selectedProgram?.program?.id)?.organisationUnits || [];
+            return prog_ous?.map((o: any) => o.id)?.includes(orgId) || false;
         }
 
         return false;
     };
 
-    const handleCancelEvent = async rowEvent => {
+    const handleCancelEvent = async (rowEvent: any) => {
         try {
             const correctProgramStageFromDataStore =
                 selectedSupervisionsConfigProgram?.programStageConfigurations?.find(
-                    p => p.programStage && p.programStage.id === rowEvent.programStageId
+                    (p: any) => p.programStage && p.programStage.id === rowEvent.programStageId
                 );
 
             if (!correctProgramStageFromDataStore) throw new Error('No program Stage configurated');
 
             const newDataValues = rowEvent.dataValues
-                ?.map(dv => dv.dataElement)
+                ?.map((dv: { dataElement: any }) => dv.dataElement)
                 .includes(correctProgramStageFromDataStore.statusSupervisionField?.id)
-                ? rowEvent.dataValues?.map(dvEl => {
+                ? rowEvent.dataValues?.map((dvEl: any) => {
                       if (correctProgramStageFromDataStore.statusSupervisionField?.id === dvEl) {
                           return {
                               ...dvEl,
@@ -829,11 +832,11 @@ const Supervision = ({ me }) => {
         }
     };
 
-    const loadProgramStages = async (programID, setState = null) => {
+    const loadProgramStages = async (programID?: string, setState?: any) => {
         try {
             !setState && setLoadingProgramStages(true);
 
-            let route = `${PROGRAMS_STAGE_ROUTE},program,programStageDataElements[dataElement[id,displayName,dataElementGroups]]`;
+            let route = `${PROGRAMS_STAGE_ROUTE},program,programStageDataElements[dataElement[id,displayName,dataElementGroups, optionSet[id,options[id,code,displayName]] , optionSetValue ]]`;
             if (programID) route = `${route}&filter=program.id:eq:${programID}`;
 
             const response = await axios.get(route);
@@ -1101,13 +1104,13 @@ const Supervision = ({ me }) => {
                                 )[0]?.orgUnitName,
                                 statusSupervision:
                                     found_event?.dataValues?.find(
-                                        dv =>
+                                        (dv: any) =>
                                             dv.dataElement ===
                                             selectedSupervisionsConfigProgram?.statusSupervision?.dataElement?.id
                                     )?.value || getDefaultStatusSupervisionIfStatusIsNull(),
                                 statusPayment:
                                     found_event?.dataValues?.find(
-                                        dv =>
+                                        (dv: any) =>
                                             dv.dataElement ===
                                             selectedSupervisionsConfigProgram?.statusPayment?.dataElement?.id
                                     )?.value || getDefaultStatusPaymentIfStatusIsNull()
@@ -1378,7 +1381,7 @@ const Supervision = ({ me }) => {
         }
     };
 
-    const createEnrollment = async enrollment => {
+    const createEnrollment = async (enrollment: any) => {
         try {
             const response = await axios.post(`${ENROLLMENTS_ROUTE}`, enrollment);
             return response.data;
@@ -1396,37 +1399,37 @@ const Supervision = ({ me }) => {
         }
     };
 
-    const generateTeiWithEnrollmentWithEvents = async payload => {
+    const generateTeiWithEnrollmentWithEvents = async (payload: any) => {
         try {
-            const currentProgram = await axios.get(
+            const currentProgram: any = await axios.get(
                 `${PROGS_ROUTE}/${selectedProgram?.program?.id}?fields=id,displayName,trackedEntityType,programStages[id,programStageDataElements[dataElement]],programTrackedEntityAttributes[trackedEntityAttribute]`
             );
             if (!currentProgram.data) throw new Error(translate('Programme_Non_Trouver'));
 
-            const autoGenerateUIDForSupervision =
+            const autoGenerateUIDForSupervision: any =
                 selectedProgram?.selectedSupervisionAutoGenerateID?.id || 'WzghGqeASL5';
 
-            const generatedCode = await generatedAutoCode(autoGenerateUIDForSupervision);
+            const generatedCode: any = await generatedAutoCode(autoGenerateUIDForSupervision);
 
-            const tei = {
+            const tei: any = {
                 trackedEntityType: currentProgram.data.trackedEntityType.id,
                 orgUnit: payload.orgUnit,
                 attributes: [{ attribute: generatedCode.ownerUid, value: generatedCode.value }]
             };
 
-            const createdTEI = await createTei(tei);
-            const tei_id = createdTEI?.response?.importSummaries[0]?.reference;
+            const createdTEI: any = await createTei(tei);
+            const tei_id: any = createdTEI?.response?.importSummaries[0]?.reference;
 
             if (!tei_id) throw new Error(translate('Erreur_Creation_TEI'));
 
-            const enrollment = {
+            const enrollment: any = {
                 orgUnit: payload.orgUnit,
                 trackedEntityInstance: tei_id,
                 program: payload.program
             };
 
-            const createdEnrollment = await createEnrollment(enrollment);
-            const enrollment_id = createdEnrollment?.response?.importSummaries[0]?.reference;
+            const createdEnrollment: any = await createEnrollment(enrollment);
+            const enrollment_id: any = createdEnrollment?.response?.importSummaries[0]?.reference;
 
             if (!enrollment_id)
                 throw new Error(
@@ -1435,10 +1438,10 @@ const Supervision = ({ me }) => {
                 );
 
             // const availableProgramStages = [];
-            const newEventsList = [];
+            const newEventsList: any[] = [];
 
             // for (let stage of availableProgramStages) {
-            const eventPayload = {
+            const eventPayload: any = {
                 eventDate: payload.period ? dayjs(payload.period).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
                 program: payload.program,
                 orgUnit: payload.orgUnit,
@@ -1464,18 +1467,18 @@ const Supervision = ({ me }) => {
                     }));
             } else {
                 // eventPayload.status = 'SCHEDULE';
-                 eventPayload.status = 'ACTIVE';
-                 eventPayload.eventDate = payload.period
-                     ? dayjs(payload.period).format('YYYY-MM-DD')
-                     : dayjs().format('YYYY-MM-DD');
-                 eventPayload.dueDate = payload.period
-                     ? dayjs(payload.period).format('YYYY-MM-DD')
-                     : dayjs().format('YYYY-MM-DD');
+                eventPayload.status = 'ACTIVE';
+                eventPayload.eventDate = payload.period
+                    ? dayjs(payload.period).format('YYYY-MM-DD')
+                    : dayjs().format('YYYY-MM-DD');
+                eventPayload.dueDate = payload.period
+                    ? dayjs(payload.period).format('YYYY-MM-DD')
+                    : dayjs().format('YYYY-MM-DD');
             }
 
             // Ajoute des dataValues superviseurs
             if (payload.programStageConfig?.supervisorField?.length > 0) {
-                const newDataValues = [];
+                const newDataValues: any[] = [];
 
                 /*
                  * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son INFÉRIEUR au nombres de superviseurs sélectionnés
@@ -1534,12 +1537,12 @@ const Supervision = ({ me }) => {
                     for (let i = 0; i < payload.programStageConfig?.supervisorField?.length; i++) {
                         for (let j = 0; j < newSupervisorsList.length; j++) {
                             if (i === j) {
-                                const currentDE = payload.programStageConfig?.supervisorField[i];
-                                const currentSUP = newSupervisorsList[j];
+                                const currentDE: any = payload.programStageConfig?.supervisorField[i];
+                                const currentSUP: any = newSupervisorsList[j];
                                 if (
                                     currentDE &&
                                     currentSUP &&
-                                    !newDataValues.map(dv => dv.dataElement).includes(currentDE.id)
+                                    !newDataValues.map((dv: any) => dv.dataElement).includes(currentDE.id)
                                 ) {
                                     newDataValues.push({
                                         dataElement: currentDE.id,
@@ -1558,12 +1561,12 @@ const Supervision = ({ me }) => {
                     for (let i = 0; i < payload.programStageConfig?.supervisorField?.length; i++) {
                         for (let j = 0; j < newSupervisorsList?.length; j++) {
                             if (i === j) {
-                                const currentDE = payload.programStageConfig?.supervisorField[i];
-                                const currentSUP = newSupervisorsList[j];
+                                const currentDE: any = payload.programStageConfig?.supervisorField[i];
+                                const currentSUP: any = newSupervisorsList[j];
                                 if (
                                     currentDE &&
                                     currentSUP &&
-                                    !newDataValues.map(dv => dv.dataElement).includes(currentDE.id)
+                                    !newDataValues.map((dv: any) => dv.dataElement).includes(currentDE.id)
                                 ) {
                                     newDataValues.push({
                                         dataElement: currentDE.id,
@@ -1582,7 +1585,7 @@ const Supervision = ({ me }) => {
 
             const selectedPeriodVerification = payload.programStageConfig?.selectedPeriodVerification;
             if (selectedPeriodVerification && payload.periodVerification) {
-                const newPayl = {
+                const newPayl: any = {
                     value: payload.periodVerification,
                     dataElement: selectedPeriodVerification.id
                 };
@@ -1590,31 +1593,31 @@ const Supervision = ({ me }) => {
             }
 
             // Period implémentation for indicator
-            let newDataValueAsListofArrayForIndicators = [];
-            const newIndicatorsPeriodTypes = [];
+            let newDataValueAsListofArrayForIndicators: any[] = [];
+            const newIndicatorsPeriodTypes: any[] = [];
             if (payload.programStageConfig?.indicators?.length > 0 && payload.periodVerification) {
                 const indicatorsList = payload.programStageConfig?.indicators;
                 const lastCrossCheckWhichIsStockData =
                     payload.programStageConfig?.recoupements[payload.programStageConfig?.recoupements.length - 1];
 
                 newDataValueAsListofArrayForIndicators = await Promise.all(
-                    eventPayload.dataValues?.map(async dv => {
-                        const newDvList = [];
-                        const foundInd = indicatorsList.find(ind => ind.value?.id === dv.dataElement);
-                        const foundRecoup =
+                    eventPayload.dataValues?.map(async (dv: any) => {
+                        const newDvList: any[] = [];
+                        const foundInd: any = indicatorsList.find((ind: any) => ind.value?.id === dv.dataElement);
+                        const foundRecoup: any =
                             lastCrossCheckWhichIsStockData?.primaryValue?.id === dv.dataElement &&
                             lastCrossCheckWhichIsStockData;
 
                         if (foundInd) {
-                            const newObject = dataStoreIndicatorsMapping?.find(
-                                d =>
+                            const newObject: any = dataStoreIndicatorsMapping?.find(
+                                (d: any) =>
                                     d.indicator ===
                                     mappingConfigs
-                                        .filter(ev => ev.programStage?.id === payload.programStage?.id)
-                                        ?.find(ev => ev.indicator?.displayName === dv.value)?.indicator?.id
+                                        .filter((ev: any) => ev.programStage?.id === payload.programStage?.id)
+                                        ?.find((ev: any) => ev.indicator?.displayName === dv.value)?.indicator?.id
                             );
-                            const foundAggrageMappingElement = newObject?.dhis2;
-                            const periodType = newObject?.periodType || 'Monthly';
+                            const foundAggrageMappingElement: any = newObject?.dhis2;
+                            const periodType: any = newObject?.periodType || 'Monthly';
 
                             if (periodType && foundAggrageMappingElement) {
                                 newIndicatorsPeriodTypes.push({
@@ -1640,7 +1643,7 @@ const Supervision = ({ me }) => {
                                 const elementMONTH_14 = foundInd?.DHIS2MonthlyValue14;
                                 const elementMONTH_15 = foundInd?.DHIS2MonthlyValue15;
 
-                                let periodPayload = {
+                                let periodPayload: any = {
                                     eventDate: eventPayload.eventDate,
                                     orgUnit: eventPayload.orgUnit,
                                     trackedEntityInstance: eventPayload.trackedEntityInstance,
@@ -2055,19 +2058,21 @@ const Supervision = ({ me }) => {
 
                         if (foundRecoup) {
                             const foundAggrageMappingElementParentRecoup = dataStoreIndicatorsMapping?.find(
-                                d =>
+                                (d: any) =>
                                     d.indicator ===
                                     mappingConfigs
-                                        .filter(ev => ev.programStage?.id === payload.programStage?.id)
-                                        .find(ev => ev.indicator?.displayName === dv.value)?.indicator?.id
+                                        .filter((ev: any) => ev.programStage?.id === payload.programStage?.id)
+                                        .find((ev: any) => ev.indicator?.displayName === dv.value)?.indicator?.id
                             );
 
                             if (foundAggrageMappingElementParentRecoup) {
                                 const concerningStockIndicatorChildren =
                                     dataStoreIndicators
-                                        ?.find(group => group.name === foundAggrageMappingElementParentRecoup.group)
+                                        ?.find(
+                                            (group: any) => group.name === foundAggrageMappingElementParentRecoup.group
+                                        )
                                         ?.children?.filter(
-                                            child =>
+                                            (child: any) =>
                                                 child.isStock &&
                                                 child.parent === foundAggrageMappingElementParentRecoup.indicator
                                         ) || [];
@@ -2130,9 +2135,9 @@ const Supervision = ({ me }) => {
             if (newIndicatorsPeriodTypes?.length > 0 && selectedIndicatorsPeriodType) {
                 const typePayload = {
                     value: newIndicatorsPeriodTypes
-                        .sort((a, b) => a.position - b.position)
-                        .filter(e => e.periodType)
-                        .map(e => e.periodType)
+                        .sort((a: any, b: any) => a.position - b.position)
+                        .filter((e: any) => e.periodType)
+                        .map((e: any) => e.periodType)
                         .join(' '),
                     dataElement: selectedIndicatorsPeriodType.id
                 };
@@ -2142,23 +2147,23 @@ const Supervision = ({ me }) => {
 
             // period implémentation for consistency over time
 
-            let newDataValueAsListofArrayForConsistencyOverTime = [];
-            const newConsistencyOverTimePeriodTypes = [];
+            let newDataValueAsListofArrayForConsistencyOverTime: any[] = [];
+            const newConsistencyOverTimePeriodTypes: any[] = [];
             if (payload.programStageConfig?.consistencyOvertimes?.length > 0 && payload.periodVerification) {
                 const consistencyOvertimesList = payload.programStageConfig?.consistencyOvertimes || [];
 
                 newDataValueAsListofArrayForConsistencyOverTime = await Promise.all(
-                    eventPayload.dataValues?.map(async dv => {
-                        const newDvList = [];
+                    eventPayload.dataValues?.map(async (dv: any) => {
+                        const newDvList: any[] = [];
                         const foundOvertime = consistencyOvertimesList.find(ind => ind.value?.id === dv.dataElement);
 
                         if (foundOvertime) {
                             const newObject = dataStoreIndicatorsMapping?.find(
-                                d =>
+                                (d: any) =>
                                     d.indicator ===
                                     mappingConfigs
-                                        .filter(ev => ev.programStage?.id === payload.programStage?.id)
-                                        ?.find(ev => ev.indicator?.displayName === dv.value)?.indicator?.id
+                                        .filter((ev: any) => ev.programStage?.id === payload.programStage?.id)
+                                        ?.find((ev: any) => ev.indicator?.displayName === dv.value)?.indicator?.id
                             );
                             const foundAggrageMappingElement = newObject?.dhis2;
                             const periodType = newObject?.periodType || 'Monthly';
@@ -2285,8 +2290,8 @@ const Supervision = ({ me }) => {
                                         payload.periodVerification
                                     );
 
-                                    const orgUnitId = eventPayload.orgUnit;
-                                    const dx = foundAggrageMappingElement.id;
+                                    const orgUnitId: any = eventPayload.orgUnit;
+                                    const dx: any = foundAggrageMappingElement.id;
 
                                     const value = await getAnalyticValue(periodObject?.analytic, orgUnitId, dx);
 
@@ -2311,9 +2316,9 @@ const Supervision = ({ me }) => {
             if (newConsistencyOverTimePeriodTypes?.length > 0 && selectedConsistencyOverTimePeriodType) {
                 const typePayload = {
                     value: newConsistencyOverTimePeriodTypes
-                        .sort((a, b) => a.position - b.position)
-                        .filter(e => e.periodType)
-                        .map(e => e.periodType)
+                        .sort((a: any, b: any) => a.position - b.position)
+                        .filter((e: any) => e.periodType)
+                        .map((e: any) => e.periodType)
                         .join(' '),
                     dataElement: selectedConsistencyOverTimePeriodType.id
                 };
@@ -2327,7 +2332,7 @@ const Supervision = ({ me }) => {
             );
 
             const newDataValueListForOvertimes = newDataValueAsListofArrayForConsistencyOverTime.reduce(
-                (prev, curr) => (curr?.length > 0 ? prev.concat(curr) : prev),
+                (prev: any, curr: any) => (curr?.length > 0 ? prev.concat(curr) : prev),
                 []
             );
 
@@ -2337,12 +2342,20 @@ const Supervision = ({ me }) => {
                 ...newDataValueListForOvertimes
             ];
 
-            eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValueList];
-            eventPayload.dataValues = [...new Set(eventPayload.dataValues.map(d => d.dataElement))].map(d =>
-                eventPayload.dataValues.find(dv => dv.dataElement === d)
+            const systemAssessments: any[] =
+                payload.systemAssessments
+                    ?.filter((s: any) => s.value)
+                    ?.map((s: any) => ({
+                        dataElement: s.id,
+                        value: s.value
+                    })) || [];
+
+            eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValueList, ...systemAssessments];
+            eventPayload.dataValues = [...new Set(eventPayload.dataValues.map((d: any) => d.dataElement))].map(d =>
+                eventPayload.dataValues.find((dv: any) => dv.dataElement === d)
             );
 
-            if (!newEventsList.map(ev => ev.programStage).includes(payload.programStage?.id)) {
+            if (!newEventsList.map((ev: any) => ev.programStage).includes(payload.programStage?.id)) {
                 newEventsList.push(eventPayload);
             }
 
@@ -2369,27 +2382,27 @@ const Supervision = ({ me }) => {
     //       } catch (err) {}
     // };
 
-    const generateEventsAsNewSupervision = async payload => {
+    const generateEventsAsNewSupervision = async (payload: any) => {
         try {
-            const existingTEI_List_response = await axios.get(
+            const existingTEI_List_response: any = await axios.get(
                 `${TRACKED_ENTITY_INSTANCES_ROUTE}?ou=${payload.orgUnit}&order=created:DESC&program=${selectedProgram?.program?.id}&fields=*&ouMode=SELECTED`
             );
-            const existingTEI_List = existingTEI_List_response.data.trackedEntityInstances;
+            const existingTEI_List: any = existingTEI_List_response.data.trackedEntityInstances;
 
             if (existingTEI_List.length === 0) {
                 return await generateTeiWithEnrollmentWithEvents(payload);
             } else {
-                const current_tei = existingTEI_List[0];
+                const current_tei: any = existingTEI_List[0];
 
-                const enrollment_id = current_tei?.enrollments.filter(
-                    en => en.program === selectedProgram?.program?.id
+                const enrollment_id: any = current_tei?.enrollments.filter(
+                    (en: any) => en.program === selectedProgram?.program?.id
                 )[0]?.enrollment;
 
                 if (!enrollment_id) throw new Error(translate('Erreur_Creation_Enrolement'));
 
-                const newEventsList = [];
+                const newEventsList: any[] = [];
 
-                const eventPayload = {
+                const eventPayload: any = {
                     eventDate: payload.period
                         ? dayjs(payload.period).format('YYYY-MM-DD')
                         : dayjs().format('YYYY-MM-DD'),
@@ -2414,8 +2427,8 @@ const Supervision = ({ me }) => {
                         selectedProgram?.configurationType === DQR ||
                         selectedProgram?.configurationType === NORMAL_PROGRAM
                             ? mappingConfigs
-                                  .filter(ev => ev.programStage?.id === payload.programStage?.id)
-                                  .map(ev => ({
+                                  .filter((ev: any) => ev.programStage?.id === payload.programStage?.id)
+                                  .map((ev: any) => ({
                                       dataElement: ev.dataElement?.id,
                                       value: ev.indicator?.displayName
                                   }))
@@ -2436,7 +2449,7 @@ const Supervision = ({ me }) => {
 
                 // Ajoute des dataValues superviseurs
                 if (payload.programStageConfig?.supervisorField?.length > 0) {
-                    const newDataValues = [];
+                    const newDataValues: any[] = [];
 
                     /*
                      * Vérification du premier cas: dans le cas oû la taille des data elements superviseurs configurer son INFÉRIEUR au nombres de superviseurs sélectionnés
@@ -2471,7 +2484,7 @@ const Supervision = ({ me }) => {
                                     if (
                                         currentDE &&
                                         currentSUP &&
-                                        !newDataValues.map(dv => dv.dataElement).includes(currentDE.id)
+                                        !newDataValues.map((dv: any) => dv.dataElement).includes(currentDE.id)
                                     ) {
                                         if (i === payload.programStageConfig?.supervisorField?.length - 1) {
                                             newDataValues.push({
@@ -2554,8 +2567,8 @@ const Supervision = ({ me }) => {
                     eventPayload.dataValues = [...eventPayload.dataValues, newPayl];
                 }
 
-                let newDataValueAsListofArrayForIndicators = [];
-                const newIndicatorsPeriodTypes = [];
+                let newDataValueAsListofArrayForIndicators: any[] = [];
+                const newIndicatorsPeriodTypes: any[] = [];
 
                 if (payload.programStageConfig?.indicators?.length > 0 && payload.periodVerification) {
                     const indicatorsList = payload.programStageConfig?.indicators;
@@ -2565,8 +2578,8 @@ const Supervision = ({ me }) => {
 
                     newDataValueAsListofArrayForIndicators = await Promise.all(
                         eventPayload.dataValues?.map(async dv => {
-                            const newDvList = [];
-                            const foundInd = indicatorsList?.find(ind => ind.value?.id === dv.dataElement);
+                            const newDvList: any[] = [];
+                            const foundInd: any = indicatorsList?.find((ind: any) => ind.value?.id === dv.dataElement);
                             const foundRecoup =
                                 lastCrossCheckWhichIsStockData?.primaryValue?.id === dv.dataElement &&
                                 lastCrossCheckWhichIsStockData;
@@ -2606,7 +2619,7 @@ const Supervision = ({ me }) => {
                                     const elementMONTH_14 = foundInd?.DHIS2MonthlyValue14;
                                     const elementMONTH_15 = foundInd?.DHIS2MonthlyValue15;
 
-                                    let periodPayload = {
+                                    let periodPayload: any = {
                                         eventDate: eventPayload.eventDate,
                                         orgUnit: eventPayload.orgUnit,
                                         trackedEntityInstance: eventPayload.trackedEntityInstance,
@@ -2614,7 +2627,7 @@ const Supervision = ({ me }) => {
                                     };
 
                                     if (elementMONTH_1) {
-                                        const periodObject = getRightPeriodFormat(
+                                        const periodObject: any = getRightPeriodFormat(
                                             1,
                                             periodType,
                                             payload.periodVerification
@@ -3094,16 +3107,16 @@ const Supervision = ({ me }) => {
                 }
                 // period implémentation for consistency over time
 
-                let newDataValueAsListofArrayForConsistencyOverTime = [];
-                const newConsistencyOverTimePeriodTypes = [];
+                let newDataValueAsListofArrayForConsistencyOverTime: any[] = [];
+                const newConsistencyOverTimePeriodTypes: any[] = [];
                 if (payload.programStageConfig?.consistencyOvertimes?.length > 0 && payload.periodVerification) {
                     const consistencyOvertimesList = payload.programStageConfig?.consistencyOvertimes || [];
 
                     newDataValueAsListofArrayForConsistencyOverTime = await Promise.all(
-                        eventPayload.dataValues?.map(async dv => {
-                            const newDvList = [];
+                        eventPayload.dataValues?.map(async (dv: any) => {
+                            const newDvList: any[] = [];
                             const foundOvertime = consistencyOvertimesList.find(
-                                ind => ind.value?.id === dv.dataElement
+                                (ind: any) => ind.value?.id === dv.dataElement
                             );
 
                             if (foundOvertime) {
@@ -3291,12 +3304,20 @@ const Supervision = ({ me }) => {
                     ...newDataValueListForOvertimes
                 ];
 
-                eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValueList];
-                eventPayload.dataValues = [...new Set(eventPayload.dataValues.map(d => d.dataElement))].map(d =>
-                    eventPayload.dataValues.find(dv => dv.dataElement === d)
+                const systemAssessments: any[] =
+                    payload.systemAssessments
+                        ?.filter((s: any) => s.value)
+                        ?.map((s: any) => ({
+                            dataElement: s.id,
+                            value: s.value
+                        })) || [];
+
+                eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValueList, ...systemAssessments];
+                eventPayload.dataValues = [...new Set(eventPayload.dataValues.map((d: any) => d.dataElement))].map(d =>
+                    eventPayload.dataValues.find((dv: any) => dv.dataElement === d)
                 );
 
-                if (!newEventsList.map(ev => ev.programStage).includes(payload.programStage?.id)) {
+                if (!newEventsList.map((ev: any) => ev.programStage).includes(payload.programStage?.id)) {
                     newEventsList.push(eventPayload);
                 }
 
@@ -3328,24 +3349,24 @@ const Supervision = ({ me }) => {
         }
     };
 
-    const saveSupervisionAsEventStrategy = async inputFieldsList => {
+    const saveSupervisionAsEventStrategy = async (inputFieldsList: any) => {
         try {
-            if (inputFieldsList?.filter(i => isAssigned(i.organisationUnit?.id))?.length > 0) {
-                const supervisionsListByProgramStages = await Promise.all(
+            if (inputFieldsList?.filter((i: any) => isAssigned(i.organisationUnit?.id))?.length > 0) {
+                const supervisionsListByProgramStages: any = await Promise.all(
                     inputFieldsList
-                        ?.filter(i => isAssigned(i.organisationUnit?.id))
-                        ?.map(async item => {
-                            let listByProgramStage = [];
+                        ?.filter((i: any) => isAssigned(i.organisationUnit?.id))
+                        ?.map(async (item: any) => {
+                            let listByProgramStage: any[] = [];
                             for (let progStageConfig of selectedProgram?.programStageConfigurations) {
                                 const found_organisationUnit = organisationUnits.find(
-                                    ou => ou.id === item.organisationUnit?.id
+                                    (ou: any) => ou.id === item.organisationUnit?.id
                                 );
 
-                                let is_ok =
+                                let is_ok: boolean =
                                     (found_organisationUnit &&
                                         progStageConfig?.programStage &&
                                         found_organisationUnit.organisationUnitGroups
-                                            ?.map(ouG => ouG.id)
+                                            ?.map((ouG: any) => ouG.id)
                                             .includes(progStageConfig?.organisationUnitGroup?.id)) ||
                                     false;
 
@@ -3357,7 +3378,7 @@ const Supervision = ({ me }) => {
                                 }
 
                                 if (is_ok) {
-                                    const payload = {
+                                    const payload: any = {
                                         ...item,
                                         orgUnit: item.organisationUnit?.id,
                                         period: item.period && dayjs(item.period).format('YYYY-MM-DD'),
@@ -3370,7 +3391,7 @@ const Supervision = ({ me }) => {
                                         programStageConfig: progStageConfig
                                     };
 
-                                    let createdTEIObject = null;
+                                    let createdTEIObject: any = null;
                                     createdTEIObject = await generateEventsAsNewSupervision(payload);
 
                                     if (createdTEIObject) {
@@ -3438,7 +3459,7 @@ const Supervision = ({ me }) => {
         setInputNbrOrgUnit(0);
     };
 
-    const validateForms = async inputFields => {
+    const validateForms = async (inputFields: any[]) => {
         inputFields
             ?.filter(i => isAssigned(i.organisationUnit?.id))
             ?.forEach(element => {
@@ -3454,7 +3475,7 @@ const Supervision = ({ me }) => {
             });
     };
 
-    const getAnalyticValue = async (period, orgUnit, dx) => {
+    const getAnalyticValue = async (period: any, orgUnit: any, dx: any) => {
         try {
             const response = await axios.get(
                 `${ANALYTICS_ROUTE}/dataValueSet.json?dimension=ou:${orgUnit}&dimension=dx:${dx}&dimension=pe:${period}&showHierarchy=false&hierarchyMeta=false&includeMetadataDetails=true&includeNumDen=true&skipRounding=false&completedOnly=false`
@@ -4685,7 +4706,6 @@ const Supervision = ({ me }) => {
                                                     fontSize: '14px'
                                                 }}
                                             >
-                                                {' '}
                                                 {translate('Nom')}
                                             </th>
                                             <th
@@ -4705,11 +4725,10 @@ const Supervision = ({ me }) => {
                                                     fontSize: '14px'
                                                 }}
                                             >
-                                                {' '}
                                                 {translate('Actions')}
                                             </th>
                                         </tr>
-                                        {selectedIndicators.map((ind, index) => (
+                                        {selectedIndicators.map((ind: any, index: number) => (
                                             <tr key={index}>
                                                 <td
                                                     style={{
@@ -4762,12 +4781,12 @@ const Supervision = ({ me }) => {
                                                             }
                                                             onConfirm={() => {
                                                                 const newArray = selectedIndicators.filter(
-                                                                    e => e.id !== ind.id
+                                                                    (e: any) => e.id !== ind.id
                                                                 );
                                                                 setSelectedIndicators(newArray);
                                                                 setSelectedElementForPerformances(
                                                                     selectedElementForPerformances.filter(
-                                                                        el => el.id !== ind.indicator?.id
+                                                                        (el: any) => el.id !== ind.indicator?.id
                                                                     )
                                                                 );
                                                             }}
@@ -4794,7 +4813,7 @@ const Supervision = ({ me }) => {
         </>
     );
 
-    const handleInputPeriod = (period, index) => {
+    const handleInputPeriod = (period: any, index: number) => {
         setInputFields(
             inputFields.map((field, fieldIndex) => {
                 if (index === fieldIndex) {
@@ -4808,13 +4827,44 @@ const Supervision = ({ me }) => {
         );
     };
 
-    const handleInputPeriodVerification = (period, index) => {
+    const handleInputPeriodVerification = (period: any, index: number) => {
         setInputFields(
             inputFields.map((field, fieldIndex) => {
                 if (index === fieldIndex) {
                     return {
                         ...field,
                         periodVerification: period
+                    };
+                }
+                return field;
+            })
+        );
+    };
+
+    const handleInputAddSystemAssessments = ({
+        codeDataElement,
+        indexAssessment,
+        indexField
+    }: {
+        codeDataElement: string;
+        indexAssessment: number;
+        indexField: number;
+    }) => {
+        setInputFields(
+            inputFields.map((field, index) => {
+                if (indexField === index) {
+                    return {
+                        ...field,
+                        systemAssessments: field.systemAssessments?.map((system: any, indexSys: number) => {
+                            if (indexSys === indexAssessment) {
+                                return {
+                                    ...system,
+                                    value: codeDataElement
+                                };
+                            }
+
+                            return system;
+                        })
                     };
                 }
                 return field;
@@ -4909,7 +4959,7 @@ const Supervision = ({ me }) => {
     const RenderOrganisationUnitForm = (colMd = 12) => (
         <div>
             <Row gutter={[10, 10]}>
-                {selectedOrganisationUnits?.map((org, index) => (
+                {selectedOrganisationUnits?.map((org: any, index: number) => (
                     <Col md={colMd} sm={24} key={index}>
                         <Card bodyStyle={{ padding: '0px' }} className="my-shadow" size="small">
                             <div
@@ -5126,7 +5176,7 @@ const Supervision = ({ me }) => {
                                                     size="small"
                                                     bordered
                                                     dataSource={inputFields[index]?.otherSupervisors}
-                                                    renderItem={item => (
+                                                    renderItem={(item: any) => (
                                                         <List.Item
                                                             style={{
                                                                 padding: '2px 10px'
@@ -5173,6 +5223,43 @@ const Supervision = ({ me }) => {
                                             </div>
                                         </Col>
                                     )}
+                                    <Col md={24}>
+                                        <div style={{ marginTop: '10px' }}>
+                                            <Accordion>
+                                                <AccordionItem
+                                                    header={
+                                                        <div style={{ backgroundColor: 'green' }}>
+                                                            {translate('System_Assessment')}
+                                                        </div>
+                                                    }
+                                                    style={{
+                                                        background: 'white',
+                                                        padding: '10px',
+                                                        border: '1px solid #ccc'
+                                                    }}
+                                                >
+                                                    <>
+                                                        {inputFields[index]?.systemAssessments?.map(
+                                                            (assessment: any, indexAssessment: number) => (
+                                                                <GenerateFields
+                                                                    dataElement={assessment}
+                                                                    onChange={(value: any) =>
+                                                                        handleInputAddSystemAssessments({
+                                                                            codeDataElement: value,
+                                                                            indexAssessment,
+                                                                            indexField: index
+                                                                        })
+                                                                    }
+                                                                    value={assessment.value}
+                                                                    key={index}
+                                                                />
+                                                            )
+                                                        )}
+                                                    </>
+                                                </AccordionItem>
+                                            </Accordion>
+                                        </div>
+                                    </Col>
                                 </Row>
                             </div>
                         </Card>
@@ -5195,21 +5282,23 @@ const Supervision = ({ me }) => {
         setSelectedPeriodType(value);
     };
 
-    const handleSelectPeriode = value => setSelectedPeriod(value);
+    const handleSelectPeriode = (value: any) => setSelectedPeriod(value);
 
-    const handleSelectOrganisationUnitGroup = value => {
+    const handleSelectOrganisationUnitGroup = (value: any) => {
         setSelectedPeriodType(null);
         setSelectedPeriod(null);
         setSelectedOrganisationUnitGroup(
-            selectedOrganisationUnitGroupSet.organisationUnitGroups?.find(org => org.id === value)
+            selectedOrganisationUnitGroupSet.organisationUnitGroups?.find((org: any) => org.id === value)
         );
     };
 
-    const handleSelectOrganisationUnitGroupForRandomCase = values => {
-        setSelectedOrganisationUnitGroups(values.map(value => organisationUnitGroups?.find(org => org.id === value)));
+    const handleSelectOrganisationUnitGroupForRandomCase = (values: any[]) => {
+        setSelectedOrganisationUnitGroups(
+            values.map((value: any) => organisationUnitGroups?.find((org: any) => org.id === value))
+        );
     };
 
-    const formatPeriod = (period, periodType) => {
+    const formatPeriod = (period: any, periodType: any) => {
         let currentPeriod = dayjs(period).format('YYYY');
 
         if (periodType === MONTH) currentPeriod = dayjs(period).format('YYYYMM');
@@ -5225,7 +5314,7 @@ const Supervision = ({ me }) => {
         return currentPeriod;
     };
 
-    const getRightPeriodFormat = (indexI, periodType, period) => {
+    const getRightPeriodFormat = (indexI: any, periodType: any, period: any) => {
         const index = indexI - 1;
         let result = {
             normal: dayjs(period).subtract(+index, 'month').format('YYYY/MM'),
@@ -5784,10 +5873,10 @@ const Supervision = ({ me }) => {
         );
 
     const generateArrayOfFieldsInputForPerformances = indicatorList => {
-        const newList = [];
+        const newList: any[] = [];
         for (let ind of indicatorList) {
-            if (selectedIndicators.map(inp => inp.indicator?.id).includes(ind.id)) {
-                newList.push(selectedIndicators.find(inp => inp.indicator.id === ind.id));
+            if (selectedIndicators.map((inp: any) => inp.indicator?.id).includes(ind.id)) {
+                newList.push(selectedIndicators?.find((inp: any) => inp.indicator.id === ind.id));
             } else {
                 newList.push({
                     id: uuid(),
@@ -5849,19 +5938,6 @@ const Supervision = ({ me }) => {
         ) : (
             <></>
         );
-
-    // const handleSelectBackgroundInformationFavorit = values => {
-    //       const currentFavs = values?.map(v => favoritBackgroundInformationList.find(b => b.id === v)) || [];
-    //       let newList = [];
-    //       setSelectedBackgroundInformationFavorit(currentFavs);
-
-    //       for (let fav of currentFavs) {
-    //             newList = newList.concat(fav.configs || []);
-    //       }
-
-    //       setNonTranslateMappingConfigs(newList || []);
-    //       setMappingConfigs([]);
-    // };
 
     const handleSelectBackgroundInformationFavorit = value => {
         const currentFavs = favoritBackgroundInformationList.find(b => b.id === value);
@@ -6776,8 +6852,11 @@ const Supervision = ({ me }) => {
         </>
     );
 
-    const initInputOrganisation = ouList => {
-        const newList = [];
+    const initInputOrganisation = (ouList: any[]) => {
+        const newList: any[] = [];
+        const dataElementsListFromProgramStage =
+            programStages[0]?.programStageDataElements?.map(de => de.dataElement) || [];
+
         for (let org of ouList) {
             if (inputFields?.map(inp => inp.organisationUnit?.id)?.includes(org.id)) {
                 newList.push(inputFields.find(inp => inp.organisationUnit.id === org.id));
@@ -6797,7 +6876,18 @@ const Supervision = ({ me }) => {
                     equipe: null,
                     supervisors: [],
                     otherSupervisors: [],
-                    inputOtherSupervisor: ''
+                    inputOtherSupervisor: '',
+                    systemAssessments:
+                        selectedProgram?.programStageConfigurations[0]?.systemAssessments
+                            ?.filter((s: { id: string }) =>
+                                dataElementsListFromProgramStage?.map((de: { id: string }) => de.id)?.includes(s.id)
+                            )
+                            ?.map((s: any) => ({
+                                ...dataElementsListFromProgramStage.find(
+                                    (de: { id: string; displayName: string }) => de.id === s.id
+                                ),
+                                value: null
+                            })) || []
                 });
             }
         }
@@ -6805,7 +6895,7 @@ const Supervision = ({ me }) => {
     };
 
     const initInputFields = () => {
-        let newList = [];
+        let newList: any[] = [];
 
         if (
             selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
@@ -6841,7 +6931,7 @@ const Supervision = ({ me }) => {
 
         const translatedList =
             nonTranslateMappingConfigs.map(mapConf => {
-                const foundElement = cumulateList.find(c => c.id === mapConf.indicator.id);
+                const foundElement = cumulateList.find((c: any) => c.id === mapConf.indicator.id);
                 const foundDE = DEs.find(de => de.id === mapConf.dataElement.id);
 
                 const foundDatastoreMappingObject = dataStoreIndicatorsMapping?.find(

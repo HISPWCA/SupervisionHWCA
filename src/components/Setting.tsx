@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Radio, Tab, TabBar } from '@dhis2/ui';
 import {
     AGGREGATE_INDICATOR,
@@ -64,74 +64,74 @@ import SettingDataElementCompletenessManagement from './SettingDataElementComple
 import SettingSourceDocumentCompletenessManagement from './SettingSourceDocumentCompletenessManagement';
 
 const Setting = () => {
-    const [currentItem, setCurrentItem] = useState(null);
-    const [renderPage, setRenderPage] = useState(PAGE_CONFIGURATION_TYPE_SUPERVISIONS);
-    const [programs, setPrograms] = useState([]);
-    const [indicatorGroups, setIndicatorGroups] = useState([]);
-    const [mappingConfigs, setMappingConfigs] = useState([]);
-    const [mappingConfigSupervisions, setMappingConfigSupervisions] = useState([]);
-    const [indicators, setIndicators] = useState([]);
-    const [dataElements, setDataElements] = useState([]);
-    const [analyseConfigs, setAnalyseConfigs] = useState([]);
-    const [programStages, setProgramStages] = useState([]);
-    const [paymentConfigList, setPaymentConfigList] = useState([]);
-    const [isEditModePayment, setEditModePayment] = useState(false);
-    const [currentPaymentConfig, setCurrentPaymentConfig] = useState(null);
-    const [dataStoreVisualizations, setDataStoreVisualizations] = useState([]);
-    const [currentVisualizationProgram, setCurrentVisualizationProgram] = useState(null);
-    const [indicatorsFieldsConfigsForRDQA, setIndicatorsFieldsConfigsForRDQA] = useState([]);
-    const [currentVisualizationConfig, setCurrentVisualizationConfig] = useState(null);
-    const [dataStorePeriodConfigs, setDataStorePeriodConfigs] = useState(null);
-    const [visualizations, setVisualizations] = useState([]);
-    const [maps, setMaps] = useState([]);
-    const [favorisItems, setFavorisItems] = useState([]);
-    const [dataStoreGlobalSettings, setDataStoreGlobalSettings] = useState(null);
-    const [indicatorName, setIndicatorName] = useState('');
-    const [indicatorEtiquette, setIndicatorEtiquette] = useState('');
-    const [indicatorWeight, setIndicatorWeight] = useState(0);
-    const [indicatorBestPositive, setIndicatorBestPositive] = useState(true);
-    const [organisationUnitGroups, setOrganisationUnitGroups] = useState([]);
-    const [loadingOrganisationUnitGroups, setLoadingOrganisationUnitGroups] = useState(false);
-    const [programStageConfigurations, setProgramStageConfigurations] = useState([]);
-    const [currentProgramstageConfiguration, setCurrentProgramstageConfiguration] = useState(null);
-    const [currentProgramstageConfigurationForRDQA, setCurrentProgramstageConfigurationForRDQA] = useState(null);
-    const [selectedStatusSupervisionDataElement, setSelectedStatusSupervisionDataElement] = useState(null);
-    const [selectedIndicator, setSelectedIndicator] = useState(null);
-    const [selectedIndicatorGroup, setSelectedIndicatorGroup] = useState(null);
-    const [selectedIndicatorType, setSelectedIndicatorType] = useState(PROGRAM_INDICATOR);
-    const [selectedTEIProgram, setSelectedTEIProgram] = useState(null);
-    const [selectedProgram, setSelectedProgram] = useState(null);
-    const [selectedTypeSupervisionPage, setSelectedTypeSupervisionPage] = useState(PAGE_CONFIG_SUPERVISION);
-    const [selectedAnalyseType, setSelectedAnalyseType] = useState(TYPE_ANALYSE_DATA_ELEMENT);
-    const [selectedAnalyseIndicator, setSelectedAnalyseIndicator] = useState(null);
-    const [selectedAnalyseDataElement, setSelectedAnalyseDataElement] = useState(null);
-    const [selectedAttributesToDisplay, setSelectedAttributesToDisplay] = useState([]);
-    const [selectedPlanificationType, setSelectedPlanificationType] = useState(ORGANISATION_UNIT);
-    const [selectedProgramForVisualization, setSelectedProgramForVisualization] = useState(null);
-    const [selectedTypeForVisualization, setSelectedTypeForVisualization] = useState('VISUALIZATION');
-    const [selectedMaps, setSelectedMaps] = useState([]);
-    const [selectedVisualizations, setSelectedVisualizations] = useState([]);
-    const [inputLibellePayment, setInputLibellePayment] = useState('');
-    const [inputMontantConstantPayment, setInputMontantConstantPayment] = useState(0);
-    const [inputFraisMobileMoneyPayment, setInputFraisMobileMoneyPayment] = useState(0);
-    const [loadingPrograms, setLoadingPrograms] = useState(false);
-    const [loadingIndicatorGroups, setLoadingIndicatorGroups] = useState(false);
-    const [loadingSaveSupervionsConfig, setLoadingSaveSupervionsConfig] = useState(false);
-    const [loadingSaveIndicatorsConfig, setLoadingSaveIndicatorsConfig] = useState(false);
-    const [loadingIndicators, setLoadingIndicators] = useState(false);
-    const [loadingDataElements, setLoadingDataElements] = useState(false);
-    const [loadingAddAnalyseConfigs, setLoadingAddAnalyseConfigs] = useState(false);
-    const [loadingProgramStages, setLoadingProgramStages] = useState(false);
-    const [loadingSaveVisualizationInDatastore, setLoadingSaveVisualizationInDatastore] = useState(false);
-    const [loadingDataStoreVisualizations, setLoadingDataStoreVisualizations] = useState(false);
-    const [loadingVis, setLoadingVis] = useState(false);
-    const [updateAllFieldsWhenHaveOneStage, setUpdateAllFieldsWhenHaveOneStage] = useState(false);
+    const [currentItem, setCurrentItem] = useState<any>(null);
+    const [renderPage, setRenderPage] = useState<any>(PAGE_CONFIGURATION_TYPE_SUPERVISIONS);
+    const [programs, setPrograms] = useState<any>([]);
+    const [indicatorGroups, setIndicatorGroups] = useState<any>([]);
+    const [mappingConfigs, setMappingConfigs] = useState<any>([]);
+    const [mappingConfigSupervisions, setMappingConfigSupervisions] = useState<any>([]);
+    const [indicators, setIndicators] = useState<any>([]);
+    const [dataElements, setDataElements] = useState<any>([]);
+    const [analyseConfigs, setAnalyseConfigs] = useState<any>([]);
+    const [programStages, setProgramStages] = useState<any>([]);
+    const [paymentConfigList, setPaymentConfigList] = useState<any>([]);
+    const [isEditModePayment, setEditModePayment] = useState<any>(false);
+    const [currentPaymentConfig, setCurrentPaymentConfig] = useState<any>(null);
+    const [dataStoreVisualizations, setDataStoreVisualizations] = useState<any>([]);
+    const [currentVisualizationProgram, setCurrentVisualizationProgram] = useState<any>(null);
+    const [indicatorsFieldsConfigsForRDQA, setIndicatorsFieldsConfigsForRDQA] = useState<any>([]);
+    const [currentVisualizationConfig, setCurrentVisualizationConfig] = useState<any>(null);
+    const [dataStorePeriodConfigs, setDataStorePeriodConfigs] = useState<any>(null);
+    const [visualizations, setVisualizations] = useState<any>([]);
+    const [maps, setMaps] = useState<any>([]);
+    const [favorisItems, setFavorisItems] = useState<any>([]);
+    const [dataStoreGlobalSettings, setDataStoreGlobalSettings] = useState<any>(null);
+    const [indicatorName, setIndicatorName] = useState<any>('');
+    const [indicatorEtiquette, setIndicatorEtiquette] = useState<any>('');
+    const [indicatorWeight, setIndicatorWeight] = useState<any>(0);
+    const [indicatorBestPositive, setIndicatorBestPositive] = useState<any>(true);
+    const [organisationUnitGroups, setOrganisationUnitGroups] = useState<any>([]);
+    const [loadingOrganisationUnitGroups, setLoadingOrganisationUnitGroups] = useState<any>(false);
+    const [programStageConfigurations, setProgramStageConfigurations] = useState<any>([]);
+    const [currentProgramstageConfiguration, setCurrentProgramstageConfiguration] = useState<any>(null);
+    const [currentProgramstageConfigurationForRDQA, setCurrentProgramstageConfigurationForRDQA] = useState<any>(null);
+    const [selectedStatusSupervisionDataElement, setSelectedStatusSupervisionDataElement] = useState<any>(null);
+    const [selectedIndicator, setSelectedIndicator] = useState<any>(null);
+    const [selectedIndicatorGroup, setSelectedIndicatorGroup] = useState<any>(null);
+    const [selectedIndicatorType, setSelectedIndicatorType] = useState<any>(PROGRAM_INDICATOR);
+    const [selectedTEIProgram, setSelectedTEIProgram] = useState<any>(null);
+    const [selectedProgram, setSelectedProgram] = useState<any>(null);
+    const [selectedTypeSupervisionPage, setSelectedTypeSupervisionPage] = useState<any>(PAGE_CONFIG_SUPERVISION);
+    const [selectedAnalyseType, setSelectedAnalyseType] = useState<any>(TYPE_ANALYSE_DATA_ELEMENT);
+    const [selectedAnalyseIndicator, setSelectedAnalyseIndicator] = useState<any>(null);
+    const [selectedAnalyseDataElement, setSelectedAnalyseDataElement] = useState<any>(null);
+    const [selectedAttributesToDisplay, setSelectedAttributesToDisplay] = useState<any>([]);
+    const [selectedPlanificationType, setSelectedPlanificationType] = useState<any>(ORGANISATION_UNIT);
+    const [selectedProgramForVisualization, setSelectedProgramForVisualization] = useState<any>(null);
+    const [selectedTypeForVisualization, setSelectedTypeForVisualization] = useState<any>('VISUALIZATION');
+    const [selectedMaps, setSelectedMaps] = useState<any>([]);
+    const [selectedVisualizations, setSelectedVisualizations] = useState<any>([]);
+    const [inputLibellePayment, setInputLibellePayment] = useState<any>('');
+    const [inputMontantConstantPayment, setInputMontantConstantPayment] = useState<any>(0);
+    const [inputFraisMobileMoneyPayment, setInputFraisMobileMoneyPayment] = useState<any>(0);
+    const [loadingPrograms, setLoadingPrograms] = useState<any>(false);
+    const [loadingIndicatorGroups, setLoadingIndicatorGroups] = useState<any>(false);
+    const [loadingSaveSupervionsConfig, setLoadingSaveSupervionsConfig] = useState<any>(false);
+    const [loadingSaveIndicatorsConfig, setLoadingSaveIndicatorsConfig] = useState<any>(false);
+    const [loadingIndicators, setLoadingIndicators] = useState<any>(false);
+    const [loadingDataElements, setLoadingDataElements] = useState<any>(false);
+    const [loadingAddAnalyseConfigs, setLoadingAddAnalyseConfigs] = useState<any>(false);
+    const [loadingProgramStages, setLoadingProgramStages] = useState<any>(false);
+    const [loadingSaveVisualizationInDatastore, setLoadingSaveVisualizationInDatastore] = useState<any>(false);
+    const [loadingDataStoreVisualizations, setLoadingDataStoreVisualizations] = useState<any>(false);
+    const [loadingVis, setLoadingVis] = useState<any>(false);
+    const [updateAllFieldsWhenHaveOneStage, setUpdateAllFieldsWhenHaveOneStage] = useState<any>(false);
 
-    const [inputSearchVis, setInputSearchVis] = useState('');
-    const [timoutID, setTimoutID] = useState(null);
-    const [visElementList, setVisElementList] = useState(null);
+    const [inputSearchVis, setInputSearchVis] = useState<any>('');
+    const [timoutID, setTimoutID] = useState<any>(null);
+    const [visElementList, setVisElementList] = useState<any>(null);
 
-    const [numberOfIndicatorAndRecoupement, setNumberOfIndicatorAndRecoupement] = useState({
+    const [numberOfIndicatorAndRecoupement, setNumberOfIndicatorAndRecoupement] = useState<any>({
         DQR: {
             nbrIndicator: 1,
             nbrRecoupement: 1,
@@ -145,12 +145,12 @@ const Setting = () => {
             nbrRecoupement: 1
         }
     });
-    const [notification, setNotification] = useState({
+    const [notification, setNotification] = useState<any>({
         show: false,
         message: null,
         type: null
     });
-    const [formState, setFormState] = useState({
+    const [formState, setFormState] = useState<any>({
         selectedConfigurationType: DQR,
         selectedSupervisionGenerationType: TYPE_GENERATION_AS_EVENT,
         selectedPlanificationType: ORGANISATION_UNIT,
@@ -164,6 +164,7 @@ const Setting = () => {
         selectedPeriodVerification: null,
         selectedIndicatorsPeriodType: null,
         selectedConsistencyOverTimePeriodType: null,
+        systemAssessments: [],
         indicators: [],
         recoupements: [],
         completeness: {
@@ -182,14 +183,14 @@ const Setting = () => {
         globalProgramArea: null,
         isFieldEditingMode: false
     });
-    const [formStateForRDQA, setFormStateForRDQA] = useState({
+    const [formStateForRDQA, setFormStateForRDQA] = useState<any>({
         selectedProgramStageForConfiguration: null,
         selectedOrganisationUnitGroup: null,
         selectedSupervisorDataElements: [],
         selectedStatusSupervisionDataElement: null,
         selectedSupervisionAutoGenerateID: null
     });
-    const [periodFormState, setPeriodFormState] = useState({
+    const [periodFormState, setPeriodFormState] = useState<any>({
         month1KeyWords: [],
         month2KeyWords: [],
         month3KeyWords: [],
@@ -223,13 +224,13 @@ const Setting = () => {
         });
     };
 
-    const initFields = (fieldList = null) => {
+    const initFields = (fieldList?: any) => {
         const dqrConfig = numberOfIndicatorAndRecoupement.DQR;
-        const newIndicators = [];
-        const newRecoupements = [];
-        const newConsistencyOverTimes = [];
-        const newDataElementCompleteness = [];
-        const newSourceDocumentCompleteness = [];
+        const newIndicators: any[] = [];
+        const newRecoupements: any[] = [];
+        const newConsistencyOverTimes: any[] = [];
+        const newDataElementCompleteness: any[] = [];
+        const newSourceDocumentCompleteness: any[] = [];
 
         for (let i = 1; i <= +dqrConfig.nbrIndicator; i++) {
             newIndicators.push({
@@ -305,7 +306,8 @@ const Setting = () => {
                 period2: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.period2 || null,
                 period3: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.period3 || null,
                 lastPeriod: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.lastPeriod || null,
-                lastPeriodKeyWords: fieldList?.consistencyOvertimes?.find(el => el.position === i)?.lastPeriodKeyWords || null
+                lastPeriodKeyWords:
+                    fieldList?.consistencyOvertimes?.find(el => el.position === i)?.lastPeriodKeyWords || null
             });
         }
 
@@ -333,6 +335,7 @@ const Setting = () => {
             recoupements: newRecoupements,
             consistencyOvertimes: newConsistencyOverTimes,
             globalProgramArea: fieldList?.globalProgramArea || null,
+            systemAssessments: fieldList?.systemAssessments || [],
             globalProgramAreaKeyWords: fieldList?.globalProgramAreaKeyWords || [],
             completeness: {
                 ...formState.completeness,
@@ -368,6 +371,7 @@ const Setting = () => {
             globalProgramAreaKeyWords: [],
             indicators: [],
             recoupements: [],
+            systemAssessments: [],
             completeness: {
                 registerKeyWords: [],
                 selectedNbrDataElementsToShow: null,
@@ -415,13 +419,13 @@ const Setting = () => {
         initFieldsForRDQA();
     };
 
-    const initFieldsForRDQA = (fieldList = []) => {
-        const newList = [];
+    const initFieldsForRDQA = (fieldList: any[] = []) => {
+        const newList: any[] = [];
         const rdqaConfig = numberOfIndicatorAndRecoupement[ERDQ];
 
         if (rdqaConfig?.nbrIndicator && rdqaConfig?.nbrRecoupement) {
             for (let i = 1; i <= +rdqaConfig?.nbrIndicator; i++) {
-                const recoupements = [];
+                const recoupements: any[] = [];
 
                 for (let j = 1; j <= +rdqaConfig?.nbrRecoupement; j++) {
                     const recoupementPayload = {
@@ -429,8 +433,8 @@ const Setting = () => {
                         name: `${translate('Recoupements')} ${j}`,
                         position: j,
                         value: fieldList
-                            ?.find(ind => ind?.position === i)
-                            ?.recoupements?.find(rec => rec.position === j)?.value,
+                            ?.find((ind: any) => ind?.position === i)
+                            ?.recoupements?.find((rec: any) => rec.position === j)?.value,
                         indicatorMargin: null,
                         recoupementMargin: null
                     };
@@ -438,7 +442,7 @@ const Setting = () => {
                     recoupements.push(recoupementPayload);
                 }
 
-                const indicatorsPayload = {
+                const indicatorsPayload: any = {
                     id: uuid(),
                     name: `${translate('Indicateurs')} ${i}`,
                     position: i,
@@ -484,7 +488,7 @@ const Setting = () => {
     const loadMaps = async () => {
         try {
             const response = await axios.get(`${MAPS_ROUTE}?paging=false&fields=id,displayName,name`);
-            setMaps(response.data?.maps?.map(m => ({ ...m, type: 'MAP' })) || []);
+            setMaps(response.data?.maps?.map((m: any) => ({ ...m, type: 'MAP' })) || []);
         } catch (err) {}
     };
 
@@ -596,8 +600,8 @@ const Setting = () => {
         setSelectedProgramForVisualization(programs.find(p => p.id === value));
     };
 
-    const handleSelectIndicatorIND = value => {
-        let currentIndicator = null;
+    const handleSelectIndicatorIND = (value: any) => {
+        let currentIndicator: any = null;
 
         if (selectedIndicatorType === AGGREGATE_INDICATOR)
             currentIndicator = selectedIndicatorGroup.indicators?.find(ind => ind.id === value);
@@ -615,15 +619,15 @@ const Setting = () => {
         }
     };
 
-    const handleSupervisionGenerationType = ({ value }) => {
+    const handleSupervisionGenerationType = ({ value }: { value?: any }) => {
         setFormState({ ...formState, selectedSupervisionGenerationType: value });
     };
 
-    const handleSupervisionPlanificationType = ({ value }) => {
+    const handleSupervisionPlanificationType = ({ value }: { value?: any }) => {
         setFormState({ ...formState, selectedPlanificationType: value });
     };
 
-    const handleDeleteConfigItem = async value => {
+    const handleDeleteConfigItem = async (value: any) => {
         try {
             if (value) {
                 setSelectedIndicator(null);
@@ -807,6 +811,7 @@ const Setting = () => {
                     globalProgramAreaKeyWords: [],
                     indicators: [],
                     recoupements: [],
+                    systemAssessments: [],
                     completeness: {
                         registerKeyWords: [],
                         selectedNbrDataElementsToShow: null,
@@ -965,6 +970,7 @@ const Setting = () => {
             globalProgramAreaKeyWords: [],
             indicators: [],
             recoupements: [],
+            systemAssessments: [],
             completeness: {
                 registerKeyWords: [],
                 selectedNbrDataElementsToShow: null,
@@ -1079,7 +1085,7 @@ const Setting = () => {
                 throw new Error(translate('ProgramStage_Already_Configured'));
             }
 
-            let newProgramStageConfigurations = [];
+            let newProgramStageConfigurations: any[] = [];
 
             // Case of DQR
             if (
@@ -1088,7 +1094,7 @@ const Setting = () => {
             ) {
                 newProgramStageConfigurations = existingConfig
                     ? formState?.isFieldEditingMode && currentProgramstageConfiguration
-                        ? programStageConfigurations.map(p => {
+                        ? programStageConfigurations.map((p: any) => {
                               if (p.programStage?.id === currentProgramstageConfiguration?.programStage?.id) {
                                   return {
                                       ...p,
@@ -1106,6 +1112,7 @@ const Setting = () => {
                                       completeness: formState?.completeness,
                                       globalProgramArea: formState?.globalProgramArea,
                                       globalProgramAreaKeyWords: formState?.globalProgramAreaKeyWords || [],
+                                      systemAssessments: formState?.systemAssessments || [],
                                       consistencyOvertimes: formState?.consistencyOvertimes
                                   };
                               }
@@ -1130,6 +1137,7 @@ const Setting = () => {
                                   completeness: formState.completeness,
                                   globalProgramArea: formState?.globalProgramArea,
                                   globalProgramAreaKeyWords: formState?.globalProgramAreaKeyWords || [],
+                                  systemAssessments: formState?.systemAssessments || [],
                                   consistencyOvertimes: formState.consistencyOvertimes
                               }
                           ]
@@ -1149,6 +1157,7 @@ const Setting = () => {
                               completeness: formState.completeness,
                               globalProgramArea: formState?.globalProgramArea,
                               globalProgramAreaKeyWords: formState?.globalProgramAreaKeyWords || [],
+                              systemAssessments: formState?.systemAssessments || [],
                               consistencyOvertimes: formState.consistencyOvertimes
                           }
                       ];
@@ -1213,7 +1222,7 @@ const Setting = () => {
                       ];
             }
 
-            const payload = {
+            const payload: any = {
                 id: uuid(),
                 generationType: formState.selectedSupervisionGenerationType,
                 planificationType: formState.selectedPlanificationType,
@@ -1297,10 +1306,10 @@ const Setting = () => {
                 }
             }
 
-            let newList = [];
+            let newList: any[] = [];
 
             if (formState.isFieldEditingMode || existingConfig) {
-                newList = mappingConfigSupervisions.map(m => {
+                newList = mappingConfigSupervisions.map((m: any) => {
                     if (m.id === existingConfig?.id) {
                         return { ...m, ...payload };
                     }
@@ -1400,7 +1409,7 @@ const Setting = () => {
 
                 if (!currentItem && existingConfig) throw new Error(translate('Indicateur_Deja_Configurer'));
 
-                const payload = {
+                const payload: any = {
                     indicator: selectedIndicator,
                     program: selectedProgram && {
                         id: selectedProgram.id,
@@ -1416,10 +1425,10 @@ const Setting = () => {
                     bestPositive: indicatorBestPositive,
                     indicatorType: selectedIndicatorType
                 };
-                let newList = [];
+                let newList: any = [];
 
                 if (currentItem) {
-                    newList = mappingConfigs.map(mapConfig => {
+                    newList = mappingConfigs.map((mapConfig: any) => {
                         if (mapConfig.id === currentItem.id) {
                             return {
                                 ...mapConfig,
@@ -1537,7 +1546,7 @@ const Setting = () => {
             });
 
             if (!existingConfig) {
-                let payload = {
+                let payload: any = {
                     id: uuid(),
                     elementType: selectedAnalyseType
                 };
@@ -1634,6 +1643,7 @@ const Setting = () => {
             selectedSupervisorDataElements: [],
             globalProgramArea: formState?.globalProgramArea,
             globalProgramAreaKeyWords: formState?.globalProgramAreaKeyWords || [],
+            systemAssessments: formState?.systemAssessments || [],
             completeness: {
                 ...formState?.completeness,
                 selectedNbrDocumentsSourceToShow: null,
@@ -1652,14 +1662,14 @@ const Setting = () => {
             selectedIndicatorsPeriodType: null,
             selectedConsistencyOverTimePeriodType: null,
             selectedSupervisorDataElements: [],
-            selectedProgramStageForConfiguration: programStages.find(pstage => pstage.id === value)
+            selectedProgramStageForConfiguration: programStages.find((pstage: any) => pstage.id === value)
         });
     };
 
-    const handleSelectOrganisationUnitGroupProgramStageForRDQA = value => {
+    const handleSelectOrganisationUnitGroupProgramStageForRDQA = (value: any) => {
         setFormStateForRDQA({
             ...formStateForRDQA,
-            selectedOrganisationUnitGroup: organisationUnitGroups.find(orgUnitGroup => orgUnitGroup.id === value)
+            selectedOrganisationUnitGroup: organisationUnitGroups.find((orgUnitGroup: any) => orgUnitGroup.id === value)
         });
     };
 
@@ -1881,6 +1891,7 @@ const Setting = () => {
                     selectedConsistencyOverTimePeriodType: value.selectedConsistencyOverTimePeriodType,
                     globalProgramArea: value?.globalProgramArea,
                     globalProgramAreaKeyWords: value?.globalProgramAreaKeyWords || [],
+                    systemAssessments: value?.systemAssessments || [],
                     completeness: {
                         ...value.completeness,
                         registerKeyWords: value?.completeness?.registerKeyWords || [],
@@ -3136,6 +3147,65 @@ const Setting = () => {
                                                         </td>
                                                     </tr>
                                                 )}
+
+                                            {formState?.selectedConfigurationType !== NORMAL_PROGRAM && (
+                                                <>
+                                                    <tr>
+                                                        <td
+                                                            style={{
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top',
+                                                                width: '50%'
+                                                            }}
+                                                        >
+                                                            {translate('Please_Select_System_Assessment')}
+                                                        </td>
+                                                        <td
+                                                            style={{
+                                                                border: '1px solid #00000070',
+                                                                padding: '2px 5px',
+                                                                verticalAlign: 'top'
+                                                            }}
+                                                        >
+                                                            <Select
+                                                                options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                    progStageDE => ({
+                                                                        label: progStageDE.dataElement?.displayName,
+                                                                        value: progStageDE.dataElement?.id
+                                                                    })
+                                                                )}
+                                                                placeholder={translate(
+                                                                    'Please_Select_System_Assessment'
+                                                                )}
+                                                                style={{ maxWidth: '335px' }}
+                                                                mode="multiple"
+                                                                onChange={(values: any[]) => {
+                                                                    setFormState({
+                                                                        ...formState,
+                                                                        systemAssessments:
+                                                                            values?.map(
+                                                                                (value: string) =>
+                                                                                    formState?.selectedProgramStageForConfiguration?.programStageDataElements?.find(
+                                                                                        (p: any) =>
+                                                                                            p.dataElement?.id === value
+                                                                                    )?.dataElement
+                                                                            ) || []
+                                                                    });
+                                                                }}
+                                                                value={
+                                                                    formState?.systemAssessments?.map(
+                                                                        (system: { id: string }) => system.id
+                                                                    ) || []
+                                                                }
+                                                                optionFilterProp="label"
+                                                                showSearch
+                                                                allowClear
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                </>
+                                            )}
                                         </tbody>
                                     </table>
                                 </div>

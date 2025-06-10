@@ -37,8 +37,7 @@ import { IoCheckmarkDoneCircle } from 'react-icons/io5';
 
 export const Body = () => {
 
-console.log('Env content +++');
-console.log(import.meta);
+
 
     const [renderPage, setRenderPage] = useState(PAGE_DASHBOARD);
     const [isDataStoreInitialized, setDataStoreInitialized] = useState(false);
@@ -737,7 +736,7 @@ console.log(import.meta);
     }, []);
 
     return (
-        <>
+        <>       
             <div className="app">
                 {loadingDataStoreInitialization && (
                     <div
