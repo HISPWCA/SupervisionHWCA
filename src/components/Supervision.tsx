@@ -22,6 +22,7 @@ import { IoListCircleOutline } from 'react-icons/io5';
 import { MdOutlineSettingsBackupRestore } from 'react-icons/md';
 import { FcInfo } from 'react-icons/fc';
 import { Accordion, AccordionItem } from '@szhsin/react-accordion';
+import { RxDoubleArrowDown } from 'react-icons/rx';
 
 import {
     Button,
@@ -4893,7 +4894,7 @@ const Supervision = ({ me }) => {
                     if (field.inputOtherSupervisor?.trim()) {
                         if (
                             !field.inputOtherSupervisor?.includes(
-                                inputOther =>
+                                (inputOther: any) =>
                                     inputOther?.trim()?.toLocaleLowerCase() !==
                                     field.inputOtherSupervisor?.trim()?.toLocaleLowerCase()
                             )
@@ -5224,21 +5225,31 @@ const Supervision = ({ me }) => {
                                         </Col>
                                     )}
                                     <Col md={24}>
-                                        <div style={{ marginTop: '10px' }}>
+                                        <hr style={{ margin: '10px 0px' }} />
+                                        <div>
                                             <Accordion>
                                                 <AccordionItem
                                                     header={
-                                                        <div style={{ backgroundColor: 'green' }}>
-                                                            {translate('System_Assessment')}
+                                                        <div
+                                                            style={{
+                                                                backgroundColor: '#0a9396',
+                                                                padding: '2px 10px',
+                                                                cursor: 'pointer',
+                                                                display: 'flex',
+                                                                color: 'white',
+                                                                gap: '10px',
+                                                                alignItems: 'center',
+                                                                fontWeight: 'bold'
+                                                            }}
+                                                        >
+                                                            <div>{translate('System_Assessment')}</div>
+                                                            <RxDoubleArrowDown
+                                                                style={{ color: 'white', fontSize: '20px' }}
+                                                            />
                                                         </div>
                                                     }
-                                                    style={{
-                                                        background: 'white',
-                                                        padding: '10px',
-                                                        border: '1px solid #ccc'
-                                                    }}
                                                 >
-                                                    <>
+                                                    <div style={{ border: '1px solid #ccc', padding: '10px' }}>
                                                         {inputFields[index]?.systemAssessments?.map(
                                                             (assessment: any, indexAssessment: number) => (
                                                                 <GenerateFields
@@ -5255,7 +5266,7 @@ const Supervision = ({ me }) => {
                                                                 />
                                                             )
                                                         )}
-                                                    </>
+                                                    </div>
                                                 </AccordionItem>
                                             </Accordion>
                                         </div>
