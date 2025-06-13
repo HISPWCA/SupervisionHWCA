@@ -1,4 +1,4 @@
-## Version: 3.0.0
+## Version: 2.5.0
 
 ## Functionalities
 
