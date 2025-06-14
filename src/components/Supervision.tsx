@@ -58,6 +58,7 @@ import {
     QUARTER,
     RANDOM,
     SCHEDULED,
+    TRUE_ONLY,
     TYPE_GENERATION_AS_ENROLMENT,
     TYPE_GENERATION_AS_EVENT,
     TYPE_GENERATION_AS_TEI,
@@ -837,7 +838,7 @@ const Supervision = ({ me }) => {
         try {
             !setState && setLoadingProgramStages(true);
 
-            let route = `${PROGRAMS_STAGE_ROUTE},program,programStageDataElements[dataElement[id,displayName,dataElementGroups, optionSet[id,options[id,code,displayName]] , optionSetValue ]]`;
+            let route = `${PROGRAMS_STAGE_ROUTE},program,programStageDataElements[dataElement[id,displayName,valueType,dataElementGroups, optionSet[id,options[id,code,displayName]] , optionSetValue ]]`;
             if (programID) route = `${route}&filter=program.id:eq:${programID}`;
 
             const response = await axios.get(route);
@@ -1326,7 +1327,8 @@ const Supervision = ({ me }) => {
         setEditionMode(!isEditionMode);
     };
 
-    const handleClickSupervisionItem = sup => {
+    const handleClickSupervisionItem = (sup: any) => {
+        cleanStatesWhenSelectProgram();
         setSelectedProgramStage(null);
         setSelectedDataElement(null);
         setSelectedAgents([]);
@@ -2343,15 +2345,15 @@ const Supervision = ({ me }) => {
                 ...newDataValueListForOvertimes
             ];
 
-            const systemAssessments: any[] =
-                payload.systemAssessments
+            const moduleChoices: any[] =
+                payload.moduleChoices
                     ?.filter((s: any) => s.value)
                     ?.map((s: any) => ({
                         dataElement: s.id,
                         value: s.value
                     })) || [];
 
-            eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValueList, ...systemAssessments];
+            eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValueList, ...moduleChoices];
             eventPayload.dataValues = [...new Set(eventPayload.dataValues.map((d: any) => d.dataElement))].map(d =>
                 eventPayload.dataValues.find((dv: any) => dv.dataElement === d)
             );
@@ -3305,15 +3307,15 @@ const Supervision = ({ me }) => {
                     ...newDataValueListForOvertimes
                 ];
 
-                const systemAssessments: any[] =
-                    payload.systemAssessments
+                const moduleChoices: any[] =
+                    payload.moduleChoices
                         ?.filter((s: any) => s.value)
                         ?.map((s: any) => ({
                             dataElement: s.id,
                             value: s.value
                         })) || [];
 
-                eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValueList, ...systemAssessments];
+                eventPayload.dataValues = [...eventPayload.dataValues, ...newDataValueList, ...moduleChoices];
                 eventPayload.dataValues = [...new Set(eventPayload.dataValues.map((d: any) => d.dataElement))].map(d =>
                     eventPayload.dataValues.find((dv: any) => dv.dataElement === d)
                 );
@@ -3423,6 +3425,37 @@ const Supervision = ({ me }) => {
         } catch (err) {
             throw err;
         }
+    };
+
+    const cleanStatesWhenSelectProgram = () => {
+        setIsNewMappingMode(false);
+        setNonTranslateMappingConfigs([]);
+        setMappingConfigs([]);
+        setTeisList([]);
+        setEmpty(false);
+
+        setSelectedOrganisationUnits([]);
+        setSelectedAgents([]);
+        setSelectedIndicators([]);
+        setSelectedPeriod(null);
+        setSelectedOrganisationUnitGroupSet(null);
+        setSelectedOrganisationUnitGroup(null);
+        setSelectedPeriodType(null);
+        setSelectedDataElement(null);
+
+        setSelectedMetaDatas([]);
+        setInputMeilleur(0);
+        setInputMauvais(0);
+        setInputMeilleurPositif(true);
+        setInputFields([]);
+        setInputDataSourceDisplayName('');
+        setInputDataSourceID(null);
+        setSelectedOrganisationUnitSingle(null);
+        setAnalyticIndicatorResults([]);
+        setRandomResults([]);
+        setAnalyticErrorMessage(null);
+        setSelectedOrganisationUnitGroups([]);
+        setInputNbrOrgUnit(0);
     };
 
     const cleanAllNewSupervisionState = () => {
@@ -3812,8 +3845,10 @@ const Supervision = ({ me }) => {
                     <div style={{ padding: '10px' }}>
                         {selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
                             dataStoreSupervisionConfigs
-                                .filter(sup => sup.planificationType === ORGANISATION_UNIT)
-                                .map((sup, index) => (
+                                .filter(
+                                    (sup: { planificationType: string }) => sup.planificationType === ORGANISATION_UNIT
+                                )
+                                .map((sup: any, index: number) => (
                                     <div
                                         key={index}
                                         className={`supervision-item ${selectedProgram?.id === sup.id ? 'active' : ''}`}
@@ -3825,11 +3860,11 @@ const Supervision = ({ me }) => {
                         {selectedSupervisionType === TYPE_SUPERVISION_AGENT &&
                             dataStoreSupervisionConfigs
                                 .filter(
-                                    sup =>
+                                    (sup: any) =>
                                         sup.generationType === TYPE_GENERATION_AS_EVENT &&
                                         sup.planificationType === AGENT
                                 )
-                                .map((sup, index) => (
+                                .map((sup: any, index: number) => (
                                     <div
                                         key={index}
                                         className={`supervision-item ${selectedProgram?.id === sup.id ? 'active' : ''}`}
@@ -3839,14 +3874,15 @@ const Supervision = ({ me }) => {
                                     </div>
                                 ))}
                         {selectedSupervisionType === TYPE_SUPERVISION_ORGANISATION_UNIT &&
-                            dataStoreSupervisionConfigs.filter(sup => sup.planificationType === ORGANISATION_UNIT)
-                                .length === 0 && (
+                            dataStoreSupervisionConfigs.filter(
+                                (sup: any) => sup.planificationType === ORGANISATION_UNIT
+                            ).length === 0 && (
                                 <div style={{ fontWeight: 'bold' }}> {translate('Aucun_Programme_Supervision')} </div>
                             )}
 
                         {selectedSupervisionType === TYPE_SUPERVISION_AGENT &&
                             dataStoreSupervisionConfigs.filter(
-                                sup =>
+                                (sup: any) =>
                                     sup.generationType === TYPE_GENERATION_AS_EVENT && sup.planificationType === AGENT
                             ).length === 0 && (
                                 <div style={{ fontWeight: 'bold' }}> {translate('Aucun_Programme_Supervision')}</div>
@@ -4842,12 +4878,12 @@ const Supervision = ({ me }) => {
         );
     };
 
-    const handleInputAddSystemAssessments = ({
-        codeDataElement,
+    const handleInputAddModuleChoices = ({
+        value,
         indexAssessment,
         indexField
     }: {
-        codeDataElement: string;
+        value: any;
         indexAssessment: number;
         indexField: number;
     }) => {
@@ -4856,11 +4892,19 @@ const Supervision = ({ me }) => {
                 if (indexField === index) {
                     return {
                         ...field,
-                        systemAssessments: field.systemAssessments?.map((system: any, indexSys: number) => {
+                        moduleChoices: field.moduleChoices?.map((system: any, indexSys: number) => {
                             if (indexSys === indexAssessment) {
+                                let deValue: any = null;
+                                if (system.optionSetValue) {
+                                    deValue = value;
+                                }
+
+                                if (!system.optionSetValue && system.valueType === TRUE_ONLY) {
+                                    deValue = value ? 'true' : null;
+                                }
                                 return {
                                     ...system,
-                                    value: codeDataElement
+                                    value: deValue
                                 };
                             }
 
@@ -4873,7 +4917,7 @@ const Supervision = ({ me }) => {
         );
     };
 
-    const handleInputOtherSupervisor = (event, index) => {
+    const handleInputOtherSupervisor = (event: any, index: any) => {
         setInputFields(
             inputFields.map((field, fieldIndex) => {
                 if (index === fieldIndex) {
@@ -5224,53 +5268,55 @@ const Supervision = ({ me }) => {
                                             </div>
                                         </Col>
                                     )}
-                                    <Col md={24}>
-                                        <hr style={{ margin: '10px 0px' }} />
-                                        <div>
-                                            <Accordion>
-                                                <AccordionItem
-                                                    header={
-                                                        <div
-                                                            style={{
-                                                                backgroundColor: '#0a9396',
-                                                                padding: '2px 10px',
-                                                                cursor: 'pointer',
-                                                                display: 'flex',
-                                                                color: 'white',
-                                                                gap: '10px',
-                                                                alignItems: 'center',
-                                                                fontWeight: 'bold'
-                                                            }}
-                                                        >
-                                                            <div>{translate('System_Assessment')}</div>
-                                                            <RxDoubleArrowDown
-                                                                style={{ color: 'white', fontSize: '20px' }}
-                                                            />
-                                                        </div>
-                                                    }
-                                                >
-                                                    <div style={{ border: '1px solid #ccc', padding: '10px' }}>
-                                                        {inputFields[index]?.systemAssessments?.map(
-                                                            (assessment: any, indexAssessment: number) => (
-                                                                <GenerateFields
-                                                                    dataElement={assessment}
-                                                                    onChange={(value: any) =>
-                                                                        handleInputAddSystemAssessments({
-                                                                            codeDataElement: value,
-                                                                            indexAssessment,
-                                                                            indexField: index
-                                                                        })
-                                                                    }
-                                                                    value={assessment.value}
-                                                                    key={index}
+                                    {inputFields[index]?.moduleChoices?.length > 0 && (
+                                        <Col md={24}>
+                                            <hr style={{ margin: '10px 0px' }} />
+                                            <div>
+                                                <Accordion>
+                                                    <AccordionItem
+                                                        header={
+                                                            <div
+                                                                style={{
+                                                                    backgroundColor: '#0a9396',
+                                                                    padding: '2px 10px',
+                                                                    cursor: 'pointer',
+                                                                    display: 'flex',
+                                                                    color: 'white',
+                                                                    gap: '10px',
+                                                                    alignItems: 'center',
+                                                                    fontWeight: 'bold'
+                                                                }}
+                                                            >
+                                                                <div>{translate('Module_Choices')}</div>
+                                                                <RxDoubleArrowDown
+                                                                    style={{ color: 'white', fontSize: '20px' }}
                                                                 />
-                                                            )
-                                                        )}
-                                                    </div>
-                                                </AccordionItem>
-                                            </Accordion>
-                                        </div>
-                                    </Col>
+                                                            </div>
+                                                        }
+                                                    >
+                                                        <div style={{ border: '1px solid #ccc', padding: '10px' }}>
+                                                            {inputFields[index]?.moduleChoices?.map(
+                                                                (assessment: any, indexAssessment: number) => (
+                                                                    <GenerateFields
+                                                                        dataElement={assessment}
+                                                                        onChange={(value: any) =>
+                                                                            handleInputAddModuleChoices({
+                                                                                value,
+                                                                                indexAssessment,
+                                                                                indexField: index
+                                                                            })
+                                                                        }
+                                                                        value={assessment.value}
+                                                                        key={index}
+                                                                    />
+                                                                )
+                                                            )}
+                                                        </div>
+                                                    </AccordionItem>
+                                                </Accordion>
+                                            </div>
+                                        </Col>
+                                    )}
                                 </Row>
                             </div>
                         </Card>
@@ -6866,7 +6912,7 @@ const Supervision = ({ me }) => {
     const initInputOrganisation = (ouList: any[]) => {
         const newList: any[] = [];
         const dataElementsListFromProgramStage =
-            programStages[0]?.programStageDataElements?.map(de => de.dataElement) || [];
+            programStages[0]?.programStageDataElements?.map((de: any) => de.dataElement) || [];
 
         for (let org of ouList) {
             if (inputFields?.map(inp => inp.organisationUnit?.id)?.includes(org.id)) {
@@ -6888,8 +6934,8 @@ const Supervision = ({ me }) => {
                     supervisors: [],
                     otherSupervisors: [],
                     inputOtherSupervisor: '',
-                    systemAssessments:
-                        selectedProgram?.programStageConfigurations[0]?.systemAssessments
+                    moduleChoices:
+                        selectedProgram?.programStageConfigurations[0]?.moduleChoices
                             ?.filter((s: { id: string }) =>
                                 dataElementsListFromProgramStage?.map((de: { id: string }) => de.id)?.includes(s.id)
                             )

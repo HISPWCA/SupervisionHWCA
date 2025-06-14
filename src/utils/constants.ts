@@ -111,3 +111,6 @@ export const PERIOD_TYPES = [
             value: 'Yearly'
       }
 ];
+
+
+export const TRUE_ONLY = 'TRUE_ONLY';

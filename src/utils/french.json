@@ -411,6 +411,7 @@
     "CurrentPeriodKeyWords": "Mots clets de la périod actuelle",
     "CurrentPeriodOnYearAgoKeyWords": "Mots clets de la période actuelle un an auparavant",
     "LastPeriodKeyWords": "Mots clets de la dernière période",
-    "Please_Select_System_Assessment": "Veuillez sélectionner l'évaluation du système",
-    "System_Assessment": "Évaluations du système"
+    "Please_Select_Module_Choices": "Veuillez sélectionner les modules",
+    "Module_Choices": "Choix des modules",
+    "Element_Type_Not_Supported": "Ce type d'élement n'est pas supporté. Veuillez choisir un autre type d'élement"
 }

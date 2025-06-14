@@ -164,7 +164,7 @@ const Setting = () => {
         selectedPeriodVerification: null,
         selectedIndicatorsPeriodType: null,
         selectedConsistencyOverTimePeriodType: null,
-        systemAssessments: [],
+        moduleChoices: [],
         indicators: [],
         recoupements: [],
         completeness: {
@@ -335,7 +335,7 @@ const Setting = () => {
             recoupements: newRecoupements,
             consistencyOvertimes: newConsistencyOverTimes,
             globalProgramArea: fieldList?.globalProgramArea || null,
-            systemAssessments: fieldList?.systemAssessments || [],
+            moduleChoices: fieldList?.moduleChoices || [],
             globalProgramAreaKeyWords: fieldList?.globalProgramAreaKeyWords || [],
             completeness: {
                 ...formState.completeness,
@@ -371,7 +371,7 @@ const Setting = () => {
             globalProgramAreaKeyWords: [],
             indicators: [],
             recoupements: [],
-            systemAssessments: [],
+            moduleChoices: [],
             completeness: {
                 registerKeyWords: [],
                 selectedNbrDataElementsToShow: null,
@@ -811,7 +811,7 @@ const Setting = () => {
                     globalProgramAreaKeyWords: [],
                     indicators: [],
                     recoupements: [],
-                    systemAssessments: [],
+                    moduleChoices: [],
                     completeness: {
                         registerKeyWords: [],
                         selectedNbrDataElementsToShow: null,
@@ -970,7 +970,7 @@ const Setting = () => {
             globalProgramAreaKeyWords: [],
             indicators: [],
             recoupements: [],
-            systemAssessments: [],
+            moduleChoices: [],
             completeness: {
                 registerKeyWords: [],
                 selectedNbrDataElementsToShow: null,
@@ -1079,7 +1079,7 @@ const Setting = () => {
                 !formState?.isFieldEditingMode &&
                 existingConfig &&
                 existingConfig.programStageConfigurations
-                    ?.map(p => p.programStage?.id)
+                    ?.map((p: any) => p.programStage?.id)
                     ?.includes(formStateForRDQA?.selectedProgramStageForConfiguration?.id)
             ) {
                 throw new Error(translate('ProgramStage_Already_Configured'));
@@ -1112,7 +1112,7 @@ const Setting = () => {
                                       completeness: formState?.completeness,
                                       globalProgramArea: formState?.globalProgramArea,
                                       globalProgramAreaKeyWords: formState?.globalProgramAreaKeyWords || [],
-                                      systemAssessments: formState?.systemAssessments || [],
+                                      moduleChoices: formState?.moduleChoices || [],
                                       consistencyOvertimes: formState?.consistencyOvertimes
                                   };
                               }
@@ -1137,7 +1137,7 @@ const Setting = () => {
                                   completeness: formState.completeness,
                                   globalProgramArea: formState?.globalProgramArea,
                                   globalProgramAreaKeyWords: formState?.globalProgramAreaKeyWords || [],
-                                  systemAssessments: formState?.systemAssessments || [],
+                                  moduleChoices: formState?.moduleChoices || [],
                                   consistencyOvertimes: formState.consistencyOvertimes
                               }
                           ]
@@ -1157,7 +1157,7 @@ const Setting = () => {
                               completeness: formState.completeness,
                               globalProgramArea: formState?.globalProgramArea,
                               globalProgramAreaKeyWords: formState?.globalProgramAreaKeyWords || [],
-                              systemAssessments: formState?.systemAssessments || [],
+                              moduleChoices: formState?.moduleChoices || [],
                               consistencyOvertimes: formState.consistencyOvertimes
                           }
                       ];
@@ -1328,15 +1328,24 @@ const Setting = () => {
                 null
             );
 
-            if (
-                formState?.selectedConfigurationType === DQR ||
-                formState?.selectedConfigurationType === NORMAL_PROGRAM
-            ) {
+            if (formState?.selectedConfigurationType === DQR) {
                 const newPeriodConfigPayload = {
                     ...dataStorePeriodConfigs,
                     month1KeyWords: periodFormState.month1KeyWords,
                     month2KeyWords: periodFormState.month2KeyWords,
-                    month3KeyWords: periodFormState.month3KeyWords
+                    month3KeyWords: periodFormState.month3KeyWords,
+                    month4KeyWords: periodFormState.month4KeyWords,
+                    month5KeyWords: periodFormState.month5KeyWords,
+                    month6KeyWords: periodFormState.month6KeyWords,
+                    month7KeyWords: periodFormState.month7KeyWords,
+                    month8KeyWords: periodFormState.month8KeyWords,
+                    month9KeyWords: periodFormState.month9KeyWords,
+                    month10KeyWords: periodFormState.month10KeyWords,
+                    month11KeyWords: periodFormState.month11KeyWords,
+                    month12KeyWords: periodFormState.month12KeyWords,
+                    month13KeyWords: periodFormState.month13KeyWords,
+                    month14KeyWords: periodFormState.month14KeyWords,
+                    month15KeyWords: periodFormState.month15KeyWords
                 };
 
                 await saveDataToDataStore(
@@ -1643,7 +1652,7 @@ const Setting = () => {
             selectedSupervisorDataElements: [],
             globalProgramArea: formState?.globalProgramArea,
             globalProgramAreaKeyWords: formState?.globalProgramAreaKeyWords || [],
-            systemAssessments: formState?.systemAssessments || [],
+            moduleChoices: formState?.moduleChoices || [],
             completeness: {
                 ...formState?.completeness,
                 selectedNbrDocumentsSourceToShow: null,
@@ -1891,7 +1900,7 @@ const Setting = () => {
                     selectedConsistencyOverTimePeriodType: value.selectedConsistencyOverTimePeriodType,
                     globalProgramArea: value?.globalProgramArea,
                     globalProgramAreaKeyWords: value?.globalProgramAreaKeyWords || [],
-                    systemAssessments: value?.systemAssessments || [],
+                    moduleChoices: value?.moduleChoices || [],
                     completeness: {
                         ...value.completeness,
                         registerKeyWords: value?.completeness?.registerKeyWords || [],
@@ -2051,7 +2060,7 @@ const Setting = () => {
                                                 >
                                                     <Select
                                                         options={formState?.selectedTEIProgram?.programTrackedEntityAttributes?.map(
-                                                            program => ({
+                                                            (program: any) => ({
                                                                 label: program.trackedEntityAttribute?.displayName,
                                                                 value: program.trackedEntityAttribute?.id
                                                             })
@@ -2449,7 +2458,6 @@ const Setting = () => {
                                                         }}
                                                     >
                                                         <TagsInput
-                                                            style={{ width: '100%' }}
                                                             value={formState?.completeness?.registerKeyWords || []}
                                                             onChange={word =>
                                                                 setFormState({
@@ -2532,7 +2540,6 @@ const Setting = () => {
                                                         }}
                                                     >
                                                         <TagsInput
-                                                            style={{ width: '100%' }}
                                                             value={formState?.globalProgramAreaKeyWords || []}
                                                             onChange={word =>
                                                                 setFormState({
@@ -2615,9 +2622,6 @@ const Setting = () => {
                                                             }}
                                                         >
                                                             <TagsInput
-                                                                style={{
-                                                                    width: '100%'
-                                                                }}
                                                                 value={periodFormState?.month1KeyWords || []}
                                                                 onChange={word => {
                                                                     setPeriodFormState({
@@ -2652,9 +2656,6 @@ const Setting = () => {
                                                             }}
                                                         >
                                                             <TagsInput
-                                                                style={{
-                                                                    width: '100%'
-                                                                }}
                                                                 value={periodFormState?.month2KeyWords || []}
                                                                 onChange={word => {
                                                                     setPeriodFormState({
@@ -2689,9 +2690,6 @@ const Setting = () => {
                                                             }}
                                                         >
                                                             <TagsInput
-                                                                style={{
-                                                                    width: '100%'
-                                                                }}
                                                                 value={periodFormState?.month3KeyWords || []}
                                                                 onChange={word => {
                                                                     setPeriodFormState({
@@ -2726,9 +2724,6 @@ const Setting = () => {
                                                             }}
                                                         >
                                                             <TagsInput
-                                                                style={{
-                                                                    width: '100%'
-                                                                }}
                                                                 value={periodFormState?.month4KeyWords || []}
                                                                 onChange={word => {
                                                                     setPeriodFormState({
@@ -2763,9 +2758,6 @@ const Setting = () => {
                                                             }}
                                                         >
                                                             <TagsInput
-                                                                style={{
-                                                                    width: '100%'
-                                                                }}
                                                                 value={periodFormState?.month5KeyWords || []}
                                                                 onChange={word => {
                                                                     setPeriodFormState({
@@ -2800,9 +2792,6 @@ const Setting = () => {
                                                             }}
                                                         >
                                                             <TagsInput
-                                                                style={{
-                                                                    width: '100%'
-                                                                }}
                                                                 value={periodFormState?.month6KeyWords || []}
                                                                 onChange={word => {
                                                                     setPeriodFormState({
@@ -2837,9 +2826,6 @@ const Setting = () => {
                                                             }}
                                                         >
                                                             <TagsInput
-                                                                style={{
-                                                                    width: '100%'
-                                                                }}
                                                                 value={periodFormState?.month7KeyWords || []}
                                                                 onChange={word => {
                                                                     setPeriodFormState({
@@ -2874,9 +2860,6 @@ const Setting = () => {
                                                             }}
                                                         >
                                                             <TagsInput
-                                                                style={{
-                                                                    width: '100%'
-                                                                }}
                                                                 value={periodFormState?.month8KeyWords || []}
                                                                 onChange={word => {
                                                                     setPeriodFormState({
@@ -2911,9 +2894,6 @@ const Setting = () => {
                                                             }}
                                                         >
                                                             <TagsInput
-                                                                style={{
-                                                                    width: '100%'
-                                                                }}
                                                                 value={periodFormState?.month9KeyWords || []}
                                                                 onChange={word => {
                                                                     setPeriodFormState({
@@ -2948,9 +2928,6 @@ const Setting = () => {
                                                             }}
                                                         >
                                                             <TagsInput
-                                                                style={{
-                                                                    width: '100%'
-                                                                }}
                                                                 value={periodFormState?.month10KeyWords || []}
                                                                 onChange={word => {
                                                                     setPeriodFormState({
@@ -2985,9 +2962,6 @@ const Setting = () => {
                                                             }}
                                                         >
                                                             <TagsInput
-                                                                style={{
-                                                                    width: '100%'
-                                                                }}
                                                                 value={periodFormState?.month11KeyWords || []}
                                                                 onChange={word => {
                                                                     setPeriodFormState({
@@ -3022,9 +2996,6 @@ const Setting = () => {
                                                             }}
                                                         >
                                                             <TagsInput
-                                                                style={{
-                                                                    width: '100%'
-                                                                }}
                                                                 value={periodFormState?.month12KeyWords || []}
                                                                 onChange={word => {
                                                                     setPeriodFormState({
@@ -3059,9 +3030,6 @@ const Setting = () => {
                                                             }}
                                                         >
                                                             <TagsInput
-                                                                style={{
-                                                                    width: '100%'
-                                                                }}
                                                                 value={periodFormState?.month13KeyWords || []}
                                                                 onChange={word => {
                                                                     setPeriodFormState({
@@ -3096,9 +3064,6 @@ const Setting = () => {
                                                             }}
                                                         >
                                                             <TagsInput
-                                                                style={{
-                                                                    width: '100%'
-                                                                }}
                                                                 value={periodFormState?.month14KeyWords || []}
                                                                 onChange={word => {
                                                                     setPeriodFormState({
@@ -3133,9 +3098,6 @@ const Setting = () => {
                                                             }}
                                                         >
                                                             <TagsInput
-                                                                style={{
-                                                                    width: '100%'
-                                                                }}
                                                                 value={periodFormState?.month15KeyWords || []}
                                                                 onChange={word => {
                                                                     setPeriodFormState({
@@ -3148,64 +3110,60 @@ const Setting = () => {
                                                     </tr>
                                                 )}
 
-                                            {formState?.selectedConfigurationType !== NORMAL_PROGRAM && (
-                                                <>
-                                                    <tr>
-                                                        <td
-                                                            style={{
-                                                                border: '1px solid #00000070',
-                                                                padding: '2px 5px',
-                                                                verticalAlign: 'top',
-                                                                width: '50%'
+                                            <>
+                                                <tr>
+                                                    <td
+                                                        style={{
+                                                            border: '1px solid #00000070',
+                                                            padding: '2px 5px',
+                                                            verticalAlign: 'top',
+                                                            width: '50%'
+                                                        }}
+                                                    >
+                                                        {translate('Please_Select_Module_Choices')}
+                                                    </td>
+                                                    <td
+                                                        style={{
+                                                            border: '1px solid #00000070',
+                                                            padding: '2px 5px',
+                                                            verticalAlign: 'top'
+                                                        }}
+                                                    >
+                                                        <Select
+                                                            options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
+                                                                progStageDE => ({
+                                                                    label: progStageDE.dataElement?.displayName,
+                                                                    value: progStageDE.dataElement?.id
+                                                                })
+                                                            )}
+                                                            placeholder={translate('Please_Select_Module_Choices')}
+                                                            style={{ width: '335px' }}
+                                                            mode="multiple"
+                                                            onChange={(values: any[]) => {
+                                                                setFormState({
+                                                                    ...formState,
+                                                                    moduleChoices:
+                                                                        values?.map(
+                                                                            (value: string) =>
+                                                                                formState?.selectedProgramStageForConfiguration?.programStageDataElements?.find(
+                                                                                    (p: any) =>
+                                                                                        p.dataElement?.id === value
+                                                                                )?.dataElement
+                                                                        ) || []
+                                                                });
                                                             }}
-                                                        >
-                                                            {translate('Please_Select_System_Assessment')}
-                                                        </td>
-                                                        <td
-                                                            style={{
-                                                                border: '1px solid #00000070',
-                                                                padding: '2px 5px',
-                                                                verticalAlign: 'top'
-                                                            }}
-                                                        >
-                                                            <Select
-                                                                options={formState?.selectedProgramStageForConfiguration?.programStageDataElements?.map(
-                                                                    progStageDE => ({
-                                                                        label: progStageDE.dataElement?.displayName,
-                                                                        value: progStageDE.dataElement?.id
-                                                                    })
-                                                                )}
-                                                                placeholder={translate(
-                                                                    'Please_Select_System_Assessment'
-                                                                )}
-                                                                style={{ maxWidth: '335px' }}
-                                                                mode="multiple"
-                                                                onChange={(values: any[]) => {
-                                                                    setFormState({
-                                                                        ...formState,
-                                                                        systemAssessments:
-                                                                            values?.map(
-                                                                                (value: string) =>
-                                                                                    formState?.selectedProgramStageForConfiguration?.programStageDataElements?.find(
-                                                                                        (p: any) =>
-                                                                                            p.dataElement?.id === value
-                                                                                    )?.dataElement
-                                                                            ) || []
-                                                                    });
-                                                                }}
-                                                                value={
-                                                                    formState?.systemAssessments?.map(
-                                                                        (system: { id: string }) => system.id
-                                                                    ) || []
-                                                                }
-                                                                optionFilterProp="label"
-                                                                showSearch
-                                                                allowClear
-                                                            />
-                                                        </td>
-                                                    </tr>
-                                                </>
-                                            )}
+                                                            value={
+                                                                formState?.moduleChoices?.map(
+                                                                    (system: { id: string }) => system.id
+                                                                ) || []
+                                                            }
+                                                            optionFilterProp="label"
+                                                            showSearch
+                                                            allowClear
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            </>
                                         </tbody>
                                     </table>
                                 </div>
@@ -3217,7 +3175,7 @@ const Setting = () => {
         </div>
     );
 
-    const handleDeleteProgramStageConfiguration = async value => {
+    const handleDeleteProgramStageConfiguration = async (value: any) => {
         try {
             const filteredProgramStages = programStageConfigurations.filter(
                 p => p.programStage?.id !== value.programStage?.id
@@ -3918,15 +3876,15 @@ const Setting = () => {
     );
 
     const handleAddVisualizationToFavorisList = () => {
-        const newFavList = [];
+        const newFavList: any[] = [];
         for (let m of selectedMaps) {
-            if (!newFavList?.map(f => f.id).includes(m.id)) {
+            if (!newFavList?.map((f: { id: string }) => f.id).includes(m.id)) {
                 newFavList.push(m);
             }
         }
 
         for (let v of selectedVisualizations) {
-            if (!newFavList?.map(f => f.id).includes(v.id)) {
+            if (!newFavList?.map((f: { id: string }) => f.id).includes(v.id)) {
                 newFavList.push(v);
             }
         }

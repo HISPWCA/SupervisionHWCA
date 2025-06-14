@@ -408,6 +408,7 @@
     "CurrentPeriodKeyWords": "Current period keywords",
     "CurrentPeriodOnYearAgoKeyWords": "Current period One year ago keywords",
     "LastPeriodKeyWords": "Last period Keywords",
-    "Please_Select_System_Assessment": "Please select the system assessment",
-    "System_Assessment": "System Assessments"
+    "Please_Select_Module_Choices": "Please select the system assessment",
+    "Module_Choices": "Modules choice",
+    "Element_Type_Not_Supported": "This element type is not supported, please select another one"
 }
